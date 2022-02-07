@@ -20,6 +20,7 @@ additionally developed with Java, so it works with Windows and Linux.
 
 ## Currently used libraries
 
+* [Rem's Engine](https://github.com/AntonioNoack/RemsStudio) (UI, Engine, GFX, Audio, Video, Meshes, ...)
 * [LWJGL](https://www.lwjgl.org/) (Graphics and Audio; OpenGL + GLFW + OpenAL + stb + jemalloc)
 * [Assimp](https://github.com/assimp/assimp) (loading 3d meshes, from LWJGL)
 * [JOML](https://github.com/JOML-CI/JOML) (Matrix calculations and transforms for rendering)
@@ -56,7 +57,8 @@ The main class for starting the video editor is me.anno.remsstudio.Runner.
 
 ## Rem's Engine
 
-**[See my progress on my personal game engine](RemsEngine.md)**
+This project was developed together
+[with my game engine](https://github.com/AntonioNoack/RemsEngine).
 
 
 <!--
