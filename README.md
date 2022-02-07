@@ -21,6 +21,9 @@ additionally developed with Java, so it works with Windows and Linux.
 ## Currently used libraries
 
 * [Rem's Engine](https://github.com/AntonioNoack/RemsStudio) (UI, Engine, GFX, Audio, Video, Meshes, ...)
+
+All the following libraries currently are part of Rem's Engine, and therefore are used indirectly:
+
 * [LWJGL](https://www.lwjgl.org/) (Graphics and Audio; OpenGL + GLFW + OpenAL + stb + jemalloc)
 * [Assimp](https://github.com/assimp/assimp) (loading 3d meshes, from LWJGL)
 * [JOML](https://github.com/JOML-CI/JOML) (Matrix calculations and transforms for rendering)
@@ -39,6 +42,8 @@ additionally developed with Java, so it works with Windows and Linux.
 * [jUnRAR](https://github.com/edmund-wagner/junrar)
   , [Apache VFS](https://search.maven.org/artifact/org.apache.commons/commons-vfs2/2.8.0/jar) (Reading RAR files)
 * [Image4j](https://github.com/imcdonagh/image4j) (Reading ICO images)
+* [Bullet](http://jbullet.advel.cz/) (3d Physics, adjusted to be FP64 instead of FP32)
+* [Box2d](https://github.com/jbox2d/jbox2d) (2d Physics, still FP32)
 
 <!-- * [jGLTF](https://github.com/AntonioNoack/jGLTF) (jGLTF for glTF files, modified), included, but only used for their PBR shader -->
 <!-- * [Caliko](https://github.com/FedUni/caliko) (FABRIK IK), not yet actively used -->
@@ -50,7 +55,7 @@ additionally developed with Java, so it works with Windows and Linux.
 ## Build
 
 To build Rem's Studio, I am using Intellij Idea (the community edition is free). It should work in other IDEs as well,
-you just need to add all libraries. In Intellij Idea set the memory of the compiler (Settings/Build/Compiler) to more
+you just need to add Rem's Engine as a '.jar' library. In Intellij Idea set the memory of the compiler (Settings/Build/Compiler) to more
 than 700 MB, as it becomes awfully slow with that amount, or even crashes.
 
 The main class for starting the video editor is me.anno.remsstudio.Runner.
