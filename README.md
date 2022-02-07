@@ -42,6 +42,8 @@ All the following libraries currently are part of Rem's Engine, and therefore ar
 * [jUnRAR](https://github.com/edmund-wagner/junrar)
   , [Apache VFS](https://search.maven.org/artifact/org.apache.commons/commons-vfs2/2.8.0/jar) (Reading RAR files)
 * [Image4j](https://github.com/imcdonagh/image4j) (Reading ICO images)
+* [Bullet](http://jbullet.advel.cz/) (3d Physics, adjusted to be FP64 instead of FP32)
+* [Box2d](https://github.com/jbox2d/jbox2d) (2d Physics, still FP32)
 
 <!-- * [jGLTF](https://github.com/AntonioNoack/jGLTF) (jGLTF for glTF files, modified), included, but only used for their PBR shader -->
 <!-- * [Caliko](https://github.com/FedUni/caliko) (FABRIK IK), not yet actively used -->
