@@ -21,6 +21,9 @@ additionally developed with Java, so it works with Windows and Linux.
 ## Currently used libraries
 
 * [Rem's Engine](https://github.com/AntonioNoack/RemsStudio) (UI, Engine, GFX, Audio, Video, Meshes, ...)
+
+All the following libraries currently are part of Rem's Engine, and therefore are used indirectly:
+
 * [LWJGL](https://www.lwjgl.org/) (Graphics and Audio; OpenGL + GLFW + OpenAL + stb + jemalloc)
 * [Assimp](https://github.com/assimp/assimp) (loading 3d meshes, from LWJGL)
 * [JOML](https://github.com/JOML-CI/JOML) (Matrix calculations and transforms for rendering)
@@ -50,7 +53,7 @@ additionally developed with Java, so it works with Windows and Linux.
 ## Build
 
 To build Rem's Studio, I am using Intellij Idea (the community edition is free). It should work in other IDEs as well,
-you just need to add all libraries. In Intellij Idea set the memory of the compiler (Settings/Build/Compiler) to more
+you just need to add Rem's Engine as a '.jar' library. In Intellij Idea set the memory of the compiler (Settings/Build/Compiler) to more
 than 700 MB, as it becomes awfully slow with that amount, or even crashes.
 
 The main class for starting the video editor is me.anno.remsstudio.Runner.
