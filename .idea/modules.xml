@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/VideoStudio.iml" filepath="$PROJECT_DIR$/VideoStudio.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RemsStudio.iml" filepath="$PROJECT_DIR$/RemsStudio.iml" />
     </modules>
   </component>
 </project>
