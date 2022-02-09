@@ -166,8 +166,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
                     val weight = castToFloat(arr[1]) ?: 1f
                     if (obj is CustomList) {
                         for (i in 2 until arr.size) {
-                            val child = load(arr[i] as? JsonArray) ?: continue
-                            obj.addChild(child)
+                            obj.add(load(arr[i] as? JsonArray) ?: continue)
                         }
                         obj.setWeight(weight)
                     } else CustomContainer(obj, library, style).setWeight(weight)
@@ -194,8 +193,8 @@ class Project(var name: String, val file: FileReference) : Saveable() {
                         writer.open(true)
                         writer.write(if (c.isY) "CustomListY" else "CustomListX")
                         writer.write((w * 1000f).roundToInt())
-                        val weightSum = SumOf.sumOf(c.customChildren) { it.weight }
-                        for (chi in c.customChildren) {
+                        val weightSum = SumOf.sumOf(c.children) { it.weight }
+                        for (chi in c.children) {
                             write(chi, chi.weight / weightSum)
                         }
                         writer.close(true)

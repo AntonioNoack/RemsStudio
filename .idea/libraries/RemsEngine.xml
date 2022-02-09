@@ -4,6 +4,9 @@
       <root url="jar://$PROJECT_DIR$/../VideoStudio/out/artifacts/Universal/VideoStudio.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../VideoStudio/src" />
+      <root url="file://$PROJECT_DIR$/../VideoStudio/src" />
+    </SOURCES>
   </library>
 </component>

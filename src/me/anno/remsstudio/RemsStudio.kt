@@ -38,8 +38,6 @@ import me.anno.ui.style.Style
 import me.anno.utils.OS
 import java.io.File
 
-// todo bug: runtime stats are missing :/
-
 // todo bug: signed distance field texts are missing / not rendering
 
 // todo isolate and remove certain frequencies from audio
@@ -170,6 +168,24 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10105) {
     override fun createUI() {
         Dict.loadDefault()
         welcomeUI = object : WelcomeUI() {
+
+            override fun createBackground(style: Style): Panel {
+                val background = ScenePreview(style)
+                val grayPlane = PanelListX(style).apply { backgroundColor = 0x55777777 }
+                val panel = PanelStack(style)
+                panel.add(background)
+                panel.add(grayPlane)
+                root.children.clear()
+                Text("Rem's Studio", root).apply {
+                    blockAlignmentX.set(0f)
+                    blockAlignmentY.set(0f)
+                    textAlignment.set(0f)
+                    relativeCharSpacing = 0.12f
+                    invalidate()
+                }
+                return panel
+            }
+
             override fun loadProject(name: String, folder: FileReference): Pair<String, FileReference> {
                 val project = RemsStudio.loadProject(name, folder)
                 return Pair(project.name, project.file)
@@ -179,22 +195,16 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10105) {
                 RemsStudioUILayouts.createEditorUI(welcomeUI)
             }
         }
-        welcomeUI.createWelcomeUI(this, RemsStudio::createBackground)
+        welcomeUI.create(this)
         StudioActions.register()
         ActionManager.init()
-    }
-
-    fun loadProject(name: String, folder: File) {
-        loadProject(name, getReference(folder))
     }
 
     fun loadProject(name: String, folder: FileReference): Project {
         val project = Project(name.trim(), folder)
         RemsStudio.project = project
         project.open()
-        GFX.addGPUTask(1) {
-            GFX.setTitle("Rem's Studio: ${project.name}")
-        }
+        GFX.setTitle("Rem's Studio: ${project.name}")
         return project
     }
 
@@ -216,12 +226,7 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10105) {
 
     override fun importFile(file: FileReference) {
         addEvent {
-            StudioFileImporter.addChildFromFile(
-                root,
-                file,
-                FileContentImporter.SoftLinkMode.ASK,
-                true
-            ) {}
+            StudioFileImporter.addChildFromFile(root, file, FileContentImporter.SoftLinkMode.ASK, true) {}
         }
     }
 
@@ -306,25 +311,6 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10105) {
         }
         run()
         history.put(title, code)
-    }
-
-    private fun createBackground(style: Style): Panel {
-        val background = ScenePreview(style)
-        val grayPlane = PanelListX(style).apply { backgroundColor = 0x55777777 }
-        val panel = PanelStack(style)
-            .apply {
-                add(background)
-                add(grayPlane)
-            }
-        root.children.clear()
-        Text("Rem's Studio", root).apply {
-            blockAlignmentX.set(0f)
-            blockAlignmentY.set(0f)
-            textAlignment.set(0f)
-            relativeCharSpacing = 0.12f
-            invalidate()
-        }
-        return panel
     }
 
     fun updateAudio() {
