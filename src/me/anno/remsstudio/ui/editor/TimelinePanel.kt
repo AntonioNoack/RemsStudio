@@ -323,7 +323,6 @@ open class TimelinePanel(style: Style) : Panel(style) {
     }
 
     override fun onMouseMoved(x: Float, y: Float, dx: Float, dy: Float) {
-        GFX.editorHoverTime = getTimeAt(x)
         if (0 in Input.mouseKeysDown) {
             if ((Input.isShiftDown || Input.isControlDown) && isPaused) {
                 // scrubbing

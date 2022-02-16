@@ -127,8 +127,9 @@ class StudioTreeView(style: Style) :
         dst.w = 0.5f + 0.5f * clamp(dst.w, 0f, 1f)
         var textColor = dst.toARGB()
         val sample = sample
-        if (isHovered) textColor = sample.hoverColor
-        if (isInFocus) textColor = sample.accentColor
+        // todo redefine these colors... I've removed them accidentally in a refactoring
+        // if (isHovered) textColor = sample.hoverColor
+        // if (isInFocus) textColor = sample.accentColor
         return textColor
     }
 
@@ -155,7 +156,7 @@ class StudioTreeView(style: Style) :
         return true
     }
 
-    override fun onDeleteKey(x: Float, y: Float) {
+    /*override fun onDeleteKey(x: Float, y: Float) {
         val panel = list.children.firstOrNull { it.contains(x, y) }
         if (panel is TreeViewPanel<*>) {
             val element = panel.getElement() as Transform
@@ -167,7 +168,7 @@ class StudioTreeView(style: Style) :
                 }
             }
         }
-    }
+    }*/
 
     override fun isValidElement(element: Any?): Boolean {
         return element is Transform
@@ -179,7 +180,7 @@ class StudioTreeView(style: Style) :
         RemsStudio.largeChange(if (isCollapsed) "Expanded $name" else "Collapsed $name") {
             val target = !isCollapsed
             // remove children from the selection???...
-            val targets = GFX.inFocus.filterIsInstance<TreeViewPanel<*>>()
+            val targets = windowStack.inFocus.filterIsInstance<TreeViewPanel<*>>()
             for (it in targets) {
                 @Suppress("unchecked_cast")
                 val element2 = it.getElement() as Transform

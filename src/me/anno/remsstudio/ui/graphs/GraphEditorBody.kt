@@ -101,7 +101,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
     @Suppress("unused_parameter")
     private fun drawValueAxis(x0: Int, y0: Int, x1: Int, y1: Int) {
 
-        val font = DrawTexts.monospaceFont.value
+        val font = DrawTexts.monospaceFont
         val fontHeight = font.size
         val yOffset = fontHeight.toInt() / 2
 
@@ -603,7 +603,6 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
     }
 
     override fun onMouseMoved(x: Float, y: Float, dx: Float, dy: Float) {
-        GFX.editorHoverTime = getTimeAt(x)
         val draggedKeyframe = draggedKeyframe
         val selectedProperty = selectedProperty
         if (isSelecting) {

@@ -17,7 +17,7 @@ object StudioActions {
     fun register() {
 
         fun setEditorTimeDilation(dilation: Double): Boolean {
-            return if (dilation == RemsStudio.editorTimeDilation || GFX.inFocus0?.isKeyInput() == true) false
+            return if (dilation == RemsStudio.editorTimeDilation || RemsStudio.windowStack.inFocus0?.isKeyInput() == true) false
             else {
                 RemsStudio.editorTimeDilation = dilation
                 true
@@ -127,7 +127,7 @@ object StudioActions {
 
     }
 
-    fun createKeymap(keyMap: StringMap) {
+    fun createKeymap(register: StringMap) {
 
         /**
          * types:
@@ -137,91 +137,92 @@ object StudioActions {
          * - up -> up
          * */
 
-        keyMap["global.space.down.${Modifiers[false, false]}", "Play|Pause"]
-        keyMap["global.space.down.${Modifiers[false, true]}", "PlaySlow|Pause"]
-        keyMap["global.space.down.${Modifiers[true, false]}", "PlayReversed|Pause"]
-        keyMap["global.space.down.${Modifiers[true, true]}", "PlayReversedSlow|Pause"]
-        keyMap["global.f11.down", "ToggleFullscreen"]
-        keyMap["global.print.down", "PrintLayout"]
-        keyMap["global.left.up", "DragEnd"]
-        keyMap["global.f5.down.${Modifiers[true, false]}", "ClearCache"]
-        keyMap["global.arrowLeft.t", "PreviousStep"]
-        keyMap["global.arrowRight.t", "NextStep"]
-        keyMap["global.arrowLeft.down.c", "Jump2Start"]
-        keyMap["global.arrowRight.down.c", "Jump2End"]
-        keyMap["global.comma.t", "PreviousFrame"]
-        keyMap["global.dot.t", "NextFrame"]
-        keyMap["global.z.t.${Modifiers[true, false]}", "Undo"]
-        keyMap["global.z.t.${Modifiers[true, true]}", "Redo"]
-        keyMap["global.y.t.${Modifiers[true, false]}", "Undo"]
-        keyMap["global.y.t.${Modifiers[true, true]}", "Redo"]
-        keyMap["global.h.t.${Modifiers[false, false, true]}", "ShowAllObjects"]
-        keyMap["global.h.t", "ToggleHideObject"]
+        register["global.space.down.${Modifiers[false, false]}", "Play|Pause"]
+        register["global.space.down.${Modifiers[false, true]}", "PlaySlow|Pause"]
+        register["global.space.down.${Modifiers[true, false]}", "PlayReversed|Pause"]
+        register["global.space.down.${Modifiers[true, true]}", "PlayReversedSlow|Pause"]
+        register["global.f11.down", "ToggleFullscreen"]
+        register["global.print.down", "PrintLayout"]
+        register["global.left.up", "DragEnd"]
+        register["global.f5.down.${Modifiers[true, false]}", "ClearCache"]
+        register["global.arrowLeft.t", "PreviousStep"]
+        register["global.arrowRight.t", "NextStep"]
+        register["global.arrowLeft.down.c", "Jump2Start"]
+        register["global.arrowRight.down.c", "Jump2End"]
+        register["global.comma.t", "PreviousFrame"]
+        register["global.dot.t", "NextFrame"]
+        register["global.z.t.${Modifiers[true, false]}", "Undo"]
+        register["global.z.t.${Modifiers[true, true]}", "Redo"]
+        register["global.y.t.${Modifiers[true, false]}", "Undo"]
+        register["global.y.t.${Modifiers[true, true]}", "Redo"]
+        register["global.h.t.${Modifiers[false, false, true]}", "ShowAllObjects"]
+        register["global.h.t", "ToggleHideObject"]
 
         // press instead of down for the delay
-        keyMap["ColorPaletteEntry.left.press", "DragStart"]
-        keyMap["SceneTab.left.press", "DragStart"]
-        keyMap["FileEntry.left.press", "DragStart"]
-        keyMap["FileEntry.left.double", "Enter|Open"]
-        keyMap["FileEntry.f2.down", "Rename"]
+        register["ColorPaletteEntry.left.press", "DragStart"]
+        register["SceneTab.left.press", "DragStart"]
+        register["FileEntry.left.press", "DragStart"]
+        register["FileEntry.left.double", "Enter|Open"]
+        register["FileEntry.f2.down", "Rename"]
         // todo only when clicked...
-        keyMap["FileEntry.right.down", "OpenOptions"]
-        keyMap["FileExplorer.right.down", "OpenOptions"]
-        keyMap["FileExplorer.mouseBackward.down", "Back"]
-        keyMap["FileExplorer.mouseForward.down", "Forward"]
-        keyMap["FileExplorerEntry.left.double", "Enter"]
-        keyMap["TreeViewPanel.left.press", "DragStart"]
-        keyMap["TreeViewPanel.f2.down", "Rename"]
-        keyMap["StackPanel.left.press", "DragStart"]
+        register["FileEntry.right.down", "OpenOptions"]
+        register["FileExplorer.right.down", "OpenOptions"]
+        register["FileExplorer.mouseBackward.down", "Back"]
+        register["FileExplorer.mouseForward.down", "Forward"]
+        register["FileExplorerEntry.left.double", "Enter"]
+        register["TreeViewPanel.left.press", "DragStart"]
+        register["TreeViewPanel.f2.down", "Rename"]
+        register["StackPanel.left.press", "DragStart"]
 
-        keyMap["HSVBox.left.down", "SelectColor"]
-        keyMap["HSVBox.left.press-unsafe", "SelectColor"]
-        keyMap["AlphaBar.left.down", "SelectColor"]
-        keyMap["AlphaBar.left.press-unsafe", "SelectColor"]
-        keyMap["HueBar.left.down", "SelectColor"]
-        keyMap["HueBar.left.press-unsafe", "SelectColor"]
-        keyMap["HSVBoxMain.left.down", "SelectColor"]
-        keyMap["HSVBoxMain.left.press-unsafe", "SelectColor"]
+        register["HSVBox.left.down", "SelectColor"]
+        register["HSVBox.left.press-unsafe", "SelectColor"]
+        register["AlphaBar.left.down", "SelectColor"]
+        register["AlphaBar.left.press-unsafe", "SelectColor"]
+        register["HueBar.left.down", "SelectColor"]
+        register["HueBar.left.press-unsafe", "SelectColor"]
+        register["HSVBoxMain.left.down", "SelectColor"]
+        register["HSVBoxMain.left.press-unsafe", "SelectColor"]
 
-        keyMap["StudioSceneView.right.p", "Turn"]
-        keyMap["StudioSceneView.left.p", "MoveObject"]
-        keyMap["StudioSceneView.left.p.${Modifiers[false, true]}", "MoveObjectAlternate"]
+        register["StudioSceneView.right.p", "Turn"]
+        register["StudioSceneView.left.p", "MoveObject"]
+        register["StudioSceneView.left.p.${Modifiers[false, true]}", "MoveObjectAlternate"]
 
         for (i in 0 until 10) {
             // keyMap["SceneView.$i.down", "Cam$i"]
-            keyMap["SceneView.numpad$i.down", "Cam$i"]
+            register["SceneView.numpad$i.down", "Cam$i"]
             // keyMap["SceneView.$i.down.${Modifiers[true, false]}", "Cam$i"]
-            keyMap["SceneView.numpad$i.down.${Modifiers[true, false]}", "Cam$i"]
+            register["SceneView.numpad$i.down.${Modifiers[true, false]}", "Cam$i"]
         }
 
-        keyMap["StudioSceneView.w.p", "MoveForward"]
-        keyMap["StudioSceneView.a.p", "MoveLeft"]
-        keyMap["StudioSceneView.s.p", "MoveBackward"]
-        keyMap["StudioSceneView.d.p", "MoveRight"]
-        keyMap["StudioSceneView.q.p", "MoveDown"]
-        keyMap["StudioSceneView.e.p", "MoveUp"]
-        keyMap["StudioSceneView.r.p", "SetMode(MOVE)"]
-        keyMap["StudioSceneView.t.p", "SetMode(ROTATE)"]
-        keyMap["StudioSceneView.z.p", "SetMode(SCALE)"]
-        keyMap["StudioSceneView.y.p", "SetMode(SCALE)"]
+        register["StudioSceneView.w.p", "MoveForward"]
+        register["StudioSceneView.a.p", "MoveLeft"]
+        register["StudioSceneView.s.p", "MoveBackward"]
+        register["StudioSceneView.d.p", "MoveRight"]
+        register["StudioSceneView.q.p", "MoveDown"]
+        register["StudioSceneView.e.p", "MoveUp"]
+        register["StudioSceneView.r.p", "SetMode(MOVE)"]
+        register["StudioSceneView.t.p", "SetMode(ROTATE)"]
+        register["StudioSceneView.z.p", "SetMode(SCALE)"]
+        register["StudioSceneView.y.p", "SetMode(SCALE)"]
 
-        keyMap["PureTextInputML.delete.typed", "DeleteAfter"]
-        keyMap["PureTextInputML.backspace.typed", "DeleteBefore"]
-        keyMap["PureTextInputML.leftArrow.typed", "MoveLeft"]
-        keyMap["PureTextInputML.rightArrow.typed", "MoveRight"]
-        keyMap["PureTextInputML.upArrow.typed", "MoveUp"]
-        keyMap["PureTextInputML.downArrow.typed", "MoveDown"]
-        keyMap["PureTextInput.leftArrow.typed", "MoveLeft"]
-        keyMap["PureTextInput.rightArrow.typed", "MoveRight"]
-        keyMap["ConsoleInput.upArrow.typed", "MoveUp"]
-        keyMap["ConsoleInput.downArrow.typed", "MoveDown"]
+        register["PureTextInputML.delete.typed", "DeleteAfter"]
+        register["PureTextInputML.backspace.typed", "DeleteBefore"]
+        register["PureTextInputML.leftArrow.typed", "MoveLeft"]
+        register["PureTextInputML.rightArrow.typed", "MoveRight"]
+        register["PureTextInputML.upArrow.typed", "MoveUp"]
+        register["PureTextInputML.downArrow.typed", "MoveDown"]
+        register["PureTextInput.leftArrow.typed", "MoveLeft"]
+        register["PureTextInput.rightArrow.typed", "MoveRight"]
+        register["ConsoleInput.upArrow.typed", "MoveUp"]
+        register["ConsoleInput.downArrow.typed", "MoveDown"]
 
-        keyMap["PanelListX.leftArrow.typed", "Previous"]
-        keyMap["PanelListX.rightArray.typed", "Next"]
-        keyMap["PanelListY.upArrow.typed", "Previous"]
-        keyMap["PanelListY.downArrow.typed", "Next"]
+        register["PanelListX.leftArrow.typed", "Previous"]
+        register["PanelListX.rightArray.typed", "Next"]
+        register["PanelListY.upArrow.typed", "Previous"]
+        register["PanelListY.downArrow.typed", "Next"]
 
-        keyMap["FileExplorer.f5.typed", "Refresh"]
+        register["FileExplorer.f5.typed", "Refresh"]
+        register["StudioTreeView.delete.typed", "Delete"]
 
     }
 

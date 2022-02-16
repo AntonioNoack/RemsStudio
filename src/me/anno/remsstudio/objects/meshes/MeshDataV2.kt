@@ -16,7 +16,7 @@ object MeshDataV2 {
     fun MeshData.drawAssimp2(
         useECSShader: Boolean,
         transform: GFXTransform?,
-        stack: Matrix4fArrayList,
+        cameraMatrix: Matrix4fArrayList,
         time: Double,
         color: Vector4fc,
         animationName: String,
@@ -29,7 +29,7 @@ object MeshDataV2 {
         val baseShader = if (useECSShader) ECSShaderLib.pbrModelShader else ShaderLib.shaderAssimp
         val shader = baseShader.value
         shader.use()
-        GFXx3D.shader3DUniforms(shader, stack, color)
+        GFXx3D.shader3DUniforms(shader, cameraMatrix, color)
         GFXTransform.uploadAttractors(transform, shader, time)
 
         val model0 = assimpModel!!
@@ -39,22 +39,23 @@ object MeshDataV2 {
         } else null
         shader.v1b("hasAnimation", skinningMatrices != null)
 
-        val localStack = Matrix4x3fArrayList()
+        val worldMatrix = Matrix4x3fArrayList()
 
         if (normalizeScale) {
             val scale = AnimGameItem.Companion.getScaleFromAABB(model0.staticAABB.value)
-            localStack.scale(scale)
+            worldMatrix.scale(scale)
         }
 
         if (centerMesh) {
-            MeshUtils.centerMesh(transform, stack, localStack, model0)
+            MeshUtils.centerMesh(transform, cameraMatrix, worldMatrix, model0)
         }
 
-        GFXx3D.transformUniform(shader, stack)
+        GFXx3D.transformUniform(shader, cameraMatrix)
 
         drawHierarchy(
             shader,
-            localStack,
+            cameraMatrix,
+            worldMatrix,
             skinningMatrices,
             color,
             model0,
