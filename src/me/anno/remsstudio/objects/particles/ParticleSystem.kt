@@ -1,22 +1,22 @@
 package me.anno.remsstudio.objects.particles
 
-import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.remsstudio.animation.AnimationIntegral.findIntegralX
-import me.anno.remsstudio.animation.AnimationIntegral.getIntegral
+import me.anno.Engine.gameTime
 import me.anno.animation.Type
 import me.anno.config.DefaultConfig
-import me.anno.gpu.GFX.gameTime
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.text.TextWriter
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
+import me.anno.remsstudio.RemsStudio
+import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.animation.AnimationIntegral.findIntegralX
+import me.anno.remsstudio.animation.AnimationIntegral.getIntegral
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.distributions.*
 import me.anno.remsstudio.objects.forces.ForceField
 import me.anno.remsstudio.objects.forces.impl.BetweenParticleGravity
-import me.anno.remsstudio.RemsStudio
 import me.anno.ui.base.SpyPanel
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY

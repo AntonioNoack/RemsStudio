@@ -1,11 +1,11 @@
 package me.anno.remsstudio.ui.scene
 
+import me.anno.Engine.deltaTime
 import me.anno.config.DefaultConfig
 import me.anno.config.DefaultStyle.black
 import me.anno.config.DefaultStyle.deepDark
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.addGPUTask
-import me.anno.gpu.GFX.deltaTime
 import me.anno.gpu.OpenGL.renderDefault
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.framebuffer.FBStack
@@ -24,11 +24,6 @@ import me.anno.io.files.FileReference
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.length
 import me.anno.maths.Maths.pow
-import me.anno.remsstudio.objects.Camera
-import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.objects.effects.ToneMappers
-import me.anno.studio.StudioBase.Companion.dragged
-import me.anno.studio.StudioBase.Companion.shiftSlowdown
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.editorTime
 import me.anno.remsstudio.RemsStudio.editorTimeDilation
@@ -40,8 +35,13 @@ import me.anno.remsstudio.Scene
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.Selection.selectTransform
 import me.anno.remsstudio.Selection.selectedTransform
+import me.anno.remsstudio.objects.Camera
+import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.objects.effects.ToneMappers
 import me.anno.remsstudio.ui.StudioFileImporter.addChildFromFile
 import me.anno.remsstudio.ui.StudioTreeView.Companion.zoomToObject
+import me.anno.studio.StudioBase.Companion.dragged
+import me.anno.studio.StudioBase.Companion.shiftSlowdown
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelList
 import me.anno.ui.custom.CustomContainer
@@ -104,7 +104,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
 
     val borderThickness = style.getSize("blackWhiteBorderThickness", 2)
 
-    override fun onPropertiesChanged(){
+    override fun onPropertiesChanged() {
         invalidateDrawing()
     }
 

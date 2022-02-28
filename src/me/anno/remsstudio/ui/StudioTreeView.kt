@@ -1,7 +1,7 @@
 package me.anno.remsstudio.ui
 
 import me.anno.config.DefaultConfig
-import me.anno.gpu.GFX
+import me.anno.config.DefaultStyle
 import me.anno.input.Input
 import me.anno.io.text.TextWriter
 import me.anno.io.utils.StringMap
@@ -122,14 +122,13 @@ class StudioTreeView(style: Style) :
     }
 
     private val tmp = Vector4f()
+    private val accentColor = style.getColor("accentColor", DefaultStyle.black)
     override fun getLocalColor(element: Transform, isHovered: Boolean, isInFocus: Boolean): Int {
         val dst = element.getLocalColor(tmp)
         dst.w = 0.5f + 0.5f * clamp(dst.w, 0f, 1f)
         var textColor = dst.toARGB()
-        val sample = sample
-        // todo redefine these colors... I've removed them accidentally in a refactoring
-        // if (isHovered) textColor = sample.hoverColor
-        // if (isInFocus) textColor = sample.accentColor
+        if (isHovered) textColor = sample.run { uiSymbol ?: text }.hoverColor
+        if (isInFocus) textColor = accentColor
         return textColor
     }
 

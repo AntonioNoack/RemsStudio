@@ -222,7 +222,7 @@ object Scene {
 
             val isFakeColorRendering = renderer.isFakeColor
 
-            stack.clear()
+            // stack.clear()
             drawScene(scene, camera, time, x, y, w, h, flipY, isFakeColorRendering, sceneView)
 
         }

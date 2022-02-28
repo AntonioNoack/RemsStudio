@@ -189,9 +189,9 @@ object StudioActions {
 
         for (i in 0 until 10) {
             // keyMap["SceneView.$i.down", "Cam$i"]
-            register["SceneView.numpad$i.down", "Cam$i"]
+            register["StudioSceneView.numpad$i.down", "Cam$i"]
             // keyMap["SceneView.$i.down.${Modifiers[true, false]}", "Cam$i"]
-            register["SceneView.numpad$i.down.${Modifiers[true, false]}", "Cam$i"]
+            register["StudioSceneView.numpad$i.down.${Modifiers[true, false]}", "Cam$i"]
         }
 
         register["StudioSceneView.w.p", "MoveForward"]

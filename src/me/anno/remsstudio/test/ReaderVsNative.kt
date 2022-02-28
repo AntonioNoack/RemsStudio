@@ -3,7 +3,7 @@ package me.anno.remsstudio.test
 import me.anno.io.text.TextReader
 import me.anno.io.text.TextWriter
 import me.anno.remsstudio.objects.Transform
-import me.anno.utils.test.measure
+import me.anno.utils.Clock.Companion.measure
 
 fun main() {
     for (i in 0 until 100) {

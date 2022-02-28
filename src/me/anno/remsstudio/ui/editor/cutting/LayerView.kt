@@ -1,5 +1,6 @@
 package me.anno.remsstudio.ui.editor.cutting
 
+import me.anno.Engine.gameTime
 import me.anno.animation.Keyframe
 import me.anno.cache.CacheData
 import me.anno.cache.instances.VideoCache
@@ -15,27 +16,27 @@ import me.anno.input.MouseButton
 import me.anno.io.files.FileReference
 import me.anno.io.text.TextReader
 import me.anno.language.translation.NameDesc
-import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.objects.Video
-import me.anno.studio.StudioBase
-import me.anno.studio.StudioBase.Companion.shiftSlowdown
+import me.anno.maths.Maths.clamp
+import me.anno.maths.Maths.mix
+import me.anno.maths.Maths.sq
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.isPlaying
 import me.anno.remsstudio.Selection.select
 import me.anno.remsstudio.Selection.selectTransform
 import me.anno.remsstudio.Selection.selectedTransform
+import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.objects.Video
 import me.anno.remsstudio.ui.StudioFileImporter.addChildFromFile
+import me.anno.remsstudio.ui.editor.TimelinePanel
+import me.anno.studio.StudioBase
+import me.anno.studio.StudioBase.Companion.shiftSlowdown
 import me.anno.ui.Panel
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.dragging.Draggable
-import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.style.Style
 import me.anno.utils.hpc.ProcessingQueue
-import me.anno.maths.Maths.clamp
-import me.anno.maths.Maths.mix
-import me.anno.maths.Maths.sq
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -111,7 +112,7 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
         solution?.keepResourcesLoaded()
     }
 
-    var lastTime = GFX.gameTime
+    var lastTime = gameTime
 
     // calculation is fast, drawing is slow
     override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
@@ -132,11 +133,11 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
                 isHovered ||
                 mouseKeysDown.isNotEmpty() ||
                 keysDown.isNotEmpty() ||
-                abs(this.lastTime - GFX.gameTime) > if (needsLayoutUpdate()) 5e7 else 1e9
+                abs(this.lastTime - gameTime) > if (needsLayoutUpdate()) 5e7 else 1e9
 
 
         if (needsUpdate && !computer.isCalculating) {
-            lastTime = GFX.gameTime
+            lastTime = gameTime
             taskQueue += {
                 try {
                     // may throw a null pointer exception,
@@ -279,7 +280,7 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
                     val dt = shiftSlowdown * dilation * dx * dtHalfLength * 2 / w
                     if (dt != 0.0) {
                         RemsStudio.incrementalChange("Move Keyframes") {
-                            for(kf in draggedKeyframes) {
+                            for (kf in draggedKeyframes) {
                                 kf.time += dt
                             }
                         }

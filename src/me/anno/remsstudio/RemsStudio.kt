@@ -1,12 +1,13 @@
 package me.anno.remsstudio
 
+import me.anno.Engine.deltaTime
+import me.anno.Engine.gameTime
 import me.anno.audio.openal.ALBase
 import me.anno.audio.openal.AudioManager
 import me.anno.audio.openal.AudioTasks
 import me.anno.config.DefaultConfig
 import me.anno.config.DefaultStyle.baseTheme
 import me.anno.gpu.GFX
-import me.anno.gpu.GFX.gameTime
 import me.anno.input.ActionManager
 import me.anno.input.Input.keyUpCtr
 import me.anno.installer.Installer.checkInstall
@@ -36,7 +37,8 @@ import me.anno.ui.editor.WelcomeUI
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.style.Style
 import me.anno.utils.OS
-import java.io.File
+
+// todo bug: rotation in SceneView etc no longer works
 
 // todo bug: signed distance field texts are missing / not rendering
 
@@ -135,7 +137,7 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10105) {
             updateLastLocalTime(child, localTime)
         }
 
-        editorTime += GFX.deltaTime * editorTimeDilation
+        editorTime += deltaTime * editorTimeDilation
         if (editorTime <= 0.0 && editorTimeDilation < 0.0) {
             editorTimeDilation = 0.0
             editorTime = 0.0

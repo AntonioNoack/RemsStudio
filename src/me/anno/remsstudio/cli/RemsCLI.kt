@@ -1,5 +1,6 @@
 package me.anno.remsstudio.cli
 
+import me.anno.Engine
 import me.anno.cache.Cache
 import me.anno.gpu.GFX
 import me.anno.gpu.framebuffer.Frame
@@ -170,7 +171,7 @@ object RemsCLI {
         while (!isDone) {
             Texture2D.destroyTextures()
             GFX.resetFBStack()
-            GFX.updateTime()
+            Engine.updateTime()
             Cache.update()
             bindTexture(GL30.GL_TEXTURE_2D, 0)
             // BlendDepth.reset()
