@@ -1,6 +1,5 @@
 package me.anno.remsstudio
 
-import com.sun.xml.internal.ws.api.pipe.Engine
 import me.anno.Engine.deltaTime
 import me.anno.Engine.gameTime
 import me.anno.audio.openal.ALBase
@@ -115,7 +114,7 @@ import me.anno.utils.OS
 
 // todo signed field to split meshes with option for face subdivisions
 
-object RemsStudio : StudioBase(true, "Rem's Studio", 10105) {
+object RemsStudio : StudioBase(true, "Rem's Studio", 10106) {
 
     // private val LOGGER = LogManager.getLogger(RemsStudio::class)
 
