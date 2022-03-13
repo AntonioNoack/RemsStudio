@@ -9,7 +9,6 @@ import me.anno.gpu.GFX.addGPUTask
 import me.anno.gpu.OpenGL.renderDefault
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.framebuffer.FBStack
-import me.anno.gpu.framebuffer.Framebuffer
 import me.anno.gpu.framebuffer.Screenshots
 import me.anno.gpu.framebuffer.StableWindowSize
 import me.anno.gpu.shader.Renderer
@@ -254,8 +253,8 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
 
         updateStableSize()
 
-        val dx = stableSize.dx + borderThickness
-        val dy = stableSize.dy + borderThickness
+        val dx = stableSize.dx + bt
+        val dy = stableSize.dy + bt
 
         drawRect(x, y, w, h, -1)
         drawRect(x + bth, y + bth, w - 2 * bth, h - 2 * bth, black)
@@ -295,23 +294,26 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         val camera = camera
         GFX.check()
 
-        val buffer: Framebuffer = FBStack["resolveClick", GFX.width, GFX.height, 4, false, 1, true]
+        val buffer = FBStack["resolveClick", width, height, 4, false, 1, true]
 
         val diameter = 5
 
-        val dx = x + stableSize.dx
-        val dy = y + stableSize.dy
-
-        val cXInt = clickX.toInt()
-        val cYInt = clickY.toInt()
+        val bt = borderThickness
+        val dx0 = stableSize.dx + bt
+        val dy0 = stableSize.dy + bt
+        val cXInt = clickX.toInt() - (this.x + dx0)
+        val cYInt = clickY.toInt() - (this.y + dy0)
 
         val root = RemsStudio.root
 
-        val idBuffer = Screenshots.getPixels(diameter, dx, dy, cXInt, cYInt, buffer, Renderer.idRenderer) {
+        val dx = 0
+        val dy = 0
+
+        val idBuffer = Screenshots.getPixels(diameter, cXInt, cYInt, buffer, Renderer.idRenderer) {
             Scene.draw(camera, root, dx, dy, width, height, editorTime, false, Renderer.idRenderer, this)
         }
 
-        val depthBuffer = Screenshots.getPixels(diameter, dx, dy, cXInt, cYInt, buffer, Renderer.depthRenderer01) {
+        val depthBuffer = Screenshots.getPixels(diameter, cXInt, cYInt, buffer, Renderer.depthRenderer01) {
             Scene.draw(camera, root, dx, dy, width, height, editorTime, false, Renderer.depthRenderer01, this)
         }
 
@@ -697,8 +699,14 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
     fun resolveClick(x: Float, y: Float, onClick: (Transform?) -> Unit) {
         val w = stableSize.stableWidth
         val h = stableSize.stableHeight
+        println("executing click $w x $h, ${this.w} x ${this.h}")
         addGPUTask(w, h) {
-            resolveClick(x, y, w, h, onClick)
+            try {
+                resolveClick(x, y, w, h, onClick)
+            } catch (e: Exception) {
+                LOGGER.warn("could not execute click")
+                e.printStackTrace()
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package me.anno.remsstudio
 
+import me.anno.engine.EngineActions
 import me.anno.gpu.GFX
 import me.anno.input.ActionManager
 import me.anno.input.Input
@@ -129,7 +130,7 @@ object StudioActions {
 
     fun createKeymap(register: StringMap) {
 
-        println("registering actions")
+        EngineActions.createKeymap(register)
 
         /**
          * types:
