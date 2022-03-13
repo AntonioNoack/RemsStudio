@@ -1,5 +1,6 @@
 package me.anno.remsstudio
 
+import com.sun.xml.internal.ws.api.pipe.Engine
 import me.anno.Engine.deltaTime
 import me.anno.Engine.gameTime
 import me.anno.audio.openal.ALBase
@@ -128,7 +129,6 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10105) {
         }
 
     fun updateLastLocalTime(parent: Transform, time: Double) {
-
         val localTime = parent.getLocalTime(time)
         parent.lastLocalTime = localTime
         val children = parent.children
@@ -136,13 +136,14 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10105) {
             val child = children[i]
             updateLastLocalTime(child, localTime)
         }
+    }
 
+    fun updateEditorTime(){
         editorTime += deltaTime * editorTimeDilation
         if (editorTime <= 0.0 && editorTimeDilation < 0.0) {
             editorTimeDilation = 0.0
             editorTime = 0.0
         }
-
     }
 
     override fun loadConfig() {
@@ -238,8 +239,10 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10105) {
 
     var editorTimeDilation = 0.0
         set(value) {
-            if (value != field) updateAudio()
-            field = value
+            if (field != value) {
+                updateAudio()
+                field = value
+            }
         }
 
     val isPaused get() = editorTimeDilation == 0.0
@@ -263,6 +266,7 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10105) {
     val selection = ArrayList<String>()
 
     override fun onGameLoopStart() {
+        updateEditorTime()
         updateLastLocalTime(root, editorTime)
     }
 

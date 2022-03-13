@@ -16,7 +16,6 @@ import me.anno.maths.Maths.fract
 import me.anno.maths.Maths.mix
 import me.anno.maths.Maths.mixARGB
 import me.anno.maths.Maths.pow
-import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.editorTime
 import me.anno.remsstudio.RemsStudio.isPaused
@@ -25,6 +24,7 @@ import me.anno.remsstudio.RemsStudio.targetDuration
 import me.anno.remsstudio.RemsStudio.targetFPS
 import me.anno.remsstudio.RemsStudio.updateAudio
 import me.anno.remsstudio.Selection
+import me.anno.remsstudio.objects.Transform
 import me.anno.ui.Panel
 import me.anno.ui.base.constraints.AxisAlignment
 import me.anno.ui.base.menu.Menu.openMenu
@@ -214,7 +214,7 @@ open class TimelinePanel(style: Style) : Panel(style) {
     override fun tickUpdate() {
         super.tickUpdate()
         for (key in drawnStrings) {
-            FontManager.getString(key)
+            FontManager.getTexture(key)
         }
     }
 

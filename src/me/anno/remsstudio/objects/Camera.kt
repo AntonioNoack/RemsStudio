@@ -1,6 +1,5 @@
 package me.anno.remsstudio.objects
 
-import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.animation.Type
 import me.anno.config.DefaultConfig
 import me.anno.config.DefaultStyle.white4
@@ -13,10 +12,11 @@ import me.anno.io.files.InvalidRef
 import me.anno.language.translation.Dict
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.pow
-import me.anno.remsstudio.objects.effects.ToneMappers
-import me.anno.remsstudio.objects.models.CameraModel.drawCamera
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.currentlyDrawnCamera
+import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.objects.effects.ToneMappers
+import me.anno.remsstudio.objects.models.CameraModel.drawCamera
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -24,6 +24,7 @@ import me.anno.ui.style.Style
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.pooling.JomlPools
 import me.anno.utils.types.Casting.castToFloat2
+import me.anno.utils.types.Floats.toRadians
 import org.joml.*
 import java.lang.Math
 
@@ -300,9 +301,9 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         val up = cameraTransform2.transformProject(tmp1.set(0f, 1f, 0f))
             .sub(position).normalize()
         val lookAt = cameraTransform2.transformProject(tmp2.set(0f, 0f, -1f))
+        val aspectRatio = GFX.viewportWidth.toFloat() / GFX.viewportHeight
         stack.perspective2(
-            Math.toRadians(fov.toDouble()).toFloat(),
-            GFX.viewportWidth * 1f / GFX.viewportHeight, near, far, 0f, 0f
+            fov.toRadians(), aspectRatio, near, far, 0f, 0f
         ).lookAt(position, lookAt, up)
         val scale = pow(1f / orbitRadius, orthographicness[time])
         if (scale != 0f && scale.isFinite()) stack.scale(scale)

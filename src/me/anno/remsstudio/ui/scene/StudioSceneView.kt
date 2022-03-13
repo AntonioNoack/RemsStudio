@@ -50,6 +50,7 @@ import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.editor.sceneView.ISceneView
 import me.anno.ui.simple.SimplePanel
 import me.anno.ui.style.Style
+import me.anno.utils.types.Booleans.toInt
 import me.anno.utils.types.Vectors.plus
 import me.anno.utils.types.Vectors.times
 import me.anno.utils.types.Vectors.toVec3f
@@ -93,6 +94,8 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
     }
 
     var camera = nullCamera ?: Camera()
+
+    override fun isOpaqueAt(x: Int, y: Int): Boolean = true
 
     override val usesFPBuffers: Boolean get() = camera.toneMapping != ToneMappers.RAW8
     override var isLocked2D = camera.rotationYXZ.isDefaultValue()
@@ -182,8 +185,11 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
     }
 
     override fun getVisualState(): Any =
-        Triple(editorTime, stableSize.stableWidth, stableSize.stableHeight) to
-                Pair(Input.isKeyDown('l'), Input.isKeyDown('n'))
+        Pair(
+            editorTime,
+            (stableSize.stableWidth.shl(16) or stableSize.stableHeight).shl(2) +
+                    Input.isKeyDown('l').toInt(1) + Input.isKeyDown('n').toInt(2)
+        )
 
     override fun tickUpdate() {
         super.tickUpdate()
@@ -796,6 +802,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         onInteraction()
         invalidateDrawing()
         RemsStudio.incrementalChange("Zoom In / Out") {
+            val camera = camera
             val radius = camera.orbitRadius[cameraTime]
             if (radius == 0f) {
                 // no orbiting

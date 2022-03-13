@@ -283,9 +283,6 @@ object Scene {
         lastGlobalCameraTransform.set(cameraTransform)
         lGCTInverted.set(cameraTransform).invert()
 
-        // todo optimize to use target directly, if no buffer in-between is required
-        // (for low-performance devices)
-
         val distortion = camera.distortion[cameraTime]
         val vignetteStrength = camera.vignetteStrength[cameraTime]
         val chromaticAberration = camera.chromaticAberration[cameraTime]
@@ -303,6 +300,8 @@ object Scene {
         val needsCG = !cgOffset.is000() || !cgSlope.is1111() || !cgPower.is1111() || cgSaturation != 1f
         val needsBloom = bloomIntensity > 0f && bloomSize > 0f
 
+        // optimize to use target directly, if no buffer in-between is required
+        // (for low-performance devices)
         var needsTemporaryBuffer = !isFakeColorRendering
         if (needsTemporaryBuffer) {
             needsTemporaryBuffer = // issues are resolved: clipping was missing maybe...
@@ -320,10 +319,8 @@ object Scene {
             if (needsTemporaryBuffer) FBStack["Scene-Main", w, h, 4, usesFPBuffers, samples, camera.useDepth]
             else OpenGL.currentBuffer as Framebuffer?
 
-        // LOGGER.info("$needsTemporaryBuffer ? $buffer")
-
         val x = if (needsTemporaryBuffer) 0 else x0
-        val y = if (needsTemporaryBuffer) 0 else y0// GFX.height - (y0 + h)
+        val y = if (needsTemporaryBuffer) 0 else y0
 
         blendMode.use(if (isFakeColorRendering) null else BlendMode.DEFAULT) {
             depthMode.use(if (camera.useDepth) DepthMode.GREATER else DepthMode.ALWAYS) {

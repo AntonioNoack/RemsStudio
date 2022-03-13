@@ -27,7 +27,7 @@ object AudioManager2 {
             transform.needsUpdate = false
             transform.startPlayback(editorTime, editorTimeDilation, camera)
         }
-        transform.children.forEach {
+        for (it in transform.children) {
             checkTree(it)
         }
     }

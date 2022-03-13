@@ -129,6 +129,8 @@ object StudioActions {
 
     fun createKeymap(register: StringMap) {
 
+        println("registering actions")
+
         /**
          * types:
          * - typed -> typed

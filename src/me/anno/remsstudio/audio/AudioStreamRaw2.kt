@@ -6,7 +6,6 @@ import me.anno.audio.AudioTransfer
 import me.anno.audio.SimpleTransfer
 import me.anno.audio.openal.SoundBuffer
 import me.anno.audio.streams.AudioStreamRaw.Companion.averageSamples
-import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
 import me.anno.audio.streams.AudioStreamRaw.Companion.ffmpegSliceSampleDuration
 import me.anno.audio.streams.FloatPair
 import me.anno.audio.streams.ShortPair
@@ -19,7 +18,6 @@ import me.anno.maths.Maths.mix
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Transform
 import me.anno.utils.Sleep.waitUntilDefined
-import me.anno.video.AudioCreator.Companion.playbackSampleRate
 import me.anno.video.ffmpeg.FFMPEGMetadata
 import me.anno.video.ffmpeg.FFMPEGStream.Companion.getAudioSequence
 import org.joml.Vector3f
@@ -34,7 +32,7 @@ class AudioStreamRaw2(
     val is3D: Boolean,
     val source: Audio?,
     val destination: Transform?
-): StereoFloatStream {
+) : StereoFloatStream {
 
     // todo if out of bounds, and not recoverable, just stop
 
