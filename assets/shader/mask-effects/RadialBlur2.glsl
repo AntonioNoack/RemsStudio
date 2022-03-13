@@ -12,7 +12,7 @@ void main(){
         vec2 nextUV = uv2 + dir * fi;
         mask = texture(maskTex, nextUV);
         effect = mix(mask.a, dot(vec3(0.3), mask.rgb), useMaskColor);
-        effect = mix(effect, 1.0 - effect, invertMask);
+        if(invertMask1) effect = 1.0 - effect;
         vec4 colorHere = texture(tex, nextUV);
         float weight = i == 0 ? 1.0 : max(0, effect-fi);
         colorSum += weight * colorHere;

@@ -1,6 +1,7 @@
 void main(){
     // blur? is already good enough, I think...
     inverseEffect = clamp(mask.a, 0.0, 1.0);
+    if(invertMask1) inverseEffect = 1.0 - inverseEffect;
     float similarity = settings.x;
     float smoothness = settings.y;
     float spill = settings.z;
@@ -10,13 +11,13 @@ void main(){
     float chromaDistance = distance(RGBtoUV(color.rgb), RGBtoUV(keyColor.rgb));
     float baseMask = mix(chromaDistance - similarity, distance(keyColor.rgb, color.rgb), isGrayscale);
     float fullMask = pow(clamp(baseMask / smoothness, 0.0, 1.0), 1.5);
-    if (invertMask < 0.5){
+    if (invertMask2){
+        color.rgb = keyColor.rgb;
+        color.a *= (1.0-fullMask) * inverseEffect;
+    } else {
         float spillValue = pow(clamp(baseMask / spill, 0.0, 1.0), 1.5);
         float grayscale = dot(color.rgb, vec3(0.2126, 0.7152, 0.0722));
         color.rgb = mix(color.rgb, vec3(grayscale), (1.0-spillValue) * (1.0-effect));
         color.a *= fullMask * inverseEffect;
-    } else {
-        color.rgb = keyColor.rgb;
-        color.a *= (1.0-fullMask) * inverseEffect;
     }
 }

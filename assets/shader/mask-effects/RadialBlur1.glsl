@@ -2,7 +2,7 @@ void main(){
     // mix in original?
     // can be done by reducing the effect strength and increasing the color strength
     effect = mix(mask.a, dot(vec3(0.3), mask.rgb), useMaskColor);
-    effect = mix(effect, 1.0 - effect, invertMask);
+    if(invertMask1) effect = 1.0 - effect;
     if (abs(effect) > 0.001){
         vec2 dir = (uv1 - offset) * -pixelating.y;
         float weightSum = 0;

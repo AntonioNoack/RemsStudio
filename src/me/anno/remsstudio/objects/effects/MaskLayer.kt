@@ -74,6 +74,7 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
 
     // not animated, because it's not meant to be transitioned, but instead to be a little helper
     var isInverted = false
+    var isInverted2 = false
 
     // ignore the bounds of this objects xy-plane?
     var isFullscreen = false
@@ -232,7 +233,6 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
         val type = type
 
         val pixelSize = effectSize[time]
-        val isInverted = if (isInverted) 1f else 0f
 
         val w = GFX.viewportWidth
         val h = GFX.viewportHeight
@@ -264,7 +264,8 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
                 draw3DMasked(
                     stack, color,
                     type.id, useMaskColor[time],
-                    pixelSize, offset, isInverted,
+                    pixelSize, offset,
+                    isInverted, isInverted2,
                     isFullscreen,
                     settings
                 )
@@ -286,7 +287,8 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
                 draw3DMasked(
                     stack, color,
                     type.id, useMaskColor[time],
-                    0f, offset, isInverted,
+                    0f, offset,
+                    isInverted, isInverted2,
                     isFullscreen,
                     settings
                 )
@@ -323,7 +325,8 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
                 draw3DMasked(
                     stack, color,
                     type.id, useMaskColor[time],
-                    pixelSize, offset, isInverted,
+                    pixelSize, offset,
+                    isInverted, isInverted2,
                     isFullscreen,
                     settings
                 )
@@ -378,6 +381,7 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
         greenScreen += vi("Similarity", "", greenScreenSimilarity, style)
         greenScreen += vi("Smoothness", "", greenScreenSmoothness, style)
         greenScreen += vi("Spill Value", "", greenScreenSpillValue, style)
+        greenScreen += vi("Invert Mask 2", "", null, isInverted2, style) { isInverted2 = it }
 
         val transition = getGroup("Transition", "Type needs to be transition", "transition")
         transition += vi("Progress", "", transitionProgress, style)

@@ -1,6 +1,6 @@
 void main(){
     effect = mix(mask.a, dot(vec3(0.3), mask.rgb), useMaskColor);
-    effect = mix(effect, 1.0 - effect, invertMask);
+    if(invertMask1) effect = 1.0 - effect;
     uv3 = (uv2 - 0.5) / pixelating;
     uv4 = mat2(1.0, 1.0, 0.6, -0.6) * uv3;
     uv4 = fract(uv4);

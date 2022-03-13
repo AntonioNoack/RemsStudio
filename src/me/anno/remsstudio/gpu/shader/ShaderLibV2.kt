@@ -17,7 +17,7 @@ object ShaderLibV2 {
                 "precision highp float;\n" +
                 "uniform sampler2D maskTex, tex, tex2;\n" +
                 "uniform float useMaskColor;\n" +
-                "uniform float invertMask;\n" +
+                "uniform bool invertMask1, invertMask2;\n" +
                 "uniform vec2 pixelating;\n" +
                 "uniform vec2 windowSize, offset;\n" +
                 "uniform int maskType;\n" +
@@ -48,7 +48,7 @@ object ShaderLibV2 {
                 "       case ${MaskType.BOKEH_BLUR.id}:\n" +
                 "       case ${MaskType.BLOOM.id}:\n" + // just mix two images
                 "           effect = mix(mask.a, dot(vec3(0.3), mask.rgb), useMaskColor);\n" +
-                "           effect = mix(effect, 1.0 - effect, invertMask);\n" +
+                "           if(invertMask1) effect = 1.0 - effect;\n" +
                 "           color = mix(texture(tex, uv2), texture(tex2, uv2), effect);\n" +
                 "           break;\n" +
                 "       case ${MaskType.UV_OFFSET.id}:\n" +

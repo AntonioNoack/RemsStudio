@@ -1,6 +1,6 @@
 void main(){
     effect = mix(mask.a, dot(vec3(0.3), mask.rgb), useMaskColor);
-    effect = mix(effect, 1.0 - effect, invertMask);
+    if(invertMask1) effect = 1.0 - effect;
 
     vec2 pixelatingX = pixelating * 0.408;
 

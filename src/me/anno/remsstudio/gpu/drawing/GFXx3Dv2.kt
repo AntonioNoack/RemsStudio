@@ -271,7 +271,8 @@ object GFXx3Dv2 {
         useMaskColor: Float,
         pixelSize: Float,
         offset: Vector2fc,
-        isInverted: Float,
+        isInverted1: Boolean,
+        isInverted2: Boolean,
         isFullscreen: Boolean,
         settings: Vector4f
     ) {
@@ -279,7 +280,8 @@ object GFXx3Dv2 {
         shader.use()
         GFXx3D.shader3DUniforms(shader, stack, color)
         shader.v1f("useMaskColor", useMaskColor)
-        shader.v1f("invertMask", isInverted)
+        shader.v1b("invertMask1", isInverted1)
+        shader.v1b("invertMask2", isInverted2)
         shader.v1i("maskType", maskType)
         shader.v2f("pixelating", pixelSize * GFX.viewportHeight / GFX.viewportWidth, pixelSize)
         shader.v4f("settings", settings)

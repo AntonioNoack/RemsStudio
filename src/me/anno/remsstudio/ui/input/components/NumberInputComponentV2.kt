@@ -29,7 +29,7 @@ class NumberInputComponentV2(
 
     var lastTime = RemsStudio.editorTime
 
-    val driver get() = owningProperty.drivers[indexInProperty]
+    val driver get() = owningProperty.drivers.getOrNull(indexInProperty)
     val hasDriver get() = driver != null
 
     override fun onMouseDown(x: Float, y: Float, button: MouseButton) {
