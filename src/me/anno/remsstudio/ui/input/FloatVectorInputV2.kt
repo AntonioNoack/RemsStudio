@@ -22,7 +22,7 @@ class FloatVectorInputV2(
     visibilityKey,
     type,
     style,
-    FloatInputV2(style, title, visibilityKey, type, owningProperty)
+    { FloatInputV2(style, title, visibilityKey, type, owningProperty) }
 ) {
 
     constructor(title: String, property: AnimatedProperty<*>, time: Double, style: Style) :

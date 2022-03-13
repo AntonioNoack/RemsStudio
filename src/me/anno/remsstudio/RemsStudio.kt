@@ -38,8 +38,6 @@ import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.style.Style
 import me.anno.utils.OS
 
-// todo bug: rotation in SceneView etc no longer works
-
 // todo bug: signed distance field texts are missing / not rendering
 
 // todo isolate and remove certain frequencies from audio
@@ -114,7 +112,7 @@ import me.anno.utils.OS
 
 // todo signed field to split meshes with option for face subdivisions
 
-object RemsStudio : StudioBase(true, "Rem's Studio", 10106) {
+object RemsStudio : StudioBase(true, "Rem's Studio", 10107) {
 
     // private val LOGGER = LogManager.getLogger(RemsStudio::class)
 
@@ -137,7 +135,7 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10106) {
         }
     }
 
-    fun updateEditorTime(){
+    fun updateEditorTime() {
         editorTime += deltaTime * editorTimeDilation
         if (editorTime <= 0.0 && editorTimeDilation < 0.0) {
             editorTimeDilation = 0.0

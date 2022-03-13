@@ -5,6 +5,7 @@ import me.anno.config.DefaultConfig
 import me.anno.config.DefaultStyle.white4
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.Perspective.perspective2
+import me.anno.gpu.pipeline.Sorting
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
@@ -26,7 +27,6 @@ import me.anno.utils.pooling.JomlPools
 import me.anno.utils.types.Casting.castToFloat2
 import me.anno.utils.types.Floats.toRadians
 import org.joml.*
-import java.lang.Math
 
 class Camera(parent: Transform? = null) : Transform(parent) {
 
@@ -35,6 +35,9 @@ class Camera(parent: Transform? = null) : Transform(parent) {
     // by implementing SoftLink: scenes can be included in others
 
     // orthographic-ness by setting the camera back some amount, and narrowing the view
+
+    // todo actually order the scene before drawing
+    var order = Sorting.FRONT_TO_BACK
 
     var lut: FileReference = InvalidRef
     val nearZ = AnimatedProperty.floatPlus(0.001f)
@@ -100,6 +103,9 @@ class Camera(parent: Transform? = null) : Transform(parent) {
             "Causes Z-Fighting, but allows 3D", "camera.depth.enabled",
             null, useDepth, style
         ) { useDepth = it }
+        /*depth += vi(
+            "Order By Z", "Transparent objects need to be sorted to appear correctly", null, order, style
+        ) { order = it }*/
         val chroma = getGroup("Chromatic Aberration", "Effect occurring in cheap lenses", "chroma")
         chroma += vi("Strength", "How large the effect is", "camera.chromaStrength", chromaticAberration, style)
         chroma += vi("Offset", "Offset", "camera.chromaOffset", chromaticOffset, style)

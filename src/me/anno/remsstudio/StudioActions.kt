@@ -208,6 +208,7 @@ object StudioActions {
         register["StudioSceneView.z.p", "SetMode(SCALE)"]
         register["StudioSceneView.y.p", "SetMode(SCALE)"]
 
+        register["CorrectingTextInput.backspace.typed", "DeleteBefore"]
         register["PureTextInputML.delete.typed", "DeleteAfter"]
         register["PureTextInputML.backspace.typed", "DeleteBefore"]
         register["PureTextInputML.leftArrow.typed", "MoveLeft"]
