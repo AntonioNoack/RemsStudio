@@ -9,7 +9,7 @@ fun main() {
     val videoId = "EaIXKubMCRQ"
     val extractor = YouTubeMeta(videoId)
     println(extractor)
-    for ((key, value) in extractor.links ?: emptyMap()) {
+    for ((key, value) in extractor.links) {
         println("$key: $value")
     }
 
