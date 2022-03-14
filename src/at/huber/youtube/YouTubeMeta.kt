@@ -6,7 +6,6 @@ import me.anno.io.config.ConfigBasics.cacheFolder
 import me.anno.io.json.JsonArray
 import me.anno.io.json.JsonNode
 import me.anno.io.json.JsonReader
-import me.anno.io.json.JsonValue
 import org.apache.logging.log4j.LogManager
 import java.io.IOException
 import java.io.UnsupportedEncodingException
@@ -94,18 +93,6 @@ class YouTubeMeta(youtubeLink: String?) {
             return node.get(key) != null
         }
 
-        private fun getString(node: JsonNode, key: String): String? {
-            return (node.get(key) as? JsonValue)?.value?.toString()
-        }
-
-        private fun getBoolean(node: JsonNode, key: String): Boolean {
-            return (node.get(key) as? JsonValue)?.asBool() ?: false
-        }
-
-        private fun getInt(node: JsonNode, key: String): Int {
-            return (node.get(key) as? JsonValue)?.asInt() ?: 0
-        }
-
         @Throws(IOException::class)
         private fun loadDataFromURL(urlString: String): String {
             val url = URL(urlString)
@@ -175,51 +162,45 @@ class YouTubeMeta(youtubeLink: String?) {
                 val javascriptFile = loadDataFromURL(decipherFunctionUrl)
                 var mat = patSignatureDecFunction.matcher(javascriptFile)
                 if (mat.find()) {
-                    decipherFunctionName = mat.group(1)
+                    val decipherFunctionName = mat.group(1)
+                    val dfn2 = decipherFunctionName.replace("$", "\\$")
+                    Companion.decipherFunctionName = decipherFunctionName
                     if (LOGGING) LOGGER.debug("Decipher FunctionName: $decipherFunctionName")
                     val patMainVariable = Pattern.compile(
-                        "(var |\\s|,|;)" + decipherFunctionName!!.replace(
-                            "$",
-                            "\\$"
-                        ) + "(=function\\((.{1,3})\\)\\{)"
+                        "(var |\\s|,|;)$dfn2(=function\\((.{1,3})\\)\\{)"
                     )
-                    val mainDecipherFunct = StringBuilder()
+                    val mainDecipherFunction = StringBuilder()
                     mat = patMainVariable.matcher(javascriptFile)
                     if (mat.find()) {
-                        mainDecipherFunct.append("var ")
-                        mainDecipherFunct.append(decipherFunctionName)
-                        mainDecipherFunct.append(mat.group(2))
+                        mainDecipherFunction.append("var ")
+                        mainDecipherFunction.append(decipherFunctionName)
+                        mainDecipherFunction.append(mat.group(2))
                     } else {
-                        val patMainFunction = Pattern.compile(
-                            "function " + decipherFunctionName!!.replace(
-                                "$",
-                                "\\$"
-                            ) + "(\\((.{1,3})\\)\\{)"
-                        )
+                        val patMainFunction = Pattern.compile("function $dfn2(\\((.{1,3})\\)\\{)")
                         mat = patMainFunction.matcher(javascriptFile)
                         if (!mat.find()) return null
-                        mainDecipherFunct.append("function ")
-                        mainDecipherFunct.append(decipherFunctionName)
-                        mainDecipherFunct.append(mat.group(2))
+                        mainDecipherFunction.append("function ")
+                        mainDecipherFunction.append(decipherFunctionName)
+                        mainDecipherFunction.append(mat.group(2))
                     }
                     var startIndex = mat.end()
                     var braces = 1
                     for (i in startIndex until javascriptFile.length) {
                         if (braces == 0 && i > startIndex + 5) {
-                            mainDecipherFunct.append(javascriptFile, startIndex, i)
-                            mainDecipherFunct.append(";")
+                            mainDecipherFunction.append(javascriptFile, startIndex, i)
+                            mainDecipherFunction.append(";")
                             break
                         }
                         val charAt = javascriptFile[i]
                         if (charAt == '{') braces++ else if (charAt == '}') braces--
                     }
-                    val functionBuilder = StringBuilder(mainDecipherFunct)
+                    val functionBuilder = StringBuilder(mainDecipherFunction)
                     // Search the main function for extra functions and variables
                     // needed for deciphering
                     // Search for variables
-                    mat = patVariableFunction.matcher(mainDecipherFunct)
+                    mat = patVariableFunction.matcher(mainDecipherFunction)
                     while (mat.find()) {
-                        val variableDef = "var " + mat.group(2) + "={"
+                        val variableDef = "var ${mat.group(2)}={"
                         if (functionBuilder.indexOf(variableDef) >= 0) continue
                         startIndex = javascriptFile.indexOf(variableDef) + variableDef.length
                         braces = 1
@@ -236,9 +217,9 @@ class YouTubeMeta(youtubeLink: String?) {
                         }
                     }
                     // Search for functions
-                    mat = patFunction.matcher(mainDecipherFunct)
+                    mat = patFunction.matcher(mainDecipherFunction)
                     while (mat.find()) {
-                        val functionDef = "function " + mat.group(2) + "("
+                        val functionDef = "function ${mat.group(2)}("
                         if (functionBuilder.indexOf(functionDef) >= 0) continue
                         startIndex = javascriptFile.indexOf(functionDef) + functionDef.length
                         braces = 0
@@ -350,7 +331,7 @@ class YouTubeMeta(youtubeLink: String?) {
             // FORMAT_STREAM_TYPE_OTF(otf=1) requires downloading the init fragment (adding `&sq=0` to the URL)
             // and parsing emsg box to determine the number of fragments that
             // would subsequently requested with (`&sq=N`) (cf. youtube-dl)
-            val type = getString(format, "type")
+            val type = format.getText("type")
             if ("FORMAT_STREAM_TYPE_OTF" != type) {
                 decodeSource(format, sources, encodedSources)
             }
@@ -363,22 +344,21 @@ class YouTubeMeta(youtubeLink: String?) {
         sources: HashMap<Format, String>,
         encodedSources: HashMap<Format, String>
     ) {
-        val itag = getInt(sourceJson, "itag")
+        val itag = sourceJson.getInt("itag")
         val format = findFormat(itag)
         if (format != null) {
-            if (hasKey(sourceJson, "url")) {
-                val url = getString(sourceJson, "url")!!
-                    .replace("\\u0026", "&")
-                sources[format] = url
-            } else if (hasKey(sourceJson, "signatureCipher")) {
-                val cipher = getString(sourceJson, "signatureCipher")
+            val url = sourceJson.getText("url")
+            if (url != null) {
+                sources[format] = url.replace("\\u0026", "&")
+            } else {
+                val cipher = sourceJson.getText("signatureCipher")
                 if (cipher != null) {
                     val mat = patSigEncUrl.matcher(cipher)
                     val matSig = patSignature.matcher(cipher)
                     if (mat.find() && matSig.find()) {
-                        val url = URLDecoder.decode(mat.group(1), "UTF-8")
+                        val url1 = URLDecoder.decode(mat.group(1), "UTF-8")
                         val signature = URLDecoder.decode(matSig.group(1), "UTF-8")
-                        sources[format] = url
+                        sources[format] = url1
                         encodedSources[format] = signature
                     }
                 }
@@ -403,26 +383,24 @@ class YouTubeMeta(youtubeLink: String?) {
                 val formats = streamingData.get("formats")
                 if (formats is JsonArray) {
                     decodeFormats(formats, sources, encodedSources)
-                } else LOGGER.warn("Formats is null")
+                } else LOGGER.warn("Missing formats")
                 val adaptiveFormats = streamingData.get("adaptiveFormats")
                 if (adaptiveFormats is JsonArray) {
                     decodeFormats(adaptiveFormats, sources, encodedSources)
-                } else LOGGER.warn("Adaptive formats is null")
+                } else LOGGER.warn("Missing adaptive formats")
             }
 
             val videoDetails = jsonData.get("videoDetails")
             if (videoDetails != null) {
                 // why would we need it again?
                 // videoId = getString(videoDetails, "videoId")
-                title = getString(videoDetails, "title")
-                author = getString(videoDetails, "author")
-                channelId = getString(videoDetails, "channelId")
-                val lengthSeconds = getString(videoDetails, "lengthSeconds")
-                if (lengthSeconds != null) videoLengthSeconds = lengthSeconds.toLongOrNull() ?: 0L
-                val viewCount2 = getString(videoDetails, "viewCount")
-                if (viewCount2 != null) viewCount = viewCount2.toLongOrNull() ?: 0L
-                isLiveStream = getBoolean(videoDetails, "isLiveContent")
-                shortDescription = getString(videoDetails, "shortDescription")
+                title = videoDetails.getText("title")
+                author = videoDetails.getText("author")
+                channelId = videoDetails.getText("channelId")
+                videoLengthSeconds = videoDetails.getLong("lengthSeconds")
+                viewCount = videoDetails.getLong("viewCount")
+                isLiveStream = videoDetails.getBool("isLiveContent")
+                shortDescription = videoDetails.getText("shortDescription")
             } else LOGGER.warn("Video details is null")
 
             if (encodedSources.isNotEmpty()) {
