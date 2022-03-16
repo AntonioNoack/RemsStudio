@@ -258,6 +258,7 @@ object ComponentUIV2 {
                 } else {
                     FloatVectorInputV2(title, values, time, style)
                         .setChangeListener { x, y, z, _ ->
+                            println("changed v3 $x $y $z")
                             RemsStudio.incrementalChange("Set $title to ($x,$y,$z)", title) {
                                 self.putValue(values, Vector3f(x.toFloat(), y.toFloat(), z.toFloat()), false)
                             }

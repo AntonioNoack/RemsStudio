@@ -1,12 +1,10 @@
 package me.anno.remsstudio.ui.graphs
 
-import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.animation.Interpolation
 import me.anno.animation.Keyframe
 import me.anno.animation.Type
 import me.anno.config.DefaultStyle.black
 import me.anno.config.DefaultStyle.white
-import me.anno.gpu.GFX
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.drawing.DrawTexts
 import me.anno.gpu.drawing.DrawTextures.drawTexture
@@ -28,10 +26,12 @@ import me.anno.remsstudio.RemsStudio.editorTime
 import me.anno.remsstudio.RemsStudio.isPaused
 import me.anno.remsstudio.RemsStudio.updateAudio
 import me.anno.remsstudio.Selection.selectedProperty
+import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.ui.MenuUtils.askNumber
+import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.ui.base.constraints.AxisAlignment
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
-import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.ui.editor.sceneView.Grid.drawSmoothLine
 import me.anno.ui.style.Style
 import me.anno.utils.Color.mulAlpha
@@ -597,10 +597,31 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         when (action) {
             "MoveUp" -> moveUp(1f)
             "MoveDown" -> moveUp(-1f)
+            "StartScale" -> {
+                val sf = selectedKeyframes
+                when (sf.size) {
+                    0 -> LOGGER.warn("You need to select keyframes first!")
+                    1 -> LOGGER.warn("You need to select at least two keyframes!")
+                    else -> {
+                        // todo it would be nice if we had a live preview
+                        askNumber(windowStack, NameDesc("Scale Time"), 1.0, NameDesc("Scale")) { scale ->
+                            if (scale != 1.0 && scale.isFinite()) {
+                                val avg = selectedKeyframes.sumOf { it.time } / selectedKeyframes.size
+                                RemsStudio.largeChange("Scale keyframes by $scale") {
+                                    selectedKeyframes.forEach {
+                                        it.time = (it.time - avg) * scale + avg
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             else -> return super.onGotAction(x, y, dx, dy, action, isContinuous)
         }
         return true
     }
+
 
     override fun onMouseMoved(x: Float, y: Float, dx: Float, dy: Float) {
         val draggedKeyframe = draggedKeyframe
@@ -752,6 +773,8 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             else -> super.onMouseClicked(x, y, button, long)
         }
     }
+
+    override val className: String = "GraphEditorBody"
 
     companion object {
         private val LOGGER = LogManager.getLogger(GraphEditorBody::class)

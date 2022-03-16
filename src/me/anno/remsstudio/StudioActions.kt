@@ -227,6 +227,7 @@ object StudioActions {
 
         register["FileExplorer.f5.typed", "Refresh"]
         register["StudioTreeView.delete.typed", "Delete"]
+        register["GraphEditorBody.s.typed", "StartScale"]
 
     }
 
