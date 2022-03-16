@@ -608,9 +608,10 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                             if (scale != 1.0 && scale.isFinite()) {
                                 val avg = selectedKeyframes.sumOf { it.time } / selectedKeyframes.size
                                 RemsStudio.largeChange("Scale keyframes by $scale") {
-                                    selectedKeyframes.forEach {
+                                    for (it in selectedKeyframes) {
                                         it.time = (it.time - avg) * scale + avg
                                     }
+                                    selectedProperty?.sort()
                                 }
                             }
                         }
