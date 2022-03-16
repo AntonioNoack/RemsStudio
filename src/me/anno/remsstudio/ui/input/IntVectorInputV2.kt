@@ -14,7 +14,10 @@ import org.joml.*
 class IntVectorInputV2(
     style: Style, title: String, visibilityKey: String, type: Type,
     private val owningProperty: AnimatedProperty<*>
-) : IntVectorInput(style, title, visibilityKey, type, { IntInputV2(style, "", visibilityKey, type, owningProperty) }) {
+) : IntVectorInput(
+    style, title, visibilityKey, type,
+    { IntInputV2(style, "", visibilityKey, type, owningProperty) }
+) {
 
     constructor(title: String, visibilityKey: String, property: AnimatedProperty<*>, time: Double, style: Style) :
             this(style, title, visibilityKey, property.type, property) {

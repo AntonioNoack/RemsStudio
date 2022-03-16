@@ -18,11 +18,8 @@ class FloatVectorInputV2(
     private val owningProperty: AnimatedProperty<*>,
     style: Style
 ) : FloatVectorInput(
-    title,
-    visibilityKey,
-    type,
-    style,
-    { FloatInputV2(style, title, visibilityKey, type, owningProperty) }
+    title, visibilityKey, type, style,
+    { FloatInputV2(style, "", visibilityKey, type, owningProperty) }
 ) {
 
     constructor(title: String, property: AnimatedProperty<*>, time: Double, style: Style) :
