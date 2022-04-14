@@ -6,6 +6,7 @@ import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.studio.StudioBase
+import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.base.Visibility
 import me.anno.ui.input.IntVectorInput
 import me.anno.ui.style.Style
@@ -54,7 +55,7 @@ class IntVectorInputV2(
     fun pasteAnimated(data: String): Unit? {
         return try {
             val editorTime = RemsStudio.editorTime
-            val animProperty = TextReader.read(data, true)
+            val animProperty = TextReader.read(data, workspace, true)
                 .firstOrNull() as? AnimatedProperty<*>
             if (animProperty != null) {
                 owningProperty.copyFrom(animProperty)

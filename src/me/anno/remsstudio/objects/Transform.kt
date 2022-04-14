@@ -12,6 +12,7 @@ import me.anno.gpu.shader.ShaderPlus
 import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
+import me.anno.io.files.FileReference
 import me.anno.io.text.TextReader
 import me.anno.io.text.TextWriter
 import me.anno.language.translation.Dict
@@ -29,6 +30,7 @@ import me.anno.remsstudio.ui.ComponentUIV2
 import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.global2Kf
 import me.anno.studio.Inspectable
+import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.Panel
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.text.LinkPanel
@@ -134,13 +136,13 @@ open class Transform() : Saveable(),
     val bottomPointingTriangle = "▼"
     val folder = "\uD83D\uDCC1"
 
-    override fun add(child: Transform) {
-        children.add(child)
+    override fun addChild(index: Int, child: Transform) {
+        children.add(index, child)
         child.parent = this
     }
 
-    override fun add(index: Int, child: Transform) {
-        children.add(index, child)
+    override fun addChild(child: Transform) {
+        children.add(child)
         child.parent = this
     }
 
@@ -622,13 +624,13 @@ open class Transform() : Saveable(),
         children.remove(child)
     }*/
 
-    fun stringify(): String {
+    /*fun stringify(): String {
         val myParent = parent
         parent = null
         val data = TextWriter.toText(this)
         parent = myParent
         return data
-    }
+    }*/
 
     fun setName(name: String): Transform {
         this.name = name
@@ -686,9 +688,10 @@ open class Transform() : Saveable(),
 
     override fun isDefaultValue() = false
 
-    open fun clone(): Transform {
+    fun clone() = clone(workspace)
+    open fun clone(workspace: FileReference): Transform {
         val asString = try {
-            TextWriter.toText(this)
+            TextWriter.toText(this, workspace)
         } catch (e: Exception) {
             e.printStackTrace()
             ""
@@ -862,7 +865,7 @@ open class Transform() : Saveable(),
 
         val nextClickId = AtomicInteger()
 
-        fun String.toTransform() = TextReader.read(this, true).first() as? Transform
+        fun String.toTransform() = TextReader.read(this, workspace, true).first() as? Transform
 
         const val minAlpha = 0.5f / 255f
         private val LOGGER = LogManager.getLogger(Transform::class)

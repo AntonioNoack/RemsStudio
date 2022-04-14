@@ -29,7 +29,7 @@ All the following libraries currently are part of Rem's Engine, and therefore ar
 * [JOML](https://github.com/JOML-CI/JOML) (Matrix calculations and transforms for rendering)
 * [FFMpeg](https://ffmpeg.org/) (Video/Image/Audio Import & Export)
 * [HSLuv](https://github.com/hsluv/hsluv-java) (HSL alternative with constant brightness)
-* [OpenSimplexNoise](https://gist.github.com/KdotJPG/b1270127455a94ac5d19) (Noise Generator)
+* [FullNoise](https://gist.github.com/KdotJPG/b1270127455a94ac5d19) (Noise Generator)
 * [LanguageTool](https://languagetool.org/) (Spellchecking)
 * [JTransforms](https://sites.google.com/site/piotrwendykier/software/jtransforms) (Fast Fourier Transform)
 * [Apache Imaging](https://commons.apache.org/proper/commons-imaging/) (More supported image formats, like .ico)

@@ -1,14 +1,13 @@
 package me.anno.remsstudio.objects.meshes
 
-import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.animation.Type
 import me.anno.cache.instances.MeshCache.getMesh
 import me.anno.config.DefaultConfig
 import me.anno.ecs.Entity
+import me.anno.ecs.components.anim.AnimRenderer
 import me.anno.ecs.components.anim.BoneByBoneAnimation
 import me.anno.ecs.components.anim.ImportedAnimation
 import me.anno.ecs.components.anim.Skeleton
-import me.anno.ecs.components.mesh.AnimRenderer
 import me.anno.ecs.components.mesh.Material
 import me.anno.ecs.components.mesh.Mesh
 import me.anno.ecs.components.mesh.MeshComponent
@@ -24,12 +23,16 @@ import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
+import me.anno.maths.Maths.pow
+import me.anno.mesh.MeshData
 import me.anno.mesh.assimp.AnimGameItem
 import me.anno.mesh.assimp.AnimatedMeshesLoader
 import me.anno.mesh.assimp.StaticMeshesLoader
 import me.anno.mesh.vox.VOXReader
+import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.objects.meshes.MeshDataV2.drawAssimp2
 import me.anno.ui.Panel
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.groups.UpdatingContainer
@@ -38,9 +41,6 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.EnumInput
 import me.anno.ui.style.Style
 import me.anno.utils.files.LocalFile.toGlobalFile
-import me.anno.maths.Maths.pow
-import me.anno.mesh.MeshData
-import me.anno.remsstudio.objects.meshes.MeshDataV2.drawAssimp2
 import me.anno.video.MissingFrameException
 import org.joml.Matrix4fArrayList
 import org.joml.Vector4fc

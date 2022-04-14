@@ -8,6 +8,7 @@ import me.anno.audio.openal.AudioTasks
 import me.anno.config.DefaultConfig
 import me.anno.config.DefaultStyle.baseTheme
 import me.anno.gpu.GFX
+import me.anno.gpu.WindowX
 import me.anno.input.ActionManager
 import me.anno.input.Input.keyUpCtr
 import me.anno.installer.Installer.checkInstall
@@ -20,7 +21,7 @@ import me.anno.remsstudio.CheckVersion.checkVersion
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.audio.AudioManager2
 import me.anno.remsstudio.cli.RemsCLI
-import me.anno.remsstudio.gpu.shader.ShaderLibV2
+import me.anno.remsstudio.gpu.ShaderLibV2
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.text.Text
@@ -114,6 +115,8 @@ import me.anno.utils.OS
 
 object RemsStudio : StudioBase(true, "Rem's Studio", 10107) {
 
+    val defaultWindowStack get() = GFX.someWindow.windowStack
+
     // private val LOGGER = LogManager.getLogger(RemsStudio::class)
 
     lateinit var currentCamera: Camera
@@ -204,7 +207,7 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10107) {
         val project = Project(name.trim(), folder)
         RemsStudio.project = project
         project.open()
-        GFX.setTitle("Rem's Studio: ${project.name}")
+        GFX.someWindow.title = "Rem's Studio: ${project.name}"
         return project
     }
 
@@ -217,7 +220,7 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10107) {
     }
 
     override fun getDefaultFileLocation(): FileReference {
-        return project?.file ?: InvalidRef
+        return workspace
     }
 
     override fun getPersistentStorage(): FileReference {
@@ -248,8 +251,8 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10107) {
     val targetDuration get(): Double = project?.targetDuration ?: Double.POSITIVE_INFINITY
     val targetSampleRate get(): Int = project?.targetSampleRate ?: 48000
     val targetFPS get(): Double = project?.targetFPS ?: 60.0
-    val targetWidth get(): Int = project?.targetWidth ?: GFX.width
-    val targetHeight get(): Int = project?.targetHeight ?: GFX.height
+    val targetWidth get(): Int = project?.targetWidth ?: GFX.someWindow.width
+    val targetHeight get(): Int = project?.targetHeight ?: GFX.someWindow.height
     val targetOutputFile get(): FileReference = project!!.targetOutputFile
     val motionBlurSteps get(): AnimatedProperty<Int> = project!!.motionBlurSteps
     val shutterPercentage get() = project!!.shutterPercentage
@@ -267,11 +270,11 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10107) {
         updateLastLocalTime(root, editorTime)
     }
 
-    override fun onGameLoop(w: Int, h: Int) {
+    override fun onGameLoop(window: WindowX, w: Int, h: Int) {
         DefaultConfig.saveMaybe("main.config")
         baseTheme.values.saveMaybe("style.config")
         Selection.update()
-        super.onGameLoop(w, h)
+        super.onGameLoop(window, w, h)
     }
 
     override fun onGameLoopEnd() {

@@ -21,7 +21,7 @@ object ColorGrading {
     ) {
 
         val group = getGroup("Color Grading (ASC CDL)", "", "color-grading")
-        group.add(img(TextPanel("" +
+        group.addChild(img(TextPanel("" +
                 "1. tint by slope\n" +
                 "2. add color with offset\n" +
                 "3. control the power\n" +
@@ -35,13 +35,13 @@ object ColorGrading {
         val offset1 = t.vi("Plus Offset", "Can be used to color black objects", "cg.offset", cgOffsetAdd, style)
         val offset2 = t.vi("Minus Offset", "Can be used to color white objects", "cg.offset.sub", cgOffsetSub, style)
 
-        group.add(img(power))
-        group.add(img(slope))
-        group.add(img(offset1))
-        group.add(img(offset2))
+        group.addChild(img(power))
+        group.addChild(img(slope))
+        group.addChild(img(offset1))
+        group.addChild(img(offset2))
 
         val satDesc = "0 = gray scale, 1 = normal, -1 = inverted colors"
-        group.add(img(t.vi("Saturation", satDesc, "cg.saturation", cgSaturation, style)))
+        group.addChild(img(t.vi("Saturation", satDesc, "cg.saturation", cgSaturation, style)))
 
     }
 

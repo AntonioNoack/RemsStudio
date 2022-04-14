@@ -1,5 +1,6 @@
 package me.anno.remsstudio
 
+import me.anno.gpu.GFX
 import me.anno.io.files.FileReference
 import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.files.InvalidRef
@@ -9,7 +10,6 @@ import me.anno.remsstudio.RemsStudio.project
 import me.anno.remsstudio.RemsStudio.root
 import me.anno.remsstudio.RemsStudio.shutterPercentage
 import me.anno.remsstudio.RemsStudio.targetOutputFile
-import me.anno.remsstudio.RemsStudio.windowStack
 import me.anno.remsstudio.audio.AudioCreatorV2
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
@@ -25,7 +25,6 @@ import me.anno.ui.base.menu.MenuOption
 import me.anno.utils.hpc.Threads.threadWithName
 import me.anno.utils.types.Strings.defaultImportType
 import me.anno.utils.types.Strings.getImportType
-import me.anno.video.AudioCreator
 import me.anno.video.VideoCreator
 import me.anno.video.VideoCreator.Companion.defaultQuality
 import me.anno.video.ffmpeg.FFMPEGEncodingBalance
@@ -192,6 +191,7 @@ object Rendering {
                 // we need to ask
                 else -> {
                     // todo ask which video is the right one
+                    val windowStack = GFX.someWindow.windowStack
                     openMenu(windowStack, NameDesc(
                         "Select the target video",
                         "Where the video part is defined; will also decide the length",
@@ -267,6 +267,7 @@ object Rendering {
     }
 
     private fun onAlreadyRendering() {
+        val windowStack = GFX.someWindow.windowStack
         msg(
             windowStack, NameDesc(
                 "Rendering already in progress!",
@@ -277,6 +278,7 @@ object Rendering {
     }
 
     private fun askOverridingIsAllowed(targetOutputFile: FileReference, callback: () -> Unit) {
+        val windowStack = GFX.someWindow.windowStack
         ask(windowStack, NameDesc("Override %1?").with("%1", targetOutputFile.name), callback)
     }
 

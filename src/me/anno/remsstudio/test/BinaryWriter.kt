@@ -3,6 +3,7 @@ package me.anno.remsstudio.test
 import me.anno.io.binary.BinaryReader
 import me.anno.io.binary.BinaryWriter
 import me.anno.io.files.FileReference.Companion.getReference
+import me.anno.io.files.InvalidRef
 import me.anno.io.text.TextWriter
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
@@ -72,13 +73,13 @@ fun main() {
     file.writeBytes(binaryValue)
 
     // load all files into the cache
-    candidates.forEach { it.save(TextWriter()) }
+    candidates.forEach { it.save(TextWriter(InvalidRef)) }
 
     // text
     val text0 = System.nanoTime()
     lateinit var textValue: String
     for (i in 0 until 100) {
-        val writer = TextWriter()
+        val writer = TextWriter(InvalidRef)
         candidates.forEach { writer.add(it) }
         writer.writeAllInList()
         textValue = writer.toString()

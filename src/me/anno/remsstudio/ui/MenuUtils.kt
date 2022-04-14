@@ -1,7 +1,6 @@
 package me.anno.remsstudio.ui
 
 import me.anno.config.DefaultConfig
-import me.anno.gpu.GFX
 import me.anno.language.translation.NameDesc
 import me.anno.studio.StudioBase.Companion.addEvent
 import me.anno.ui.Window
@@ -21,8 +20,6 @@ object MenuUtils {
         actionName: NameDesc,
         callback: (Double) -> Unit
     ) {
-        GFX.updateMousePosition()
-        windowStack.updateMousePosition()
         askNumber(
             windowStack,
             windowStack.mouseXi - Menu.paddingX,

@@ -3,16 +3,16 @@ package me.anno.remsstudio.history
 import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
-import me.anno.remsstudio.objects.Camera
-import me.anno.remsstudio.objects.Transform
-import me.anno.studio.StudioBase.Companion.defaultWindowStack
 import me.anno.remsstudio.RemsStudio
+import me.anno.remsstudio.RemsStudio.defaultWindowStack
 import me.anno.remsstudio.RemsStudio.nullCamera
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.Selection.select
-import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
-import me.anno.remsstudio.ui.sceneTabs.SceneTabs
+import me.anno.remsstudio.objects.Camera
+import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.ui.scene.StudioSceneView
+import me.anno.remsstudio.ui.sceneTabs.SceneTabs
+import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.utils.structures.lists.Lists.join
 
 class HistoryState() : Saveable() {
@@ -57,7 +57,7 @@ class HistoryState() : Saveable() {
         RemsStudio.editorTime = editorTime
         val listOfAll = root.listOfAll.toList()
         select(selectedUUID, selectedPropName)
-        defaultWindowStack?.forEach { window ->
+        defaultWindowStack.forEach { window ->
             var index = 0
             window.panel.forAll {
                 if (it is StudioSceneView) {
@@ -89,7 +89,7 @@ class HistoryState() : Saveable() {
 
         state.title = title
         state.selectedUUID = Selection.selectedTransform?.getUUID() ?: -1
-        state.usedCameras = defaultWindowStack!!.map { window ->
+        state.usedCameras = defaultWindowStack.map { window ->
             window.panel.listOfAll.filterIsInstance<StudioSceneView>().map { it.camera.getUUID() }.toList()
         }.join().toIntArray()
 

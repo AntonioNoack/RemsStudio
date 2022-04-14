@@ -15,7 +15,7 @@ import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.remsstudio.gpu.drawing.GFXx3Dv2
+import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.documents.SiteSelection.parseSites

@@ -18,7 +18,7 @@ import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.Scene
 import me.anno.remsstudio.Scene.mayUseMSAA
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.remsstudio.gpu.drawing.GFXx3Dv2.draw3DMasked
+import me.anno.remsstudio.gpu.GFXx3Dv2.draw3DMasked
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.geometric.Circle

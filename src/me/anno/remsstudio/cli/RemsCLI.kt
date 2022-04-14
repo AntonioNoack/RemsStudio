@@ -11,14 +11,16 @@ import me.anno.gpu.texture.Texture2D.Companion.bindTexture
 import me.anno.installer.Installer.checkInstall
 import me.anno.io.config.ConfigBasics
 import me.anno.io.files.FileReference.Companion.getReference
+import me.anno.io.files.InvalidRef
 import me.anno.io.text.TextReader
 import me.anno.remsstudio.*
-import me.anno.remsstudio.gpu.shader.ShaderLibV2
+import me.anno.remsstudio.gpu.ShaderLibV2
 import me.anno.remsstudio.objects.Transform
 import me.anno.studio.CommandLines.parseDouble
 import me.anno.studio.CommandLines.parseFloat
 import me.anno.studio.CommandLines.parseInt
 import me.anno.studio.StudioBase
+import me.anno.studio.StudioBase.Companion.workEventTasks
 import me.anno.utils.Sleep.sleepABit
 import me.anno.utils.types.Strings.getImportType
 import me.anno.utils.types.Strings.isBlank2
@@ -76,6 +78,9 @@ object RemsCLI {
             readText(line.getOptionValue("input"))
         } else return error("Input needs to be defined")
 
+        // todo find project above scene source
+        val project0 = getReference(sceneSource).getParent() ?: InvalidRef
+
         val yes = line.hasOption("yes") || line.hasOption("force")
         val no = line.hasOption("no")
         if (yes && no) return error("Cannot enable yes and no at the same time")
@@ -83,7 +88,7 @@ object RemsCLI {
         init()
 
         val scene = try {
-            TextReader.readFirstOrNull<Transform>(sceneSource, true)
+            TextReader.readFirstOrNull<Transform>(sceneSource, project0, true)
                 ?: return error("Could not find scene")
         } catch (e: RuntimeException) {
             e.printStackTrace()
@@ -180,7 +185,7 @@ object RemsCLI {
             GFX.check()
             Frame.reset()
             GFX.workGPUTasks(false)
-            GFX.workEventTasks()
+            workEventTasks()
             sleepABit(true)
         }
 

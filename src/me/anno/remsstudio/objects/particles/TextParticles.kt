@@ -8,6 +8,7 @@ import me.anno.fonts.mesh.TextMesh
 import me.anno.fonts.mesh.TextMeshGroup
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
+import me.anno.io.files.InvalidRef
 import me.anno.io.text.TextWriter
 import me.anno.remsstudio.objects.text.Text
 import me.anno.ui.base.groups.PanelListY
@@ -127,9 +128,7 @@ class TextParticles : ParticleSystem() {
         text.saveWithoutSuper(writer)
     }
 
-    override fun getSystemState(): Any? {
-        return super.getSystemState() to TextWriter.toText(text)
-    }
+    override fun getSystemState() = super.getSystemState() to TextWriter.toText(text, InvalidRef)
 
     override fun readObject(name: String, value: ISaveable?) {
         when (name) {

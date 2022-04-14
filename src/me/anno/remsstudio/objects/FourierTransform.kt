@@ -250,14 +250,14 @@ class FourierTransform : Transform() {
     ) {
         super.createInspector(list, style, getGroup)
         val fourier = getGroup("Fourier Transform", "", "fourier")
-        fourier.add(vi("Audio File", "", null, file, style) { file = it })
-        fourier.add(
+        fourier.addChild(vi("Audio File", "", null, file, style) { file = it })
+        fourier.addChild(
             vi(
                 "Sample Rate", "What the highest frequency should be",
                 // higher frequencies are eliminated, because we interpolate samples (I think...)
                 sampleRateType, sampleRate, style
             ) { sampleRate = max(64, it) })
-        fourier.add(
+        fourier.addChild(
             vi(
                 "Buffer Size",
                 "Should be at least twice the buffer size, 'Resolution' of the fourier transform, and length of samples per batch",
@@ -265,24 +265,24 @@ class FourierTransform : Transform() {
                 bufferSize,
                 style
             ) { bufferSize = max(64, it) })
-        fourier.add(
+        fourier.addChild(
             vi(
                 "Buffer Min", "Use only a part of the fourier transform; -1 = disabled",
                 null, minBufferIndex, style
             ) { minBufferIndex = it })
-        fourier.add(
+        fourier.addChild(
             vi(
                 "Buffer Max", "Use only a part of the fourier transform; -1 = disabled",
                 null, maxBufferIndex, style
             ) { maxBufferIndex = it })
         val amplitude = getGroup("Amplitude", "", "amplitude")
-        amplitude.add(vi("Position, Linear", "", posLin, style))
-        amplitude.add(vi("Position, Logarithmic", "", posLog, style))
-        amplitude.add(vi("Rotation, Linear", "", rotLin, style))
-        amplitude.add(vi("Rotation, Logarithmic", "", rotLog, style))
-        amplitude.add(vi("Scale, Offset", "", scaOff, style))
-        amplitude.add(vi("Scale, Linear", "", scaLin, style))
-        amplitude.add(vi("Scale, Logarithmic", "", scaLog, style))
+        amplitude.addChild(vi("Position, Linear", "", posLin, style))
+        amplitude.addChild(vi("Position, Logarithmic", "", posLog, style))
+        amplitude.addChild(vi("Rotation, Linear", "", rotLin, style))
+        amplitude.addChild(vi("Rotation, Logarithmic", "", rotLog, style))
+        amplitude.addChild(vi("Scale, Offset", "", scaOff, style))
+        amplitude.addChild(vi("Scale, Linear", "", scaLin, style))
+        amplitude.addChild(vi("Scale, Logarithmic", "", scaLog, style))
     }
 
     override fun drawChildrenAutomatically(): Boolean = false

@@ -1,15 +1,15 @@
 package me.anno.remsstudio.animation.drivers
 
-import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.animation.Type
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.maths.Maths.clamp
+import me.anno.maths.noise.FullNoise
+import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
 import me.anno.ui.Panel
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
-import org.kdotjpg.OpenSimplexNoise
 import kotlin.math.min
 
 class PerlinNoiseDriver : AnimationDriver() {
@@ -19,9 +19,9 @@ class PerlinNoiseDriver : AnimationDriver() {
 
     var seed = 0L
 
-    private var noiseInstance = OpenSimplexNoise(seed)
-    fun getNoise(): OpenSimplexNoise {
-        if (noiseInstance.seed != seed) noiseInstance = OpenSimplexNoise(seed)
+    private var noiseInstance = FullNoise(seed)
+    fun getNoise(): FullNoise {
+        if (noiseInstance.seed != seed) noiseInstance = FullNoise(seed)
         return noiseInstance
     }
 
@@ -35,8 +35,8 @@ class PerlinNoiseDriver : AnimationDriver() {
     fun getMaxValue(falloff: Float, octaves: Int): Float =
         if (octaves >= 0) 1f else 1f + falloff * getMaxValue(falloff, octaves - 1)
 
-    fun getValue(time: Double, noise: OpenSimplexNoise, falloff: Double, step: Int): Double {
-        var value0 = noise.eval(time, step.toDouble())
+    fun getValue(time: Double, noise: FullNoise, falloff: Double, step: Int): Double {
+        var value0 = noise.getValue(time.toFloat(), step.toFloat()).toDouble()
         if (step > 0) value0 += falloff * getValue(2.0 * time, noise, falloff, step - 1)
         return value0
     }

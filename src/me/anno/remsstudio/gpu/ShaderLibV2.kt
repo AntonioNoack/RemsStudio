@@ -1,4 +1,4 @@
-package me.anno.remsstudio.gpu.shader
+package me.anno.remsstudio.gpu
 
 import me.anno.gpu.shader.BaseShader
 import me.anno.gpu.shader.GLSLLib

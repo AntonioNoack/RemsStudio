@@ -5,7 +5,7 @@ import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
-import me.anno.studio.StudioBase.Companion.defaultWindowStack
+import me.anno.remsstudio.RemsStudio.defaultWindowStack
 import me.anno.remsstudio.history.HistoryState.Companion.capture
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
@@ -25,7 +25,7 @@ class History : Saveable() {
     fun isEmpty() = states.isEmpty()
 
     fun clearToSize() {
-        synchronized(states){
+        synchronized(states) {
             while (states.size > maxChanged && maxChanged > 0) {
                 states.removeAt(0)
             }
@@ -43,7 +43,7 @@ class History : Saveable() {
     }
 
     fun put(change: HistoryState): Int {
-        synchronized(states){
+        synchronized(states) {
             // remove states at the top of the stack...
             // while (states.size > nextInsertIndex) states.removeAt(states.lastIndex)
             states += change
@@ -62,7 +62,7 @@ class History : Saveable() {
     }
 
     fun redo() {
-        synchronized(states){
+        synchronized(states) {
             if (nextInsertIndex < states.size) {
                 states[nextInsertIndex].apply()
                 nextInsertIndex++
@@ -71,7 +71,7 @@ class History : Saveable() {
     }
 
     fun undo() {
-        synchronized(states){
+        synchronized(states) {
             if (nextInsertIndex > 1) {
                 nextInsertIndex--
                 states[nextInsertIndex - 1].apply()
@@ -87,12 +87,16 @@ class History : Saveable() {
     }
 
     fun display() {
-        openMenu(defaultWindowStack!!, NameDesc("Inspect History", "", "ui.inspectHistory"), states.mapIndexed { index, change ->
-            val title = if (index == nextInsertIndex - 1) "* ${change.title}" else change.title
-            MenuOption(NameDesc(title, Dict["Click to redo", "ui.history.clickToUndo"], "")) {
-                redo(index)
-            }
-        }.reversed())
+        openMenu(
+            defaultWindowStack,
+            NameDesc("Inspect History", "", "ui.inspectHistory"),
+            states.mapIndexed { index, change ->
+                val title = if (index == nextInsertIndex - 1) "* ${change.title}" else change.title
+                MenuOption(NameDesc(title, Dict["Click to redo", "ui.history.clickToUndo"], "")) {
+                    redo(index)
+                }
+            }.reversed()
+        )
     }
 
     override fun readInt(name: String, value: Int) {
@@ -103,9 +107,9 @@ class History : Saveable() {
     }
 
     override fun readObjectArray(name: String, values: Array<ISaveable?>) {
-        when(name){
+        when (name) {
             "states" -> {
-                synchronized(states){
+                synchronized(states) {
                     states += values.filterIsInstance<HistoryState>()
                 }
             }
@@ -123,7 +127,7 @@ class History : Saveable() {
     override fun save(writer: BaseWriter) {
         super.save(writer)
         writer.writeInt("nextInsertIndex", nextInsertIndex)
-        synchronized(states){
+        synchronized(states) {
             writer.writeObjectList(this, "states", states)
         }
     }

@@ -5,7 +5,6 @@ import me.anno.animation.Keyframe
 import me.anno.cache.CacheData
 import me.anno.cache.instances.VideoCache
 import me.anno.config.DefaultStyle.white4
-import me.anno.gpu.GFX
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.input.Input
 import me.anno.input.Input.isControlDown
@@ -30,6 +29,7 @@ import me.anno.remsstudio.ui.StudioFileImporter.addChildFromFile
 import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.studio.StudioBase
 import me.anno.studio.StudioBase.Companion.shiftSlowdown
+import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.Panel
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
@@ -368,7 +368,7 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
     override fun onPaste(x: Float, y: Float, data: String, type: String) {
         if (!data.startsWith("[")) return super.onPaste(x, y, data, type)
         try {
-            val childMaybe = TextReader.read(data, true).firstOrNull { it is Transform } as? Transform
+            val childMaybe = TextReader.read(data, workspace, true).firstOrNull { it is Transform } as? Transform
             val child = childMaybe ?: return super.onPaste(x, y, data, type)
             val original = (StudioBase.dragged as? Draggable)?.getOriginal() as? Transform
             RemsStudio.largeChange("Pasted Component / Changed Timeline Slot") {

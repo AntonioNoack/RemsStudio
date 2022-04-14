@@ -37,9 +37,9 @@ import me.anno.remsstudio.RemsStudio.targetHeight
 import me.anno.remsstudio.RemsStudio.targetWidth
 import me.anno.remsstudio.Scene
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.remsstudio.gpu.drawing.GFXx3Dv2
-import me.anno.remsstudio.gpu.drawing.GFXx3Dv2.draw3DVideo
-import me.anno.remsstudio.gpu.drawing.GFXxSVGv2
+import me.anno.remsstudio.gpu.GFXx3Dv2
+import me.anno.remsstudio.gpu.GFXx3Dv2.draw3DVideo
+import me.anno.remsstudio.gpu.GFXxSVGv2
 import me.anno.remsstudio.objects.lists.Element
 import me.anno.remsstudio.objects.lists.SplittableElement
 import me.anno.remsstudio.objects.models.SpeakerModel.drawSpeakers
@@ -1037,8 +1037,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
         return forcedMeta?.videoFrameCount ?: 0
     }
 
-    override fun clone(): Transform {
-        val clone = super.clone() as Video
+    override fun clone(workspace: FileReference): Transform {
+        val clone = super.clone(workspace) as Video
         clone.lastFrame = lastFrame
         clone.lastW = lastW
         clone.lastH = lastH

@@ -3,11 +3,12 @@ package me.anno.remsstudio.test
 import me.anno.animation.Interpolation
 import me.anno.io.csv.CSVReader
 import me.anno.io.files.FileReference.Companion.getReference
+import me.anno.io.files.InvalidRef
 import me.anno.io.text.TextWriter
+import me.anno.remsstudio.RemsRegistry
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.geometric.Circle
 import me.anno.remsstudio.objects.geometric.LinePolygon
-import me.anno.remsstudio.RemsRegistry
 import me.anno.utils.OS
 import org.joml.Vector3f
 
@@ -66,6 +67,6 @@ fun main() {
     }
 
     // export this as a Rem's Studio project file, where we have multiple animated lines
-    folder.getChild("lines.json").writeText(TextWriter.toText(root))
+    folder.getChild("lines.json").writeText(TextWriter.toText(root, InvalidRef))
 
 }

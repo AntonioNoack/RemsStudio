@@ -17,7 +17,7 @@ import me.anno.io.files.InvalidRef
 import me.anno.language.translation.Dict
 import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.remsstudio.gpu.drawing.GFXx3Dv2.draw3DPolygon
+import me.anno.remsstudio.gpu.GFXx3Dv2.draw3DPolygon
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.ui.base.groups.PanelListY

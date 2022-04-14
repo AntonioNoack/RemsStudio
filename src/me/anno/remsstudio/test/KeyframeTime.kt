@@ -1,11 +1,12 @@
 package me.anno.remsstudio.test
 
+import me.anno.animation.Interpolation
+import me.anno.io.files.InvalidRef
 import me.anno.io.text.TextReader
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.animation.Interpolation
 import me.anno.utils.LOGGER
 
-fun main(){
+fun main() {
 
     val prop = AnimatedProperty.float()
     prop.isAnimated = true
@@ -15,7 +16,7 @@ fun main(){
     prop.keyframes.forEach { it.interpolation = Interpolation.EASE_IN }
 
     val asString = prop.toString()
-    val fromString = TextReader.read(asString, false)
+    val fromString = TextReader.read(asString, InvalidRef, false)
         .filterIsInstance<AnimatedProperty<*>>().first()
 
     LOGGER.info(asString)

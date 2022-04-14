@@ -3,8 +3,8 @@ package me.anno.remsstudio
 import me.anno.installer.Installer
 import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.language.translation.NameDesc
+import me.anno.remsstudio.RemsStudio.defaultWindowStack
 import me.anno.studio.StudioBase.Companion.addEvent
-import me.anno.studio.StudioBase.Companion.defaultWindowStack
 import me.anno.ui.base.menu.Menu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.utils.OS
@@ -38,7 +38,7 @@ object CheckVersion {
                         LOGGER.info("Found newer version: $name")
                         // wait for everything to be loaded xD
                         addEvent {
-                            Menu.openMenu(windowStack!!,
+                            Menu.openMenu(windowStack,
                                 NameDesc("New Version Available!", "", "ui.newVersion"), listOf(
                                     MenuOption(NameDesc("See Download Options", "", "ui.newVersion.openLink")) {
                                         URI("https", "remsstudio.phychi.com", "/", "s=download").toURL().openInBrowser()

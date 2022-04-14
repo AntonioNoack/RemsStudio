@@ -7,6 +7,7 @@ import me.anno.config.DefaultStyle.deepDark
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.addGPUTask
 import me.anno.gpu.OpenGL.renderDefault
+import me.anno.gpu.drawing.DrawRectangles.drawBorder
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.framebuffer.Screenshots
@@ -256,14 +257,16 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         val dx = stableSize.dx + bt
         val dy = stableSize.dy + bt
 
-        drawRect(x, y, w, h, -1)
-        drawRect(x + bth, y + bth, w - 2 * bth, h - 2 * bth, black)
-        drawRect(x + bt, y + bt, w - 2 * bt, h - 2 * bt, deepDark)
+        val white = -1
+        drawBorder(x, y, w, h, white, bth)
+        drawBorder(x + bth, y + bth, w - bt, h - bt, black, bth)
+        // filled with scene background color anyways
+        // drawRect(x + bt, y + bt, w - 2 * bt, h - 2 * bt, deepDark)
 
         val x00 = x + dx
         val y00 = y + dy
-        val wx = min(stableSize.stableWidth, GFX.width - x00)
-        val wy = min(stableSize.stableHeight, GFX.height - y00)
+        val wx = min(stableSize.stableWidth, GFX.someWindow.width - x00)
+        val wy = min(stableSize.stableHeight, GFX.someWindow.height - y00)
         val rw = min(wx, w - 2 * bt)
         val rh = min(wy, h - 2 * bt)
         if (rw > 0 && rh > 0) {
@@ -398,7 +401,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         if (!mayControlCamera) return
 
         // todo rotate/move our camera or the selected object?
-        val size = -20f * shiftSlowdown / GFX.height
+        val size = -20f * shiftSlowdown / GFX.someWindow.height
         when (touches.size) {
             2 -> {
                 val first = touches[0]!!
@@ -565,7 +568,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
 
     override fun onMouseMoved(x: Float, y: Float, dx: Float, dy: Float) {
         // fov is relative to height -> modified to depend on height
-        val size = 20f * shiftSlowdown / GFX.height
+        val size = 20f * shiftSlowdown / GFX.someWindow.height
         val dx0 = dx * size
         val dy0 = dy * size
         // move stuff, if mouse is down and no touch is down
@@ -590,7 +593,10 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             return
         }
         // move the camera
-        val size = 20f * shiftSlowdown * (if (selectedTransform is Camera) -1f else 1f) / max(GFX.width, GFX.height)
+        val size = 20f * shiftSlowdown * (if (selectedTransform is Camera) -1f else 1f) / max(
+            GFX.someWindow.width,
+            GFX.someWindow.height
+        )
         val dx0 = dx * size
         val dy0 = dy * size
         val scaleFactor = -10f

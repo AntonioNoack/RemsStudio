@@ -3,15 +3,16 @@ package me.anno.remsstudio.ui
 import me.anno.config.DefaultConfig
 import me.anno.config.DefaultStyle
 import me.anno.input.Input
+import me.anno.io.files.InvalidRef
 import me.anno.io.text.TextWriter
 import me.anno.io.utils.StringMap
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.RemsStudio
+import me.anno.remsstudio.RemsStudio.defaultWindowStack
 import me.anno.remsstudio.RemsStudio.lastTouchedCamera
 import me.anno.remsstudio.RemsStudio.nullCamera
-import me.anno.remsstudio.RemsStudio.windowStack
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Rectangle
@@ -40,7 +41,7 @@ class StudioTreeView(style: Style) :
 
     override fun getDragType(element: Transform): String = "Transform"
 
-    override fun stringifyForCopy(element: Transform): String = TextWriter.toText(element)
+    override fun stringifyForCopy(element: Transform): String = TextWriter.toText(element, InvalidRef)
 
     override fun getSymbol(element: Transform): String {
         return element.symbol
@@ -251,9 +252,10 @@ class StudioTreeView(style: Style) :
                     extras += Menu.menuSeparator1
                     extras += additional
                 }
+                val ws = defaultWindowStack
                 Menu.openMenu(
-                    windowStack,
-                    Input.mouseX, Input.mouseY, NameDesc("Add Child", "", "ui.objects.add"),
+                    defaultWindowStack,
+                    ws.mouseX, ws.mouseY, NameDesc("Add Child", "", "ui.objects.add"),
                     options.entries
                         .sortedBy { (key, _) -> key.lowercase(Locale.getDefault()) }
                         .map { (key, value) ->

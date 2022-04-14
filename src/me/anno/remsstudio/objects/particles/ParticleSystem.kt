@@ -6,6 +6,7 @@ import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
+import me.anno.io.files.InvalidRef
 import me.anno.io.text.TextWriter
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
@@ -309,7 +310,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
             fun getName() = "$name: ${property.distribution.className.split("Distribution").first()}"
             val group = getGroup(getName(), "", "$viCtr")
             group.setTooltip(description)
-            group.add(SpyPanel(style) {
+            group.addChild(SpyPanel(style) {
                 if (group.isAnyChildInFocus) {
                     val needsUpdate = selectedDistribution !== property
                     selectedDistribution = property
@@ -438,7 +439,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
 
     open fun getSystemState(): Any? {
         // val t0 = System.nanoTime()
-        val writer = TextWriter()
+        val writer = TextWriter(InvalidRef)
         writer.add(spawnPosition)
         writer.add(spawnVelocity)
         writer.add(spawnRotation)

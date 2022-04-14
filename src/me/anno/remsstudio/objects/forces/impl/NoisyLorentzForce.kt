@@ -2,6 +2,7 @@ package me.anno.remsstudio.objects.forces.impl
 
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
+import me.anno.maths.noise.FullNoise
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.inspectable.InspectableAnimProperty
 import me.anno.remsstudio.objects.particles.Particle
@@ -13,7 +14,6 @@ import me.anno.utils.types.Vectors.times
 import org.joml.Vector3f
 import org.joml.Vector3fc
 import org.joml.Vector4f
-import org.kdotjpg.OpenSimplexNoise
 import java.util.*
 
 class NoisyLorentzForce : PerParticleForce(
@@ -21,9 +21,9 @@ class NoisyLorentzForce : PerParticleForce(
     "Circular motion by velocity, randomized by location", "lorentz.noisy"
 ) {
 
-    lateinit var nx: OpenSimplexNoise
-    lateinit var ny: OpenSimplexNoise
-    lateinit var nz: OpenSimplexNoise
+    lateinit var nx: FullNoise
+    lateinit var ny: FullNoise
+    lateinit var nz: FullNoise
 
     var seed = initRandomizers(0)
 
@@ -31,22 +31,22 @@ class NoisyLorentzForce : PerParticleForce(
 
     fun initRandomizers(seed: Long): Long {
         val random = Random(seed)
-        nx = OpenSimplexNoise(random.nextLong())
-        ny = OpenSimplexNoise(random.nextLong())
-        nz = OpenSimplexNoise(random.nextLong())
+        nx = FullNoise(random.nextLong())
+        ny = FullNoise(random.nextLong())
+        nz = FullNoise(random.nextLong())
         return seed
     }
 
     fun getMagneticField(position: Vector3fc, time: Double): Vector3fc {
         val scale = fieldScale[time]
-        val px = (position.x() * scale.x()).toDouble()
-        val py = (position.y() * scale.y()).toDouble()
-        val pz = (position.z() * scale.z()).toDouble()
-        val pw = (time * scale.w())
+        val px = (position.x() * scale.x())
+        val py = (position.y() * scale.y())
+        val pz = (position.z() * scale.z())
+        val pw = (time * scale.w()).toFloat()
         return Vector3f(
-            nx.eval(px, py, pz, pw).toFloat(),
-            ny.eval(px, py, pz, pw).toFloat(),
-            nz.eval(px, py, pz, pw).toFloat()
+            nx.getValue(px, py, pz, pw),
+            ny.getValue(px, py, pz, pw),
+            nz.getValue(px, py, pz, pw)
         )
     }
 

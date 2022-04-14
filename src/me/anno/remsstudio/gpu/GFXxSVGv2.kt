@@ -1,4 +1,4 @@
-package me.anno.remsstudio.gpu.drawing
+package me.anno.remsstudio.gpu
 
 import me.anno.gpu.SVGxGFX
 import me.anno.gpu.buffer.StaticBuffer

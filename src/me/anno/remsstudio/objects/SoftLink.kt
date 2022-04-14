@@ -18,7 +18,7 @@ import me.anno.language.translation.Dict
 import me.anno.gpu.drawing.UVProjection
 import me.anno.remsstudio.objects.text.Text
 import me.anno.remsstudio.Scene
-import me.anno.remsstudio.gpu.drawing.GFXx3Dv2.draw3DVideo
+import me.anno.remsstudio.gpu.GFXx3Dv2.draw3DVideo
 import me.anno.remsstudio.ui.StudioFileImporter.addChildFromFile
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory

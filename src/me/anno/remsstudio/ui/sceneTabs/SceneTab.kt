@@ -1,6 +1,7 @@
 package me.anno.remsstudio.ui.sceneTabs
 
 import me.anno.config.DefaultConfig
+import me.anno.gpu.GFX
 import me.anno.input.ActionManager
 import me.anno.input.MouseButton
 import me.anno.io.files.FileReference
@@ -8,10 +9,15 @@ import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.text.TextReader
 import me.anno.io.text.TextWriter
 import me.anno.language.translation.NameDesc
-import me.anno.remsstudio.objects.Transform
-import me.anno.studio.StudioBase.Companion.dragged
-import me.anno.remsstudio.history.History
+import me.anno.maths.Maths.mixARGB
 import me.anno.remsstudio.RemsStudio.project
+import me.anno.remsstudio.history.History
+import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.ui.scene.SceneTabData
+import me.anno.remsstudio.ui.sceneTabs.SceneTabs.currentTab
+import me.anno.remsstudio.ui.sceneTabs.SceneTabs.open
+import me.anno.studio.StudioBase.Companion.dragged
+import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.base.menu.Menu.ask
 import me.anno.ui.base.menu.Menu.msg
 import me.anno.ui.base.menu.Menu.openMenu
@@ -20,11 +26,7 @@ import me.anno.ui.base.text.TextPanel
 import me.anno.ui.dragging.Draggable
 import me.anno.ui.editor.files.FileExplorer
 import me.anno.ui.editor.files.toAllowedFilename
-import me.anno.remsstudio.ui.sceneTabs.SceneTabs.currentTab
-import me.anno.remsstudio.ui.sceneTabs.SceneTabs.open
-import me.anno.remsstudio.ui.scene.SceneTabData
 import me.anno.utils.hpc.Threads.threadWithName
-import me.anno.maths.Maths.mixARGB
 import org.apache.logging.log4j.LogManager
 
 class SceneTab(var file: FileReference?, var scene: Transform, history: History?) : TextPanel("", DefaultConfig.style) {
@@ -35,7 +37,8 @@ class SceneTab(var file: FileReference?, var scene: Transform, history: History?
     }
 
     var history = history ?: try {
-        TextReader.readFirstOrNull<History>(file!!)!!
+        // todo find project for file
+        TextReader.readFirstOrNull<History>(file!!, workspace)!!
     } catch (e: java.lang.Exception) {
         History()
     }
@@ -96,7 +99,7 @@ class SceneTab(var file: FileReference?, var scene: Transform, history: History?
             try {
                 synchronized(scene) {
                     dst.getParent()?.mkdirs()
-                    TextWriter.save(listOf(scene, history), dst)
+                    TextWriter.save(listOf(scene, history), dst, workspace)
                     file = dst
                     hasChanged = false
                     onSuccess()
@@ -158,7 +161,7 @@ class SceneTab(var file: FileReference?, var scene: Transform, history: History?
     }
 
     override fun onMouseUp(x: Float, y: Float, button: MouseButton) {
-        ActionManager.executeGlobally(0f, 0f, false, listOf("DragEnd"))
+        ActionManager.executeGlobally(GFX.someWindow, 0f, 0f, false, listOf("DragEnd"))
     }
 
     override fun onPaste(x: Float, y: Float, data: String, type: String) {

@@ -1,4 +1,4 @@
-package me.anno.remsstudio.gpu.drawing
+package me.anno.remsstudio.gpu
 
 import me.anno.gpu.GFX
 import me.anno.gpu.OpenGL
@@ -9,11 +9,11 @@ import me.anno.gpu.drawing.GFXx3D
 import me.anno.gpu.drawing.UVProjection
 import me.anno.gpu.shader.Shader
 import me.anno.gpu.shader.ShaderLib
+import me.anno.gpu.shader.ShaderLib.shader3DText
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.Filtering
 import me.anno.gpu.texture.Texture2D
 import me.anno.remsstudio.RemsStudio
-import me.anno.remsstudio.gpu.shader.ShaderLibV2
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Video
 import me.anno.remsstudio.objects.geometric.Polygon
@@ -85,7 +85,7 @@ object GFXx3Dv2 {
         that: GFXTransform, time: Double, offset: Vector3fc,
         stack: Matrix4fArrayList, buffer: StaticBuffer, color: Vector4fc
     ) {
-        val shader = ShaderLib.shader3DforText.value
+        val shader = shader3DText.value
         shader.use()
         GFXx3D.shader3DUniforms(shader, stack, color)
         shader.v3f("offset", offset)
@@ -189,6 +189,11 @@ object GFXx3Dv2 {
         depth: Float,
         hasUVAttractors: Boolean
     ) {
+
+        // why ever this would be drawn...
+        if (colors.all { it.w() <= 0f }) {
+            return
+        }
 
         val shader = ShaderLib.shaderSDFText.value
         shader.use()

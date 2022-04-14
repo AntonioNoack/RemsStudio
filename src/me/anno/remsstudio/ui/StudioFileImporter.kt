@@ -12,8 +12,8 @@ import me.anno.remsstudio.objects.meshes.MeshTransform
 import me.anno.gpu.drawing.UVProjection
 import me.anno.remsstudio.objects.text.Text
 import me.anno.studio.StudioBase.Companion.addEvent
-import me.anno.studio.StudioBase.Companion.defaultWindowStack
 import me.anno.remsstudio.RemsStudio
+import me.anno.remsstudio.RemsStudio.defaultWindowStack
 import me.anno.remsstudio.Selection.selectTransform
 import me.anno.ui.base.menu.Menu.ask
 import me.anno.ui.base.menu.Menu.openMenu
@@ -46,7 +46,7 @@ object StudioFileImporter : FileContentImporter<Transform>() {
         when (file.extension.getImportType()) {
             "Transform" -> when (useSoftLink) {
                 SoftLinkMode.ASK -> openMenu(
-                    defaultWindowStack!!, listOf(
+                    defaultWindowStack, listOf(
                         MenuOption(NameDesc("Link")) {
                             addChildFromFile(parent, file, SoftLinkMode.CREATE_LINK, doSelect, depth, callback)
                         },

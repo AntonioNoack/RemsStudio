@@ -14,6 +14,7 @@ import me.anno.input.Input.isControlDown
 import me.anno.input.Input.isShiftDown
 import me.anno.input.Input.mouseKeysDown
 import me.anno.input.MouseButton
+import me.anno.io.files.InvalidRef
 import me.anno.io.text.TextReader
 import me.anno.io.text.TextWriter
 import me.anno.language.translation.NameDesc
@@ -29,6 +30,7 @@ import me.anno.remsstudio.Selection.selectedProperty
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.ui.MenuUtils.askNumber
 import me.anno.remsstudio.ui.editor.TimelinePanel
+import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.base.constraints.AxisAlignment
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
@@ -68,7 +70,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
 
     override fun getVisualState() = Triple(super.getVisualState(), centralValue, dvHalfHeight)
 
-    fun normValue01(value: Float) = 0.5f - (value - centralValue) / dvHalfHeight * 0.5f
+    fun normValue01(value: Float) = 0.5 - (value - centralValue) / dvHalfHeight * 0.5
 
     fun getValueAt(my: Float) = centralValue - dvHalfHeight * normAxis11(my, y, h)
     fun getYAt(value: Float) = y + h * normValue01(value)
@@ -111,7 +113,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         val deltaValue = 2 * dvHalfHeight
 
         val textLines = clamp(h * 0.7f / fontHeight, 2f, 5f)
-        val valueStep = getValueStep(deltaValue / textLines)
+        val valueStep = getValueStep((deltaValue / textLines).toFloat())
 
         val minStepIndex = (minValue / valueStep).toInt() - 1
         val maxStepIndex = (maxValue / valueStep).toInt() + 1
@@ -168,8 +170,8 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                 .forEach { add(it.value) }
         } else add(property.defaultValue)
 
-        centralValue = (maxValue + minValue) * 0.5f
-        dvHalfHeight = max(property.type.unitScale * 0.5f, (maxValue - minValue) * 0.5f) * 1.2f
+        centralValue = (maxValue + minValue) * 0.5
+        dvHalfHeight = max(property.type.unitScale * 0.5, (maxValue - minValue) * 0.5) * 1.2
 
     }
 
@@ -278,8 +280,8 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                         val endX = getXAt(kf2Global(first.time)).toFloat()
                         val endValue = first.value!!
                         for (i in 0 until channelCount) {
-                            val startY = getYAt(startValue[i])
-                            val endY = getYAt(endValue[i])
+                            val startY = getYAt(startValue[i]).toFloat()
+                            val endY = getYAt(endValue[i]).toFloat()
                             drawSmoothLine(
                                 x0.toFloat(), startY, endX, endY,
                                 this.x, this.y, this.w, this.h, valueColors[i], 0.5f
@@ -294,7 +296,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         } else {
             val value = property.defaultValue!!
             for (i in 0 until channelCount) {
-                val y = getYAt(value[i])
+                val y = getYAt(value[i]).toFloat()
                 drawSmoothLine(
                     x0.toFloat(), y, x1.toFloat(), y,
                     this.x, this.y, this.w, this.h,
@@ -356,8 +358,8 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                         val startX = getXAt(kf2Global(last.time)).toFloat()
                         val startValue = last.value!!
                         for (i in 0 until channelCount) {
-                            val endY = getYAt(endValue[i])
-                            val startY = getYAt(startValue[i])
+                            val endY = getYAt(endValue[i]).toFloat()
+                            val startY = getYAt(startValue[i]).toFloat()
                             drawSmoothLine(
                                 startX, startY, x1.toFloat(), endY,
                                 this.x, this.y, this.w, this.h, valueColors[i], 0.5f
@@ -430,10 +432,10 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         val t0 = getTimeAt(minX.toFloat())
         for (i in 0 until channelCount) {
             var lastX = minX
-            var lastY = getYAt(property[global2Kf(t0)]!![i])
+            var lastY = getYAt(property[global2Kf(t0)]!![i]).toFloat()
             fun addLine(xHere: Int, tGlobalHere: Double) {
                 val value = property[global2Kf(tGlobalHere)]!!
-                val yHere = getYAt(value[i])
+                val yHere = getYAt(value[i]).toFloat()
                 if (xHere > lastX && xHere >= x0 && lastX < x1) {
                     drawSmoothLine(
                         lastX.toFloat(), lastY, xHere.toFloat(), yHere,
@@ -476,7 +478,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         val property = selectedProperty ?: return null
         var bestDragged: Keyframe<*>? = null
         var bestChannel = 0
-        val maxMargin = dotSize * 2f / 3f + 1f
+        val maxMargin = dotSize * 2.0 / 3.0 + 1.0
         var bestDistance = maxMargin
         property.keyframes.forEach { kf ->
             val globalT = mix(0.0, 1.0, kf2Global(kf.time))
@@ -486,7 +488,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                     if (channel.isChannelActive()) {
                         val dy = y - getYAt(kf.getChannelAsFloat(channel))
                         if (abs(dy) < maxMargin) {
-                            val distance = length(dx.toFloat(), dy)
+                            val distance = length(dx, dy)
                             if (distance < bestDistance) {
                                 bestDragged = kf
                                 bestChannel = channel
@@ -645,7 +647,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                             else -> false
                         }
                     ) {
-                        draggedKeyframe.setValue(draggedChannel, getValueAt(y), selectedProperty.type)
+                        draggedKeyframe.setValue(draggedChannel, getValueAt(y).toFloat(), selectedProperty.type)
                     }
                     selectedProperty.sort()
                 } else {
@@ -690,7 +692,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
     }
 
     fun clampValues() {
-        dvHalfHeight = clamp(dvHalfHeight, 0.001f * lastUnitScale, 1000f * lastUnitScale)
+        dvHalfHeight = clamp(dvHalfHeight, 0.001 * lastUnitScale, 1000.0 * lastUnitScale)
     }
 
     override fun onPaste(x: Float, y: Float, data: String, type: String) {
@@ -702,7 +704,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             val time0 = getTimeAt(x)
             val target = selectedProperty ?: return super.onPaste(x, y, data, type)
             val targetType = target.type
-            val parsedKeyframes = TextReader.read(data, true).filterIsInstance<Keyframe<*>>()
+            val parsedKeyframes = TextReader.read(data, workspace, true).filterIsInstance<Keyframe<*>>()
             if (parsedKeyframes.isNotEmpty()) {
                 RemsStudio.largeChange("Pasted Keyframes") {
                     parsedKeyframes.forEach { sth ->
@@ -728,7 +730,8 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         return TextWriter.toText(
             selectedKeyframes
                 .map { Keyframe(it.time - time0, it.value) }
-                .toList()
+                .toList(),
+            InvalidRef
         )
     }
 

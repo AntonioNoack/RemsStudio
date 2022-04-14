@@ -312,7 +312,7 @@ object Scene {
                         chromaticAberration > 0f ||
                         toneMapping != ToneMappers.RAW8 ||
                         needsCG || needsBloom ||
-                        w > GFX.width || h > GFX.height
+                        w > GFX.someWindow.width || h > GFX.someWindow.height
         }
 
         var buffer: Framebuffer? =

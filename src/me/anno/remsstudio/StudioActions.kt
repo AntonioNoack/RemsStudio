@@ -3,7 +3,6 @@ package me.anno.remsstudio
 import me.anno.engine.EngineActions
 import me.anno.gpu.GFX
 import me.anno.input.ActionManager
-import me.anno.input.Input
 import me.anno.input.Modifiers
 import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.utils.StringMap
@@ -18,7 +17,7 @@ object StudioActions {
     fun register() {
 
         fun setEditorTimeDilation(dilation: Double): Boolean {
-            return if (dilation == RemsStudio.editorTimeDilation || RemsStudio.windowStack.inFocus0?.isKeyInput() == true) false
+            return if (dilation == RemsStudio.editorTimeDilation || GFX.someWindow.windowStack.inFocus0?.isKeyInput() == true) false
             else {
                 RemsStudio.editorTimeDilation = dilation
                 true
@@ -31,7 +30,7 @@ object StudioActions {
             "PlaySlow" to { setEditorTimeDilation(0.2) },
             "PlayReversed" to { setEditorTimeDilation(-1.0) },
             "PlayReversedSlow" to { setEditorTimeDilation(-0.2) },
-            "ToggleFullscreen" to { GFX.toggleFullscreen(); true },
+            "ToggleFullscreen" to { GFX.someWindow.toggleFullscreen(); true },
             "PrintLayout" to { printLayout();true },
             "NextFrame" to {
                 RemsStudio.editorTime = (round(RemsStudio.editorTime * RemsStudio.targetFPS) + 1) / RemsStudio.targetFPS
@@ -67,16 +66,17 @@ object StudioActions {
 
                     val type = dragged.getContentType()
                     val data = dragged.getContent()
+                    val window = GFX.someWindow
 
                     when (type) {
                         "File" -> {
                             GFX.hoveredPanel?.onPasteFiles(
-                                Input.mouseX, Input.mouseY,
+                                window.mouseX, window.mouseY,
                                 data.split("\n").map { getReference(it) }
                             )
                         }
                         else -> {
-                            GFX.hoveredPanel?.onPaste(Input.mouseX, Input.mouseY, data, type)
+                            GFX.hoveredPanel?.onPaste(window.mouseX, window.mouseY, data, type)
                         }
                     }
 

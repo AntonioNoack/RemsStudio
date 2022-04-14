@@ -14,30 +14,30 @@ import me.anno.io.text.TextReader
 import me.anno.io.text.TextWriter
 import me.anno.io.utils.StringMap
 import me.anno.language.Language
+import me.anno.remsstudio.RemsStudio.editorTime
+import me.anno.remsstudio.RemsStudioUILayouts.createDefaultMainUI
+import me.anno.remsstudio.history.History
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.history.History
-import me.anno.remsstudio.RemsStudio.editorTime
 import me.anno.remsstudio.ui.StudioFileExplorer
 import me.anno.remsstudio.ui.StudioTreeView
 import me.anno.remsstudio.ui.StudioUITypeLibrary
+import me.anno.remsstudio.ui.editor.cutting.LayerViewContainer
+import me.anno.remsstudio.ui.scene.SceneTabData
+import me.anno.remsstudio.ui.scene.StudioSceneView
+import me.anno.remsstudio.ui.sceneTabs.SceneTab
+import me.anno.remsstudio.ui.sceneTabs.SceneTabs
+import me.anno.remsstudio.utils.Utils.getAnimated
+import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.Panel
 import me.anno.ui.custom.CustomContainer
 import me.anno.ui.custom.CustomList
-import me.anno.remsstudio.RemsStudioUILayouts.createDefaultMainUI
-import me.anno.remsstudio.ui.editor.cutting.LayerViewContainer
-import me.anno.remsstudio.ui.sceneTabs.SceneTab
-import me.anno.remsstudio.ui.sceneTabs.SceneTabs
-import me.anno.remsstudio.ui.scene.SceneTabData
-import me.anno.remsstudio.ui.scene.StudioSceneView
-import me.anno.remsstudio.utils.Utils.getAnimated
 import me.anno.utils.bugs.SumOf
 import me.anno.utils.files.Files.use
 import me.anno.utils.types.Casting.castToFloat
 import me.anno.video.ffmpeg.FFMPEGEncodingBalance
 import me.anno.video.ffmpeg.FFMPEGEncodingType
 import org.apache.logging.log4j.LogManager
-import java.io.File
 import kotlin.math.roundToInt
 
 // todo option to reset the timeline
@@ -55,7 +55,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
         defaultConfig["target.width"] = 1920
         defaultConfig["target.height"] = 1080
         defaultConfig["target.fps"] = 30f
-        config = ConfigBasics.loadConfig(configFile, defaultConfig, true)
+        config = ConfigBasics.loadConfig(configFile, file, defaultConfig, true)
     }
 
     val scenes = getReference(file, "Scenes")
@@ -95,7 +95,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
         try {
             if (tabsFile.exists) {
                 val loadedUIData = TextReader
-                    .read(tabsFile, true)
+                    .read(tabsFile, workspace, true)
                 val sceneTabs = loadedUIData
                     .filterIsInstance<SceneTabData>()
                 if (sceneTabs.isEmpty()) {
@@ -104,9 +104,13 @@ class Project(var name: String, val file: FileReference) : Saveable() {
                     GFX.addGPUTask(1) {
                         SceneTabs.closeAll()
                         for (tabData in sceneTabs) {
-                            val tab = SceneTab(null, Transform(), null)
-                            tabData.apply(tab)
-                            SceneTabs.open(tab)
+                            try {
+                                val tab = SceneTab(null, Transform(), null)
+                                tabData.apply(tab)
+                                SceneTabs.open(tab)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
                         }
                     }
                 }
@@ -137,7 +141,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
 
     fun saveTabs() {
         val data = SceneTabs.sceneTabs.map { SceneTabData(it) }
-        TextWriter.save(data, tabsFile)
+        TextWriter.save(data, workspace, tabsFile)
     }
 
     fun loadUI2(): Panel? {

@@ -1,4 +1,4 @@
-package me.anno.remsstudio.gpu.drawing
+package me.anno.remsstudio.gpu
 
 import me.anno.gpu.drawing.GFXx3D
 import me.anno.gpu.shader.Shader

@@ -75,8 +75,8 @@ open class TimelinePanel(style: Style) : Panel(style) {
 
     companion object {
 
-        var centralValue = 0f
-        var dvHalfHeight = 1f
+        var centralValue = 0.0
+        var dvHalfHeight = 1.0
 
         var dtHalfLength = 30.0
         var centralTime = dtHalfLength
@@ -130,9 +130,9 @@ open class TimelinePanel(style: Style) : Panel(style) {
             // centralTime = max(centralTime, dtHalfLength)
         }
 
-        val movementSpeed get() = 0.05f * sqrt(GFX.width * GFX.height.toFloat())
+        val movementSpeed get() = 0.05f * sqrt(GFX.someWindow.width * GFX.someWindow.height.toFloat())
 
-        val propertyDt get() = 10f * dtHalfLength / GFX.width
+        val propertyDt get() = 10f * dtHalfLength / GFX.someWindow.width
 
         fun moveRight(sign: Float) {
             val delta = sign * dtHalfLength * 0.05f

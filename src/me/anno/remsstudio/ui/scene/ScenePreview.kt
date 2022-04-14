@@ -96,8 +96,8 @@ class ScenePreview(style: Style) : PanelList(null, style.getChild("sceneView")),
 
         drawRect(x, y, w, h, deepDark)
 
-        w = min(w, GFX.width - x)
-        h = min(h, GFX.height - y)
+        w = min(w, GFX.someWindow.width - x)
+        h = min(h, GFX.someWindow.height - y)
 
         var dx = 0
         var dy = 0
@@ -136,8 +136,8 @@ class ScenePreview(style: Style) : PanelList(null, style.getChild("sceneView")),
         }
 
         // prevent us drawing over the size of the frame
-        goodW = min(goodW, GFX.width - (x + dx))
-        goodH = min(goodH, GFX.height - (y + dy))
+        goodW = min(goodW, GFX.someWindow.width - (x + dx))
+        goodH = min(goodH, GFX.someWindow.height - (y + dy))
 
         drawRect(x + dx, y + dy, rw, rh, black)
         Scene.draw(

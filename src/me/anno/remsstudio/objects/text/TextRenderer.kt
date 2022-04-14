@@ -6,10 +6,10 @@ import me.anno.fonts.mesh.TextMesh
 import me.anno.fonts.signeddistfields.algorithm.SignedDistanceField
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.GFXx3D
+import me.anno.remsstudio.Selection
+import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.remsstudio.objects.attractors.EffectMorphing
 import me.anno.remsstudio.objects.modes.TextRenderMode
-import me.anno.remsstudio.Selection
-import me.anno.remsstudio.gpu.drawing.GFXx3Dv2
 import me.anno.ui.editor.sceneView.Grid
 import me.anno.utils.pooling.JomlPools
 import me.anno.utils.types.Strings.isBlank2
@@ -249,6 +249,7 @@ object TextRenderer {
         oc1: Vector4fc, oc2: Vector4fc, oc3: Vector4fc
     ) {
 
+        if (color.w() + oc1.w() + oc2.w() + oc3.w() <= 0f) return
         val sdf2 = element.getSDFTexture(key)
         if (sdf2 == null) {
             if (GFX.isFinalRendering) throw MissingFrameException("Text-Texture (291) ${element.font}: '${element.text}'")
@@ -268,7 +269,8 @@ object TextRenderer {
             val texture = sdf?.texture
             if (texture != null && texture.isCreated) {
 
-                val baseScale = TextMesh.DEFAULT_LINE_HEIGHT / sdfResolution / (exampleLayout.ascent + exampleLayout.descent)
+                val baseScale =
+                    TextMesh.DEFAULT_LINE_HEIGHT / sdfResolution / (exampleLayout.ascent + exampleLayout.descent)
 
                 val scaleX = 0.5f * texture.w * baseScale
                 val scaleY = 0.5f * texture.h * baseScale
@@ -313,7 +315,7 @@ object TextRenderer {
                         element, time,
                         stack, offset, scale,
                         texture, color, 5,
-                        arrayOf(
+                        arrayOf(// is only created once -> don't worry too much about it
                             color, oc1, oc2, oc3,
                             Vector4f(0f)
                         ),

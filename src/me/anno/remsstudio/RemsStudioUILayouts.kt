@@ -3,17 +3,12 @@ package me.anno.remsstudio
 import me.anno.config.DefaultConfig
 import me.anno.extensions.ExtensionLoader
 import me.anno.gpu.GFX
-import me.anno.input.Input.mouseX
-import me.anno.input.Input.mouseY
 import me.anno.input.MouseButton
 import me.anno.io.config.ConfigBasics
 import me.anno.io.files.InvalidRef
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
-import me.anno.remsstudio.objects.Camera
-import me.anno.studio.Projects.getRecentProjects
-import me.anno.studio.StudioBase
-import me.anno.studio.StudioBase.Companion.instance
+import me.anno.remsstudio.RemsStudio.defaultWindowStack
 import me.anno.remsstudio.RemsStudio.nullCamera
 import me.anno.remsstudio.RemsStudio.project
 import me.anno.remsstudio.RemsStudio.root
@@ -24,10 +19,17 @@ import me.anno.remsstudio.Rendering.renderPart
 import me.anno.remsstudio.Rendering.renderSetPercent
 import me.anno.remsstudio.Selection.selectTransform
 import me.anno.remsstudio.Selection.selectedTransform
+import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.ui.StudioFileExplorer
 import me.anno.remsstudio.ui.StudioTreeView
 import me.anno.remsstudio.ui.StudioTreeView.Companion.openAddMenu
 import me.anno.remsstudio.ui.StudioUITypeLibrary
+import me.anno.remsstudio.ui.editor.cutting.LayerViewContainer
+import me.anno.remsstudio.ui.graphs.GraphEditor
+import me.anno.remsstudio.ui.scene.StudioSceneView
+import me.anno.remsstudio.ui.sceneTabs.SceneTabs
+import me.anno.studio.Projects.getRecentProjects
+import me.anno.studio.StudioBase.Companion.instance
 import me.anno.ui.Panel
 import me.anno.ui.base.SpacerPanel
 import me.anno.ui.base.groups.PanelListY
@@ -37,14 +39,10 @@ import me.anno.ui.base.menu.Menu.openMenuByPanels
 import me.anno.ui.custom.CustomContainer
 import me.anno.ui.custom.CustomList
 import me.anno.ui.debug.ConsoleOutputPanel.Companion.createConsoleWithStats
-import me.anno.ui.editor.config.ConfigPanel
-import me.anno.remsstudio.ui.editor.cutting.LayerViewContainer
 import me.anno.ui.editor.OptionBar
 import me.anno.ui.editor.PropertyInspector
 import me.anno.ui.editor.WelcomeUI
-import me.anno.remsstudio.ui.graphs.GraphEditor
-import me.anno.remsstudio.ui.sceneTabs.SceneTabs
-import me.anno.remsstudio.ui.scene.StudioSceneView
+import me.anno.ui.editor.config.ConfigPanel
 import me.anno.ui.style.Style
 import me.anno.ui.utils.WindowStack.Companion.createReloadWindow
 import me.anno.utils.files.OpenInBrowser.openInBrowser
@@ -54,7 +52,7 @@ import java.net.URL
 
 object RemsStudioUILayouts {
 
-    private val windowStack get() = StudioBase.defaultWindowStack!!
+    private val windowStack get() = defaultWindowStack
 
     private val LOGGER = LogManager.getLogger(RemsStudioUILayouts::class)
 
@@ -94,7 +92,7 @@ object RemsStudioUILayouts {
         }
 
         options.addAction(configTitle, Dict["Language", "ui.top.config.language"]) {
-            Dict.selectLanguages(style).onMouseClicked(mouseX, mouseY, MouseButton.LEFT, false)
+            Dict.selectLanguages(style).onMouseClicked(windowStack.mouseX, windowStack.mouseY, MouseButton.LEFT, false)
         }
 
         options.addAction(configTitle, Dict["Open Config Folder", "ui.top.config.openFolder"]) {
@@ -147,13 +145,16 @@ object RemsStudioUILayouts {
 
         // todo shortcuts, which can be set for all actions??...
 
-        val callback = { GFX.requestAttentionMaybe() }
+        val callback = { GFX.someWindow.requestAttentionMaybe() }
         options.addAction(renderTitle, Dict["Settings", "ui.top.render.settings"]) { selectTransform(RenderSettings) }
         options.addAction(renderTitle, Dict["Set%", "ui.top.render.topPercent"]) { renderSetPercent(true, callback) }
         options.addAction(renderTitle, Dict["Full", "ui.top.render.full"]) { renderPart(1, true, callback) }
         options.addAction(renderTitle, Dict["Half", "ui.top.render.half"]) { renderPart(2, true, callback) }
         options.addAction(renderTitle, Dict["Quarter", "ui.top.render.quarter"]) { renderPart(4, true, callback) }
-        options.addAction(renderTitle, Dict["Override Audio", "ui.top.render.overrideAudio"]) { overrideAudio(InvalidRef, true, callback) }
+        options.addAction(
+            renderTitle,
+            Dict["Override Audio", "ui.top.render.overrideAudio"]
+        ) { overrideAudio(InvalidRef, true, callback) }
         options.addAction(renderTitle, Dict["Audio Only", "ui.top.audioOnly"]) { renderAudio(true, callback) }
 
         options.addAction(helpTitle, "Tutorials") {
