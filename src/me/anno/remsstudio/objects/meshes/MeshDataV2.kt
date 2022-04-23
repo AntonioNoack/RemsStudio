@@ -7,6 +7,7 @@ import me.anno.mesh.MeshData
 import me.anno.mesh.MeshUtils
 import me.anno.mesh.assimp.AnimGameItem
 import me.anno.remsstudio.objects.GFXTransform
+import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Matrix4x3fArrayList
 import org.joml.Vector4fc
@@ -52,9 +53,14 @@ object MeshDataV2 {
 
         GFXx3D.transformUniform(shader, cameraMatrix)
 
+        val cameraXPreGlobal = Matrix4f()
+        cameraXPreGlobal.set(cameraMatrix)
+            .mul(worldMatrix)
+
         drawHierarchy(
             shader,
             cameraMatrix,
+            cameraXPreGlobal,
             worldMatrix,
             skinningMatrices,
             color,

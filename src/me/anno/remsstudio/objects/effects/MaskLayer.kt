@@ -33,7 +33,7 @@ import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector4f
 import org.joml.Vector4fc
-import org.lwjgl.opengl.GL11.*
+import org.lwjgl.opengl.GL11C.*
 import java.net.URL
 
 open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {

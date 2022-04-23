@@ -27,7 +27,7 @@ import me.anno.utils.types.Strings.isBlank2
 import me.anno.utils.types.Strings.parseTimeOrNull
 import org.apache.commons.cli.*
 import org.apache.logging.log4j.LogManager
-import org.lwjgl.opengl.GL30
+import org.lwjgl.opengl.GL30C
 import java.io.File
 import java.net.URL
 import java.util.*
@@ -178,10 +178,9 @@ object RemsCLI {
             GFX.resetFBStack()
             Engine.updateTime()
             Cache.update()
-            bindTexture(GL30.GL_TEXTURE_2D, 0)
+            bindTexture(GL30C.GL_TEXTURE_2D, 0)
             // BlendDepth.reset()
-            GL30.glDisable(GL30.GL_CULL_FACE)
-            GL30.glDisable(GL30.GL_ALPHA_TEST)
+            GL30C.glDisable(GL30C.GL_CULL_FACE)
             GFX.check()
             Frame.reset()
             GFX.workGPUTasks(false)

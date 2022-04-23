@@ -297,7 +297,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         val camera = camera
         GFX.check()
 
-        val buffer = FBStack["resolveClick", width, height, 4, false, 1, true]
+        val buffer = FBStack["resolveClick", width, height, 4, true, 1, true]
 
         val diameter = 5
 
@@ -312,12 +312,12 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         val dx = 0
         val dy = 0
 
-        val idBuffer = Screenshots.getPixels(diameter, cXInt, cYInt, buffer, Renderer.idRenderer) {
+        val idBuffer = Screenshots.getU8RGBAPixels(diameter, cXInt, cYInt, buffer, Renderer.idRenderer) {
             Scene.draw(camera, root, dx, dy, width, height, editorTime, false, Renderer.idRenderer, this)
         }
 
-        val depthBuffer = Screenshots.getPixels(diameter, cXInt, cYInt, buffer, Renderer.depthRenderer01) {
-            Scene.draw(camera, root, dx, dy, width, height, editorTime, false, Renderer.depthRenderer01, this)
+        val depthBuffer = Screenshots.getFP32RPixels(diameter, cXInt, cYInt, buffer, Renderer.depthRenderer) {
+            Scene.draw(camera, root, dx, dy, width, height, editorTime, false, Renderer.depthRenderer, this)
         }
 
         val bestResult = Screenshots.getClosestId(diameter, idBuffer, depthBuffer)

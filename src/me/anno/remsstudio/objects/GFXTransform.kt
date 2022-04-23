@@ -16,8 +16,8 @@ import me.anno.ui.style.Style
 import me.anno.utils.types.Floats.put3
 import org.joml.Vector3fc
 import org.joml.Vector4f
-import org.lwjgl.opengl.GL20.glUniform3fv
-import org.lwjgl.opengl.GL20.glUniform4fv
+import org.lwjgl.opengl.GL20C.glUniform3fv
+import org.lwjgl.opengl.GL20C.glUniform4fv
 import kotlin.math.abs
 import kotlin.math.sqrt
 

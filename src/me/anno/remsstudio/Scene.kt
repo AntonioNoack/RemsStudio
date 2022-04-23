@@ -56,8 +56,8 @@ import me.anno.video.MissingFrameException
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector4f
-import org.lwjgl.opengl.GL11.glClear
-import org.lwjgl.opengl.GL11.glClearColor
+import org.lwjgl.opengl.GL11C.glClear
+import org.lwjgl.opengl.GL11C.glClearColor
 import org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT
 import org.lwjgl.opengl.GL11C.GL_DEPTH_BUFFER_BIT
 import kotlin.math.cos
