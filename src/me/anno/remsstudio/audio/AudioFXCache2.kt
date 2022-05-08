@@ -250,8 +250,8 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
                 // get previous data, and process it
                 val effect = effectKey.effect
                 val previousKey = pipelineKey.previousKey!!
-                val left = FAPool[bufferSize, true]
-                val right = FAPool[bufferSize, true]
+                val left = FAPool[bufferSize, true, true]
+                val right = FAPool[bufferSize, true, true]
                 val cachedSolutions = HashMap<Int, Pair<FloatArray, FloatArray>>()
                 effect.apply({ deltaIndex ->
                     cachedSolutions.getOrPut(deltaIndex) {
@@ -348,7 +348,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
             val data = ShortData()
             rangingProcessing += {
                 val splits = SPLITS
-                val values = SAPool[splits * 2, false]
+                val values = SAPool[splits * 2, false, true]
                 var lastBufferIndex = 0L
                 lateinit var buffer: Pair<FloatArray, FloatArray>
                 val bufferSizeM1 = bufferSize - 1

@@ -13,8 +13,6 @@ import me.anno.ecs.components.mesh.Mesh
 import me.anno.ecs.components.mesh.MeshComponent
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.OpenGL
-import me.anno.gpu.shader.BaseShader.Companion.cullFaceColoringGeometry
-import me.anno.gpu.shader.BaseShader.Companion.lineGeometry
 import me.anno.input.Input
 import me.anno.io.ISaveable
 import me.anno.io.ISaveable.Companion.registerCustomClass
@@ -30,6 +28,8 @@ import me.anno.mesh.assimp.AnimatedMeshesLoader
 import me.anno.mesh.assimp.StaticMeshesLoader
 import me.anno.mesh.vox.VOXReader
 import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.gpu.GFXDebug.lineGeometry
+import me.anno.remsstudio.gpu.GFXDebug.cullFaceColoringGeometry
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.meshes.MeshDataV2.drawAssimp2

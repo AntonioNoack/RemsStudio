@@ -167,7 +167,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
                         notFound += type
                         return null
                     }
-                    val weight = castToFloat(arr[1]) ?: 1f
+                    val weight = castToFloat(arr[1]!!) ?: 1f
                     if (obj is CustomList) {
                         for (i in 2 until arr.size) {
                             obj.add(load(arr[i] as? JsonArray) ?: continue)

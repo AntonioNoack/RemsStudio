@@ -33,7 +33,7 @@ object ShaderLibV2 {
                 "   vec2 uv2 = uv1 * 0.5 + 0.5, uv3, uv4;\n" +
                 "   vec4 mask = texture(maskTex, uv2);\n" +
                 "   vec4 color;\n" +
-                "   float effect, inverseEffect;\n" +
+                "   float effect = 0.0, inverseEffect;\n" +
                 "   switch(maskType){\n" +
                 GLSLLib.case(MaskType.MASKING.id, "shader/mask-effects/Masking.glsl") +
                 GLSLLib.case(MaskType.TRANSITION.id, "shader/mask-effects/Transition.glsl") +
@@ -54,6 +54,9 @@ object ShaderLibV2 {
                 "       case ${MaskType.UV_OFFSET.id}:\n" +
                 "           vec2 offset = (mask.rg-mask.gb) * pixelating;\n" +
                 "           color = texture(tex, uv2 + offset);\n" +
+                "           break;\n" +
+                "       default:" +
+                "           color = vec4(1.0,0.0,1.0,1.0);\n" +
                 "           break;\n" +
                 "   }\n" +
                 "   if(color.a <= 0.001) discard;\n" +

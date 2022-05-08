@@ -289,8 +289,8 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
             } else {
                 val thisSlot = this@LayerView.timelineSlot
                 if (dx != 0f) {
-                    val dilation = transform.listOfInheritance
-                        .fold(1.0) { t0, tx -> t0 * tx.timeDilation.value }
+                    //val dilation = transform.listOfInheritance
+                    //    .fold(1.0) { t0, tx -> t0 * tx.timeDilation.value }
                     RemsStudio.incrementalChange("Change Time Dilation / Offset") {
                         if (isControlDown) {
                             // todo scale around the time=0 point?

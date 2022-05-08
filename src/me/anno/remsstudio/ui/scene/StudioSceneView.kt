@@ -47,8 +47,8 @@ import me.anno.ui.base.groups.PanelList
 import me.anno.ui.custom.CustomContainer
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.files.FileContentImporter
-import me.anno.ui.editor.sceneView.ISceneView
-import me.anno.ui.simple.SimplePanel
+import me.anno.remsstudio.ui.editor.ISceneView
+import me.anno.remsstudio.ui.editor.SimplePanel
 import me.anno.ui.style.Style
 import me.anno.utils.types.Booleans.toInt
 import me.anno.utils.types.Vectors.plus

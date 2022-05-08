@@ -47,7 +47,7 @@ import me.anno.remsstudio.RemsStudio.nullCamera
 import me.anno.remsstudio.Selection.selectedTransform
 import me.anno.ui.editor.sceneView.Gizmos.drawGizmo
 import me.anno.ui.editor.sceneView.Grid
-import me.anno.ui.editor.sceneView.ISceneView
+import me.anno.remsstudio.ui.editor.ISceneView
 import me.anno.utils.types.Vectors.is000
 import me.anno.utils.types.Vectors.is1111
 import me.anno.utils.types.Vectors.minus

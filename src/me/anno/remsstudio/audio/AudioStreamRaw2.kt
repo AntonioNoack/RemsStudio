@@ -165,8 +165,8 @@ class AudioStreamRaw2(
 
         val updateInterval = min(bufferSize, 1024)
 
-        val leftBuffer = FAPool[sampleCount, true]
-        val rightBuffer = FAPool[sampleCount, true]
+        val leftBuffer = FAPool[sampleCount, true, true]
+        val rightBuffer = FAPool[sampleCount, true, true]
 
         val s0 = ShortPair()
         val s1 = ShortPair()

@@ -19,7 +19,7 @@ import me.anno.remsstudio.RemsStudio.targetWidth
 import me.anno.remsstudio.Scene
 import me.anno.remsstudio.objects.Camera
 import me.anno.ui.base.groups.PanelList
-import me.anno.ui.editor.sceneView.ISceneView
+import me.anno.remsstudio.ui.editor.ISceneView
 import me.anno.ui.style.Style
 import me.anno.utils.types.Floats.toDegrees
 import me.anno.utils.types.Vectors.minus

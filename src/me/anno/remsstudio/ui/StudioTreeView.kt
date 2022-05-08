@@ -2,7 +2,6 @@ package me.anno.remsstudio.ui
 
 import me.anno.config.DefaultConfig
 import me.anno.config.DefaultStyle
-import me.anno.input.Input
 import me.anno.io.files.InvalidRef
 import me.anno.io.text.TextWriter
 import me.anno.io.utils.StringMap
@@ -47,22 +46,8 @@ class StudioTreeView(style: Style) :
         return element.symbol
     }
 
-    override fun addChild(element: Transform, child: Any) {
-        element.addChild(child as? Transform ?: return)
-    }
-
-    override fun removeChild(element: Transform, child: Transform) {
-        element.removeChild(child)
-    }
-
-    override fun addBefore(self: Transform, sibling: Any) {
-        sibling as Transform
-        self.addBefore(sibling)
-    }
-
-    override fun addAfter(self: Transform, sibling: Any) {
-        sibling as Transform
-        self.addAfter(sibling)
+    override fun removeChild(parent: Transform, child: Transform) {
+        parent.removeChild(child)
     }
 
     override fun setCollapsed(element: Transform, collapsed: Boolean) {
@@ -277,5 +262,12 @@ class StudioTreeView(style: Style) :
     }
 
     override val className get() = "StudioTreeView"
+    override fun getIndexInParent(parent: Transform, child: Transform): Int {
+        return child.indexInParent
+    }
+
+    override fun addChild(element: Transform, child: Any, index: Int) {
+        element.addChild(index, child as Transform)
+    }
 
 }

@@ -325,8 +325,7 @@ class YouTubeMeta(youtubeLink: String?) {
         sources: HashMap<Format, String>,
         encodedSources: HashMap<Format, String>
     ) {
-        val content: List<Any> = formats.content
-        for (o in content) {
+        for (o in formats.content) {
             val format = o as JsonNode
             // FORMAT_STREAM_TYPE_OTF(otf=1) requires downloading the init fragment (adding `&sq=0` to the URL)
             // and parsing emsg box to determine the number of fragments that
