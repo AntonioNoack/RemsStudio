@@ -113,7 +113,7 @@ import me.anno.utils.OS
 
 // todo signed field to split meshes with option for face subdivisions
 
-object RemsStudio : StudioBase(true, "Rem's Studio", 10107) {
+object RemsStudio : StudioBase(true, "Rem's Studio", 10108) {
 
     val defaultWindowStack get() = GFX.someWindow.windowStack
 
