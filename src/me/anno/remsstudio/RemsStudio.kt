@@ -39,8 +39,6 @@ import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.style.Style
 import me.anno.utils.OS
 
-// todo bug: signed distance field texts are missing / not rendering
-
 // todo isolate and remove certain frequencies from audio
 // todo visualize audio frequency, always!!!, from 25Hz to 48kHz
 // inspiration: https://www.youtube.com/watch?v=RA5UiLYWdbM&ab_channel=TomScott
@@ -75,7 +73,7 @@ import me.anno.utils.OS
 // for perspective matching: e.g. moving a fake image onto another image
 
 // todo create proxies only for sections of video
-// todo proxies for faster playback? e.g. every 10th frame? idk...
+// todo proxies for sped-up videos? e.g. every 10th frame? idk...
 
 // proxy creation uses 100% cpu... prevent that somehow, or decrease process priority?
 // it uses 36% on its own -> heavier weight?
@@ -111,8 +109,6 @@ import me.anno.utils.OS
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
-// todo signed field to split meshes with option for face subdivisions
-
 object RemsStudio : StudioBase(true, "Rem's Studio", 10108) {
 
     val defaultWindowStack get() = GFX.someWindow.windowStack
@@ -128,7 +124,7 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10108) {
             project?.language = value
         }
 
-    fun updateLastLocalTime(parent: Transform, time: Double) {
+    private fun updateLastLocalTime(parent: Transform, time: Double) {
         val localTime = parent.getLocalTime(time)
         parent.lastLocalTime = localTime
         val children = parent.children
@@ -138,7 +134,7 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10108) {
         }
     }
 
-    fun updateEditorTime() {
+    private fun updateEditorTime() {
         editorTime += deltaTime * editorTimeDilation
         if (editorTime <= 0.0 && editorTimeDilation < 0.0) {
             editorTimeDilation = 0.0

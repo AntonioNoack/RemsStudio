@@ -10,7 +10,7 @@ void main(){
     // https://www.shadertoy.com/view/ldl3W8
 
     float md = 8.0;
-    vec2 mv = 0.0;
+    vec2 mv = vec2(0.0);
     for(int j=-1;j<=1;j++)
     for(int i=-1;i<=1;i++) {
         vec2 g = vec2(float(i), float(j));
