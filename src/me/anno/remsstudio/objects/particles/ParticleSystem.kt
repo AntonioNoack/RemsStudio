@@ -223,7 +223,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
         particles.clear()
         aliveParticles.clear()
         random = Random(seed)
-        invalidateUI()
+        invalidateUI(false)
     }
 
     var lastState: Any? = null
@@ -314,7 +314,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
                 if (group.isAnyChildInFocus) {
                     val needsUpdate = selectedDistribution !== property
                     selectedDistribution = property
-                    if (needsUpdate) invalidateUI()
+                    if (needsUpdate) invalidateUI(true)
                 }
             })
             group.addOnClickListener { _, _, button, long ->

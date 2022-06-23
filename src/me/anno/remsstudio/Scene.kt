@@ -87,12 +87,12 @@ object Scene {
 
         sqrtToneMappingShader = BaseShader("sqrt/tone-mapping",
             "" +
-                    "$attribute vec2 attr0;\n" +
+                    "$attribute vec2 coords;\n" +
                     "uniform float ySign;\n" +
                     "void main(){" +
-                    "   vec2 coords = attr0*2.0-1.0;\n" +
-                    "   gl_Position = vec4(coords.x, coords.y * ySign, 0.0, 1.0);\n" +
-                    "   uv = attr0;\n" +
+                    "   vec2 coords1 = coords*2.0-1.0;\n" +
+                    "   gl_Position = vec4(coords1.x, coords1.y * ySign, 0.0, 1.0);\n" +
+                    "   uv = coords;\n" +
                     "}", uvList, "" +
                     "uniform sampler2D tex;\n" +
                     "uniform vec3 fxScale;\n" +

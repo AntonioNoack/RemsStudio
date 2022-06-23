@@ -28,6 +28,7 @@ import me.anno.remsstudio.ui.scene.StudioSceneView
 import me.anno.remsstudio.ui.sceneTabs.SceneTab
 import me.anno.remsstudio.ui.sceneTabs.SceneTabs
 import me.anno.remsstudio.utils.Utils.getAnimated
+import me.anno.studio.StudioBase.Companion.addEvent
 import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.Panel
 import me.anno.ui.custom.CustomContainer
@@ -83,7 +84,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
                 }, History()
             )
             tab.save {}
-            GFX.addGPUTask(1) {
+            addEvent {
                 SceneTabs.closeAll()
                 SceneTabs.open(tab)
                 saveTabs()
@@ -101,7 +102,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
                 if (sceneTabs.isEmpty()) {
                     tabsDefault()
                 } else {
-                    GFX.addGPUTask(1) {
+                    addEvent {
                         SceneTabs.closeAll()
                         for (tabData in sceneTabs) {
                             try {

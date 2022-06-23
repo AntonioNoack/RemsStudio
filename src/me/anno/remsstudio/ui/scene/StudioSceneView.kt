@@ -517,7 +517,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                 invalidateDrawing()
                 RemsStudio.incrementalChange("Move Object") {
                     selected.position.addKeyframe(localTime, oldPosition + localDelta)
-                    invalidateUI()
+                    invalidateUI(false)
                 }
 
             }
@@ -538,7 +538,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                             oldScale.z() * pow(base, localDelta.z * speed2)
                         )
                     )
-                    invalidateUI()
+                    invalidateUI(false)
                 }
             }
             SceneDragMode.ROTATE -> {
@@ -559,7 +559,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                 invalidateDrawing()
                 RemsStudio.incrementalChange("Rotate Object") {
                     selected.rotationYXZ.addKeyframe(localTime, oldRotation + localDelta)
-                    invalidateUI()
+                    invalidateUI(false)
                 }
             }
         }
@@ -607,7 +607,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         invalidateDrawing()
         RemsStudio.incrementalChange("Turn Camera") {
             camera.putValue(camera.rotationYXZ, oldRotation + Vector3f(dy0 * scaleFactor, dx0 * scaleFactor, 0f), false)
-            invalidateUI()
+            invalidateUI(false)
         }
     }
 
@@ -706,7 +706,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         val w = stableSize.stableWidth
         val h = stableSize.stableHeight
         println("executing click $w x $h, ${this.w} x ${this.h}")
-        addGPUTask(w, h) {
+        addGPUTask("click", w, h) {
             try {
                 resolveClick(x, y, w, h, onClick)
             } catch (e: Exception) {

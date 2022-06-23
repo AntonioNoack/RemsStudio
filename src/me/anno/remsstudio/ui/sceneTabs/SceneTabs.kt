@@ -13,6 +13,7 @@ import me.anno.ui.base.groups.PanelList
 import me.anno.ui.base.scrolling.ScrollPanelX
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.remsstudio.ui.scene.SceneTabData
+import me.anno.studio.StudioBase.Companion.addEvent
 import me.anno.utils.structures.lists.Lists.getOrPrevious
 import org.apache.logging.log4j.LogManager
 
@@ -32,7 +33,7 @@ object SceneTabs : ScrollPanelX(DefaultConfig.style) {
         if (opened != null) {
             open(opened)
         } else {
-            GFX.addGPUTask(1) {
+            addEvent {
                 addChildFromFile(null, file, FileContentImporter.SoftLinkMode.COPY_CONTENT, false) { transform ->
                     var file2 = file
                     if (file2.lcExtension != "json") {

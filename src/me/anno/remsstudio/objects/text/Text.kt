@@ -117,7 +117,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
     var needsUpdate = false
     override fun claimLocalResources(lTime0: Double, lTime1: Double) {
         if (needsUpdate) {
-            invalidateUI()
+            invalidateUI(false)
             needsUpdate = false
         }
     }

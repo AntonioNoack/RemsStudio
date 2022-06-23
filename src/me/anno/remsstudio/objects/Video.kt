@@ -632,7 +632,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
         }
 
         if (needsImageUpdate) {
-            invalidateUI()
+            invalidateUI(true)
             needsImageUpdate = false
         }
 
@@ -875,12 +875,12 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
                 if (isPaused) {
                     playbackButton.text = getPlaybackTitle(true)
                     if (component == null) {
-                        AudioTasks.addTask(5) {
+                        AudioTasks.addTask("start",5) {
                             val audio2 = Video(file, null)
                             audio2.startPlayback(0.0, 1.0, nullCamera!!)
                             component = audio2.component
                         }
-                    } else AudioTasks.addTask(1) { stopPlayback() }
+                    } else AudioTasks.addTask("stop",1) { stopPlayback() }
                 } else StudioBase.warn("Separated playback is only available with paused editor")
             }
             .setTooltip("Listen to the audio separated from the rest"))

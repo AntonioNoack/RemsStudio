@@ -40,14 +40,10 @@ open class AudioFileStream2(
 
     constructor(audio: Audio, speed: Double, globalTime: Double, playbackSampleRate: Int, listener: Camera) :
             this(
-                audio.file,
-                audio.isLooping.value,
+                audio.file, audio.isLooping.value,
                 getIndex(globalTime, speed, playbackSampleRate),
                 getMeta(audio.file, false)!!,
-                audio,
-                listener,
-                speed,
-                playbackSampleRate
+                audio, listener, speed, playbackSampleRate
             )
 
     init {

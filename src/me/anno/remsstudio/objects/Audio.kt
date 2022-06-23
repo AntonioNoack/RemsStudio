@@ -63,7 +63,7 @@ abstract class Audio(var file: FileReference = InvalidRef, parent: Transform? = 
 
     override fun onDestroy() {
         super.onDestroy()
-        AudioTasks.addTask(1) { stopPlayback() }
+        AudioTasks.addTask("stop",1) { stopPlayback() }
     }
 
     // we need a flag, whether we draw in editor mode or not -> GFX.isFinalRendering

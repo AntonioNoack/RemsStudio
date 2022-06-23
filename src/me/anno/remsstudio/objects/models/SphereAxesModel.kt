@@ -15,7 +15,7 @@ object SphereAxesModel {
     private fun createLineModel(sides0: Int): StaticBuffer {
 
         val attributes = listOf(
-            Attribute("attr0", 3)
+            Attribute("coords", 3)
         )
 
         val sideCount = pow(2f, sides0 + 3f).toInt()

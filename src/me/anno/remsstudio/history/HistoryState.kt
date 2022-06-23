@@ -71,7 +71,7 @@ class HistoryState() : Saveable() {
                 }
             }
         }
-        invalidateUI()
+        invalidateUI(true)
     }
 
     fun capture(previous: HistoryState?) {

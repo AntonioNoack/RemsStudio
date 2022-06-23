@@ -18,7 +18,7 @@ object SphereModel {
     private fun createModel(subdivisions: Int): StaticBuffer {
 
         val attributes = listOf(
-            Attribute("attr0", 3)
+            Attribute("coords", 3)
         )
 
         val triangleCount = 20 shl (subdivisions * 2)
@@ -85,7 +85,7 @@ object SphereModel {
     private fun createLineModel(subdivisions: Int): StaticBuffer {
 
         val attributes = listOf(
-            Attribute("attr0", 3)
+            Attribute("coords", 3)
         )
 
         val triangleCount = 20 shl (subdivisions * 2)

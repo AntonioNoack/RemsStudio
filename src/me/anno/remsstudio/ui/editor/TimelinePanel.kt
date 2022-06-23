@@ -2,6 +2,7 @@ package me.anno.remsstudio.ui.editor
 
 import me.anno.config.DefaultConfig.defaultFont
 import me.anno.config.DefaultStyle
+import me.anno.config.DefaultStyle.black
 import me.anno.fonts.FontManager
 import me.anno.fonts.keys.TextCacheKey
 import me.anno.gpu.GFX
@@ -231,7 +232,7 @@ open class TimelinePanel(style: Style) : Panel(style) {
 
         val fontSize = font.sizeInt
         val fontColor = fontColor
-        val backgroundColor = backgroundColor
+        val backgroundColor = backgroundColor and black.inv()
 
         val lineY = y0 + 2 + fontSize
         val lineH = y1 - y0 - 4 - fontSize

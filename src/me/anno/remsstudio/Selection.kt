@@ -105,7 +105,7 @@ object Selection {
                 si = st
             }
 
-            invalidateUI()
+            invalidateUI(true)
 
             needsUpdate = false
 

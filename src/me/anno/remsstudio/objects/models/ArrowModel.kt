@@ -26,7 +26,7 @@ object ArrowModel {
     private fun createModel(): StaticBuffer {
 
         val attributes = listOf(
-            Attribute("attr0", 3)
+            Attribute("coords", 3)
         )
 
         val triangleCount = 6
@@ -66,7 +66,7 @@ object ArrowModel {
     private fun createLineModel(): StaticBuffer {
 
         val attributes = listOf(
-            Attribute("attr0", 3)
+            Attribute("coords", 3)
         )
 
         val vertexCount = 2 * 7

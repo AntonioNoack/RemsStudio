@@ -36,7 +36,7 @@ class PerlinNoiseDriver : AnimationDriver() {
         if (octaves >= 0) 1f else 1f + falloff * getMaxValue(falloff, octaves - 1)
 
     fun getValue(time: Double, noise: FullNoise, falloff: Double, step: Int): Double {
-        var value0 = noise.getValue(time.toFloat(), step.toFloat()).toDouble()
+        var value0 = noise[time.toFloat(),step.toFloat()].toDouble()
         if (step > 0) value0 += falloff * getValue(2.0 * time, noise, falloff, step - 1)
         return value0
     }

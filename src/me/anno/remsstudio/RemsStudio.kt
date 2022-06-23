@@ -296,14 +296,14 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10108) {
             history.update(title, code)
         }
         currentTab?.hasChanged = true
-        invalidateUI()
+        invalidateUI(false)
     }
 
     fun largeChange(title: String, run: () -> Unit) {
         change(title, gameTime, run)
         lastCode = null
         currentTab?.hasChanged = true
-        invalidateUI()
+        invalidateUI(true)
     }
 
     private fun change(title: String, code: Any, run: () -> Unit) {
@@ -316,7 +316,7 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10108) {
     }
 
     fun updateAudio() {
-        AudioTasks.addTask(100) {
+        AudioTasks.addTask("update",100) {
             // update the audio player...
             if (isPlaying) {
                 AudioManager.requestUpdate()

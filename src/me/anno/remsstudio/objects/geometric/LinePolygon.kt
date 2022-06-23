@@ -18,6 +18,7 @@ import me.anno.gpu.shader.builder.Variable
 import me.anno.remsstudio.objects.attractors.EffectColoring
 import me.anno.remsstudio.objects.attractors.EffectMorphing
 import me.anno.gpu.drawing.UVProjection
+import me.anno.gpu.shader.BaseShader
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
@@ -209,7 +210,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
             // todo use correct forward direction
             val forward = Vector3f(0f, 0f, 1f)
 
-            val shader = shader.value.value
+            val shader = shader.value
 
             fun drawSegment(i0: Float, i1: Float, alpha: Float) {
                 val p0 = getPosition(i0)
@@ -285,22 +286,22 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
 
     companion object {
         val cache = CacheSection("LineCache")
-        val shader = lazy {
-            ShaderLib.createShaderPlus(
+        val shader by lazy {
+            BaseShader(
                 "linePolygon", ShaderLib.v3DBase +
-                        "$attribute vec3 attr0;\n" +
+                        "$attribute vec3 coords;\n" +
                         "$attribute vec2 attr1;\n" +
                         "uniform vec4 tiling;\n" +
                         "uniform vec3 pos0, pos1, pos2, pos3;\n" +
                         "uniform vec4 col0, col1;\n" +
                         "void main(){\n" +
-                        "   vec2 att = attr0.xy*0.5+0.5;\n" +
+                        "   vec2 att = coords.xy*0.5+0.5;\n" +
                         "   localPosition = mix(mix(pos0, pos1, att.x), mix(pos2, pos3, att.x), att.y);\n" +
                         "   gl_Position = transform * vec4(localPosition, 1.0);\n" +
                         ShaderLib.flatNormal +
                         ShaderLib.positionPostProcessing +
                         "   uv = attr1;\n" +
-                        "   uvw = attr0;\n" +
+                        "   uvw = coords;\n" +
                         "   colX = mix(col0, col1, att.y);\n" +
                         "}", y3D + Variable(GLSLType.V4F,"colX"), "" +
                         ShaderLib.getTextureLib +
@@ -312,7 +313,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
                         // does work, just the error should be cleaner...
                         // "   gl_FragDepth += 0.01 * random(uv);\n" +
                         "   gl_FragColor = color;\n" +
-                        "}", listOf()
+                        "}"
             )
         }
     }

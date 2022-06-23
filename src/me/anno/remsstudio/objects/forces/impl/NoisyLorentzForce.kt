@@ -44,9 +44,9 @@ class NoisyLorentzForce : PerParticleForce(
         val pz = (position.z() * scale.z())
         val pw = (time * scale.w()).toFloat()
         return Vector3f(
-            nx.getValue(px, py, pz, pw),
-            ny.getValue(px, py, pz, pw),
-            nz.getValue(px, py, pz, pw)
+            nx[px, py, pz, pw],
+            ny[px, py, pz, pw],
+            nz[px, py, pz, pw]
         )
     }
 

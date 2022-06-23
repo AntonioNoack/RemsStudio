@@ -7,8 +7,6 @@ import me.anno.audio.SimpleTransfer
 import me.anno.audio.openal.SoundBuffer
 import me.anno.audio.streams.AudioStreamRaw.Companion.averageSamples
 import me.anno.audio.streams.AudioStreamRaw.Companion.ffmpegSliceSampleDuration
-import me.anno.audio.streams.FloatPair
-import me.anno.audio.streams.ShortPair
 import me.anno.audio.streams.StereoFloatStream
 import me.anno.cache.instances.AudioCache
 import me.anno.cache.keys.AudioSliceKey
@@ -18,6 +16,8 @@ import me.anno.maths.Maths.mix
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Transform
 import me.anno.utils.Sleep.waitUntilDefined
+import me.anno.utils.structures.tuples.FloatPair
+import me.anno.utils.structures.tuples.ShortPair
 import me.anno.video.ffmpeg.FFMPEGMetadata
 import me.anno.video.ffmpeg.FFMPEGStream.Companion.getAudioSequence
 import org.joml.Vector3f

@@ -25,11 +25,8 @@ import me.anno.maths.Maths.pow
 import me.anno.mesh.MeshData
 import me.anno.mesh.assimp.AnimGameItem
 import me.anno.mesh.assimp.AnimatedMeshesLoader
-import me.anno.mesh.assimp.StaticMeshesLoader
 import me.anno.mesh.vox.VOXReader
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.remsstudio.gpu.GFXDebug.lineGeometry
-import me.anno.remsstudio.gpu.GFXDebug.cullFaceColoringGeometry
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.meshes.MeshDataV2.drawAssimp2
@@ -110,13 +107,13 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             }) { it.assimpModel }
         }
 
-        fun loadAssimpStatic(file: FileReference, instance: Transform?): MeshData? {
+        /*fun loadAssimpStatic(file: FileReference, instance: Transform?): MeshData? {
             return loadModel(file, "Assimp-Static", instance, { meshData ->
                 val reader = StaticMeshesLoader()
                 val meshes = reader.load(file)
                 meshData.assimpModel = meshes
             }) { it.assimpModel }
-        }
+        }*/
 
     }
 
@@ -181,7 +178,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                         false, this, stack, time, color,
                         animation[time], true, centerMesh, normalizeScale, false
                     )
-                    Input.isKeyDown('l') -> {// line debugging
+                    /*Input.isKeyDown('l') -> {// line debugging
                         OpenGL.geometryShader.use(lineGeometry) {
                             data.drawAssimp2(
                                 false, this, stack, time, color,
@@ -196,7 +193,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                                 animation[time], true, centerMesh, normalizeScale, false
                             )
                         }
-                    }
+                    }*/
                     else -> data.drawAssimp2(
                         false, this, stack, time, color,
                         animation[time], true, centerMesh, normalizeScale, true

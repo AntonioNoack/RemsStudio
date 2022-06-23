@@ -2,9 +2,12 @@ package me.anno.remsstudio.gpu
 
 import me.anno.gpu.shader.BaseShader
 import me.anno.gpu.shader.GLSLLib
+import me.anno.gpu.shader.GLSLType
 import me.anno.gpu.shader.ShaderLib
 import me.anno.gpu.shader.ShaderLib.v3DMasked
 import me.anno.gpu.shader.ShaderLib.y3DMasked
+import me.anno.gpu.shader.builder.Variable
+import me.anno.gpu.shader.builder.VariableMode
 import me.anno.remsstudio.objects.effects.MaskType
 
 object ShaderLibV2 {
@@ -61,12 +64,18 @@ object ShaderLibV2 {
                 "   }\n" +
                 "   if(color.a <= 0.001) discard;\n" +
                 "   if(${ShaderLib.hasForceFieldColor}) color *= getForceFieldColor();\n" +
-                "   vec3 finalColor = color.rgb;\n" +
-                "   float finalAlpha = min(color.a, 1.0);\n" +
+                "   finalColor = color.rgb;\n" +
+                "   finalAlpha = min(color.a, 1.0);\n" +
                 "}"
         shader3DMasked =
-            ShaderLib.createShaderPlus("3d-masked", v3DMasked, y3DMasked, f3DMasked, listOf("maskTex", "tex", "tex2"))
-        shader3DMasked.ignoreUniformWarnings(listOf("tiling"))
+            BaseShader(
+                "3d-masked", listOf(), v3DMasked, y3DMasked, listOf(
+                    Variable(GLSLType.V3F, "finalColor", VariableMode.OUT),
+                    Variable(GLSLType.V1F, "finalAlpha", VariableMode.OUT)
+                ), f3DMasked
+            )
+        shader3DMasked.setTextureIndices(listOf("maskTex", "tex", "tex2"))
+        shader3DMasked.ignoreNameWarnings("tiling")
 
 
     }
