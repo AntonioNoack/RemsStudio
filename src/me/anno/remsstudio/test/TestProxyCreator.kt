@@ -1,14 +1,18 @@
 package me.anno.remsstudio.test
 
-import me.anno.io.files.FileReference
+import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.remsstudio.RemsConfig
+import me.anno.remsstudio.RemsRegistry
 import me.anno.remsstudio.RemsStudio
 import me.anno.utils.OS
-import me.anno.video.VideoProxyCreator
+import me.anno.utils.OS.downloads
+import me.anno.video.VideoProxyCreator.getProxyFile
 
 fun main() {
     // test for a video file
     RemsStudio.setupNames()
+    RemsRegistry.init()
     RemsConfig.init()
-    VideoProxyCreator.getProxyFile(FileReference.getReference(OS.videos, "GodRays.mp4"))
+    getProxyFile(getReference(OS.videos, "GodRays.mp4"))
+    getProxyFile(getReference(downloads.getChild("Sonic Frontiers is an absolute mess.mp4")))
 }

@@ -3,12 +3,19 @@ package at.huber.youtube
 import at.huber.youtube.Format.Companion.findFormat
 import me.anno.io.Streams.readText
 import me.anno.io.config.ConfigBasics.cacheFolder
+import me.anno.io.files.FileReference
+import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.json.JsonArray
 import me.anno.io.json.JsonNode
 import me.anno.io.json.JsonReader
+import me.anno.remsstudio.RemsConfig
+import me.anno.remsstudio.RemsRegistry
+import me.anno.remsstudio.RemsStudio
+import me.anno.utils.Clock
+import me.anno.utils.OS.desktop
+import me.anno.video.VideoProxyCreator
 import org.apache.logging.log4j.LogManager
 import java.io.IOException
-import java.io.UnsupportedEncodingException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLDecoder
@@ -22,9 +29,52 @@ import javax.script.ScriptException
  * @param youtubeLink the youtube page link or video id
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-class YouTubeMeta(youtubeLink: String?) {
+class YouTubeMeta(youtubeLink: String) {
 
     companion object {
+
+        @JvmStatic
+        fun main(args: Array<String>) {
+            RemsStudio.setupNames()
+            RemsRegistry.init()
+            RemsConfig.init()
+            // todo YouTube proxies make no sense, as we already have proxies given by YouTube themselves; and they are rate limited
+            // todo implement YouTube video support
+            // todo add a download button for a smoother editing experience
+            /*val ref0 = getReference(
+                "https://rr2---sn-8xgn5uxa-cxgl.googlevideo.com/videoplayback?expire=1656189783&ei=9x63YorcJI6BgQeX7YHgAg&ip=89.247.172.32&id=o-ACbmXnM2NF6wZGIS8MwPVlRkjy_C7kd89D7Xc2lLuvdg&itag=134&aitags=133%2C134%2C135%2C136%2C160%2C242%2C243%2C244%2C247%2C278%2C298%2C299%2C302%2C303&source=youtube&requiressl=yes&mh=FB&mm=31%2C29&mn=sn-8xgn5uxa-cxgl%2Csn-4g5lzne6&ms=au%2Crdu&mv=m&mvi=2&pcm2cms=yes&pl=21&initcwndbps=1655000&spc=4ocVC-ZQoHk8e_JrbCqSU_Qfn-cvDXw&vprv=1&mime=video%2Fmp4&ns=Ehj6dYTfCpYkE2BzAWPjiYIG&gir=yes&clen=880321&dur=154.720&lmt=1656125907651755&mt=1656168074&fvip=4&keepalive=yes&fexp=24001373%2C24007246&c=WEB&txp=5432434&n=FoDk66rL5PEDjw7laaT&sparams=expire%2Cei%2Cip%2Cid%2Caitags%2Csource%2Crequiressl%2Cspc%2Cvprv%2Cmime%2Cns%2Cgir%2Cclen%2Cdur%2Clmt&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpcm2cms%2Cpl%2Cinitcwndbps&lsig=AG3C_xAwRgIhAL0BJoCZQRfZsFGUD_b4KcfWIkOp2sgOiCIDwsk-Ua2OAiEAsXwk8Z4HiDPIrJzS2YpRz_dLIFVGhp19Eb17My1nRsU%3D&sig=AOq0QJ8wRgIhAMm77mHvtBfle_Arv30LRGPfubHiQ56fgW5vGvzF6t2TAiEA6oLCeqTJDFtYJ3rMghITGgSNj2R73K0z_yGES_d_Em4="
+            )
+            val meta = FFMPEGMetadata.getMeta(ref0, false)
+            println(meta)
+            process(ref0)*/
+            // speed is slow :/, why? because download speed is rate limited by YouTube themselves to playback speed
+            val file = getReference("https://www.youtube.com/watch?v=K5_Kg39SYpw")
+            val links = YouTubeMeta(file.absolutePath).links
+            for (link in links) {
+                println(link)
+            }
+            val tmp = desktop.getChild("tmp.mp4")
+            for (link in links) {
+                if (link.key.videoCodec == VideoCodec.H264) {
+                    val clock = Clock()
+                    val ref = getReference(link.value)
+                    tmp.writeFile(ref)
+                    clock.stop("done downloading")
+                    process(tmp)
+                    break
+                }
+            }
+            // Engine.requestShutdown()
+        }
+
+        fun process(ref: FileReference) {
+            println(ref.exists)
+            println(ref.nameWithoutExtension)
+            println(ref.name)
+            println(ref.length())
+            val proxy = VideoProxyCreator.getProxyFile(ref)
+            println(proxy)
+        }
 
         var CACHING = true
         var LOGGING = false
@@ -35,7 +85,7 @@ class YouTubeMeta(youtubeLink: String?) {
         private var decipherFunctions: String? = null
         private var decipherFunctionName: String? = null
 
-        // somebody had issues and changed chrome version to 99.0.4844.51, so if we encounter some, we might try that
+        // somebody had issues and changed Chrome version to 99.0.4844.51, so if we encounter some, we might try that
         private const val USER_AGENT =
             "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.98 Safari/537.36"
         private const val IMAGE_BASE_URL = "http://i.ytimg.com/vi/"
@@ -93,7 +143,6 @@ class YouTubeMeta(youtubeLink: String?) {
             return node.get(key) != null
         }
 
-        @Throws(IOException::class)
         private fun loadDataFromURL(urlString: String): String {
             val url = URL(urlString)
             val urlConnection = url.openConnection() as HttpURLConnection
@@ -245,81 +294,56 @@ class YouTubeMeta(youtubeLink: String?) {
     }
 
     var videoId: String? = null
-        private set
     var title: String? = null
-        private set
     var shortDescription: String? = null
-        private set
     var author: String? = null
-        private set
     var channelId: String? = null
-        private set
     var videoLengthSeconds = 0L
-        private set
     var viewCount = 0L
-        private set
     var isLiveStream = false
-        private set
 
     /** 120 x 90 */
-    val thumbnailUrl
-        get() = "$IMAGE_BASE_URL$videoId/default.jpg"
+    val thumbnailUrl get() = "$IMAGE_BASE_URL$videoId/default.jpg"
 
     /** 320 x 180 */
-    val mediumQualityImageUrl
-        get() = "$IMAGE_BASE_URL$videoId/mqdefault.jpg"
+    val mediumQualityImageUrl get() = "$IMAGE_BASE_URL$videoId/mqdefault.jpg"
 
     /** 480 x 360 */
-    val highQualityImageUrl
-        get() = "$IMAGE_BASE_URL$videoId/hqdefault.jpg"
+    val highQualityImageUrl get() = "$IMAGE_BASE_URL$videoId/hqdefault.jpg"
 
     /** 640 x 480 */
-    val higherQualityImageUrl
-        get() = "$IMAGE_BASE_URL$videoId/sddefault.jpg"
+    val higherQualityImageUrl get() = "$IMAGE_BASE_URL$videoId/sddefault.jpg"
 
     /** maximum resolution */
-    val maximumQualityImageUrl
-        get() = "$IMAGE_BASE_URL$videoId/maxresdefault.jpg"
+    val maximumQualityImageUrl get() = "$IMAGE_BASE_URL$videoId/maxresdefault.jpg"
 
     init {
-        if (youtubeLink != null) {
-            var mat = patYouTubePageLink.matcher(youtubeLink)
+        var mat = patYouTubePageLink.matcher(youtubeLink)
+        if (mat.find()) {
+            videoId = mat.group(3)
+        } else {
+            mat = patYouTubeShortLink.matcher(youtubeLink)
             if (mat.find()) {
                 videoId = mat.group(3)
-            } else {
-                mat = patYouTubeShortLink.matcher(youtubeLink)
-                if (mat.find()) {
-                    videoId = mat.group(3)
-                } else if (youtubeLink.matches(Regex("\\p{Graph}+?"))) {
-                    videoId = youtubeLink
-                }
+            } else if (youtubeLink.matches(Regex("\\p{Graph}+?"))) {
+                videoId = youtubeLink
             }
-            if (videoId == null) {
-                LOGGER.error("Wrong YouTube link format")
-            }
+        }
+        if (videoId == null) {
+            LOGGER.error("Wrong YouTube link format")
         }
     }
 
     val links = try {
-        loadMetadata(videoId) ?: emptyMap()
+        loadMetadata(videoId)
     } catch (e: Exception) {
         if (videoId != null) LOGGER.error("Extraction failed", e)
-        emptyMap()
-    }
+        null
+    } ?: emptyMap()
 
-    override fun toString(): String {
-        return "YouTubeMeta{" +
-                "videoId='" + videoId + '\'' +
-                ", title='" + title + '\'' +
-                ", author='" + author + '\'' +
-                ", channelId='" + channelId + '\'' +
-                ", videoLength=" + videoLengthSeconds +
-                ", viewCount=" + viewCount +
-                ", isLiveStream=" + isLiveStream +
-                ", links=" + links + "}"
-    }
+    override fun toString() = "YouTubeMeta{videoId='$videoId', title='$title, author='$author', channelId='$channelId" +
+            "', videoLength=$videoLengthSeconds, viewCount=$viewCount, isLiveStream=$isLiveStream, links=$links}"
 
-    @Throws(UnsupportedEncodingException::class)
     private fun decodeFormats(
         formats: JsonArray,
         sources: HashMap<Format, String>,
@@ -337,7 +361,6 @@ class YouTubeMeta(youtubeLink: String?) {
         }
     }
 
-    @Throws(UnsupportedEncodingException::class)
     private fun decodeSource(
         sourceJson: JsonNode,
         sources: HashMap<Format, String>,

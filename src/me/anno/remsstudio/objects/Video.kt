@@ -77,7 +77,6 @@ import me.anno.video.formats.gpu.GPUFrame
 import org.apache.logging.log4j.LogManager
 import org.joml.*
 import java.net.URL
-import kotlin.collections.set
 import kotlin.math.*
 
 // game, where everything is explicitly rendered on 5-10 cubemaps first? lol
@@ -835,7 +834,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
             "Preview FPS",
             "Smoother preview, heavier calculation",
             editorVideoFPS.value.toString(),
-            editorFPS.filter { it * 0.98 <= (meta?.videoFPS ?: 1e85) }.map { NameDesc(it.toString()) },
+            editorFPS.filterIndexed { index, it -> index == 0 || it * 0.98 <= (meta?.videoFPS ?: 1e85) }
+                .map { NameDesc(it.toString()) },
             style
         )
             .setChangeListener { _, index, _ -> editorVideoFPS.value = editorFPS[index] }
@@ -875,12 +875,12 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
                 if (isPaused) {
                     playbackButton.text = getPlaybackTitle(true)
                     if (component == null) {
-                        AudioTasks.addTask("start",5) {
+                        AudioTasks.addTask("start", 5) {
                             val audio2 = Video(file, null)
                             audio2.startPlayback(0.0, 1.0, nullCamera!!)
                             component = audio2.component
                         }
-                    } else AudioTasks.addTask("stop",1) { stopPlayback() }
+                    } else AudioTasks.addTask("stop", 1) { stopPlayback() }
                 } else StudioBase.warn("Separated playback is only available with paused editor")
             }
             .setTooltip("Listen to the audio separated from the rest"))

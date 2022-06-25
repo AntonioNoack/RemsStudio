@@ -214,7 +214,7 @@ object Scene {
 
         currentCamera = camera
 
-        useFrame(x, y, w, h, false, renderer) {
+        useFrame(x, y, w, h, renderer) {
 
             drawRect(x, y, w, h, black)
 
@@ -325,7 +325,7 @@ object Scene {
         blendMode.use(if (isFakeColorRendering) null else BlendMode.DEFAULT) {
             depthMode.use(if (camera.useDepth) DepthMode.GREATER else DepthMode.ALWAYS) {
 
-                useFrame(x, y, w, h, false, buffer) {
+                useFrame(x, y, w, h, buffer) {
 
                     Frame.bind()
 
