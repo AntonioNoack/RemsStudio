@@ -177,7 +177,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
     }
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
-        TextRenderer.draw(this, stack, time, color) {
+        if (color.w() >= 1f / 255f) TextRenderer.draw(this, stack, time, color) {
             super.onDraw(stack, time, color)
         }
     }

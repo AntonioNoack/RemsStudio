@@ -19,10 +19,10 @@ import me.anno.ui.base.menu.Menu.ask
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.editor.files.FileContentImporter
-import me.anno.utils.hpc.Threads.threadWithName
 import me.anno.utils.types.Strings.getImportType
 import org.apache.logging.log4j.LogManager
 import org.joml.Vector3f
+import kotlin.concurrent.thread
 
 object StudioFileImporter : FileContentImporter<Transform>() {
 
@@ -69,7 +69,7 @@ object StudioFileImporter : FileContentImporter<Transform>() {
                     }
                 }
                 else -> {
-                    threadWithName("ImportFromFile") {
+                    thread(name = "ImportFromFile") {
                         val text = file.readText()
                         try {
                             val transform = text.toTransform()

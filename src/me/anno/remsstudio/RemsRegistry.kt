@@ -2,6 +2,14 @@ package me.anno.remsstudio
 
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.animation.Keyframe
+import me.anno.ecs.Entity
+import me.anno.ecs.components.anim.*
+import me.anno.ecs.components.mesh.Material
+import me.anno.ecs.components.mesh.Mesh
+import me.anno.ecs.components.mesh.MeshComponent
+import me.anno.ecs.prefab.Prefab
+import me.anno.ecs.prefab.change.CAdd
+import me.anno.ecs.prefab.change.CSet
 import me.anno.remsstudio.animation.drivers.FunctionDriver
 import me.anno.remsstudio.animation.drivers.HarmonicDriver
 import me.anno.remsstudio.animation.drivers.PerlinNoiseDriver
@@ -41,6 +49,20 @@ object RemsRegistry {
     fun init() {
 
         registerCustomClass(StringMap())
+
+        registerCustomClass(Prefab())
+        registerCustomClass(CSet())
+        registerCustomClass(CAdd())
+        registerCustomClass(Entity())
+        registerCustomClass(MeshComponent())
+        registerCustomClass(AnimRenderer())
+        registerCustomClass(Mesh())
+        registerCustomClass(Material())
+        registerCustomClass(Skeleton())
+        registerCustomClass(ImportedAnimation())
+        registerCustomClass(BoneByBoneAnimation())
+        registerCustomClass(AnimationState())
+
         registerCustomClass(SaveableArray())
         registerCustomClass(Transform())
         registerCustomClass(Text())

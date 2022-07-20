@@ -8,7 +8,6 @@ import me.anno.studio.Inspectable
 import me.anno.remsstudio.RemsStudio.root
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.utils.structures.maps.BiMap
-import me.anno.utils.types.Sequences.getOrNull
 import org.apache.logging.log4j.LogManager
 
 object Selection {
@@ -127,6 +126,17 @@ object Selection {
             selectedUUID < specialIdOffset -> root.listOfAll.getOrNull(selectedUUID)
             else -> specialIds.reverse.getOrDefault(selectedUUID, null)
         }
+    }
+
+    private fun <V> Sequence<V>.getOrNull(index: Int): V? {
+        if (index < 0) return null
+        val iterator = iterator()
+        for (i in 0 until index) {
+            if (!iterator.hasNext()) return null
+            iterator.next()
+        }
+        if (!iterator.hasNext()) return null
+        return iterator.next()
     }
 
     private const val specialIdOffset = 1_000_000_000

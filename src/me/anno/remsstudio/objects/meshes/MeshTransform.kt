@@ -12,8 +12,6 @@ import me.anno.ecs.components.mesh.Material
 import me.anno.ecs.components.mesh.Mesh
 import me.anno.ecs.components.mesh.MeshComponent
 import me.anno.gpu.GFX.isFinalRendering
-import me.anno.gpu.OpenGL
-import me.anno.input.Input
 import me.anno.io.ISaveable
 import me.anno.io.ISaveable.Companion.registerCustomClass
 import me.anno.io.base.BaseWriter
@@ -102,7 +100,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         fun loadAssimpAnimated(file: FileReference, instance: Transform?): MeshData? {
             return loadModel(file, "Assimp", instance, { meshData ->
                 val reader = AnimatedMeshesLoader
-                val meshes = reader.load(file)
+                val meshes = reader.read(file, file.getParent() ?: InvalidRef)
                 meshData.assimpModel = meshes
             }) { it.assimpModel }
         }

@@ -82,15 +82,14 @@ object TextRenderer {
         }
 
         val shadowColor = element.shadowColor[time]
-
-        if (shadowColor.w() >= 0f) {
+        if (shadowColor.w() >= 1f / 255f) {
             val shadowSmoothness = element.shadowSmoothness[time]
             val shadowOffset = element.shadowOffset[time] * (1f / TextMesh.DEFAULT_FONT_HEIGHT)
             stack.next {
                 stack.translate(shadowOffset)
                 val tintedShadowColor = JomlPools.vec4f.create()
                     .set(color).mul(shadowColor)
-                draw(
+                if (tintedShadowColor.w >= 1f / 255f) draw(
                     element, stack, time, tintedShadowColor,
                     lineSegmentsWithStyle, drawMeshes, drawSDFTextures,
                     keys, exampleLayout,
@@ -103,7 +102,7 @@ object TextRenderer {
             }
         }
 
-        draw(
+        if (color.w() >= 1f / 255f) draw(
             element, stack, time, color,
             lineSegmentsWithStyle, drawMeshes, drawSDFTextures,
             keys, exampleLayout,

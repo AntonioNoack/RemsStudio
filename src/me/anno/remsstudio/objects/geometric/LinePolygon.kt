@@ -224,8 +224,8 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
                     shader,
                     Vector3f(p0).add(d0), Vector3f(p0).sub(d0),
                     Vector3f(p1).add(d1), Vector3f(p1).sub(d1),
-                    getColor(i0).mulAlpha(alpha),
-                    getColor(i1).mulAlpha(alpha),
+                    getColor(i0).mulAlpha(alpha) as Vector4f,
+                    getColor(i1).mulAlpha(alpha) as Vector4f,
                     stack
                 )
             }
@@ -309,7 +309,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
                         noiseFunc +
                         "void main(){\n" +
                         "   vec4 color = colX;\n" +
-                        "   if(${ShaderLib.hasForceFieldColor}) color *= getForceFieldColor();\n" +
+                        "   if(${ShaderLib.hasForceFieldColor}) color *= getForceFieldColor(finalPosition);\n" +
                         // does work, just the error should be cleaner...
                         // "   gl_FragDepth += 0.01 * random(uv);\n" +
                         "   gl_FragColor = color;\n" +

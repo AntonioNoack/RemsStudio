@@ -2,7 +2,6 @@ package me.anno.remsstudio
 
 import me.anno.animation.Type
 import me.anno.config.DefaultConfig.style
-import me.anno.gpu.GFX
 import me.anno.io.Saveable
 import me.anno.io.config.ConfigBasics
 import me.anno.io.files.FileReference
@@ -34,7 +33,6 @@ import me.anno.ui.Panel
 import me.anno.ui.custom.CustomContainer
 import me.anno.ui.custom.CustomList
 import me.anno.utils.bugs.SumOf
-import me.anno.utils.files.Files.use
 import me.anno.utils.types.Casting.castToFloat
 import me.anno.video.ffmpeg.FFMPEGEncodingBalance
 import me.anno.video.ffmpeg.FFMPEGEncodingType
@@ -146,7 +144,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
     }
 
     fun loadUI2(): Panel? {
-        return use(uiFile.inputStream()) { fis ->
+        return uiFile.inputStream().use { fis ->
             val library = StudioUITypeLibrary()
             val types = library.types
             val notFound = HashSet<String>()
@@ -188,7 +186,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
     }
 
     fun saveUI() {
-        use(uiFile.outputStream()) { fos ->
+        uiFile.outputStream().use { fos ->
             val writer = JsonWriter(fos)
             val cdc = mainUI as CustomList
             fun write(c: Panel, w: Float) {

@@ -13,7 +13,6 @@ import me.anno.remsstudio.objects.geometric.Polygon
 import me.anno.remsstudio.objects.particles.ParticleSystem
 import me.anno.remsstudio.objects.text.Text
 import me.anno.utils.OS
-import me.anno.utils.files.Files.use
 import org.apache.logging.log4j.LogManager
 import java.io.*
 import java.util.zip.DeflaterOutputStream
@@ -61,7 +60,7 @@ fun main() {
     lateinit var binaryValue: ByteArray
     for (i in 0 until 100) {
         bos = ByteArrayOutputStream(4096)
-        use(DataOutputStream(bos)) { dos ->
+        DataOutputStream(bos).use { dos ->
             val writer = BinaryWriter(dos)
             candidates.forEach { writer.add(it) }
             writer.writeAllInList()
@@ -95,7 +94,7 @@ fun main() {
     logger.info("length text, compressed: ${compress(textValue.toByteArray())}")
     logger.info("length binary, compressed: ${compress(binaryValue)}")
 
-    use(DataInputStream(ByteArrayInputStream(binaryValue))) { dis ->
+    DataInputStream(ByteArrayInputStream(binaryValue)).use { dis ->
         val reader = BinaryReader(dis)
         reader.readAllInList()
         val content = reader.sortedContent

@@ -14,7 +14,6 @@ import me.anno.input.Input.keyUpCtr
 import me.anno.installer.Installer.checkInstall
 import me.anno.io.files.FileReference
 import me.anno.io.files.FileReference.Companion.getReference
-import me.anno.io.files.InvalidRef
 import me.anno.language.Language
 import me.anno.language.translation.Dict
 import me.anno.remsstudio.CheckVersion.checkVersion
@@ -109,7 +108,7 @@ import me.anno.utils.OS
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
-object RemsStudio : StudioBase(true, "Rem's Studio", 10108) {
+object RemsStudio : StudioBase(true, "Rem's Studio", 10109) {
 
     val defaultWindowStack get() = GFX.someWindow.windowStack
 
@@ -316,7 +315,7 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10108) {
     }
 
     fun updateAudio() {
-        AudioTasks.addTask("update",100) {
+        AudioTasks.addTask("update", 100) {
             // update the audio player...
             if (isPlaying) {
                 AudioManager.requestUpdate()
@@ -339,6 +338,12 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10108) {
 
     @JvmStatic
     fun main(args: Array<String>) {
+
+        // todo test scene with ALL rendering/playback features
+
+        // Build.isDebug = false
+        // Build.isShipped = true
+        // Build.lock()
         if (args.isEmpty()) {
             run()
         } else {

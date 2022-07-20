@@ -17,6 +17,7 @@ import me.anno.io.text.TextReader
 import me.anno.io.text.TextWriter
 import me.anno.language.translation.Dict
 import me.anno.maths.Maths.clamp
+import me.anno.maths.Maths.max
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.editorTime
 import me.anno.remsstudio.Scene
@@ -137,7 +138,7 @@ open class Transform() : Saveable(),
     val folder = "\uD83D\uDCC1"
 
     override fun addChild(index: Int, child: Transform) {
-        children.add(index, child)
+        children.add(max(index, 0), child)
         child.parent = this
     }
 

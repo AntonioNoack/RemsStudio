@@ -9,6 +9,7 @@ import me.anno.mesh.assimp.AnimGameItem
 import me.anno.remsstudio.objects.GFXTransform
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
+import org.joml.Matrix4x3f
 import org.joml.Matrix4x3fArrayList
 import org.joml.Vector4fc
 
@@ -40,31 +41,32 @@ object MeshDataV2 {
         } else null
         shader.v1b("hasAnimation", skinningMatrices != null)
 
-        val worldMatrix = Matrix4x3fArrayList()
+        val localTransform = Matrix4x3fArrayList()
 
         if (normalizeScale) {
             val scale = AnimGameItem.Companion.getScaleFromAABB(model0.staticAABB.value)
-            worldMatrix.scale(scale)
+            localTransform.scale(scale)
         }
 
         if (centerMesh) {
-            MeshUtils.centerMesh(transform, cameraMatrix, worldMatrix, model0)
+            MeshUtils.centerMesh(transform, cameraMatrix, localTransform, model0)
         }
 
         GFXx3D.transformUniform(shader, cameraMatrix)
 
         val cameraXPreGlobal = Matrix4f()
         cameraXPreGlobal.set(cameraMatrix)
-            .mul(worldMatrix)
+            .mul(localTransform)
 
-        drawHierarchy(
+        val localTransform0 = Matrix4x3f(localTransform)
+        model0.drawHierarchy(
             shader,
             cameraMatrix,
             cameraXPreGlobal,
-            worldMatrix,
+            localTransform,
+            localTransform0,
             skinningMatrices,
             color,
-            model0,
             model0.hierarchy,
             useMaterials,
             drawSkeletons

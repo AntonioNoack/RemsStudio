@@ -69,6 +69,8 @@ class Camera(parent: Transform? = null) : Transform(parent) {
     var onlyShowTarget = true
     var useDepth = true
 
+    var backgroundColor = AnimatedProperty.color(Vector4f(0f, 0f, 0f, 1f))
+
     fun getEffectiveOffset(localTime: Double) = orthographicDistance(orthographicness[localTime])
     fun getEffectiveNear(localTime: Double, offset: Float = getEffectiveOffset(localTime)) = nearZ[localTime] + offset
     fun getEffectiveFar(localTime: Double, offset: Float = getEffectiveOffset(localTime)) = farZ[localTime] + offset
@@ -87,6 +89,13 @@ class Camera(parent: Transform? = null) : Transform(parent) {
 
         val transform = getGroup("Transform", "", "transform")
         transform += vi("Orbit Radius", "Orbiting Distance", "camera.orbitDis", orbitRadius, style)
+        transform += vi(
+            "Background Color",
+            "Clearing color for the screen",
+            "camera.backgroundColor",
+            backgroundColor,
+            style
+        )
 
         val cam = getGroup("Projection", "How rays of light are mapped to the screen", "projection")
         cam += vi("FOV", "Field Of View, in degrees, vertical", "camera.fov", fovYDegrees, style)
@@ -233,6 +242,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         writer.writeObject(this, "cgOffsetSub", cgOffsetSub)
         writer.writeObject(this, "cgSlope", cgSlope)
         writer.writeObject(this, "cgPower", cgPower)
+        writer.writeObject(this, "backgroundColor", backgroundColor)
     }
 
     override fun readBoolean(name: String, value: Boolean) {
@@ -264,6 +274,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
             "cgOffsetSub" -> cgOffsetSub.copyFrom(value)
             "cgSlope" -> cgSlope.copyFrom(value)
             "cgPower" -> cgPower.copyFrom(value)
+            "backgroundColor" -> backgroundColor.copyFrom(value)
             else -> super.readObject(name, value)
         }
     }

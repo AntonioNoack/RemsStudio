@@ -26,8 +26,8 @@ import me.anno.ui.base.text.TextPanel
 import me.anno.ui.dragging.Draggable
 import me.anno.ui.editor.files.FileExplorer
 import me.anno.ui.editor.files.toAllowedFilename
-import me.anno.utils.hpc.Threads.threadWithName
 import org.apache.logging.log4j.LogManager
+import kotlin.concurrent.thread
 
 class SceneTab(var file: FileReference?, var scene: Transform, history: History?) : TextPanel("", DefaultConfig.style) {
 
@@ -95,7 +95,7 @@ class SceneTab(var file: FileReference?, var scene: Transform, history: History?
     fun save(dst: FileReference, onSuccess: () -> Unit) {
         if (dst.isDirectory) dst.deleteRecursively()
         LOGGER.info("Saving $dst, ${scene.listOfAll.joinToString { it.name }}")
-        threadWithName("SaveScene") {
+        thread(name = "SaveScene") {
             try {
                 synchronized(scene) {
                     dst.getParent()?.mkdirs()

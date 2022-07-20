@@ -22,7 +22,6 @@ import me.anno.ui.base.menu.Menu.ask
 import me.anno.ui.base.menu.Menu.msg
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
-import me.anno.utils.hpc.Threads.threadWithName
 import me.anno.utils.types.Strings.defaultImportType
 import me.anno.utils.types.Strings.getImportType
 import me.anno.video.VideoCreator
@@ -32,6 +31,7 @@ import me.anno.video.ffmpeg.FFMPEGEncodingType
 import me.anno.video.ffmpeg.FFMPEGMetadata.Companion.getMeta
 import org.apache.logging.log4j.LogManager
 import java.io.File
+import kotlin.concurrent.thread
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -224,7 +224,7 @@ object Rendering {
                     isRendering = false
                     callback()
                 }
-                threadWithName("Rendering::renderAudio()") {
+                thread(name = "Rendering::renderAudio()") {
                     createOrAppendAudio(targetOutputFile, video, false)
                 }
             }
@@ -259,7 +259,7 @@ object Rendering {
                 isRendering = false
                 callback()
             }
-            threadWithName("Rendering::renderAudio()") {
+            thread(name = "Rendering::renderAudio()") {
                 createOrAppendAudio(targetOutputFile, null, false)
             }
         }

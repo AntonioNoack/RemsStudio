@@ -63,7 +63,7 @@ object ShaderLibV2 {
                 "           break;\n" +
                 "   }\n" +
                 "   if(color.a <= 0.001) discard;\n" +
-                "   if(${ShaderLib.hasForceFieldColor}) color *= getForceFieldColor();\n" +
+                "   if(${ShaderLib.hasForceFieldColor}) color *= getForceFieldColor(finalPosition);\n" +
                 "   finalColor = color.rgb;\n" +
                 "   finalAlpha = min(color.a, 1.0);\n" +
                 "}"

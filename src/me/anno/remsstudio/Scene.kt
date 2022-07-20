@@ -56,10 +56,7 @@ import me.anno.video.MissingFrameException
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector4f
-import org.lwjgl.opengl.GL11C.glClear
-import org.lwjgl.opengl.GL11C.glClearColor
-import org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT
-import org.lwjgl.opengl.GL11C.GL_DEPTH_BUFFER_BIT
+import org.lwjgl.opengl.GL11C.*
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -218,7 +215,7 @@ object Scene {
 
             drawRect(x, y, w, h, black)
 
-            usesFPBuffers = sceneView?.usesFPBuffers ?: camera.toneMapping != ToneMappers.RAW8
+            usesFPBuffers = sceneView?.usesFPBuffers ?: (camera.toneMapping != ToneMappers.RAW8)
 
             val isFakeColorRendering = renderer.isFakeColor
 
@@ -226,39 +223,6 @@ object Scene {
             drawScene(scene, camera, time, x, y, w, h, flipY, isFakeColorRendering, sceneView)
 
         }
-    }
-
-    fun clearColors(
-        camera: Camera, buffer: Framebuffer?, needsTemporaryBuffer: Boolean,
-        x: Int, y: Int, w: Int, h: Int
-    ) {
-
-        Frame.bind()
-
-        glClearColor(0f, 0f, 0f, 1f)
-
-        if (camera.useDepth) {
-            if (buffer != null) {
-                if (needsTemporaryBuffer) {
-                    glClear(GL_DEPTH_BUFFER_BIT or GL_COLOR_BUFFER_BIT)
-                } else {
-                    drawRect(x, y, w, h, black)
-                    glClear(GL_DEPTH_BUFFER_BIT)
-                }
-            } else {
-                glClear(GL_DEPTH_BUFFER_BIT)
-            }
-        } else {
-            if (buffer != null) {
-                glClear(GL_COLOR_BUFFER_BIT)
-            }
-        }
-
-        if (buffer == null) {
-            GFX.check()
-            drawRect(x, y, w, h, black)
-        }
-
     }
 
     fun drawScene(
@@ -323,13 +287,19 @@ object Scene {
         val y = if (needsTemporaryBuffer) 0 else y0
 
         blendMode.use(if (isFakeColorRendering) null else BlendMode.DEFAULT) {
-            depthMode.use(if (camera.useDepth) DepthMode.GREATER else DepthMode.ALWAYS) {
+            depthMode.use(if (camera.useDepth) DepthMode.GREATER_EQUAL else DepthMode.ALWAYS) {
 
                 useFrame(x, y, w, h, buffer) {
 
                     Frame.bind()
 
-                    clearColors(camera, buffer, needsTemporaryBuffer, x, y, w, h)
+                    OpenGL.scissorTest.use(true) {
+                        Frame.bind()
+                        glScissor(Frame.lastX2, Frame.lastY2, Frame.lastW, Frame.lastH)
+                        val color = camera.backgroundColor.getValueAt(RemsStudio.editorTime, Vector4f())
+                        glClearColor(color.x(), color.y(), color.z(), color.w())
+                        glClear(GL_DEPTH_BUFFER_BIT or GL_COLOR_BUFFER_BIT)
+                    }
 
                     // draw the 3D stuff
                     nearZ = camera.nearZ[cameraTime]

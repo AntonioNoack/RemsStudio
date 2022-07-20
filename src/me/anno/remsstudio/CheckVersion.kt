@@ -9,11 +9,11 @@ import me.anno.ui.base.menu.Menu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.utils.OS
 import me.anno.utils.files.OpenInBrowser.openInBrowser
-import me.anno.utils.hpc.Threads.threadWithName
 import org.apache.logging.log4j.LogManager
 import java.io.IOException
 import java.net.URI
 import java.net.URL
+import kotlin.concurrent.thread
 
 object CheckVersion {
 
@@ -28,7 +28,7 @@ object CheckVersion {
 
     fun checkVersion() {
         val windowStack = defaultWindowStack
-        threadWithName("CheckVersion") {
+        thread(name = "CheckVersion") {
             val latestVersion = checkVersion(URL(url))
             if (latestVersion > -1) {
                 if (latestVersion > RemsStudio.versionNumber) {
