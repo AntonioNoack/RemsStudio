@@ -1,7 +1,6 @@
 package me.anno.remsstudio
 
 import me.anno.config.DefaultConfig
-import me.anno.config.DefaultStyle.black
 import me.anno.gpu.DepthMode
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.flat01
@@ -13,12 +12,11 @@ import me.anno.gpu.OpenGL.renderDefault
 import me.anno.gpu.OpenGL.renderPurely
 import me.anno.gpu.OpenGL.useFrame
 import me.anno.gpu.blending.BlendMode
-import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.framebuffer.Frame
 import me.anno.gpu.framebuffer.Framebuffer
 import me.anno.gpu.shader.BaseShader
-import me.anno.gpu.shader.OpenGLShader.Companion.attribute
+import me.anno.gpu.shader.GLSLType
 import me.anno.gpu.shader.Renderer
 import me.anno.gpu.shader.Shader
 import me.anno.gpu.shader.ShaderFuncLib.acesToneMapping
@@ -30,24 +28,27 @@ import me.anno.gpu.shader.ShaderLib.brightness
 import me.anno.gpu.shader.ShaderLib.createShader
 import me.anno.gpu.shader.ShaderLib.simplestVertexShader
 import me.anno.gpu.shader.ShaderLib.uvList
+import me.anno.gpu.shader.builder.Variable
+import me.anno.gpu.shader.builder.VariableMode
+import me.anno.gpu.shader.effects.GaussianBlur
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.GPUFiltering
 import me.anno.gpu.texture.Texture3D
 import me.anno.image.ImageGPUCache.getLUT
+import me.anno.remsstudio.RemsStudio.currentCamera
+import me.anno.remsstudio.RemsStudio.gfxSettings
+import me.anno.remsstudio.RemsStudio.nullCamera
+import me.anno.remsstudio.Selection.selectedTransform
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Camera.Companion.DEFAULT_VIGNETTE_STRENGTH
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.Transform.Companion.drawUICircle
 import me.anno.remsstudio.objects.Transform.Companion.xAxis
-import me.anno.gpu.shader.effects.GaussianBlur
-import me.anno.remsstudio.RemsStudio.currentCamera
 import me.anno.remsstudio.objects.effects.ToneMappers
-import me.anno.remsstudio.RemsStudio.gfxSettings
-import me.anno.remsstudio.RemsStudio.nullCamera
-import me.anno.remsstudio.Selection.selectedTransform
+import me.anno.remsstudio.ui.editor.ISceneView
 import me.anno.ui.editor.sceneView.Gizmos.drawGizmo
 import me.anno.ui.editor.sceneView.Grid
-import me.anno.remsstudio.ui.editor.ISceneView
+import me.anno.utils.LOGGER
 import me.anno.utils.types.Vectors.is000
 import me.anno.utils.types.Vectors.is1111
 import me.anno.utils.types.Vectors.minus
@@ -83,23 +84,29 @@ object Scene {
         // add randomness against banding
 
         sqrtToneMappingShader = BaseShader("sqrt/tone-mapping",
+            listOf(
+                Variable(GLSLType.V2F, "coords", VariableMode.ATTR),
+                Variable(GLSLType.V1F, "ySign"),
+            ),
             "" +
-                    "$attribute vec2 coords;\n" +
-                    "uniform float ySign;\n" +
                     "void main(){" +
                     "   vec2 coords1 = coords*2.0-1.0;\n" +
                     "   gl_Position = vec4(coords1.x, coords1.y * ySign, 0.0, 1.0);\n" +
                     "   uv = coords;\n" +
-                    "}", uvList, "" +
-                    "uniform sampler2D tex;\n" +
-                    "uniform vec3 fxScale;\n" +
-                    "uniform vec2 chromaticAberration;" +
-                    "uniform vec2 chromaticOffset;\n" +
-                    "uniform vec2 distortion, distortionOffset;\n" +
-                    "uniform float vignetteStrength;\n" +
-                    "uniform vec3 vignetteColor;\n" +
-                    "uniform float minValue;\n" +
-                    "uniform int toneMapper;\n" +
+                    "}", uvList, listOf(
+                Variable(GLSLType.S2D, "tex"),
+                Variable(GLSLType.V2F, "chromaticAberration"),
+                Variable(GLSLType.V2F, "chromaticOffset"),
+                Variable(GLSLType.V2F, "distortion"),
+                Variable(GLSLType.V2F, "distortionOffset"),
+                Variable(GLSLType.V3F, "fxScale"),
+                Variable(GLSLType.V1F, "vignetteStrength"),
+                Variable(GLSLType.V3F, "vignetteColor"),
+                Variable(GLSLType.V1I, "toneMapper"),
+                Variable(GLSLType.V1F, "minValue"),
+                Variable(GLSLType.V3F, "finalColor", VariableMode.OUT),
+                Variable(GLSLType.V1F, "finalAlpha", VariableMode.OUT)
+            ), "" +
                     noiseFunc +
                     reinhardToneMapping +
                     acesToneMapping +
@@ -126,9 +133,10 @@ object Scene {
                     "   vec2 duv = chromaticAberration * nuv + chromaticOffset;\n" +
                     "   vec2 uvG = distort(uv2, nuv, vec2(0.0));\n" +
                     "   vec4 col0 = getColor(uvG);\n" +
-                    "   if(minValue < 0.0){" +
-                    "       gl_FragColor = col0;\n" +
-                    "   } else {" +
+                    "   if(minValue < 0.0) {\n" +
+                    "       finalColor = col0.rgb;\n" +
+                    "       finalAlpha = col0.a;\n" +
+                    "   } else {\n" +
                     "       vec2 uvR = distort(uv2, nuv, duv), uvB = distort(uv2, nuv, -duv);\n" +
                     "       float r = getColor(uvR).r;\n" +
                     "       vec2 ga = col0.ga;\n" +
@@ -137,17 +145,17 @@ object Scene {
                     "       vec3 toneMapped;\n" +
                     "       switch(toneMapper){\n" +
                     ToneMappers.values().joinToString("") {
-                        "" +
-                                "\t\tcase ${it.id}: toneMapped = ${it.glslFuncName}(raw);break;\n"
-                    } +
-                    "           default: toneMapped = vec3(1.0, 0.0, 1.0);\n" +
+                        "case ${it.id}: toneMapped = ${it.glslFuncName}(raw);break;\n"
+                    } + "default: toneMapped = vec3(1.0, 0.0, 1.0);\n" +
                     "       }" +
                     "       vec3 colorGraded = colorGrading(toneMapped);\n" +
                     // todo the grid is drawn with ^2 in raw8 mode, the rest is fine...
                     "       vec4 color = vec4(toneMapper == ${ToneMappers.RAW8.id} ? colorGraded : sqrt(colorGraded), ga.y);\n" +
                     "       float rSq = dot(nuv,nuv);\n" + // nuv nuv 😂 (hedgehog sounds for German children)
                     "       color = mix(vec4(vignetteColor, 1.0), color, 1.0/(1.0 + vignetteStrength*rSq));\n" +
-                    "       gl_FragColor = color + random(uv) * minValue;\n" +
+                    "       color += random(uv) * minValue;\n" +
+                    "       finalColor = color.rgb;\n" +
+                    "       finalAlpha = color.a;\n" +
                     "   }" +
                     "}"
         )
@@ -208,20 +216,11 @@ object Scene {
         time: Double,
         flipY: Boolean, renderer: Renderer, sceneView: ISceneView?
     ) {
-
         currentCamera = camera
-
         useFrame(x, y, w, h, renderer) {
-
-            drawRect(x, y, w, h, black)
-
             usesFPBuffers = sceneView?.usesFPBuffers ?: (camera.toneMapping != ToneMappers.RAW8)
-
             val isFakeColorRendering = renderer.isFakeColor
-
-            // stack.clear()
             drawScene(scene, camera, time, x, y, w, h, flipY, isFakeColorRendering, sceneView)
-
         }
     }
 
@@ -323,8 +322,6 @@ object Scene {
                     }
 
                     if (!isFakeColorRendering && !isFinalRendering && sceneView != null) {
-                        // todo why is this add not working???
-                        // it is working for the scene components...
                         blendMode.use(BlendMode.ADD) {
                             drawGrid(cameraTransform, sceneView)
                         }

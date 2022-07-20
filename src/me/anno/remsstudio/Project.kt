@@ -14,6 +14,7 @@ import me.anno.io.text.TextWriter
 import me.anno.io.utils.StringMap
 import me.anno.language.Language
 import me.anno.remsstudio.RemsStudio.editorTime
+import me.anno.remsstudio.RemsStudio.project
 import me.anno.remsstudio.RemsStudioUILayouts.createDefaultMainUI
 import me.anno.remsstudio.history.History
 import me.anno.remsstudio.objects.Camera
@@ -73,13 +74,24 @@ class Project(var name: String, val file: FileReference) : Saveable() {
 
         fun tabsDefault() {
             val ref = getReference(scenes, "Root.json")
+            val tab0 = if (ref.exists) {
+                try {
+                    val data = TextReader.read(ref.inputStream(), workspace, true)
+                    val trans = data.filterIsInstance<Transform>().firstOrNull()
+                    val history = data.filterIsInstance<History>().firstOrNull()
+                    if (trans != null) Pair(trans, history ?: History()) else null
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    null
+                }
+            } else null
             val tab = SceneTab(
                 ref,
-                Transform().run {
+                tab0?.first ?: Transform().run {
                     name = "Root"
                     Camera(this)
                     this
-                }, History()
+                }, tab0?.second ?: History()
             )
             tab.save {}
             addEvent {

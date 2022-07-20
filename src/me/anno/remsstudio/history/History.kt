@@ -137,7 +137,7 @@ class History : Saveable() {
     override val className get() = "History"
 
     companion object {
-        val LOGGER = LogManager.getLogger(History::class)
+        private val LOGGER = LogManager.getLogger(History::class)
         val maxChanged = 512
     }
 
