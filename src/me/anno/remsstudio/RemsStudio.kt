@@ -1,5 +1,6 @@
 package me.anno.remsstudio
 
+import me.anno.Build
 import me.anno.Engine.deltaTime
 import me.anno.Engine.gameTime
 import me.anno.audio.openal.ALBase
@@ -341,9 +342,9 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10109) {
 
         // todo test scene with ALL rendering/playback features
 
-        // Build.isDebug = false
-        // Build.isShipped = true
-        // Build.lock()
+        Build.isDebug = false
+        Build.isShipped = true
+        Build.lock()
         if (args.isEmpty()) {
             run()
         } else {
