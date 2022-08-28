@@ -49,7 +49,7 @@ class AudioStreamRaw2(
 
     fun localAmplitude(time: Double): Float {
         if (source == null) return 1f
-        return source.amplitude[time] * clamp(source.color[time].w(), 0f, 1f)
+        return source.amplitude[time] * clamp(source.color[time].w, 0f, 1f)
     }
 
     val ffmpegSampleRate = meta.audioSampleRate

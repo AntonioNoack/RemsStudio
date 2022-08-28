@@ -9,7 +9,7 @@ import me.anno.ui.input.TextInputML
 import me.anno.ui.style.Style
 import me.anno.maths.Maths.fract
 import org.joml.Matrix4fArrayList
-import org.joml.Vector4fc
+import org.joml.Vector4f
 import java.net.URL
 import java.util.*
 import kotlin.math.floor
@@ -48,7 +48,7 @@ class Timer(parent: Transform? = null): Text("", parent) {
         return partResult!!
     }*/
 
-    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
         val fract = fract(time)
         val s0 = floor(time).toLong()

@@ -35,7 +35,7 @@ class SphereHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4
         ).mul(scale).normalize().transform()
     }
 
-    override fun drawTransformed(stack: Matrix4fArrayList, color: Vector4fc) {
+    override fun drawTransformed(stack: Matrix4fArrayList, color: Vector4f) {
         drawSphere(stack, color, 1f)
     }
 

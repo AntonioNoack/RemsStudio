@@ -5,7 +5,7 @@ import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.GFX.toRadians
-import me.anno.gpu.OpenGL
+import me.anno.gpu.GFXState
 import me.anno.gpu.blending.BlendMode
 import me.anno.gpu.drawing.GFXx3D.draw3DCircle
 import me.anno.gpu.shader.ShaderPlus
@@ -312,12 +312,12 @@ open class Transform() : Saveable(),
         )
     }
 
-    fun updateLocalColor(parentColor: Vector4fc, localTime: Double) {
+    fun updateLocalColor(parentColor: Vector4f, localTime: Double) {
         lastLocalColor = getLocalColor(parentColor, localTime, lastLocalColor)
     }
 
     fun getLocalAlpha(parentAlpha: Float, localTime: Double, tmp: Vector4f): Float {
-        var col = color.getValueAt(localTime, tmp).w()
+        var col = color.getValueAt(localTime, tmp).w
         val fadeIn = fadeIn[localTime]
         val fadeOut = fadeOut[localTime]
         val m1 = clamp((localTime - getStartTime()) / fadeIn, 0.0, 1.0)
@@ -327,17 +327,17 @@ open class Transform() : Saveable(),
         return col
     }
 
-    fun getLocalColor(parentColor: Vector4fc?, localTime: Double, dst: Vector4f = Vector4f()): Vector4f {
+    fun getLocalColor(parentColor: Vector4f?, localTime: Double, dst: Vector4f = Vector4f()): Vector4f {
         // we would need a temporary value for the parent color, as may be parentColor == dst
         var px = 1f
         var py = 1f
         var pz = 1f
         var pw = 1f
         if (parentColor != null) {
-            px = parentColor.x()
-            py = parentColor.y()
-            pz = parentColor.z()
-            pw = parentColor.w()
+            px = parentColor.x
+            py = parentColor.y
+            pz = parentColor.z
+            pw = parentColor.w
         }
         val col = color.getValueAt(localTime, dst)
         val mul = colorMultiplier[localTime]
@@ -364,13 +364,13 @@ open class Transform() : Saveable(),
             transform.translate(position)
         }
 
-        if (euler.y() != 0f) transform.rotate(toRadians(euler.y()), yAxis)
-        if (euler.x() != 0f) transform.rotate(toRadians(euler.x()), xAxis)
-        if (euler.z() != 0f) transform.rotate(toRadians(euler.z()), zAxis)
+        if (euler.y != 0f) transform.rotate(toRadians(euler.y), yAxis)
+        if (euler.x != 0f) transform.rotate(toRadians(euler.x), xAxis)
+        if (euler.z != 0f) transform.rotate(toRadians(euler.z), zAxis)
 
-        if (scale.x() != 1f || scale.y() != 1f || scale.z() != 1f) transform.scale(scale)
+        if (scale.x != 1f || scale.y != 1f || scale.z != 1f) transform.scale(scale)
 
-        if (skew.x() != 0f || skew.y() != 0f) transform.skew(skew)
+        if (skew.x != 0f || skew.y != 0f) transform.skew(skew)
 
         if (alignWithCamera != 0f) {
             transform.alignWithCamera(alignWithCamera)
@@ -398,7 +398,7 @@ open class Transform() : Saveable(),
     /**
      * stack with camera already included
      * */
-    fun draw(stack: Matrix4fArrayList, parentTime: Double, parentColor: Vector4fc) {
+    fun draw(stack: Matrix4fArrayList, parentTime: Double, parentColor: Vector4f) {
 
         val time = getLocalTime(parentTime)
         val color = getLocalColor(parentColor, time, tmp0)
@@ -407,16 +407,16 @@ open class Transform() : Saveable(),
 
     }
 
-    fun draw(stack: Matrix4fArrayList, time: Double, parentColor: Vector4fc, color: Vector4fc) {
+    fun draw(stack: Matrix4fArrayList, time: Double, parentColor: Vector4f, color: Vector4f) {
 
-        if (color.w() > minAlpha && visibility.isVisible) {
+        if (color.w > minAlpha && visibility.isVisible) {
             applyTransformLT(stack, time)
             drawDirectly(stack, time, parentColor, color)
         }
 
     }
 
-    fun drawDirectly(stack: Matrix4fArrayList, time: Double, parentColor: Vector4fc, color: Vector4fc) {
+    fun drawDirectly(stack: Matrix4fArrayList, time: Double, parentColor: Vector4f, color: Vector4f) {
 
         GFX.drawnId = clickId
         val doBlending = when (GFX.drawMode) {
@@ -425,7 +425,7 @@ open class Transform() : Saveable(),
         }
 
         if (doBlending) {
-            OpenGL.blendMode.use(blendMode) {
+            GFXState.blendMode.use(blendMode) {
                 onDraw(stack, time, color)
                 drawChildren(stack, time, color, parentColor)
             }
@@ -435,7 +435,7 @@ open class Transform() : Saveable(),
         }
     }
 
-    fun drawChildren(stack: Matrix4fArrayList, time: Double, color: Vector4fc, parentColor: Vector4fc) {
+    fun drawChildren(stack: Matrix4fArrayList, time: Double, color: Vector4f, parentColor: Vector4f) {
         val passesOnColor = passesOnColor()
         val childColor = if (passesOnColor) color else parentColor
         if (drawChildrenAutomatically()) {
@@ -445,7 +445,7 @@ open class Transform() : Saveable(),
 
     open fun drawChildrenAutomatically() = true
 
-    fun drawChildren(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    fun drawChildren(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val size = children.size
         drawnChildCount = size
         for (i in 0 until size) {
@@ -455,7 +455,7 @@ open class Transform() : Saveable(),
         }
     }
 
-    fun drawChild(stack: Matrix4fArrayList, time: Double, color: Vector4fc, child: Transform?) {
+    fun drawChild(stack: Matrix4fArrayList, time: Double, color: Vector4f, child: Transform?) {
         if (child != null) {
             stack.next {
                 child.draw(stack, time, color)
@@ -463,7 +463,7 @@ open class Transform() : Saveable(),
         }
     }
 
-    open fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    open fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         drawUICircle(stack, 0.02f, 0.7f, color)
     }
 
@@ -842,7 +842,7 @@ open class Transform() : Saveable(),
 
     companion object {
 
-        fun drawUICircle(stack: Matrix4fArrayList, scale: Float = 0.02f, inner: Float = 0.7f, color: Vector4fc) {
+        fun drawUICircle(stack: Matrix4fArrayList, scale: Float = 0.02f, inner: Float = 0.7f, color: Vector4f) {
             // draw a small symbol to indicate pivot
             if (!isFinalRendering) {
                 stack.pushMatrix()
@@ -860,9 +860,9 @@ open class Transform() : Saveable(),
         // these values MUST NOT be changed
         // they are universal constants, and are used
         // within shaders, too
-        val xAxis: Vector3fc = Vector3f(1f, 0f, 0f)
-        val yAxis: Vector3fc = Vector3f(0f, 1f, 0f)
-        val zAxis: Vector3fc = Vector3f(0f, 0f, 1f)
+        val xAxis = Vector3f(1f, 0f, 0f)
+        val yAxis = Vector3f(0f, 1f, 0f)
+        val zAxis = Vector3f(0f, 0f, 1f)
 
         val nextClickId = AtomicInteger()
 

@@ -1,7 +1,7 @@
 package me.anno.remsstudio.gpu
 
 import me.anno.gpu.GFX
-import me.anno.gpu.OpenGL
+import me.anno.gpu.GFXState
 import me.anno.gpu.buffer.SimpleBuffer
 import me.anno.gpu.buffer.SimpleBuffer.Companion.circleBuffer
 import me.anno.gpu.buffer.StaticBuffer
@@ -19,7 +19,10 @@ import me.anno.remsstudio.objects.Video
 import me.anno.remsstudio.objects.geometric.Polygon
 import me.anno.video.formats.gpu.GPUFrame
 import ofx.mio.OpticalFlow
-import org.joml.*
+import org.joml.Matrix4fArrayList
+import org.joml.Vector2f
+import org.joml.Vector3f
+import org.joml.Vector4f
 import kotlin.math.min
 
 object GFXx3Dv2 {
@@ -32,7 +35,7 @@ object GFXx3Dv2 {
     fun shader3DUniforms(
         shader: Shader, stack: Matrix4fArrayList,
         w: Int, h: Int,
-        tiling: Vector4fc?, filtering: Filtering,
+        tiling: Vector4f?, filtering: Filtering,
         uvProjection: UVProjection?
     ) {
 
@@ -63,8 +66,8 @@ object GFXx3Dv2 {
 
     fun shader3DUniforms(
         shader: Shader, stack: Matrix4fArrayList,
-        w: Int, h: Int, color: Vector4fc?,
-        tiling: Vector4fc?, filtering: Filtering,
+        w: Int, h: Int, color: Vector4f?,
+        tiling: Vector4f?, filtering: Filtering,
         uvProjection: UVProjection?
     ) {
         shader3DUniforms(shader, stack, w, h, tiling, filtering, uvProjection)
@@ -74,7 +77,7 @@ object GFXx3Dv2 {
     fun shader3DUniforms(
         shader: Shader, stack: Matrix4fArrayList,
         w: Int, h: Int, color: Int,
-        tiling: Vector4fc?, filtering: Filtering,
+        tiling: Vector4f?, filtering: Filtering,
         uvProjection: UVProjection?
     ) {
         shader3DUniforms(shader, stack, w, h, tiling, filtering, uvProjection)
@@ -82,8 +85,8 @@ object GFXx3Dv2 {
     }
 
     fun draw3DText(
-        that: GFXTransform, time: Double, offset: Vector3fc,
-        stack: Matrix4fArrayList, buffer: StaticBuffer, color: Vector4fc
+        that: GFXTransform, time: Double, offset: Vector3f,
+        stack: Matrix4fArrayList, buffer: StaticBuffer, color: Vector4f
     ) {
         val shader = shader3DText.value
         shader.use()
@@ -96,8 +99,8 @@ object GFXx3Dv2 {
 
     fun draw3DVideo(
         video: GFXTransform, time: Double,
-        stack: Matrix4fArrayList, texture: Texture2D, color: Vector4fc,
-        filtering: Filtering, clamping: Clamping, tiling: Vector4fc?, uvProjection: UVProjection
+        stack: Matrix4fArrayList, texture: Texture2D, color: Vector4f,
+        filtering: Filtering, clamping: Clamping, tiling: Vector4f?, uvProjection: UVProjection
     ) {
         val shader = ShaderLib.shader3DRGBA.value
         shader.use()
@@ -110,8 +113,8 @@ object GFXx3Dv2 {
 
     fun draw3DVideo(
         video: GFXTransform, time: Double,
-        stack: Matrix4fArrayList, v0: GPUFrame, v1: GPUFrame, interpolation: Float, color: Vector4fc,
-        filtering: Filtering, clamping: Clamping, tiling: Vector4fc?, uvProjection: UVProjection
+        stack: Matrix4fArrayList, v0: GPUFrame, v1: GPUFrame, interpolation: Float, color: Vector4f,
+        filtering: Filtering, clamping: Clamping, tiling: Vector4f?, uvProjection: UVProjection
     ) {
 
         if (!v0.isCreated || !v1.isCreated) throw RuntimeException("Frame must be loaded to be rendered!")
@@ -122,7 +125,7 @@ object GFXx3Dv2 {
         val lambda = 0.01f
         val blurAmount = 0.05f
 
-        OpenGL.renderPurely {
+        GFXState.renderPurely {
             // interpolate all textures
             val interpolated = t0.zip(t1).map { (x0, x1) -> OpticalFlow.run(lambda, blurAmount, interpolation, x0, x1) }
             // bind them
@@ -142,8 +145,8 @@ object GFXx3Dv2 {
 
     fun draw3DVideo(
         video: GFXTransform, time: Double,
-        stack: Matrix4fArrayList, texture: GPUFrame, color: Vector4fc,
-        filtering: Filtering, clamping: Clamping, tiling: Vector4fc?, uvProjection: UVProjection
+        stack: Matrix4fArrayList, texture: GPUFrame, color: Vector4f,
+        filtering: Filtering, clamping: Clamping, tiling: Vector4f?, uvProjection: UVProjection
     ) {
         if (!texture.isCreated) throw RuntimeException("Frame must be loaded to be rendered!")
         val shader0 = texture.get3DShader()
@@ -160,7 +163,7 @@ object GFXx3Dv2 {
     fun draw3DPolygon(
         polygon: Polygon, time: Double,
         stack: Matrix4fArrayList, buffer: StaticBuffer,
-        texture: Texture2D, color: Vector4fc,
+        texture: Texture2D, color: Vector4f,
         inset: Float,
         filtering: Filtering, clamping: Clamping
     ) {
@@ -178,12 +181,12 @@ object GFXx3Dv2 {
         that: GFXTransform,
         time: Double,
         stack: Matrix4fArrayList,
-        offset: Vector2fc,
-        scale: Vector2fc,
+        offset: Vector2f,
+        scale: Vector2f,
         texture: Texture2D,
-        color: Vector4fc,
+        color: Vector4f,
         colorCount: Int,
-        colors: Array<Vector4fc>,
+        colors: Array<Vector4f>,
         distances: FloatArray,
         smoothness: FloatArray,
         depth: Float,
@@ -191,7 +194,7 @@ object GFXx3Dv2 {
     ) {
 
         // why ever this would be drawn...
-        if (colors.all { it.w() <= 0f }) {
+        if (colors.all { it.w <= 0f }) {
             return
         }
 
@@ -215,10 +218,10 @@ object GFXx3Dv2 {
         buffer.position(0)
         for (i in 0 until cc) {
             val colorI = colors[i]
-            buffer.put(colorI.x())
-            buffer.put(colorI.y())
-            buffer.put(colorI.z())
-            buffer.put(colorI.w())
+            buffer.put(colorI.x)
+            buffer.put(colorI.y)
+            buffer.put(colorI.z)
+            buffer.put(colorI.w)
         }
         buffer.position(0)
         shader.v4Array("colors", buffer)
@@ -242,7 +245,7 @@ object GFXx3Dv2 {
         innerRadius: Float,
         startDegrees: Float,
         endDegrees: Float,
-        color: Vector4fc
+        color: Vector4f
     ) {
         val shader = ShaderLib.shader3DCircle.value
         shader.use()
@@ -271,11 +274,11 @@ object GFXx3Dv2 {
 
     fun draw3DMasked(
         stack: Matrix4fArrayList,
-        color: Vector4fc,
+        color: Vector4f,
         maskType: Int,
         useMaskColor: Float,
         pixelSize: Float,
-        offset: Vector2fc,
+        offset: Vector2f,
         isInverted1: Boolean,
         isInverted2: Boolean,
         isFullscreen: Boolean,

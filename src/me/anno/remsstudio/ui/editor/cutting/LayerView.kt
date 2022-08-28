@@ -5,6 +5,7 @@ import me.anno.animation.Keyframe
 import me.anno.cache.CacheData
 import me.anno.cache.instances.VideoCache
 import me.anno.config.DefaultStyle.white4
+import me.anno.gpu.GFX
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.input.Input
 import me.anno.input.Input.isControlDown
@@ -107,8 +108,8 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
             } else null
         )
 
-    override fun tickUpdate() {
-        super.tickUpdate()
+    override fun onUpdate() {
+        super.onUpdate()
         solution?.keepResourcesLoaded()
     }
 
@@ -133,7 +134,7 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
                 isHovered ||
                 mouseKeysDown.isNotEmpty() ||
                 keysDown.isNotEmpty() ||
-                abs(this.lastTime - gameTime) > if (needsLayoutUpdate()) 5e7 else 1e9
+                abs(this.lastTime - gameTime) > if (needsLayoutUpdate(GFX.activeWindow!!)) 5e7 else 1e9
 
 
         if (needsUpdate && !computer.isCalculating) {

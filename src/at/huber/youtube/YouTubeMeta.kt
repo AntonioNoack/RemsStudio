@@ -354,7 +354,7 @@ class YouTubeMeta(youtubeLink: String) {
             // FORMAT_STREAM_TYPE_OTF(otf=1) requires downloading the init fragment (adding `&sq=0` to the URL)
             // and parsing emsg box to determine the number of fragments that
             // would subsequently requested with (`&sq=N`) (cf. youtube-dl)
-            val type = format.getText("type")
+            val type = format.getString("type")
             if ("FORMAT_STREAM_TYPE_OTF" != type) {
                 decodeSource(format, sources, encodedSources)
             }
@@ -369,11 +369,11 @@ class YouTubeMeta(youtubeLink: String) {
         val itag = sourceJson.getInt("itag")
         val format = findFormat(itag)
         if (format != null) {
-            val url = sourceJson.getText("url")
+            val url = sourceJson.getString("url")
             if (url != null) {
                 sources[format] = url.replace("\\u0026", "&")
             } else {
-                val cipher = sourceJson.getText("signatureCipher")
+                val cipher = sourceJson.getString("signatureCipher")
                 if (cipher != null) {
                     val mat = patSigEncUrl.matcher(cipher)
                     val matSig = patSignature.matcher(cipher)
@@ -416,13 +416,13 @@ class YouTubeMeta(youtubeLink: String) {
             if (videoDetails != null) {
                 // why would we need it again?
                 // videoId = getString(videoDetails, "videoId")
-                title = videoDetails.getText("title")
-                author = videoDetails.getText("author")
-                channelId = videoDetails.getText("channelId")
+                title = videoDetails.getString("title")
+                author = videoDetails.getString("author")
+                channelId = videoDetails.getString("channelId")
                 videoLengthSeconds = videoDetails.getLong("lengthSeconds")
                 viewCount = videoDetails.getLong("viewCount")
                 isLiveStream = videoDetails.getBool("isLiveContent")
-                shortDescription = videoDetails.getText("shortDescription")
+                shortDescription = videoDetails.getString("shortDescription")
             } else LOGGER.warn("Video details is null")
 
             if (encodedSources.isNotEmpty()) {

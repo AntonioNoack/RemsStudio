@@ -64,13 +64,13 @@ abstract class Distribution(val displayName: String, val description: String) : 
     fun Vector3f.mul(size: Vector4f) = mul(size.x, size.y, size.z)
     fun Vector3f.add(delta: Vector4f) = add(delta.x, delta.y, delta.z)
 
-    open fun draw(stack: Matrix4fArrayList, color: Vector4fc) {
+    open fun draw(stack: Matrix4fArrayList, color: Vector4f) {
         onDraw(stack, color)
     }
 
-    abstract fun onDraw(stack: Matrix4fArrayList, color: Vector4fc)
+    abstract fun onDraw(stack: Matrix4fArrayList, color: Vector4f)
 
-    fun drawSphere(stack: Matrix4fArrayList, color: Vector4fc, alpha: Float = 1f) {
+    fun drawSphere(stack: Matrix4fArrayList, color: Vector4f, alpha: Float = 1f) {
         Grid.drawBuffer(
             stack,
             if (alpha == 1f) color

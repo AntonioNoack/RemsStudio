@@ -14,7 +14,7 @@ import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
 import me.anno.utils.types.Floats.put3
-import org.joml.Vector3fc
+import org.joml.Vector3f
 import org.joml.Vector4f
 import org.lwjgl.opengl.GL20C.glUniform3fv
 import org.lwjgl.opengl.GL20C.glUniform4fv
@@ -54,7 +54,7 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
         fx += vi("Coloring: Base Color", "Base color for coloring", attractorBaseColor, style)
     }
 
-    open fun transformLocally(pos: Vector3fc, time: Double): Vector3fc {
+    open fun transformLocally(pos: Vector3f, time: Double): Vector3f {
         return pos
     }
 
@@ -102,9 +102,9 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                 for (attractor in attractors) {
                     val localTime = attractor.lastLocalTime
                     val position = transformLocally(attractor.position[localTime], time)
-                    buffer.put(position.x() * 0.5f + 0.5f)
-                    buffer.put(position.y() * 0.5f + 0.5f)
-                    buffer.put(position.z())
+                    buffer.put(position.x * 0.5f + 0.5f)
+                    buffer.put(position.y * 0.5f + 0.5f)
+                    buffer.put(position.z)
                 }
                 buffer.position(0)
                 glUniform3fv(loc1, buffer)
@@ -119,9 +119,9 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                     val weight = attractor.lastInfluence
                     val sharpness = attractor.sharpness[localTime]
                     val scale = attractor.scale[localTime]
-                    buffer.put(sqrt(sy / sx) * weight * scale.z() / scale.x())
-                    buffer.put(sqrt(sx / sy) * weight * scale.z() / scale.y())
-                    buffer.put(10f / (scale.z() * weight * weight))
+                    buffer.put(sqrt(sy / sx) * weight * scale.z / scale.x)
+                    buffer.put(sqrt(sx / sy) * weight * scale.z / scale.y)
+                    buffer.put(10f / (scale.z * weight * weight))
                     buffer.put(sharpness)
                 }
                 buffer.position(0)
@@ -163,10 +163,10 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                 val localTime = attractor.lastLocalTime
                 val color = attractor.color[localTime]
                 val colorM = attractor.colorMultiplier[localTime]
-                buffer.put(color.x() * colorM)
-                buffer.put(color.y() * colorM)
-                buffer.put(color.z() * colorM)
-                buffer.put(color.w())
+                buffer.put(color.x * colorM)
+                buffer.put(color.y * colorM)
+                buffer.put(color.z * colorM)
+                buffer.put(color.w)
             }
             buffer.position(0)
             glUniform4fv(shader["forceFieldColors"], buffer)
@@ -187,9 +187,9 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                 val localTime = attractor.lastLocalTime
                 val scale = attractor.scale[localTime]
                 val power = attractor.sharpness[localTime]
-                buffer.put(abs(sy / sx / scale.x()))
-                buffer.put(abs(sx / sy / scale.y()))
-                buffer.put(abs(1f / scale.z()))
+                buffer.put(abs(sy / sx / scale.x))
+                buffer.put(abs(sx / sy / scale.y))
+                buffer.put(abs(1f / scale.z))
                 buffer.put(power)
             }
             buffer.position(0)

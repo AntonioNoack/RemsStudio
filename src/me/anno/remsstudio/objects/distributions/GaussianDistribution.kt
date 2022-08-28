@@ -46,7 +46,7 @@ class GaussianDistribution(center: Vector4f, size: Vector4f, rotation: Vector4f 
         ).mul(gaussianScale).transform()
     }
 
-    override fun drawTransformed(stack: Matrix4fArrayList, color: Vector4fc) {
+    override fun drawTransformed(stack: Matrix4fArrayList, color: Vector4f) {
         val i0 = 0.68f
         val i1 = 0.95f
         val i2 = 0.99f

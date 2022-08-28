@@ -5,7 +5,6 @@ import me.anno.gpu.buffer.StaticBuffer
 import me.anno.utils.types.Vectors.minus
 import me.anno.utils.types.Vectors.plus
 import org.joml.Vector3f
-import org.joml.Vector3fc
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -31,7 +30,7 @@ object SphereModel {
 
         val z = 0.447215f
 
-        fun addTriangle(a: Vector3fc, b: Vector3fc, c: Vector3fc, sub: Int = 0) {
+        fun addTriangle(a: Vector3f, b: Vector3f, c: Vector3f, sub: Int = 0) {
             if (sub < subdivisions) {
                 // subdivide further
                 val ab = (a + b).normalize()
@@ -43,7 +42,7 @@ object SphereModel {
                 addTriangle(ab, bc, ca, sub + 1)
             } else {
                 // keep the normals the same
-                if((a-b).cross(a-c).dot(a) < 0f){
+                if ((a - b).cross(a - c).dot(a) < 0f) {
                     buffer.put(a)
                     buffer.put(b)
                     buffer.put(c)
@@ -55,27 +54,27 @@ object SphereModel {
             }
         }
 
-        val p0 = Vector3f(0f,1f,0f)
-        val p1 = Vector3f(0f,-1f,0f)
+        val p0 = Vector3f(0f, 1f, 0f)
+        val p1 = Vector3f(0f, -1f, 0f)
 
-        val ring0 = Array(8){
+        val ring0 = Array(8) {
             val angle = (it * 0.2 * 2 * PI).toFloat()
             Vector3f(cos(angle), z, sin(angle)).normalize()
         }
 
-        val ring1 = Array(8){
+        val ring1 = Array(8) {
             val angle = ((it + 0.5) * 0.2 * 2 * PI).toFloat()
             Vector3f(cos(angle), -z, sin(angle)).normalize()
         }
 
-        for(i in 0 until 5){
+        for (i in 0 until 5) {
             // top hull
-            addTriangle(ring0[i], ring0[i+1], p0)
+            addTriangle(ring0[i], ring0[i + 1], p0)
             // in-between
-            addTriangle(ring0[i], ring0[i+1], ring1[i])
-            addTriangle(ring1[i], ring1[i+1], ring0[i+1])
+            addTriangle(ring0[i], ring0[i + 1], ring1[i])
+            addTriangle(ring1[i], ring1[i + 1], ring0[i + 1])
             // bottom hull
-            addTriangle(ring1[i], ring1[i+1], p1)
+            addTriangle(ring1[i], ring1[i + 1], p1)
         }
 
         return buffer
@@ -98,7 +97,7 @@ object SphereModel {
 
         val z = 0.447215f
 
-        fun addTriangle(a: Vector3fc, b: Vector3fc, c: Vector3fc, sub: Int = 0) {
+        fun addTriangle(a: Vector3f, b: Vector3f, c: Vector3f, sub: Int = 0) {
             if (sub < subdivisions) {
                 // subdivide further
                 val ab = (a + b).normalize()
@@ -119,41 +118,41 @@ object SphereModel {
             }
         }
 
-        val p0 = Vector3f(0f,1f,0f)
-        val p1 = Vector3f(0f,-1f,0f)
+        val p0 = Vector3f(0f, 1f, 0f)
+        val p1 = Vector3f(0f, -1f, 0f)
 
-        val ring0 = Array(8){
+        val ring0 = Array(8) {
             val angle = (it * 0.2 * 2 * PI).toFloat()
             Vector3f(cos(angle), z, sin(angle)).normalize()
         }
 
-        val ring1 = Array(8){
+        val ring1 = Array(8) {
             val angle = ((it + 0.5) * 0.2 * 2 * PI).toFloat()
             Vector3f(cos(angle), -z, sin(angle)).normalize()
         }
 
-        for(i in 0 until 5){
+        for (i in 0 until 5) {
             // top hull
-            addTriangle(ring0[i], ring0[i+1], p0)
+            addTriangle(ring0[i], ring0[i + 1], p0)
             // in-between
-            addTriangle(ring0[i], ring0[i+1], ring1[i])
-            addTriangle(ring1[i], ring1[i+1], ring0[i+1])
+            addTriangle(ring0[i], ring0[i + 1], ring1[i])
+            addTriangle(ring1[i], ring1[i + 1], ring0[i + 1])
             // bottom hull
-            addTriangle(ring1[i], ring1[i+1], p1)
+            addTriangle(ring1[i], ring1[i + 1], p1)
         }
 
         return buffer
 
     }
 
-    fun destroy(){
+    fun destroy() {
         sphereLineModels.forEach {
-            if(it.isInitialized()){
+            if (it.isInitialized()) {
                 it.value.destroy()
             }
         }
         sphereModels.forEach {
-            if(it.isInitialized()){
+            if (it.isInitialized()) {
                 it.value.destroy()
             }
         }

@@ -37,7 +37,6 @@ import me.anno.video.MissingFrameException
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
-import org.joml.Vector4fc
 import java.net.URL
 import java.util.*
 import kotlin.math.abs
@@ -252,7 +251,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
 
     open fun needsChildren() = true
 
-    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
         super.onDraw(stack, time, color)
 
@@ -286,7 +285,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
     /**
      * draw all particles at this point in time
      * */
-    private fun drawParticles(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    private fun drawParticles(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val fadeIn = fadeIn[time].toDouble()
         val fadeOut = fadeOut[time].toDouble()
         val simulationStep = simulationStep

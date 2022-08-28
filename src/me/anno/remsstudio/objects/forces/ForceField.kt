@@ -2,6 +2,7 @@ package me.anno.remsstudio.objects.forces
 
 import me.anno.config.DefaultConfig
 import me.anno.language.translation.Dict
+import me.anno.maths.Maths
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.forces.impl.*
 import me.anno.remsstudio.objects.inspectable.InspectableAnimProperty
@@ -15,7 +16,6 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.sceneView.Grid
 import me.anno.ui.editor.stacked.Option
 import me.anno.ui.style.Style
-import me.anno.maths.Maths
 import me.anno.utils.types.Floats.toRadians
 import org.joml.*
 import kotlin.math.abs
@@ -66,7 +66,7 @@ abstract class ForceField(val displayName: String, val descriptionI: String) : T
     }
 
     fun drawPerParticle(
-        stack: Matrix4fArrayList, time: Double, color: Vector4fc,
+        stack: Matrix4fArrayList, time: Double, color: Vector4f,
         applyTransform: (Particle, index0: Int, indexF: Float) -> Unit
     ) {
         super.onDraw(stack, time, color)
@@ -76,7 +76,7 @@ abstract class ForceField(val displayName: String, val descriptionI: String) : T
         val stepSize = system.simulationStep
         val t0 = System.nanoTime()
         for (particle in system.particles) {
-            val opacity = particle.opacity * particle.getLifeOpacity(time, stepSize, 0.5, 0.5).toFloat()
+            val opacity: Float = particle.opacity * particle.getLifeOpacity(time, stepSize, 0.5, 0.5).toFloat()
             if (opacity > 0f) {
                 val index = (time - particle.birthTime) / stepSize
                 val index0 = floor(index).toInt()
@@ -86,7 +86,7 @@ abstract class ForceField(val displayName: String, val descriptionI: String) : T
                     stack.translate(position)
                     applyTransform(particle, index0, indexF)
                     Grid.drawBuffer(
-                        stack, Vector4f(color.x(), color.y(), color.z(), color.w() * opacity),
+                        stack, Vector4f(color.x, color.y, color.z, color.w * opacity),
                         ArrowModel.arrowLineModel
                     )
                 }
@@ -99,7 +99,7 @@ abstract class ForceField(val displayName: String, val descriptionI: String) : T
     }
 
     fun drawForcePerParticle(
-        stack: Matrix4fArrayList, time: Double, color: Vector4fc
+        stack: Matrix4fArrayList, time: Double, color: Vector4f
     ) {
         val particles = (parent as? ParticleSystem)?.particles?.filter { it.isAlive(time) } ?: return
         drawPerParticle(stack, time, color) { p, index0, indexF ->
@@ -122,9 +122,9 @@ abstract class ForceField(val displayName: String, val descriptionI: String) : T
     fun getDirection(time: Double): Vector3f {
         val rot = rotationYXZ[time]
         val quat = Quaternionf()
-        quat.rotateY(rot.y().toRadians())
-        quat.rotateX(rot.x().toRadians())
-        quat.rotateZ(rot.z().toRadians())
+        quat.rotateY(rot.y.toRadians())
+        quat.rotateX(rot.x.toRadians())
+        quat.rotateZ(rot.z.toRadians())
         return quat.transform(Vector3f(0f, 1f, 0f))
     }
 

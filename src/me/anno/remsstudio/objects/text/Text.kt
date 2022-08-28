@@ -1,6 +1,5 @@
 package me.anno.remsstudio.objects.text
 
-import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.animation.Type
 import me.anno.cache.CacheData
 import me.anno.cache.instances.TextCache
@@ -17,6 +16,7 @@ import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
 import me.anno.maths.Maths.mix
+import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.lists.Element
@@ -33,9 +33,7 @@ import me.anno.ui.style.Style
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
-import org.joml.Vector4fc
 import java.net.URL
-import kotlin.math.max
 import kotlin.streams.toList
 
 // todo background "color" in the shape of a plane? for selections and such
@@ -176,8 +174,8 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
         return data.value as Pair<PartResult, List<TextSegmentKey>>
     }
 
-    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
-        if (color.w() >= 1f / 255f) TextRenderer.draw(this, stack, time, color) {
+    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
+        if (color.w >= 1f / 255f) TextRenderer.draw(this, stack, time, color) {
             super.onDraw(stack, time, color)
         }
     }

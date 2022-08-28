@@ -1,9 +1,12 @@
 package me.anno.remsstudio.objects.distributions
 
-import me.anno.gpu.buffer.CubemapModel.cubemapLineModel
-import me.anno.ui.editor.sceneView.Grid
+import me.anno.ecs.components.mesh.shapes.CubemapModel.cubemapLineModel
 import me.anno.maths.Maths.max
-import org.joml.*
+import me.anno.ui.editor.sceneView.Grid
+import org.joml.Matrix4fArrayList
+import org.joml.Vector2f
+import org.joml.Vector3f
+import org.joml.Vector4f
 import kotlin.math.abs
 
 class CuboidHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4f = Vector4f()) :
@@ -38,8 +41,8 @@ class CuboidHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4
             y = if (y > 0f) +1f else -1f
             x *= maxScale / scale.x // undo scaling
         }
-        if(x.isNaN()) x = 0f
-        if(y.isNaN()) y = 0f
+        if (x.isNaN()) x = 0f
+        if (y.isNaN()) y = 0f
         return Vector2f(
             x, y
         ).transform()
@@ -70,9 +73,9 @@ class CuboidHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4
                 y *= maxScale / scale.y
             }
         }
-        if(x.isNaN()) x = 0f
-        if(y.isNaN()) y = 0f
-        if(z.isNaN()) z = 0f
+        if (x.isNaN()) x = 0f
+        if (y.isNaN()) y = 0f
+        if (z.isNaN()) z = 0f
         return Vector3f(
             x, y, z
         ).transform()
@@ -114,16 +117,16 @@ class CuboidHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4
                 z *= maxScale / scale.z
             }
         }
-        if(x.isNaN()) x = 0f
-        if(y.isNaN()) y = 0f
-        if(z.isNaN()) z = 0f
-        if(w.isNaN()) w = 0f
+        if (x.isNaN()) x = 0f
+        if (y.isNaN()) y = 0f
+        if (z.isNaN()) z = 0f
+        if (w.isNaN()) w = 0f
         return Vector4f(
             x, y, z, w
         ).transform()
     }
 
-    override fun drawTransformed(stack: Matrix4fArrayList, color: Vector4fc) {
+    override fun drawTransformed(stack: Matrix4fArrayList, color: Vector4f) {
         // draw cube out of lines
         Grid.drawBuffer(stack, color, cubemapLineModel)
     }

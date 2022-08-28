@@ -6,7 +6,7 @@ import me.anno.audio.openal.AudioManager
 import me.anno.audio.openal.AudioTasks
 import me.anno.cache.data.ImageData.Companion.imageTimeout
 import me.anno.cache.data.VideoData.Companion.framesPerContainer
-import me.anno.cache.instances.MeshCache
+import me.anno.cache.instances.OldMeshCache
 import me.anno.cache.instances.VideoCache.getVideoFrame
 import me.anno.cache.instances.VideoCache.getVideoFrameWithoutGenerator
 import me.anno.config.DefaultConfig
@@ -178,16 +178,16 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
         return localTime >= 0.0 && (looping != LoopingState.PLAY_ONCE || localTime < lastDuration)
     }
 
-    override fun transformLocally(pos: Vector3fc, time: Double): Vector3fc {
+    override fun transformLocally(pos: Vector3f, time: Double): Vector3f {
         val doScale = uvProjection.value.doScale && lastW != lastH
         return if (doScale) {
             val avgSize =
                 if (lastW * targetHeight > lastH * targetWidth) lastW.toFloat() * targetHeight / targetWidth else lastH.toFloat()
             val sx = lastW / avgSize
             val sy = lastH / avgSize
-            Vector3f(pos.x() / sx, -pos.y() / sy, pos.z())
+            Vector3f(pos.x / sx, -pos.y / sy, pos.z)
         } else {
-            Vector3f(pos.x(), -pos.y(), pos.z())
+            Vector3f(pos.x, -pos.y, pos.z)
         }
     }
 
@@ -261,7 +261,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
     /**
      * todo when final rendering, then sometimes frames are just black...
      * */
-    private fun drawImageSequence(meta: ImageSequenceMeta, stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    private fun drawImageSequence(meta: ImageSequenceMeta, stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
         var wasDrawn = false
 
@@ -352,7 +352,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
 
     private var lastFrame: GPUFrame? = null
 
-    private fun drawVideo(meta: FFMPEGMetadata, stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    private fun drawVideo(meta: FFMPEGMetadata, stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
         val duration = meta.videoDuration
         lastDuration = duration
@@ -477,7 +477,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
         val ext = file.extension
         return when {
             ext.equals("svg", true) ->
-                MeshCache.getSVG(file, imageTimeout, true)
+                OldMeshCache.getSVG(file, imageTimeout, true)
             ext.equals("webp", true) || ext.equals("dds", true) ->
                 // calculate required scale? no, without animation, we don't need to scale it down ;)
                 getVideoFrame(file, 1, 0, 1, 1.0, imageTimeout, true)
@@ -486,12 +486,12 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
         }
     }
 
-    private fun drawImage(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    private fun drawImage(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val file = file
         val ext = file.extension
         when {
             ext.equals("svg", true) -> {
-                val bufferData = MeshCache.getSVG(file, imageTimeout, true)
+                val bufferData = OldMeshCache.getSVG(file, imageTimeout, true)
                 if (bufferData == null) onMissingImageOrFrame(0)
                 else {
                     GFXxSVGv2.draw3DSVG(
@@ -693,7 +693,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
         }
     }
 
-    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
         needsImageUpdate = false
 

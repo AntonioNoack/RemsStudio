@@ -4,7 +4,7 @@ import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.animation.Type
 import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX.isFinalRendering
-import me.anno.gpu.OpenGL.useFrame
+import me.anno.gpu.GFXState.useFrame
 import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.framebuffer.Frame
 import me.anno.gpu.shader.Renderer
@@ -32,7 +32,7 @@ import me.anno.utils.structures.ValueWithDefaultFunc
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
-import org.joml.Vector4fc
+import org.joml.Vector4f
 import org.lwjgl.opengl.GL11C.*
 import kotlin.math.roundToInt
 
@@ -73,18 +73,17 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
     private var lastModified: Any? = null
     private var lastCamera: Camera? = null
 
-    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         super.onDraw(stack, time, color)
         if (renderToTexture) {
             // render to texture to keep all post-processing settings
             val resolution = resolution[time]
-            val rx = resolution.x().roundToInt()
-            val ry = resolution.y().roundToInt()
+            val rx = resolution.x.roundToInt()
+            val ry = resolution.y.roundToInt()
             if (rx > 0 && ry > 0 && rx * ry < 16e6) {
                 val fb = FBStack["SoftLink", rx, ry, 4, false, 1, true]
                 useFrame(fb) {
-                    Frame.bind()
-                    glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+                    fb.clearColor(0, true)
                     drawSceneWithPostProcessing(time)
                 }
                 draw3DVideo(
@@ -106,7 +105,7 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
     }
 
     private val tmpMatrix0 = Matrix4f()
-    fun drawScene(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    fun drawScene(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         updateCache()
         val camera = lastCamera
         if (camera != null) {
@@ -125,8 +124,8 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
         updateCache()
         val camera = lastCamera ?: Camera()
         val size = resolution[time]
-        val w = StrictMath.max(size.x().roundToInt(), 4)
-        val h = StrictMath.max(size.y().roundToInt(), 4)
+        val w = StrictMath.max(size.x.roundToInt(), 4)
+        val h = StrictMath.max(size.y.roundToInt(), 4)
         val wasFinalRendering = isFinalRendering
         isFinalRendering = true
         Scene.draw(
@@ -187,7 +186,7 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
         ) { cameraIndex = it }
         list += FrameSizeInput(
             "Resolution",
-            resolution[lastLocalTime].run { "${x().roundToInt()} x ${y().roundToInt()}" },
+            resolution[lastLocalTime].run { "${x.roundToInt()} x ${y.roundToInt()}" },
             style
         )
             .setChangeListener { w, h -> putValue(resolution, Vector2f(w.toFloat(), h.toFloat()), true) }

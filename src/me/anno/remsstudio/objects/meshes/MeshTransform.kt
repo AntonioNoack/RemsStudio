@@ -1,7 +1,7 @@
 package me.anno.remsstudio.objects.meshes
 
 import me.anno.animation.Type
-import me.anno.cache.instances.MeshCache.getMesh
+import me.anno.cache.instances.OldMeshCache.getMesh
 import me.anno.config.DefaultConfig
 import me.anno.ecs.Entity
 import me.anno.ecs.components.anim.AnimRenderer
@@ -38,7 +38,7 @@ import me.anno.ui.style.Style
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.video.MissingFrameException
 import org.joml.Matrix4fArrayList
-import org.joml.Vector4fc
+import org.joml.Vector4f
 
 class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(parent) {
 
@@ -128,7 +128,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
     var extension = ""
     var powerOf10Correction = 0
 
-    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
         val file = file
         if (file.hasValidName() && file.exists) {
@@ -160,7 +160,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
 
     }
 
-    fun drawAssimp(data: MeshData?, stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    fun drawAssimp(data: MeshData?, stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         if (data?.assimpModel != null) {
             stack.next {
 
@@ -177,7 +177,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                         animation[time], true, centerMesh, normalizeScale, false
                     )
                     /*Input.isKeyDown('l') -> {// line debugging
-                        OpenGL.geometryShader.use(lineGeometry) {
+                        GFXState.geometryShader.use(lineGeometry) {
                             data.drawAssimp2(
                                 false, this, stack, time, color,
                                 animation[time], true, centerMesh, normalizeScale, false
@@ -185,7 +185,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                         }
                     }
                     Input.isKeyDown('n') -> {// normal debugging
-                        OpenGL.geometryShader.use(cullFaceColoringGeometry) {
+                        GFXState.geometryShader.use(cullFaceColoringGeometry) {
                             data.drawAssimp2(
                                 false, this, stack, time, color,
                                 animation[time], true, centerMesh, normalizeScale, false

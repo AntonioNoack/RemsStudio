@@ -170,7 +170,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
             .addLeftClickListener { resetTransform(true) }
     }
 
-    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
         if (GFX.isFinalRendering) return
         if (this === currentlyDrawnCamera) return

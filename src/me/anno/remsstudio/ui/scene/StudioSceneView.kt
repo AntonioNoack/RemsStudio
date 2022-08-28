@@ -3,12 +3,10 @@ package me.anno.remsstudio.ui.scene
 import me.anno.Engine.deltaTime
 import me.anno.config.DefaultConfig
 import me.anno.config.DefaultStyle.black
-import me.anno.config.DefaultStyle.deepDark
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.addGPUTask
-import me.anno.gpu.OpenGL.renderDefault
+import me.anno.gpu.GFXState.renderDefault
 import me.anno.gpu.drawing.DrawRectangles.drawBorder
-import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.framebuffer.Screenshots
 import me.anno.gpu.framebuffer.StableWindowSize
@@ -40,6 +38,8 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.effects.ToneMappers
 import me.anno.remsstudio.ui.StudioFileImporter.addChildFromFile
 import me.anno.remsstudio.ui.StudioTreeView.Companion.zoomToObject
+import me.anno.remsstudio.ui.editor.ISceneView
+import me.anno.remsstudio.ui.editor.SimplePanel
 import me.anno.studio.StudioBase.Companion.dragged
 import me.anno.studio.StudioBase.Companion.shiftSlowdown
 import me.anno.ui.base.buttons.TextButton
@@ -47,8 +47,6 @@ import me.anno.ui.base.groups.PanelList
 import me.anno.ui.custom.CustomContainer
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.files.FileContentImporter
-import me.anno.remsstudio.ui.editor.ISceneView
-import me.anno.remsstudio.ui.editor.SimplePanel
 import me.anno.ui.style.Style
 import me.anno.utils.types.Booleans.toInt
 import me.anno.utils.types.Vectors.plus
@@ -129,7 +127,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             // control can be used to avoid rotating the camera
             if (isLocked2D && !isControlDown) {
                 val rot = camera.rotationYXZ
-                val rot0z = rot[camera.lastLocalTime].z()
+                val rot0z = rot[camera.lastLocalTime].z
                 camera.putValue(rot, Vector3f(0f, 0f, rot0z), true)
             }
             is2DPanel.text = if (isLocked2D) "2D" else "3D"
@@ -191,8 +189,8 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     Input.isKeyDown('l').toInt(1) + Input.isKeyDown('n').toInt(2)
         )
 
-    override fun tickUpdate() {
-        super.tickUpdate()
+    override fun onUpdate() {
+        super.onUpdate()
         parseKeyInput()
         parseTouchInput()
         claimResources()
@@ -533,9 +531,9 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                 RemsStudio.incrementalChange("Scale Object") {
                     selected.scale.addKeyframe(
                         localTime, Vector3f(
-                            oldScale.x() * pow(base, localDelta.x * speed2),
-                            oldScale.y() * pow(base, localDelta.y * speed2),
-                            oldScale.z() * pow(base, localDelta.z * speed2)
+                            oldScale.x * pow(base, localDelta.x * speed2),
+                            oldScale.y * pow(base, localDelta.y * speed2),
+                            oldScale.z * pow(base, localDelta.z * speed2)
                         )
                     )
                     invalidateUI(false)

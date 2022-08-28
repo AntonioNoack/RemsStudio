@@ -7,7 +7,7 @@ import me.anno.gpu.buffer.StaticBuffer
 import me.anno.remsstudio.RemsStudio
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
-import org.joml.Vector4fc
+import org.joml.Vector4f
 import kotlin.math.tan
 
 object CameraModel {
@@ -15,7 +15,7 @@ object CameraModel {
     fun drawCamera(
         stack: Matrix4fArrayList,
         offset: Float,
-        color: Vector4fc,
+        color: Vector4f,
         fov: Float, near: Float, far: Float
     ) {
 

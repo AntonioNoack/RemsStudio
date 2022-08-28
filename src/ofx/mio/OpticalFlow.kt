@@ -1,7 +1,7 @@
 package ofx.mio
 
 import me.anno.gpu.GFX.flat01
-import me.anno.gpu.OpenGL.useFrame
+import me.anno.gpu.GFXState.useFrame
 import me.anno.gpu.shader.ShaderLib.createShader
 import me.anno.gpu.shader.ShaderLib.simplestVertexShader
 import me.anno.gpu.framebuffer.FBStack
@@ -26,7 +26,6 @@ object OpticalFlow {
         // flow process
 
         useFrame(flowT, Renderer.colorRenderer) {
-            Frame.bind()
             val flow = flowShader.value.value
             flow.use()
             flow.v2f("scale", 1f, 1f)
@@ -47,7 +46,6 @@ object OpticalFlow {
 
         val blurH = FBStack["blurH", w, h, 4, false, 1, false]
         useFrame(blurH, Renderer.colorRenderer) {
-            Frame.bind()
             flowT.bindTexture0(0, GPUFiltering.TRULY_NEAREST, Clamping.CLAMP)
             blur.v1f("horizontalPass", 1f)
             flat01.draw(blur)
@@ -55,7 +53,6 @@ object OpticalFlow {
 
         val blurV = FBStack["blurV", w, h, 4, false, 1, false]
         useFrame(blurV, Renderer.colorRenderer) {
-            Frame.bind()
             blurH.bindTexture0(0, GPUFiltering.LINEAR, Clamping.CLAMP)
             blur.v1f("horizontalPass", 0f)
             flat01.draw(blur)
@@ -63,8 +60,6 @@ object OpticalFlow {
 
         val result = FBStack["reposition", w, h, 4, false, 1, false]
         useFrame(result, Renderer.colorRenderer) {
-
-            Frame.bind()
 
             // reposition
             val repos = repositionShader.value.value

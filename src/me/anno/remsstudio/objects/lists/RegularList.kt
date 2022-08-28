@@ -13,9 +13,9 @@ import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
 import org.joml.Matrix4fArrayList
-import org.joml.Vector2fc
-import org.joml.Vector3fc
-import org.joml.Vector4fc
+import org.joml.Vector2f
+import org.joml.Vector3f
+import org.joml.Vector4f
 import java.util.*
 
 
@@ -79,7 +79,7 @@ class RegularList(parent: Transform? = null) : GFXTransform(parent) {
         }
     }
 
-    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         super.onDraw(stack, time, color)
 
         // todo make text replacement simpler???
@@ -98,9 +98,9 @@ class RegularList(parent: Transform? = null) : GFXTransform(parent) {
     }
 
     fun drawArrayChild(
-        transform: Matrix4fArrayList, time: Double, perChildDelay: Double, color: Vector4fc,
+        transform: Matrix4fArrayList, time: Double, perChildDelay: Double, color: Vector4f,
         index: Int, instanceCount: Int, random: Random,
-        position: Vector3fc, euler: Vector3fc, scale: Vector3fc, skew: Vector2fc
+        position: Vector3f, euler: Vector3f, scale: Vector3f, skew: Vector2f
     ) {
 
         val childIndex = selectionMode[index, children.size, random]
@@ -109,22 +109,22 @@ class RegularList(parent: Transform? = null) : GFXTransform(parent) {
         if (index + 1 < instanceCount) {
 
             //val position = perChildTranslation[time]
-            if (position.x() != 0f || position.y() != 0f || position.z() != 0f) {
+            if (position.x != 0f || position.y != 0f || position.z != 0f) {
                 transform.translate(position)
             }
 
             //val euler = perChildRotation[time]
-            if (euler.y() != 0f) transform.rotate(GFX.toRadians(euler.y()), yAxis)
-            if (euler.x() != 0f) transform.rotate(GFX.toRadians(euler.x()), xAxis)
-            if (euler.z() != 0f) transform.rotate(GFX.toRadians(euler.z()), zAxis)
+            if (euler.y != 0f) transform.rotate(GFX.toRadians(euler.y), yAxis)
+            if (euler.x != 0f) transform.rotate(GFX.toRadians(euler.x), xAxis)
+            if (euler.z != 0f) transform.rotate(GFX.toRadians(euler.z), zAxis)
 
             //val scale = perChildScale[time]
-            if (scale.x() != 1f || scale.y() != 1f || scale.z() != 1f) transform.scale(scale)
+            if (scale.x != 1f || scale.y != 1f || scale.z != 1f) transform.scale(scale)
 
             // val skew = perChildSkew[time]
-            if (skew.x() != 0f || skew.y() != 0f) transform.mul3x3(// works
-                1f, skew.y(), 0f,
-                skew.x(), 1f, 0f,
+            if (skew.x != 0f || skew.y != 0f) transform.mul3x3(// works
+                1f, skew.y, 0f,
+                skew.x, 1f, 0f,
                 0f, 0f, 1f
             )
 

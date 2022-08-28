@@ -3,8 +3,8 @@ package me.anno.remsstudio.objects.effects
 import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.isFinalRendering
-import me.anno.gpu.OpenGL.renderDefault
-import me.anno.gpu.OpenGL.useFrame
+import me.anno.gpu.GFXState.renderDefault
+import me.anno.gpu.GFXState.useFrame
 import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.framebuffer.Frame
 import me.anno.gpu.framebuffer.Framebuffer
@@ -32,7 +32,6 @@ import me.anno.ui.style.Style
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector4f
-import org.joml.Vector4fc
 import org.lwjgl.opengl.GL11C.*
 import java.net.URL
 
@@ -88,7 +87,7 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
 
     override val symbol get() = DefaultConfig["ui.symbol.mask", "\uD83D\uDCA5"]
 
-    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
         val showResult = isFinalRendering || (!showMask && !showMasked)
         var needsDefault = false
@@ -183,50 +182,33 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
 
     override fun drawChildrenAutomatically() = false
 
-    fun drawMask(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    fun drawMask(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
         useFrame(mask, Renderer.colorRenderer) {
-
-            Frame.bind()
 
             // alpha needs to be 0 for some masks like the green screen!!
 
             val child = children.getOrNull(0)
             if (child?.className == "Transform" && child.children.isEmpty()) {
-
-                glClearColor(1f, 1f, 1f, 0f)
-                glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
-
+                mask.clearColor(0xffffff, true)
             } else {
-
-                glClearColor(0f, 0f, 0f, 0f)
-                glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
-
+                mask.clearColor(0, true)
                 drawChild(stack, time, color, child)
-
             }
         }
 
     }
 
-    fun drawMasked(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
-
+    fun drawMasked(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         useFrame(masked, Renderer.colorRenderer) {
-
-            Frame.bind()
-
             // alpha muss auch hier 0 sein, für den greenscreen
-            glClearColor(0f, 0f, 0f, 0f)
-            glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
-
+            masked.clearColor(0, true)
             drawChild(stack, time, color, children.getOrNull(1))
-
         }
-
     }
 
     // mask = 0, tex = 1
-    fun drawOnScreen(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    fun drawOnScreen(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
         GFX.check()
 
@@ -277,7 +259,7 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
 
                 val src0 = masked
                 src0.bindTexture0(0, src0.textures[0].filtering, src0.textures[0].clamping!!)
-                val srcBuffer = src0.msBuffer ?: src0
+                val srcBuffer = src0.ssBuffer ?: src0
                 BokehBlur.draw(srcBuffer.textures[0], temp, pixelSize, Scene.usesFPBuffers)
 
                 temp.bindTexture0(2, GPUFiltering.TRULY_NEAREST, Clamping.CLAMP)

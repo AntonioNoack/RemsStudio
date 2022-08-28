@@ -1,16 +1,24 @@
 package me.anno.remsstudio.gpu
 
 import me.anno.gpu.shader.BaseShader
-import me.anno.gpu.shader.GLSLLib
 import me.anno.gpu.shader.GLSLType
 import me.anno.gpu.shader.ShaderLib
 import me.anno.gpu.shader.ShaderLib.v3DMasked
 import me.anno.gpu.shader.ShaderLib.y3DMasked
 import me.anno.gpu.shader.builder.Variable
 import me.anno.gpu.shader.builder.VariableMode
+import me.anno.io.ResourceHelper
+import me.anno.io.Streams.readText
 import me.anno.remsstudio.objects.effects.MaskType
 
 object ShaderLibV2 {
+    
+    fun case(case: Int, path: String) = ResourceHelper.loadResource(path).readText()
+        .trim().run {
+            replace("\r", "")
+        }.run {
+            "case $case:\n" + substring(indexOf('\n')+1, lastIndexOf('\n')) + "\nbreak;\n"
+        }
 
     lateinit var shader3DMasked: BaseShader
 
@@ -38,15 +46,15 @@ object ShaderLibV2 {
                 "   vec4 color;\n" +
                 "   float effect = 0.0, inverseEffect;\n" +
                 "   switch(maskType){\n" +
-                GLSLLib.case(MaskType.MASKING.id, "shader/mask-effects/Masking.glsl") +
-                GLSLLib.case(MaskType.TRANSITION.id, "shader/mask-effects/Transition.glsl") +
-                GLSLLib.case(MaskType.QUAD_PIXELATION.id, "shader/mask-effects/QuadPixelating.glsl") +
-                GLSLLib.case(MaskType.TRI_PIXELATION.id, "shader/mask-effects/TriPixelating.glsl") +
-                GLSLLib.case(MaskType.HEX_PIXELATION.id, "shader/mask-effects/HexPixelating.glsl") +
-                GLSLLib.case(MaskType.VORONOI_PIXELATION.id, "shader/mask-effects/VoronoiPixelating.glsl") +
-                GLSLLib.case(MaskType.RADIAL_BLUR_1.id, "shader/mask-effects/RadialBlur1.glsl") +
-                GLSLLib.case(MaskType.RADIAL_BLUR_2.id, "shader/mask-effects/RadialBlur2.glsl") +
-                GLSLLib.case(MaskType.GREEN_SCREEN.id, "shader/mask-effects/GreenScreen.glsl") +
+                case(MaskType.MASKING.id, "shader/mask-effects/Masking.glsl") +
+                case(MaskType.TRANSITION.id, "shader/mask-effects/Transition.glsl") +
+                case(MaskType.QUAD_PIXELATION.id, "shader/mask-effects/QuadPixelating.glsl") +
+                case(MaskType.TRI_PIXELATION.id, "shader/mask-effects/TriPixelating.glsl") +
+                case(MaskType.HEX_PIXELATION.id, "shader/mask-effects/HexPixelating.glsl") +
+                case(MaskType.VORONOI_PIXELATION.id, "shader/mask-effects/VoronoiPixelating.glsl") +
+                case(MaskType.RADIAL_BLUR_1.id, "shader/mask-effects/RadialBlur1.glsl") +
+                case(MaskType.RADIAL_BLUR_2.id, "shader/mask-effects/RadialBlur2.glsl") +
+                case(MaskType.GREEN_SCREEN.id, "shader/mask-effects/GreenScreen.glsl") +
                 "       case ${MaskType.GAUSSIAN_BLUR.id}:\n" +
                 "       case ${MaskType.BOKEH_BLUR.id}:\n" +
                 "       case ${MaskType.BLOOM.id}:\n" + // just mix two images

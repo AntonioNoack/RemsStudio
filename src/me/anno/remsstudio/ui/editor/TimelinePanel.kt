@@ -212,8 +212,8 @@ open class TimelinePanel(style: Style) : Panel(style) {
 
     }
 
-    override fun tickUpdate() {
-        super.tickUpdate()
+    override fun onUpdate() {
+        super.onUpdate()
         for (key in drawnStrings) {
             FontManager.getTexture(key)
         }

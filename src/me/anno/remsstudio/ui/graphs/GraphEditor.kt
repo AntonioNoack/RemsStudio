@@ -20,9 +20,9 @@ class GraphEditor(style: Style) : PanelListY(style) {
         val cc = controls.child as PanelList
         for (type in Interpolation.values()) {
             cc += object : TextButton(type.symbol, true, style) {
-                override fun tickUpdate() {
+                override fun onUpdate() {
                     visibility = Visibility[body.selectedKeyframes.isNotEmpty()]
-                    super.tickUpdate()
+                    super.onUpdate()
                 }
             }
                 .apply {
@@ -42,17 +42,16 @@ class GraphEditor(style: Style) : PanelListY(style) {
 
     }
 
-    override fun tickUpdate() {
-        super.tickUpdate()
+    override fun onUpdate() {
+        super.onUpdate()
 
         // explicitly even for invisible children
         controls.forAllPanels {
-            it.tickUpdate()
+            it.onUpdate()
             it.tick()
         }
 
         children[0].visibility = Visibility[selectedProperty?.isAnimated == true]
-
     }
 
     override val className: String = "GraphEditor"

@@ -2,7 +2,7 @@ package me.anno.remsstudio.ui
 
 import me.anno.animation.Type
 import me.anno.gpu.blending.BlendMode
-import me.anno.gpu.blending.blendModes
+import me.anno.gpu.blending.BlendMode.Companion.blendModes
 import me.anno.io.files.FileReference
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.animation.AnimatedProperty

@@ -3,7 +3,6 @@ package me.anno.remsstudio.objects.models
 import me.anno.gpu.buffer.Attribute
 import me.anno.gpu.buffer.StaticBuffer
 import org.joml.Vector2f
-import org.joml.Vector2fc
 
 object ArrowModel {
 
@@ -15,12 +14,12 @@ object ArrowModel {
     private val leftBottom = Vector2f(-1f, -smallHeight)
 
     private const val center = 0.2f
-    private val centerTop = Vector2f(center,smallHeight)
-    private val centerBottom = Vector2f(center,-smallHeight)
+    private val centerTop = Vector2f(center, smallHeight)
+    private val centerBottom = Vector2f(center, -smallHeight)
 
     private const val arrow = 0.5f
-    private val arrowTop = Vector2f(center,arrow)
-    private val arrowBottom = Vector2f(center,-arrow)
+    private val arrowTop = Vector2f(center, arrow)
+    private val arrowBottom = Vector2f(center, -arrow)
     private val front = Vector2f(+1f, 0f)
 
     private fun createModel(): StaticBuffer {
@@ -37,7 +36,7 @@ object ArrowModel {
             vertexCount
         )
 
-        fun addTriangle(a: Vector2fc, b: Vector2fc, c: Vector2fc) {
+        fun addTriangle(a: Vector2f, b: Vector2f, c: Vector2f) {
 
             // from both sides
             buffer.put(a)
@@ -57,7 +56,7 @@ object ArrowModel {
 
         addTriangle(leftTop, centerBottom, centerTop)
         addTriangle(leftBottom, leftTop, centerBottom)
-        addTriangle(arrowTop,arrowBottom,front)
+        addTriangle(arrowTop, arrowBottom, front)
 
         return buffer
 
@@ -76,7 +75,7 @@ object ArrowModel {
             vertexCount
         )
 
-        fun addLine(a: Vector2fc, b: Vector2f){
+        fun addLine(a: Vector2f, b: Vector2f) {
             buffer.put(a)
             buffer.put(0f)
             buffer.put(b)
@@ -95,7 +94,7 @@ object ArrowModel {
 
     }
 
-    fun destroy(){
+    fun destroy() {
         arrowLineModel.destroy()
         arrowModel.destroy()
     }

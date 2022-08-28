@@ -2,20 +2,19 @@ package me.anno.remsstudio.objects.forces.impl
 
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
+import me.anno.maths.Maths.pow
 import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.objects.forces.ForceField
 import me.anno.remsstudio.objects.inspectable.InspectableAnimProperty
 import me.anno.remsstudio.objects.models.ArrowModel.arrowLineModel
 import me.anno.remsstudio.objects.particles.Particle
 import me.anno.remsstudio.objects.particles.ParticleState
-import me.anno.remsstudio.objects.forces.ForceField
 import me.anno.ui.editor.sceneView.Grid
-import me.anno.maths.Maths.pow
 import me.anno.utils.types.Vectors.minus
 import me.anno.utils.types.Vectors.times
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
-import org.joml.Vector4fc
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -58,7 +57,7 @@ class TornadoField : ForceField(
         }
     }
 
-    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         super.onDraw(stack, time, color)
         // draw a tornado of arrows
         for (i in 1 until 5) {

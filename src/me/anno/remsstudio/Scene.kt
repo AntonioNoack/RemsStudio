@@ -5,16 +5,16 @@ import me.anno.gpu.DepthMode
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.flat01
 import me.anno.gpu.GFX.isFinalRendering
-import me.anno.gpu.OpenGL
-import me.anno.gpu.OpenGL.blendMode
-import me.anno.gpu.OpenGL.depthMode
-import me.anno.gpu.OpenGL.renderDefault
-import me.anno.gpu.OpenGL.renderPurely
-import me.anno.gpu.OpenGL.useFrame
+import me.anno.gpu.GFXState
+import me.anno.gpu.GFXState.blendMode
+import me.anno.gpu.GFXState.depthMask
+import me.anno.gpu.GFXState.depthMode
+import me.anno.gpu.GFXState.renderDefault
+import me.anno.gpu.GFXState.renderPurely
+import me.anno.gpu.GFXState.useFrame
 import me.anno.gpu.blending.BlendMode
-import me.anno.gpu.framebuffer.FBStack
-import me.anno.gpu.framebuffer.Frame
-import me.anno.gpu.framebuffer.Framebuffer
+import me.anno.gpu.drawing.DrawRectangles.drawRect
+import me.anno.gpu.framebuffer.*
 import me.anno.gpu.shader.BaseShader
 import me.anno.gpu.shader.GLSLType
 import me.anno.gpu.shader.Renderer
@@ -48,7 +48,6 @@ import me.anno.remsstudio.objects.effects.ToneMappers
 import me.anno.remsstudio.ui.editor.ISceneView
 import me.anno.ui.editor.sceneView.Gizmos.drawGizmo
 import me.anno.ui.editor.sceneView.Grid
-import me.anno.utils.LOGGER
 import me.anno.utils.types.Vectors.is000
 import me.anno.utils.types.Vectors.is1111
 import me.anno.utils.types.Vectors.minus
@@ -57,7 +56,6 @@ import me.anno.video.MissingFrameException
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector4f
-import org.lwjgl.opengl.GL11C.*
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -191,7 +189,7 @@ object Scene {
 
     fun getNextBuffer(
         name: String,
-        previous: Framebuffer,
+        previous: IFramebuffer,
         offset: Int,
         nearest: GPUFiltering,
         samples: Int?
@@ -278,26 +276,24 @@ object Scene {
                         w > GFX.someWindow.width || h > GFX.someWindow.height
         }
 
-        var buffer: Framebuffer? =
+        var buffer: IFramebuffer =
             if (needsTemporaryBuffer) FBStack["Scene-Main", w, h, 4, usesFPBuffers, samples, camera.useDepth]
-            else OpenGL.currentBuffer as Framebuffer?
+            else GFXState.currentBuffer as Framebuffer? ?: NullFramebuffer
 
         val x = if (needsTemporaryBuffer) 0 else x0
         val y = if (needsTemporaryBuffer) 0 else y0
 
         blendMode.use(if (isFakeColorRendering) null else BlendMode.DEFAULT) {
-            depthMode.use(if (camera.useDepth) DepthMode.GREATER_EQUAL else DepthMode.ALWAYS) {
+            depthMode.use(if (camera.useDepth) DepthMode.CLOSE else DepthMode.ALWAYS) {
 
                 useFrame(x, y, w, h, buffer) {
 
-                    Frame.bind()
-
-                    OpenGL.scissorTest.use(true) {
-                        Frame.bind()
-                        glScissor(Frame.lastX2, Frame.lastY2, Frame.lastW, Frame.lastH)
-                        val color = camera.backgroundColor.getValueAt(RemsStudio.editorTime, Vector4f())
-                        glClearColor(color.x(), color.y(), color.z(), color.w())
-                        glClear(GL_DEPTH_BUFFER_BIT or GL_COLOR_BUFFER_BIT)
+                    val color = camera.backgroundColor.getValueAt(RemsStudio.editorTime, Vector4f())
+                    buffer.clearDepth()
+                    depthMask.use(false) {
+                        depthMode.use(DepthMode.ALWAYS) {
+                            drawRect(x, y, w, h, color)
+                        }
                     }
 
                     // draw the 3D stuff
@@ -362,18 +358,18 @@ object Scene {
 
         if (lut == null && needsLUT && isFinalRendering) throw MissingFrameException(lutFile)
 
-        if (buffer != null && needsTemporaryBuffer) {
+        if (buffer is Framebuffer && needsTemporaryBuffer) {
 
             renderPurely {
 
                 if (needsBloom) {
-                    buffer = applyBloom(buffer!!, w, h, bloomSize, bloomIntensity, bloomThreshold)
+                    buffer = applyBloom(buffer, w, h, bloomSize, bloomIntensity, bloomThreshold)
                 }
 
                 if (lut != null) {
-                    drawWithLUT(buffer!!, isFakeColorRendering, camera, cameraTime, w, h, flipY, lut)
+                    drawWithLUT(buffer, isFakeColorRendering, camera, cameraTime, w, h, flipY, lut)
                 } else {
-                    drawWithoutLUT(buffer!!, isFakeColorRendering, camera, cameraTime, w, h, flipY)
+                    drawWithoutLUT(buffer, isFakeColorRendering, camera, cameraTime, w, h, flipY)
                 }
 
                 /*useFrame(x0, y0, w, h, false) {
@@ -388,7 +384,7 @@ object Scene {
     }
 
     private fun drawWithLUT(
-        buffer: Framebuffer,
+        buffer: IFramebuffer,
         isFakeColorRendering: Boolean,
         camera: Camera,
         cameraTime: Double,
@@ -418,7 +414,7 @@ object Scene {
     }
 
     private fun drawWithoutLUT(
-        buffer: Framebuffer,
+        buffer: IFramebuffer,
         isFakeColorRendering: Boolean,
         camera: Camera,
         cameraTime: Double,
@@ -431,9 +427,9 @@ object Scene {
     }
 
     private fun applyBloom(
-        buffer: Framebuffer, w: Int, h: Int,
+        buffer: IFramebuffer, w: Int, h: Int,
         bloomSize: Float, bloomIntensity: Float, bloomThreshold: Float
-    ): Framebuffer {
+    ): IFramebuffer {
 
         // create blurred version
         GaussianBlur.draw(buffer, bloomSize, w, h, 1, bloomThreshold, false, Matrix4fArrayList())
@@ -518,8 +514,8 @@ object Scene {
         // middle gray = 0.18?
 
         // distortion
-        shader.v3f("fxScale", fxScaleX, fxScaleY, 1f + distortion.z())
-        shader.v2f("distortion", distortion.x(), distortion.y())
+        shader.v3f("fxScale", fxScaleX, fxScaleY, 1f + distortion.z)
+        shader.v2f("distortion", distortion.x, distortion.y)
         shader.v2f("distortionOffset", distortionOffset)
         if (!isFakeColorRendering) {
             // vignette

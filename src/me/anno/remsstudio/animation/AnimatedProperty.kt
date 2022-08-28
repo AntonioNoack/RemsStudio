@@ -7,15 +7,15 @@ import me.anno.animation.Interpolation
 import me.anno.animation.Interpolation.Companion.getWeights
 import me.anno.animation.Keyframe
 import me.anno.animation.Type
-import me.anno.remsstudio.animation.drivers.AnimationDriver
 import me.anno.config.DefaultStyle.black3
 import me.anno.gpu.GFX.glThread
 import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
-import me.anno.remsstudio.RemsStudio.root
-import me.anno.remsstudio.utils.WrongClassType
 import me.anno.maths.Maths.clamp
+import me.anno.remsstudio.RemsStudio.root
+import me.anno.remsstudio.animation.drivers.AnimationDriver
+import me.anno.remsstudio.utils.WrongClassType
 import me.anno.utils.structures.lists.UnsafeArrayList
 import me.anno.utils.types.AnyToDouble.getDouble
 import org.apache.logging.log4j.LogManager
@@ -54,27 +54,27 @@ class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
         fun double() = AnimatedProperty<Double>(Type.DOUBLE)
         fun double(defaultValue: Double) = AnimatedProperty(Type.DOUBLE, defaultValue)
         fun vec2() = AnimatedProperty<Vector2f>(Type.VEC2)
-        fun vec2(defaultValue: Vector2fc) = AnimatedProperty(Type.VEC2, defaultValue)
+        fun vec2(defaultValue: Vector2f) = AnimatedProperty(Type.VEC2, defaultValue)
         fun vec3() = AnimatedProperty(Type.VEC3, black3)
         fun dir3() = vec3(Vector3f(0f, 1f, 0f))
-        fun vec3(defaultValue: Vector3fc) = AnimatedProperty(Type.VEC3, defaultValue)
-        fun vec4() = AnimatedProperty<Vector4fc>(Type.VEC4)
-        fun vec4(defaultValue: Vector4fc) = AnimatedProperty(Type.VEC4, defaultValue)
+        fun vec3(defaultValue: Vector3f) = AnimatedProperty(Type.VEC3, defaultValue)
+        fun vec4() = AnimatedProperty<Vector4f>(Type.VEC4)
+        fun vec4(defaultValue: Vector4f) = AnimatedProperty(Type.VEC4, defaultValue)
         fun pos() = AnimatedProperty<Vector3f>(Type.POSITION)
-        fun pos(defaultValue: Vector3fc) = AnimatedProperty(Type.POSITION, defaultValue)
-        fun pos2D() = AnimatedProperty<Vector2fc>(Type.POSITION_2D)
-        fun rotYXZ() = AnimatedProperty<Vector3fc>(Type.ROT_YXZ)
+        fun pos(defaultValue: Vector3f) = AnimatedProperty(Type.POSITION, defaultValue)
+        fun pos2D() = AnimatedProperty<Vector2f>(Type.POSITION_2D)
+        fun rotYXZ() = AnimatedProperty<Vector3f>(Type.ROT_YXZ)
         fun rotY() = AnimatedProperty<Float>(Type.ROT_Y)
-        fun rotXZ() = AnimatedProperty<Vector2fc>(Type.ROT_XZ)
-        fun scale() = AnimatedProperty<Vector3fc>(Type.SCALE)
-        fun scale(defaultValue: Vector3fc) = AnimatedProperty(Type.SCALE, defaultValue)
-        fun color() = AnimatedProperty<Vector4fc>(Type.COLOR)
-        fun color(defaultValue: Vector4fc) = AnimatedProperty(Type.COLOR, defaultValue)
-        fun color3() = AnimatedProperty<Vector3fc>(Type.COLOR3)
-        fun color3(defaultValue: Vector3fc) = AnimatedProperty(Type.COLOR3, defaultValue)
+        fun rotXZ() = AnimatedProperty<Vector2f>(Type.ROT_XZ)
+        fun scale() = AnimatedProperty<Vector3f>(Type.SCALE)
+        fun scale(defaultValue: Vector3f) = AnimatedProperty(Type.SCALE, defaultValue)
+        fun color() = AnimatedProperty<Vector4f>(Type.COLOR)
+        fun color(defaultValue: Vector4f) = AnimatedProperty(Type.COLOR, defaultValue)
+        fun color3() = AnimatedProperty<Vector3f>(Type.COLOR3)
+        fun color3(defaultValue: Vector3f) = AnimatedProperty(Type.COLOR3, defaultValue)
         fun quat() = AnimatedProperty<Quaternionf>(Type.QUATERNION)
-        fun skew() = AnimatedProperty<Vector2fc>(Type.SKEW_2D)
-        fun tiling() = AnimatedProperty<Vector4fc>(Type.TILING)
+        fun skew() = AnimatedProperty<Vector2f>(Type.SKEW_2D)
+        fun tiling() = AnimatedProperty<Vector4f>(Type.TILING)
 
         fun string() = AnimatedProperty(Type.STRING, "")
         fun alignment() = AnimatedProperty(Type.ALIGNMENT, 0f)
@@ -287,8 +287,8 @@ class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
             is Float -> a
             is Double -> a
             is Long -> a.toDouble()
-            is Vector2fc, is Vector3fc, is Vector4fc, is Quaternionf -> a
-            is Vector2dc, is Vector3dc, is Vector4dc, is Quaterniond -> a
+            is Vector2f, is Vector3f, is Vector4f, is Quaternionf -> a
+            is Vector2d, is Vector3d, is Vector4d, is Quaterniond -> a
             is String -> a
             else -> throw RuntimeException("don't know how to calc $a")
         } // needed by Intellij Kotlin compiler

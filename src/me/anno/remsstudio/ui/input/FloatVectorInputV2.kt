@@ -35,28 +35,28 @@ class FloatVectorInputV2(
     }
 
     constructor(
-        title: String, visibilityKey: String, value: Vector2fc, type: Type,
+        title: String, visibilityKey: String, value: Vector2f, type: Type,
         owningProperty: AnimatedProperty<*>, style: Style
     ) : this(title, visibilityKey, type, owningProperty, style) {
         setValue(value, false)
     }
 
     constructor(
-        title: String, visibilityKey: String, value: Vector2dc, type: Type,
+        title: String, visibilityKey: String, value: Vector2d, type: Type,
         owningProperty: AnimatedProperty<*>, style: Style
     ) : this(title, visibilityKey, type, owningProperty, style) {
         setValue(value, false)
     }
 
     constructor(
-        title: String, visibilityKey: String, value: Vector3dc, type: Type,
+        title: String, visibilityKey: String, value: Vector3d, type: Type,
         owningProperty: AnimatedProperty<*>, style: Style
     ) : this(title, visibilityKey, type, owningProperty, style) {
         setValue(value, false)
     }
 
     constructor(
-        title: String, visibilityKey: String, value: Vector4dc, type: Type,
+        title: String, visibilityKey: String, value: Vector4d, type: Type,
         owningProperty: AnimatedProperty<*>, style: Style
     ) : this(title, visibilityKey, type, owningProperty, style) {
         setValue(value, false)

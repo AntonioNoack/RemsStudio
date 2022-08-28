@@ -34,14 +34,14 @@ class ConstantDistribution(val center: Vector4f) : Distribution(
         )
     }
 
-    override fun draw(stack: Matrix4fArrayList, color: Vector4fc) {
+    override fun draw(stack: Matrix4fArrayList, color: Vector4f) {
         stack.next {
             stack.translate(center.x, center.y, center.z)
             onDraw(stack, color)
         }
     }
 
-    override fun onDraw(stack: Matrix4fArrayList, color: Vector4fc) {
+    override fun onDraw(stack: Matrix4fArrayList, color: Vector4f) {
         val l = displayLength
         Grid.drawLine(stack, color, Vector3f(-l, 0f, 0f), Vector3f(+l, 0f, 0f))
         Grid.drawLine(stack, color, Vector3f(0f, -l, 0f), Vector3f(0f, +l, 0f))

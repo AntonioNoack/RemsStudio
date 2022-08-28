@@ -3,7 +3,7 @@ package me.anno.remsstudio
 import me.anno.Build
 import me.anno.engine.EngineActions
 import me.anno.gpu.GFX
-import me.anno.gpu.OpenGL
+import me.anno.gpu.GFXState
 import me.anno.gpu.debug.DebugGPUStorage
 import me.anno.input.ActionManager
 import me.anno.input.Input
@@ -165,7 +165,7 @@ object StudioActions {
                 true
             },
             "ResetOpenGLSession" to {
-                StudioBase.addEvent { OpenGL.newSession() }
+                StudioBase.addEvent { GFXState.newSession() }
                 true
             }
         )

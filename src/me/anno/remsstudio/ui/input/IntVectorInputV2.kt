@@ -31,21 +31,21 @@ class IntVectorInputV2(
     }
 
     constructor(
-        style: Style, title: String, visibilityKey: String, value: Vector2ic, type: Type,
+        style: Style, title: String, visibilityKey: String, value: Vector2i, type: Type,
         owningProperty: AnimatedProperty<*>
     ) : this(style, title, visibilityKey, type, owningProperty) {
         setValue(value, false)
     }
 
     constructor(
-        style: Style, title: String, visibilityKey: String, value: Vector3ic, type: Type,
+        style: Style, title: String, visibilityKey: String, value: Vector3i, type: Type,
         owningProperty: AnimatedProperty<*>
     ) : this(style, title, visibilityKey, type, owningProperty) {
         setValue(value, false)
     }
 
     constructor(
-        style: Style, title: String, visibilityKey: String, value: Vector4ic, type: Type,
+        style: Style, title: String, visibilityKey: String, value: Vector4i, type: Type,
         owningProperty: AnimatedProperty<*>
     ) : this(style, title, visibilityKey, type, owningProperty) {
         setValue(value, false)

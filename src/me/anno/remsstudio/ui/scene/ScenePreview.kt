@@ -18,8 +18,8 @@ import me.anno.remsstudio.RemsStudio.targetHeight
 import me.anno.remsstudio.RemsStudio.targetWidth
 import me.anno.remsstudio.Scene
 import me.anno.remsstudio.objects.Camera
-import me.anno.ui.base.groups.PanelList
 import me.anno.remsstudio.ui.editor.ISceneView
+import me.anno.ui.base.groups.PanelList
 import me.anno.ui.style.Style
 import me.anno.utils.types.Floats.toDegrees
 import me.anno.utils.types.Vectors.minus
@@ -78,9 +78,9 @@ class ScenePreview(style: Style) : PanelList(null, style.getChild("sceneView")),
         val relativeMovement = clamp01(movementSpeed * deltaTime / (distance + 0.2f))
         val diff = pos - (target * 0.5f)
         val r0 = camera.rotationYXZ[0.0]
-        val x0 = r0.x()
+        val x0 = r0.x
         val x1 = if (isLocked2D) 0f else 0.3f * atan2(diff.y, length(diff.x, diff.z)).toDegrees()
-        val y0 = r0.y()
+        val y0 = r0.y
         val y1 = if (isLocked2D) 0f else atan2(diff.x, diff.z).toDegrees()
         val rs = clamp01(rotationSpeed * deltaTime)
         camera.rotationYXZ.set(Vector3f(mixAngle(x0, x1, rs), mixAngle(y0, y1, rs), 0f))

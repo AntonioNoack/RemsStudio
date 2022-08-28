@@ -28,7 +28,7 @@ import me.anno.video.MissingFrameException
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
-import org.joml.Vector4fc
+import org.joml.Vector4f
 import kotlin.math.floor
 import kotlin.math.sqrt
 
@@ -104,7 +104,7 @@ class FourierTransform : Transform() {
         return getSize(kotlin.math.max(index, 0), size)
     }
 
-    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
         lastWarning = null
 

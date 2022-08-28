@@ -3,27 +3,27 @@ package me.anno.remsstudio.objects.geometric
 import me.anno.cache.CacheSection
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.GFXx3D
-import me.anno.gpu.shader.ShaderLib
-import me.anno.gpu.shader.ShaderLib.y3D
-import me.anno.gpu.shader.Shader
-import me.anno.io.ISaveable
-import me.anno.io.base.BaseWriter
-import me.anno.remsstudio.objects.GFXTransform
-import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.gpu.shader.GLSLType
-import me.anno.gpu.shader.OpenGLShader.Companion.attribute
-import me.anno.gpu.shader.ShaderFuncLib.noiseFunc
-import me.anno.gpu.shader.builder.Variable
-import me.anno.remsstudio.objects.attractors.EffectColoring
-import me.anno.remsstudio.objects.attractors.EffectMorphing
 import me.anno.gpu.drawing.UVProjection
 import me.anno.gpu.shader.BaseShader
+import me.anno.gpu.shader.GLSLType
+import me.anno.gpu.shader.OpenGLShader.Companion.attribute
+import me.anno.gpu.shader.Shader
+import me.anno.gpu.shader.ShaderFuncLib.noiseFunc
+import me.anno.gpu.shader.ShaderLib
+import me.anno.gpu.shader.ShaderLib.y3D
+import me.anno.gpu.shader.builder.Variable
+import me.anno.io.ISaveable
+import me.anno.io.base.BaseWriter
+import me.anno.maths.Maths
+import me.anno.maths.Maths.fract
+import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.objects.GFXTransform
+import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.objects.attractors.EffectColoring
+import me.anno.remsstudio.objects.attractors.EffectMorphing
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
-import me.anno.maths.Maths
-import me.anno.maths.Maths.fract
 import me.anno.utils.types.Vectors.minus
 import me.anno.utils.types.Vectors.mulAlpha
 import me.anno.utils.types.Vectors.times
@@ -83,7 +83,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
         group += vi("Fading", "How much the last points fade, if the offsets exclude everything", fadingOnEnd, style)
     }
 
-    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
         // todo coloring and morphing needs to be applied to the children
 
@@ -104,7 +104,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
 
             val scales = points.mapIndexed { index, it ->
                 val s = it.scale[times[index]]
-                (s.x() + s.y()) * lineStrength
+                (s.x + s.y) * lineStrength
             }
 
             val size = points.size
@@ -224,8 +224,8 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
                     shader,
                     Vector3f(p0).add(d0), Vector3f(p0).sub(d0),
                     Vector3f(p1).add(d1), Vector3f(p1).sub(d1),
-                    getColor(i0).mulAlpha(alpha) as Vector4f,
-                    getColor(i1).mulAlpha(alpha) as Vector4f,
+                    getColor(i0).mulAlpha(alpha),
+                    getColor(i1).mulAlpha(alpha),
                     stack
                 )
             }
@@ -288,9 +288,11 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
         val cache = CacheSection("LineCache")
         val shader by lazy {
             BaseShader(
-                "linePolygon", ShaderLib.v3DBase +
+                // todo uniforms + attributes to variables
+                "linePolygon", "" +
                         "$attribute vec3 coords;\n" +
                         "$attribute vec2 attr1;\n" +
+                        "uniform mat4 transform;\n" +
                         "uniform vec4 tiling;\n" +
                         "uniform vec3 pos0, pos1, pos2, pos3;\n" +
                         "uniform vec4 col0, col1;\n" +
@@ -303,7 +305,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
                         "   uv = attr1;\n" +
                         "   uvw = coords;\n" +
                         "   colX = mix(col0, col1, att.y);\n" +
-                        "}", y3D + Variable(GLSLType.V4F,"colX"), "" +
+                        "}", y3D + Variable(GLSLType.V4F, "colX"), "" +
                         ShaderLib.getTextureLib +
                         ShaderLib.getColorForceFieldLib +
                         noiseFunc +

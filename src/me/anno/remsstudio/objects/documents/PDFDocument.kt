@@ -34,7 +34,7 @@ import org.apache.pdfbox.pdmodel.PDDocument
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
-import org.joml.Vector4fc
+import org.joml.Vector4f
 import kotlin.math.*
 
 // todo different types of lists (x list, y list, grid, linear particle system, random particle system, ...)
@@ -96,7 +96,7 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
 
     fun getQuality() = if (isFinalRendering) renderQuality else editorQuality
 
-    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
         val file = file
         val ref = meta

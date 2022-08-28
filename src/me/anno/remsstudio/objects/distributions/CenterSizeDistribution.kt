@@ -53,7 +53,7 @@ abstract class CenterSizeDistribution(
         return Vector4f(Vector3f(vector.x, vector.y, vector.z), vector.w)
     }
 
-    override fun onDraw(stack: Matrix4fArrayList, color: Vector4fc) {
+    override fun onDraw(stack: Matrix4fArrayList, color: Vector4f) {
         // draw a sphere
         stack.next {
             stack.translate(center.x, center.y, center.z)
@@ -65,7 +65,7 @@ abstract class CenterSizeDistribution(
         }
     }
 
-    abstract fun drawTransformed(stack: Matrix4fArrayList, color: Vector4fc)
+    abstract fun drawTransformed(stack: Matrix4fArrayList, color: Vector4f)
 
     override fun nextV1(): Float {
         return (random.nextFloat() - 0.5f).transform()

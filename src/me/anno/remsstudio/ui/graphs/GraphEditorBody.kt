@@ -395,7 +395,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                 if (x < x1 || x + width >= x0) {// visible
                     val colorVector =
                         if (property.type == Type.COLOR3)
-                            Vector4f(kf.value as Vector3fc, 1f)
+                            Vector4f(kf.value as Vector3f, 1f)
                         else kf.value as Vector4f
                     val color = colorVector.toARGB()
                     val color2 = color.mulAlpha(0.25f)
@@ -641,8 +641,8 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                     editorTime = time
                     updateAudio()
                     if (draggedKeyframe.value is Number || when (draggedKeyframe.value) {
-                            is Vector2fc, is Vector3fc, is Vector4fc,
-                            is Vector2dc, is Vector3dc, is Vector4dc,
+                            is Vector2f, is Vector3f, is Vector4f,
+                            is Vector2d, is Vector3d, is Vector4d,
                             is Quaternionf, is Quaterniond -> true
                             else -> false
                         }

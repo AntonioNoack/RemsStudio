@@ -12,7 +12,6 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
 import me.anno.utils.types.Vectors.times
 import org.joml.Vector3f
-import org.joml.Vector3fc
 import org.joml.Vector4f
 import java.util.*
 
@@ -37,12 +36,12 @@ class NoisyLorentzForce : PerParticleForce(
         return seed
     }
 
-    fun getMagneticField(position: Vector3fc, time: Double): Vector3fc {
+    fun getMagneticField(position: Vector3f, time: Double): Vector3f {
         val scale = fieldScale[time]
-        val px = (position.x() * scale.x())
-        val py = (position.y() * scale.y())
-        val pz = (position.z() * scale.z())
-        val pw = (time * scale.w()).toFloat()
+        val px = (position.x * scale.x)
+        val py = (position.y * scale.y)
+        val pz = (position.z * scale.z)
+        val pw = (time * scale.w).toFloat()
         return Vector3f(
             nx[px, py, pz, pw],
             ny[px, py, pz, pw],

@@ -1,16 +1,18 @@
 package me.anno.remsstudio.objects.particles
 
 import me.anno.gpu.GFX
+import me.anno.maths.Maths
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.forces.ForceField
-import me.anno.maths.Maths
 import me.anno.utils.structures.lists.UnsafeArrayList
 import me.anno.utils.types.Floats.f2
 import me.anno.utils.types.Floats.toRadians
 import me.anno.utils.types.Vectors.plus
 import me.anno.utils.types.Vectors.times
 import me.anno.video.MissingFrameException
-import org.joml.*
+import org.joml.Matrix4fArrayList
+import org.joml.Vector3f
+import org.joml.Vector4f
 import kotlin.math.max
 
 class Particle(
@@ -18,16 +20,16 @@ class Particle(
     val birthTime: Double,
     val lifeTime: Double,
     val mass: Float,
-    val color: Vector4fc,
-    val scale: Vector3fc,
+    val color: Vector4f,
+    val scale: Vector3f,
     simulationStep: Double
 ) {
 
-    private val isScaled = scale.x() != 1f || scale.y() != 1f || scale.z() != 1f
+    private val isScaled = scale.x != 1f || scale.y != 1f || scale.z != 1f
 
     private val maxStateCount = max((lifeTime / simulationStep).toInt() + 1, 2)
     val hasDied get() = states.size >= maxStateCount
-    val opacity get() = color.w()
+    val opacity get() = color.w
 
     override fun toString(): String {
         return "Particle[${type.className}, ${birthTime.f2()}]"
@@ -79,12 +81,12 @@ class Particle(
 
     fun draw(
         stack: Matrix4fArrayList,
-        time: Double, color: Vector4fc,
+        time: Double, color: Vector4f,
         simulationStep: Double,
         fadeIn: Double, fadeOut: Double
     ) {
         val lifeOpacity = getLifeOpacity(time, simulationStep, fadeIn, fadeOut).toFloat()
-        val opacity = Maths.clamp(lifeOpacity * this.color.w(), 0f, 1f)
+        val opacity = Maths.clamp(lifeOpacity * this.color.w, 0f, 1f)
         if (opacity > 1e-3f) {// else not visible
             stack.next {
                 try {
@@ -136,7 +138,7 @@ class Particle(
                 )
             }
         }
-        val ddPosition = force / mass
+        val ddPosition = Vector3f(force).div(mass)
         val dt = simulationStep.toFloat()
         val dPosition = oldState.dPosition + ddPosition * dt
         val position = oldState.position + dPosition * dt

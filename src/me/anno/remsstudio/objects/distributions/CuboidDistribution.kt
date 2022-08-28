@@ -1,8 +1,11 @@
 package me.anno.remsstudio.objects.distributions
 
-import me.anno.gpu.buffer.CubemapModel.cubemapLineModel
+import me.anno.ecs.components.mesh.shapes.CubemapModel.cubemapLineModel
 import me.anno.ui.editor.sceneView.Grid
-import org.joml.*
+import org.joml.Matrix4fArrayList
+import org.joml.Vector2f
+import org.joml.Vector3f
+import org.joml.Vector4f
 
 class CuboidDistribution(center: Vector4f, size: Vector4f, rotation: Vector4f = Vector4f()) : CenterSizeDistribution(
     "Cuboid",
@@ -43,7 +46,7 @@ class CuboidDistribution(center: Vector4f, size: Vector4f, rotation: Vector4f = 
         ).sub(1f, 1f, 1f, 1f).transform()
     }
 
-    override fun drawTransformed(stack: Matrix4fArrayList, color: Vector4fc) {
+    override fun drawTransformed(stack: Matrix4fArrayList, color: Vector4f) {
         // draw cube out of lines
         Grid.drawBuffer(stack, color, cubemapLineModel)
     }

@@ -7,11 +7,7 @@ import me.anno.mesh.MeshData
 import me.anno.mesh.MeshUtils
 import me.anno.mesh.assimp.AnimGameItem
 import me.anno.remsstudio.objects.GFXTransform
-import org.joml.Matrix4f
-import org.joml.Matrix4fArrayList
-import org.joml.Matrix4x3f
-import org.joml.Matrix4x3fArrayList
-import org.joml.Vector4fc
+import org.joml.*
 
 object MeshDataV2 {
 
@@ -20,7 +16,7 @@ object MeshDataV2 {
         transform: GFXTransform?,
         cameraMatrix: Matrix4fArrayList,
         time: Double,
-        color: Vector4fc,
+        color: Vector4f,
         animationName: String,
         useMaterials: Boolean,
         centerMesh: Boolean,

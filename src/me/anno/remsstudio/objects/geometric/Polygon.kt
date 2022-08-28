@@ -1,6 +1,6 @@
 package me.anno.remsstudio.objects.geometric
 
-import me.anno.cache.instances.MeshCache
+import me.anno.cache.instances.OldMeshCache
 import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.toRadians
@@ -25,8 +25,9 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.video.MissingFrameException
-import org.joml.*
-import java.lang.Math
+import org.joml.Matrix4fArrayList
+import org.joml.Vector3f
+import org.joml.Vector4f
 import java.net.URL
 import kotlin.math.cos
 import kotlin.math.sin
@@ -47,14 +48,14 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
     var vertexCount = AnimatedProperty.intPlus(5)
     var starNess = AnimatedProperty.float01()
 
-    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4fc) {
+    override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val inset = clamp(starNess[time], 0f, 1f)
         val image = getImage(texture, 5000, true)
         if (image == null && texture.hasValidName() && GFX.isFinalRendering) throw MissingFrameException(texture)
         val texture = image ?: whiteTexture
         val count = vertexCount[time]//.roundToInt()
         if (inset == 1f && count % 2 == 0) return// invisible
-        val selfDepth = scale[time].z()
+        val selfDepth = scale[time].z
         stack.next {
             if (autoAlign) {
                 stack.rotate(toRadians(if (count == 4) 45f else 90f), zAxis)
@@ -70,16 +71,16 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
         return
     }
 
-    override fun transformLocally(pos: Vector3fc, time: Double): Vector3fc {
+    override fun transformLocally(pos: Vector3f, time: Double): Vector3f {
         val count = vertexCount[time]
-        val z = if (is3D) pos.z() else 0f
+        val z = if (is3D) pos.z else 0f
         return if (autoAlign) {
             if (count == 4) {
-                Vector3f(0.5f * (pos.x() + pos.y()), 0.5f * (pos.x() - pos.y()), z)
+                Vector3f(0.5f * (pos.x + pos.y), 0.5f * (pos.x - pos.y), z)
             } else {
                 Vector3f(sqrt2, -sqrt2, z)
             }
-        } else Vector3f(pos.x(), -pos.y(), z)
+        } else Vector3f(pos.x, -pos.y, z)
     }
 
     override fun createInspector(
@@ -182,7 +183,7 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
         fun getBuffer(n: Int, hasDepth: Boolean): StaticBuffer {
             if (n < minEdges) return getBuffer(minEdges, hasDepth)
             if (n > maxEdges) return getBuffer(maxEdges, hasDepth)
-            return MeshCache.getEntry(
+            return OldMeshCache.getEntry(
                 n * 2 + (if (hasDepth) 1 else 0),
                 meshTimeout, false
             ) {

@@ -39,9 +39,9 @@ class FloatInputV2(
 
     override fun getValue(value: Any): Double {
         return when (value) {
-            is Vector2fc, is Vector3fc, is Vector4fc,
+            is Vector2f, is Vector3f, is Vector4f,
             is Quaternionf -> AnyToFloat.getFloat(value, indexInProperty).toDouble()
-            is Vector2dc, is Vector3dc, is Vector4dc,
+            is Vector2d, is Vector3d, is Vector4d,
             is Quaterniond -> AnyToDouble.getDouble(value, indexInProperty)
             else -> super.getValue(value)
         }

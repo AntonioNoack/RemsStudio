@@ -23,7 +23,7 @@ import kotlin.math.min
 
 object TextRenderer {
 
-    fun draw(element: Text, stack: Matrix4fArrayList, time: Double, color: Vector4fc, superCall: () -> Unit) {
+    fun draw(element: Text, stack: Matrix4fArrayList, time: Double, color: Vector4f, superCall: () -> Unit) {
 
         val text = element.text[time]
         if (text.isBlank2()) {
@@ -82,7 +82,7 @@ object TextRenderer {
         }
 
         val shadowColor = element.shadowColor[time]
-        if (shadowColor.w() >= 1f / 255f) {
+        if (shadowColor.w >= 1f / 255f) {
             val shadowSmoothness = element.shadowSmoothness[time]
             val shadowOffset = element.shadowOffset[time] * (1f / TextMesh.DEFAULT_FONT_HEIGHT)
             stack.next {
@@ -102,7 +102,7 @@ object TextRenderer {
             }
         }
 
-        if (color.w() >= 1f / 255f) draw(
+        if (color.w >= 1f / 255f) draw(
             element, stack, time, color,
             lineSegmentsWithStyle, drawMeshes, drawSDFTextures,
             keys, exampleLayout,
@@ -118,9 +118,9 @@ object TextRenderer {
     private val oc1 = Vector4f()
     private val oc2 = Vector4f()
 
-    private fun correctColor(c0: Vector4fc, c1: Vector4f) {
+    private fun correctColor(c0: Vector4f, c1: Vector4f) {
         if (c1.w < 1f / 255f) {
-            c1.set(c0.x(), c0.y(), c0.z(), c1.w)
+            c1.set(c0.x, c0.y, c0.z, c1.w)
         }
     }
 
@@ -129,7 +129,7 @@ object TextRenderer {
      * or the shader needs to be improved
      * let's just try the easiest way to correct the issue in 99% of all cases
      * */
-    private fun correctColors(color: Vector4fc, oc0: Vector4f, oc1: Vector4f, oc2: Vector4f) {
+    private fun correctColors(color: Vector4f, oc0: Vector4f, oc1: Vector4f, oc2: Vector4f) {
         correctColor(color, oc0)
         correctColor(oc0, oc1)
         correctColor(oc1, oc2)
@@ -137,7 +137,7 @@ object TextRenderer {
 
     private fun getOutlineColors(
         element: Text,
-        useExtraColors: Boolean, drawSDFTexture: Boolean, time: Double, color: Vector4fc,
+        useExtraColors: Boolean, drawSDFTexture: Boolean, time: Double, color: Vector4f,
         oc0: Vector4f, oc1: Vector4f, oc2: Vector4f
     ) {
         if (useExtraColors && drawSDFTexture) {
@@ -152,9 +152,9 @@ object TextRenderer {
                 oc2.set(element.outlineColor2[time])
             }
         } else {
-            color.mulAlpha(element.outlineColor0[time].w(), oc0)
-            color.mulAlpha(element.outlineColor1[time].w(), oc1)
-            color.mulAlpha(element.outlineColor2[time].w(), oc2)
+            color.mulAlpha(element.outlineColor0[time].w, oc0)
+            color.mulAlpha(element.outlineColor1[time].w, oc1)
+            color.mulAlpha(element.outlineColor2[time].w, oc2)
         }
 
         correctColors(color, oc0, oc1, oc2)
@@ -164,7 +164,7 @@ object TextRenderer {
     private val tmp0 = Vector4f()
     private fun draw(
         element: Text,
-        stack: Matrix4fArrayList, time: Double, color: Vector4fc,
+        stack: Matrix4fArrayList, time: Double, color: Vector4f,
         lineSegmentsWithStyle: PartResult,
         drawMeshes: Boolean, drawSDFTexture: Boolean,
         keys: List<TextSegmentKey>, exampleLayout: TextLayout,
@@ -241,14 +241,14 @@ object TextRenderer {
     private fun drawSDFTexture(
         element: Text,
         key: TextSegmentKey, time: Double, stack: Matrix4fArrayList,
-        color: Vector4fc, lineDeltaX: Float, lineDeltaY: Float,
+        color: Vector4f, lineDeltaX: Float, lineDeltaY: Float,
         startIndex: Int, endIndex: Int,
         exampleLayout: TextLayout,
         extraSmoothness: Float,
-        oc1: Vector4fc, oc2: Vector4fc, oc3: Vector4fc
+        oc1: Vector4f, oc2: Vector4f, oc3: Vector4f
     ) {
 
-        if (color.w() + oc1.w() + oc2.w() + oc3.w() <= 0f) return
+        if (color.w + oc1.w + oc2.w + oc3.w <= 0f) return
         val sdf2 = element.getSDFTexture(key)
         if (sdf2 == null) {
             if (GFX.isFinalRendering) throw MissingFrameException("Text-Texture (291) ${element.font}: '${element.text}'")
@@ -340,7 +340,7 @@ object TextRenderer {
     private fun drawMesh(
         element: Text,
         key: TextSegmentKey, time: Double, stack: Matrix4fArrayList,
-        color: Vector4fc, lineDeltaX: Float, lineDeltaY: Float,
+        color: Vector4f, lineDeltaX: Float, lineDeltaY: Float,
         startIndex: Int, endIndex: Int
     ) {
 

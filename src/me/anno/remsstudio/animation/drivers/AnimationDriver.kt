@@ -1,17 +1,17 @@
 package me.anno.remsstudio.animation.drivers
 
+import me.anno.animation.Type
 import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
-import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.animation.Type
-import me.anno.studio.Inspectable
 import me.anno.remsstudio.Selection.select
 import me.anno.remsstudio.Selection.selectProperty
 import me.anno.remsstudio.Selection.selectedTransform
+import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.objects.Transform
+import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.menu.Menu.openMenu
@@ -23,7 +23,6 @@ import me.anno.ui.utils.WindowStack
 import org.joml.Vector2d
 import org.joml.Vector3d
 import org.joml.Vector4d
-import org.joml.Vector4dc
 
 abstract class AnimationDriver : Saveable(), Inspectable {
 
@@ -51,12 +50,12 @@ abstract class AnimationDriver : Saveable(), Inspectable {
         )
     }
 
-    open fun getValue(time: Double, keyframeValue: Vector4dc): Vector4d {
+    open fun getValue(time: Double, keyframeValue: Vector4d): Vector4d {
         return Vector4d(
-            getValue0(time * frequency, keyframeValue.x(), 0) * amplitude[time],
-            getValue0(time * frequency, keyframeValue.y(), 1) * amplitude[time],
-            getValue0(time * frequency, keyframeValue.z(), 2) * amplitude[time],
-            getValue0(time * frequency, keyframeValue.w(), 3) * amplitude[time]
+            getValue0(time * frequency, keyframeValue.x, 0) * amplitude[time],
+            getValue0(time * frequency, keyframeValue.y, 1) * amplitude[time],
+            getValue0(time * frequency, keyframeValue.z, 2) * amplitude[time],
+            getValue0(time * frequency, keyframeValue.w, 3) * amplitude[time]
         )
     }
 
@@ -122,7 +121,11 @@ abstract class AnimationDriver : Saveable(), Inspectable {
     }
 
     companion object {
-        fun openDriverSelectionMenu(windowStack: WindowStack, oldDriver: AnimationDriver?, whenSelected: (AnimationDriver?) -> Unit) {
+        fun openDriverSelectionMenu(
+            windowStack: WindowStack,
+            oldDriver: AnimationDriver?,
+            whenSelected: (AnimationDriver?) -> Unit
+        ) {
             fun add(create: () -> AnimationDriver): () -> Unit = { whenSelected(create()) }
             val options = arrayListOf(
                 MenuOption(NameDesc("Harmonics", "sin(pi*i*t)", "obj.driver.harmonics"), add { HarmonicDriver() }),
