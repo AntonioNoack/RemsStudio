@@ -152,7 +152,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
 
     fun saveTabs() {
         val data = SceneTabs.sceneTabs.map { SceneTabData(it) }
-        TextWriter.save(data, workspace, tabsFile)
+        TextWriter.save(data, tabsFile, workspace)
     }
 
     fun loadUI2(): Panel? {
@@ -169,7 +169,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
                         "CustomListX" -> CustomList(false, style)
                         "CustomListY" -> CustomList(true, style)
                         "TreeView" -> StudioTreeView(style)
-                        "FileExplorer" -> StudioFileExplorer(RemsStudio.project?.scenes, style)
+                        "FileExplorer" -> StudioFileExplorer(project?.scenes, style)
                         "CuttingView", "LayerViewContainer" -> LayerViewContainer(style)
                         "SceneView", "StudioSceneView" -> StudioSceneView(style)
                         else -> types[type]?.constructor?.invoke()
