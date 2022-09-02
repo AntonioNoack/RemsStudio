@@ -5,6 +5,7 @@ import me.anno.gpu.shader.ShaderLib
 import me.anno.gpu.buffer.Attribute
 import me.anno.gpu.buffer.StaticBuffer
 import me.anno.remsstudio.RemsStudio
+import me.anno.utils.types.Floats.toRadians
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
@@ -22,7 +23,7 @@ object CameraModel {
         stack.translate(0f, 0f, offset)
 
         val scaleZ = 1f
-        val scaleY = scaleZ * tan(GFX.toRadians(fov) / 2f)
+        val scaleY = scaleZ * tan(fov.toRadians() / 2f)
         val scaleX = scaleY * RemsStudio.targetWidth / RemsStudio.targetHeight
         stack.scale(scaleX, scaleY, scaleZ)
         val shader = ShaderLib.lineShader3D.value

@@ -3,7 +3,6 @@ package me.anno.remsstudio.objects.geometric
 import me.anno.cache.instances.OldMeshCache
 import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX
-import me.anno.gpu.GFX.toRadians
 import me.anno.gpu.buffer.Attribute
 import me.anno.gpu.buffer.StaticBuffer
 import me.anno.gpu.texture.Clamping
@@ -24,6 +23,7 @@ import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
 import me.anno.utils.files.LocalFile.toGlobalFile
+import me.anno.utils.types.Floats.toRadians
 import me.anno.video.MissingFrameException
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
@@ -58,7 +58,7 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
         val selfDepth = scale[time].z
         stack.next {
             if (autoAlign) {
-                stack.rotate(toRadians(if (count == 4) 45f else 90f), zAxis)
+                stack.rotateZ((if (count == 4) 45f else 90f).toRadians())
                 stack.scale(sqrt2, sqrt2, if (is3D) 1f else 0f)
             } else if (!is3D) {
                 stack.scale(1f, 1f, 0f)

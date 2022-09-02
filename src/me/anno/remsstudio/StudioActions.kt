@@ -3,6 +3,7 @@ package me.anno.remsstudio
 import me.anno.Build
 import me.anno.engine.EngineActions
 import me.anno.gpu.GFX
+import me.anno.gpu.GFXBase
 import me.anno.gpu.GFXState
 import me.anno.gpu.debug.DebugGPUStorage
 import me.anno.input.ActionManager
@@ -10,6 +11,7 @@ import me.anno.input.Input
 import me.anno.input.Modifiers
 import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.utils.StringMap
+import me.anno.remsstudio.RemsStudio.hoveredPanel
 import me.anno.remsstudio.objects.modes.TransformVisibility
 import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.studio.StudioBase
@@ -74,13 +76,13 @@ object StudioActions {
 
                     when (type) {
                         "File" -> {
-                            GFX.hoveredPanel?.onPasteFiles(
+                            hoveredPanel?.onPasteFiles(
                                 window.mouseX, window.mouseY,
                                 data.split("\n").map { getReference(it) }
                             )
                         }
                         else -> {
-                            GFX.hoveredPanel?.onPaste(window.mouseX, window.mouseY, data, type)
+                            hoveredPanel?.onPaste(window.mouseX, window.mouseY, data, type)
                         }
                     }
 

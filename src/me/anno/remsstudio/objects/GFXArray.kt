@@ -1,7 +1,6 @@
 package me.anno.remsstudio.objects
 
 import me.anno.config.DefaultConfig
-import me.anno.gpu.GFX
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
@@ -10,6 +9,7 @@ import me.anno.remsstudio.objects.modes.ArraySelectionMode
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
+import me.anno.utils.types.Floats.toRadians
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector3f
@@ -106,9 +106,9 @@ class GFXArray(parent: Transform? = null) : GFXTransform(parent) {
             }
 
             //val euler = perChildRotation[time]
-            if (euler.y != 0f) transform.rotate(GFX.toRadians(euler.y), yAxis)
-            if (euler.x != 0f) transform.rotate(GFX.toRadians(euler.x), xAxis)
-            if (euler.z != 0f) transform.rotate(GFX.toRadians(euler.z), zAxis)
+            if (euler.y != 0f) transform.rotateY(euler.y.toRadians())
+            if (euler.x != 0f) transform.rotateX(euler.x.toRadians())
+            if (euler.z != 0f) transform.rotateZ(euler.z.toRadians())
 
             //val scale = perChildScale[time]
             if (scale.x != 1f || scale.y != 1f || scale.z != 1f) transform.scale(scale)

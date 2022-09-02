@@ -4,11 +4,10 @@ import me.anno.animation.Type
 import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.isFinalRendering
-import me.anno.gpu.GFX.toRadians
 import me.anno.gpu.GFXState
 import me.anno.gpu.blending.BlendMode
 import me.anno.gpu.drawing.GFXx3D.draw3DCircle
-import me.anno.gpu.shader.ShaderPlus
+import me.anno.gpu.shader.Renderer
 import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
@@ -48,11 +47,15 @@ import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
 import me.anno.utils.structures.ValueWithDefaultFunc
 import me.anno.utils.types.Casting.castToDouble
 import me.anno.utils.types.Casting.castToDouble2
+import me.anno.utils.types.Floats.toRadians
 import me.anno.utils.types.Matrices.skew
 import me.anno.utils.types.Strings.isBlank2
 import me.anno.video.MissingFrameException
 import org.apache.logging.log4j.LogManager
-import org.joml.*
+import org.joml.Matrix4f
+import org.joml.Matrix4fArrayList
+import org.joml.Vector3f
+import org.joml.Vector4f
 import java.net.URL
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -364,9 +367,9 @@ open class Transform() : Saveable(),
             transform.translate(position)
         }
 
-        if (euler.y != 0f) transform.rotate(toRadians(euler.y), yAxis)
-        if (euler.x != 0f) transform.rotate(toRadians(euler.x), xAxis)
-        if (euler.z != 0f) transform.rotate(toRadians(euler.z), zAxis)
+        if (euler.y != 0f) transform.rotateY(euler.y.toRadians())
+        if (euler.x != 0f) transform.rotateX(euler.x.toRadians())
+        if (euler.z != 0f) transform.rotateZ(euler.z.toRadians())
 
         if (scale.x != 1f || scale.y != 1f || scale.z != 1f) transform.scale(scale)
 
@@ -419,8 +422,8 @@ open class Transform() : Saveable(),
     fun drawDirectly(stack: Matrix4fArrayList, time: Double, parentColor: Vector4f, color: Vector4f) {
 
         GFX.drawnId = clickId
-        val doBlending = when (GFX.drawMode) {
-            ShaderPlus.DrawMode.COLOR_SQUARED, ShaderPlus.DrawMode.COLOR -> true
+        val doBlending = when (GFXState.currentRenderer) {
+            Renderer.colorRenderer, Renderer.colorSqRenderer -> true
             else -> false
         }
 

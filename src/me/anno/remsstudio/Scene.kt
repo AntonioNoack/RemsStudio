@@ -35,6 +35,7 @@ import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.GPUFiltering
 import me.anno.gpu.texture.Texture3D
 import me.anno.image.ImageGPUCache.getLUT
+import me.anno.maths.Maths.PIf
 import me.anno.remsstudio.RemsStudio.currentCamera
 import me.anno.remsstudio.RemsStudio.gfxSettings
 import me.anno.remsstudio.RemsStudio.nullCamera
@@ -217,7 +218,7 @@ object Scene {
         currentCamera = camera
         useFrame(x, y, w, h, renderer) {
             usesFPBuffers = sceneView?.usesFPBuffers ?: (camera.toneMapping != ToneMappers.RAW8)
-            val isFakeColorRendering = renderer.isFakeColor
+            val isFakeColorRendering = renderer != Renderer.colorRenderer && renderer != Renderer.colorSqRenderer
             drawScene(scene, camera, time, x, y, w, h, flipY, isFakeColorRendering, sceneView)
         }
     }
@@ -536,7 +537,7 @@ object Scene {
     private fun drawGrid(cameraTransform: Matrix4f, sceneView: ISceneView) {
         stack.next {
             if (sceneView.isLocked2D) {
-                stack.rotate(Math.PI.toFloat() / 2, xAxis)
+                stack.rotateX(PIf / 2)
             }
             Grid.draw(stack, cameraTransform)
         }

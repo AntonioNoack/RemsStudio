@@ -17,6 +17,7 @@ import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Video
 import me.anno.remsstudio.objects.geometric.Polygon
+import me.anno.utils.types.Floats.toRadians
 import me.anno.video.formats.gpu.GPUFrame
 import ofx.mio.OpticalFlow
 import org.joml.Matrix4fArrayList
@@ -59,7 +60,6 @@ object GFXx3Dv2 {
 
         if (tiling != null) shader.v4f("tiling", tiling)
         else shader.v4f("tiling", 1f, 1f, 0f, 0f)
-        shader.v1i("drawMode", GFX.drawMode.id)
         shader.v1i("uvProjection", uvProjection?.id ?: UVProjection.Planar.id)
 
     }
@@ -205,8 +205,6 @@ object GFXx3Dv2 {
 
         GFX.shaderColor(shader, "tint", color)
 
-        shader.v1i("drawMode", GFX.drawMode.id)
-
         val cc = min(colorCount, ShaderLib.maxOutlineColors)
 
         /**
@@ -265,8 +263,8 @@ object GFXx3Dv2 {
         } else if (a1 > a0 + 360) {
             a1 = a0 + 360
         }
-        val angle0 = GFX.toRadians(a0)
-        val angle1 = GFX.toRadians(a1)
+        val angle0 = a0.toRadians()
+        val angle1 = a1.toRadians()
         shader.v3f("circleParams", 1f - innerRadius, angle0, angle1)
         circleBuffer.draw(shader)
         GFX.check()
