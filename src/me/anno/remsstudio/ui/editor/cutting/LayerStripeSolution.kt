@@ -1,8 +1,8 @@
 package me.anno.remsstudio.ui.editor.cutting
 
 import me.anno.Build
-import me.anno.remsstudio.audio.AudioFXCache2
-import me.anno.remsstudio.audio.AudioFXCache2.SPLITS
+import me.anno.animation.LoopingState
+import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
 import me.anno.cache.instances.VideoCache
 import me.anno.config.DefaultConfig
 import me.anno.config.DefaultStyle.black
@@ -13,14 +13,15 @@ import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.max
 import me.anno.maths.Maths.mixARGB
 import me.anno.maths.Maths.nonNegativeModulo
+import me.anno.remsstudio.RemsStudio.nullCamera
+import me.anno.remsstudio.audio.AudioFXCache2
+import me.anno.remsstudio.audio.AudioFXCache2.SPLITS
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.Video
-import me.anno.animation.LoopingState
-import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
-import me.anno.remsstudio.RemsStudio.nullCamera
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.centralTime
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.dtHalfLength
 import me.anno.remsstudio.ui.editor.cutting.LayerView.Companion.maxLines
+import me.anno.utils.Color.toHexColor
 import me.anno.video.ffmpeg.FFMPEGMetadata
 import org.joml.Vector4f
 import kotlin.math.abs

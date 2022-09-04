@@ -269,6 +269,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
 
             val isLooping = isLooping.value
             val duration = meta.duration
+            println("drawing image sequence, setting duration to $duration")
             lastDuration = duration
 
             if (time >= 0.0 && (isLooping != LoopingState.PLAY_ONCE || time <= duration)) {
@@ -354,7 +355,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
 
     private fun drawVideo(meta: FFMPEGMetadata, stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
-        val duration = meta.videoDuration
+        val duration = meta.duration
+        println("drawing video, setting duration to $duration")
         lastDuration = duration
 
         val forceAuto = isFinalRendering && forceAutoScale
@@ -671,6 +673,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
                     if (file != lastAddedEndKeyframesFile) {
                         lastAddedEndKeyframesFile = file
                     }
+                    println("updating video/audio, setting duration to ${meta.duration}")
                     lastDuration = meta.duration
                 }
                 if (meta == null) {
@@ -720,7 +723,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
                 VideoType.IMAGE -> drawImage(stack, time, color)
                 VideoType.AUDIO -> {
                     val meta = meta
-                    if (meta != null) lastDuration = meta.videoDuration
+                    if (meta != null) lastDuration = meta.duration
                     drawSpeakers(stack, Vector4f(color), is3D, amplitude[time])
                 }
                 else -> throw RuntimeException("$type needs visualization") // for the future
