@@ -1,11 +1,6 @@
 package me.anno.remsstudio.animation
 
-import me.anno.animation.AnimationMaths
-import me.anno.animation.AnimationMaths.mul
-import me.anno.animation.AnimationMaths.mulAdd
 import me.anno.animation.Interpolation
-import me.anno.animation.Interpolation.Companion.getWeights
-import me.anno.animation.Keyframe
 import me.anno.animation.Type
 import me.anno.config.DefaultStyle.black3
 import me.anno.gpu.GFX.glThread
@@ -14,6 +9,9 @@ import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.RemsStudio.root
+import me.anno.remsstudio.animation.AnimationMaths.mul
+import me.anno.remsstudio.animation.AnimationMaths.mulAdd
+import me.anno.remsstudio.animation.Keyframe.Companion.getWeights
 import me.anno.remsstudio.animation.drivers.AnimationDriver
 import me.anno.remsstudio.utils.WrongClassType
 import me.anno.utils.structures.lists.UnsafeArrayList
@@ -245,7 +243,7 @@ class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
         val v2 = getDouble(v, 2)
         val v3 = getDouble(v, 3)
         // replace the components, which have drivers, with the driver values
-        @Suppress("UNCHECKED_CAST")
+        @Suppress("UNCHECKED_CAST", "USELESS_CAST")
         return when (animatedValue) {
             is Int -> drivers[0]?.getValue(time, v0, 0)?.toInt() ?: animatedValue
             is Long -> drivers[0]?.getValue(time, v0, 0)?.toLong() ?: animatedValue
@@ -271,7 +269,7 @@ class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
                 getFloat(1, time, v1, animatedValue.y),
                 getFloat(2, time, v2, animatedValue.z),
                 getFloat(3, time, v3, animatedValue.w)
-            )
+            ) as Any
             else -> throw RuntimeException("Replacing components with drivers in $animatedValue is not yet supported!")
         } as V
     }
@@ -309,8 +307,8 @@ class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
         super.save(writer)
         sort()
         // must be written before keyframes!!
+        writer.writeBoolean("isAnimated", isAnimated)
         if (isAnimated) {
-            writer.writeBoolean("isAnimated", isAnimated)
             writer.writeObjectList(this, "vs", keyframes)
         } else {
             // isAnimated = false is default

@@ -1,6 +1,6 @@
 package me.anno.remsstudio.test
 
-import me.anno.animation.Keyframe
+import me.anno.remsstudio.animation.Keyframe
 import me.anno.io.ISaveable.Companion.registerCustomClass
 import me.anno.io.files.InvalidRef
 import me.anno.io.text.TextReader

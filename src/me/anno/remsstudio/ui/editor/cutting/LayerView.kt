@@ -1,7 +1,7 @@
 package me.anno.remsstudio.ui.editor.cutting
 
 import me.anno.Engine.gameTime
-import me.anno.animation.Keyframe
+import me.anno.remsstudio.animation.Keyframe
 import me.anno.cache.CacheData
 import me.anno.cache.instances.VideoCache
 import me.anno.config.DefaultStyle.white4

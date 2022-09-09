@@ -1,7 +1,7 @@
 package me.anno.remsstudio
 
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.animation.Keyframe
+import me.anno.remsstudio.animation.Keyframe
 import me.anno.ecs.Entity
 import me.anno.ecs.components.anim.*
 import me.anno.ecs.components.mesh.Material

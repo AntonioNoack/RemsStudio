@@ -1,7 +1,7 @@
 package me.anno.remsstudio.ui.graphs
 
 import me.anno.animation.Interpolation
-import me.anno.animation.Keyframe
+import me.anno.remsstudio.animation.Keyframe
 import me.anno.animation.Type
 import me.anno.config.DefaultStyle.black
 import me.anno.config.DefaultStyle.white
