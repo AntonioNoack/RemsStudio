@@ -88,7 +88,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
 
         fun loadVOX(file: FileReference, instance: Transform?): MeshData? {
             return loadModel(file, "vox", instance, {
-                val reader = VOXReader().read(file)
+                val reader = VOXReader().read(file.inputStreamSync())
                 val entity = reader.toEntityPrefab(file).createInstance() as Entity
                 // alternatively for testing:
                 // reader.toEntityPrefab().createInstance()

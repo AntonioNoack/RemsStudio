@@ -5,7 +5,6 @@ import me.anno.animation.LoopingState
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
 import me.anno.cache.instances.VideoCache
 import me.anno.config.DefaultConfig
-import me.anno.config.DefaultStyle.black
 import me.anno.gpu.drawing.DrawGradients.drawRectGradient
 import me.anno.gpu.drawing.DrawRectangles
 import me.anno.gpu.drawing.DrawStriped.drawRectStriped
@@ -21,7 +20,7 @@ import me.anno.remsstudio.objects.Video
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.centralTime
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.dtHalfLength
 import me.anno.remsstudio.ui.editor.cutting.LayerView.Companion.maxLines
-import me.anno.utils.Color.toHexColor
+import me.anno.utils.Color.black
 import me.anno.video.ffmpeg.FFMPEGMetadata
 import org.joml.Vector4f
 import kotlin.math.abs

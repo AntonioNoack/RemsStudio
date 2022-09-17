@@ -2,7 +2,6 @@ package me.anno.remsstudio
 
 import me.anno.animation.Type
 import me.anno.config.DefaultConfig
-import me.anno.config.DefaultStyle.black
 import me.anno.gpu.GFX
 import me.anno.io.files.InvalidRef
 import me.anno.language.translation.NameDesc
@@ -29,6 +28,7 @@ import me.anno.ui.input.FloatInput
 import me.anno.ui.input.IntInput
 import me.anno.ui.style.Style
 import me.anno.maths.Maths.mixARGB
+import me.anno.utils.Color.black
 import me.anno.utils.process.DelayedTask
 import me.anno.video.ffmpeg.FFMPEGEncodingBalance
 import me.anno.video.ffmpeg.FFMPEGEncodingType

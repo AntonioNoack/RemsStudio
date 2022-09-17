@@ -2,7 +2,6 @@ package me.anno.remsstudio.ui.editor
 
 import me.anno.config.DefaultConfig.defaultFont
 import me.anno.config.DefaultStyle
-import me.anno.config.DefaultStyle.black
 import me.anno.fonts.FontManager
 import me.anno.fonts.keys.TextCacheKey
 import me.anno.gpu.GFX
@@ -32,6 +31,7 @@ import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.custom.CustomContainer.Companion.isCross
 import me.anno.ui.style.Style
+import me.anno.utils.Color.black
 import me.anno.utils.Color.mulAlpha
 import me.anno.utils.structures.tuples.Quad
 import me.anno.utils.types.Strings.formatTime
@@ -50,7 +50,7 @@ open class TimelinePanel(style: Style) : Panel(style) {
 
     var drawnStrings = ArrayList<TextCacheKey>(64)
 
-    val accentColor = style.getColor("accentColor", DefaultStyle.black)
+    val accentColor = style.getColor("accentColor", black)
 
     override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
         drawnStrings.clear()

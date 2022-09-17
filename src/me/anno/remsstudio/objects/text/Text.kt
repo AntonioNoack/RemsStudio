@@ -2,10 +2,10 @@ package me.anno.remsstudio.objects.text
 
 import me.anno.animation.Type
 import me.anno.cache.CacheData
-import me.anno.cache.instances.TextCache
 import me.anno.cache.keys.TextSegmentKey
 import me.anno.config.DefaultConfig
 import me.anno.fonts.FontManager
+import me.anno.fonts.FontManager.TextCache
 import me.anno.fonts.PartResult
 import me.anno.fonts.mesh.TextMesh.Companion.DEFAULT_FONT_HEIGHT
 import me.anno.fonts.mesh.TextMesh.Companion.DEFAULT_LINE_HEIGHT

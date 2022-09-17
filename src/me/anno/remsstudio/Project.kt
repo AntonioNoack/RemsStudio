@@ -76,7 +76,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
             val ref = getReference(scenes, "Root.json")
             val tab0 = if (ref.exists) {
                 try {
-                    val data = TextReader.read(ref.inputStream(), workspace, true)
+                    val data = TextReader.read(ref.inputStreamSync(), workspace, true)
                     val trans = data.filterIsInstance<Transform>().firstOrNull()
                     val history = data.filterIsInstance<History>().firstOrNull()
                     if (trans != null) Pair(trans, history ?: History()) else null
@@ -156,7 +156,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
     }
 
     fun loadUI2(): Panel? {
-        return uiFile.inputStream().use { fis ->
+        return uiFile.inputStreamSync().use { fis ->
             val library = StudioUITypeLibrary()
             val types = library.types
             val notFound = HashSet<String>()

@@ -26,7 +26,7 @@ fun main() {
         .filter { it.name.startsWith(filePrefix) && it.extension == fileExtension }
     val data = files.associate {
         val timeStep = it.nameWithoutExtension.substring(filePrefix.length).toDouble() / timeScale
-        val values = CSVReader.readNumerical(it.readText(), ',', '\n', 0.0)
+        val values = CSVReader.readNumerical(it.readTextSync(), ',', '\n', 0.0)
         timeStep to values
     }.toSortedMap() // sort by timeStep
 

@@ -2,7 +2,6 @@ package me.anno.remsstudio.objects
 
 import me.anno.animation.Type
 import me.anno.config.DefaultConfig
-import me.anno.config.DefaultStyle.white4
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.Perspective.perspective2
 import me.anno.gpu.pipeline.Sorting
@@ -22,6 +21,7 @@ import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
+import me.anno.utils.Color.white4
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.pooling.JomlPools
 import me.anno.utils.types.Casting.castToFloat2

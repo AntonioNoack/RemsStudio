@@ -1,10 +1,8 @@
 package me.anno.remsstudio.ui.editor.cutting
 
 import me.anno.Engine.gameTime
-import me.anno.remsstudio.animation.Keyframe
 import me.anno.cache.CacheData
 import me.anno.cache.instances.VideoCache
-import me.anno.config.DefaultStyle.white4
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.input.Input
@@ -24,6 +22,7 @@ import me.anno.remsstudio.RemsStudio.isPlaying
 import me.anno.remsstudio.Selection.select
 import me.anno.remsstudio.Selection.selectTransform
 import me.anno.remsstudio.Selection.selectedTransform
+import me.anno.remsstudio.animation.Keyframe
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.Video
 import me.anno.remsstudio.ui.StudioFileImporter.addChildFromFile
@@ -37,6 +36,7 @@ import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.dragging.Draggable
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.style.Style
+import me.anno.utils.Color.white4
 import me.anno.utils.hpc.ProcessingQueue
 import kotlin.math.abs
 import kotlin.math.roundToInt

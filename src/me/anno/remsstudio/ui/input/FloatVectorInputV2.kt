@@ -7,7 +7,6 @@ import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.studio.StudioBase
 import me.anno.studio.StudioBase.Companion.workspace
-import me.anno.ui.base.Visibility
 import me.anno.ui.input.FloatVectorInput
 import me.anno.ui.style.Style
 import org.joml.*
@@ -74,7 +73,7 @@ class FloatVectorInputV2(
         val focused1 = titleView?.isInFocus == true
         if (RemsStudio.hideUnusedProperties) {
             val focused2 = focused1 || owningProperty == Selection.selectedProperty
-            valueList.visibility = if (focused2) Visibility.VISIBLE else Visibility.GONE
+            valueList.isVisible = if (focused2) true else false
         }
         super.onDraw(x0, y0, x1, y1)
     }

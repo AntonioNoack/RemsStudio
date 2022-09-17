@@ -70,7 +70,7 @@ object StudioFileImporter : FileContentImporter<Transform>() {
                 }
                 else -> {
                     thread(name = "ImportFromFile") {
-                        val text = file.readText()
+                        val text = file.readTextSync()
                         try {
                             val transform = text.toTransform()
                             if (transform == null) {
@@ -134,7 +134,7 @@ object StudioFileImporter : FileContentImporter<Transform>() {
             }
             "Text" -> {
                 try {
-                    addText(name, parent, file.readText(), doSelect, callback)
+                    addText(name, parent, file.readTextSync(), doSelect, callback)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     return
@@ -169,7 +169,7 @@ object StudioFileImporter : FileContentImporter<Transform>() {
             else -> {
                 LOGGER.warn("Unknown file type: ${file.extension}")
                 try {
-                    addText(name, parent, file.readText(), doSelect, callback)
+                    addText(name, parent, file.readTextSync(), doSelect, callback)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     return

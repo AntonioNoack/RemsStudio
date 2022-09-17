@@ -23,6 +23,7 @@ import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.editor.treeView.TreeView
 import me.anno.ui.editor.treeView.TreeViewPanel
 import me.anno.ui.style.Style
+import me.anno.utils.Color.black
 import me.anno.utils.Color.toARGB
 import me.anno.utils.structures.lists.UpdatingList
 import org.apache.logging.log4j.LogManager
@@ -108,7 +109,7 @@ class StudioTreeView(style: Style) :
     }
 
     private val tmp = Vector4f()
-    private val accentColor = style.getColor("accentColor", DefaultStyle.black)
+    private val accentColor = style.getColor("accentColor", black)
     override fun getLocalColor(element: Transform, isHovered: Boolean, isInFocus: Boolean): Int {
         val dst = element.getLocalColor(tmp)
         dst.w = 0.5f + 0.5f * clamp(dst.w, 0f, 1f)

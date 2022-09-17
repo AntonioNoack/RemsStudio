@@ -19,7 +19,7 @@ class NumberInputComponentV2(
     style: Style
 ) : NumberInputComponent(visibilityKey, style) {
 
-    val indexInProperty get() = indexInParent
+    val indexInProperty get() = indexInParent - 1
 
     init {
         setResetListener { AnyToDouble.getDouble(owningProperty.type.defaultValue, indexInProperty).toString() }

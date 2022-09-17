@@ -3,8 +3,6 @@ package me.anno.remsstudio.ui.graphs
 import me.anno.animation.Interpolation
 import me.anno.remsstudio.animation.Keyframe
 import me.anno.animation.Type
-import me.anno.config.DefaultStyle.black
-import me.anno.config.DefaultStyle.white
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.drawing.DrawTexts
 import me.anno.gpu.drawing.DrawTextures.drawTexture
@@ -36,8 +34,10 @@ import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.editor.sceneView.Grid.drawSmoothLine
 import me.anno.ui.style.Style
+import me.anno.utils.Color.black
 import me.anno.utils.Color.mulAlpha
 import me.anno.utils.Color.toARGB
+import me.anno.utils.Color.white
 import me.anno.utils.types.AnyToFloat.get
 import org.apache.logging.log4j.LogManager
 import org.joml.*
@@ -538,6 +538,10 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
 
     override fun onMouseDown(x: Float, y: Float, button: MouseButton) {
         // find the dragged element
+        if (!isHovered) {
+            super.onMouseDown(x, y, button)
+            return
+        }
         invalidateDrawing()
         val atCursor = getKeyframeAt(x, y)
         if (atCursor != null && selectedKeyframes.size > 1 && atCursor.first in selectedKeyframes) {
@@ -548,6 +552,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             if (button.isLeft) {
                 isSelecting = isShiftDown
                 if (!isSelecting) {
+                    println("onMouseDown without selecting -> clear")
                     selectedKeyframes.clear()
                 }
                 val keyframeChannel = getKeyframeAt(x, y)

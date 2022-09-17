@@ -2,7 +2,6 @@ package me.anno.remsstudio.ui.scene
 
 import me.anno.Engine.gameTime
 import me.anno.Engine.rawDeltaTime
-import me.anno.config.DefaultStyle.black
 import me.anno.config.DefaultStyle.deepDark
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.DrawRectangles.drawRect
@@ -21,6 +20,7 @@ import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.ui.editor.ISceneView
 import me.anno.ui.base.groups.PanelList
 import me.anno.ui.style.Style
+import me.anno.utils.Color.black
 import me.anno.utils.types.Floats.toDegrees
 import me.anno.utils.types.Vectors.minus
 import me.anno.utils.types.Vectors.times

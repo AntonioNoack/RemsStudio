@@ -2,7 +2,6 @@ package me.anno.remsstudio.ui.scene
 
 import me.anno.Engine.deltaTime
 import me.anno.config.DefaultConfig
-import me.anno.config.DefaultStyle.black
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.addGPUTask
 import me.anno.gpu.GFXState.renderDefault
@@ -48,6 +47,7 @@ import me.anno.ui.custom.CustomContainer
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.style.Style
+import me.anno.utils.Color.black
 import me.anno.utils.types.Booleans.toInt
 import me.anno.utils.types.Vectors.plus
 import me.anno.utils.types.Vectors.times

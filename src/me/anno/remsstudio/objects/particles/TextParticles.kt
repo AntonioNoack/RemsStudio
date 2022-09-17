@@ -1,8 +1,8 @@
 package me.anno.remsstudio.objects.particles
 
 import me.anno.cache.CacheData
-import me.anno.cache.instances.TextCache
 import me.anno.cache.keys.TextSegmentKey
+import me.anno.fonts.FontManager.TextCache
 import me.anno.fonts.PartResult
 import me.anno.fonts.mesh.TextMesh
 import me.anno.fonts.mesh.TextMeshGroup

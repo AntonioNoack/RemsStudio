@@ -58,7 +58,7 @@ class YouTubeMeta(youtubeLink: String) {
                 if (link.key.videoCodec == VideoCodec.H264) {
                     val clock = Clock()
                     val ref = getReference(link.value)
-                    tmp.writeFile(ref)
+                    tmp.writeFile(ref) {}
                     clock.stop("done downloading")
                     process(tmp)
                     break
@@ -112,7 +112,7 @@ class YouTubeMeta(youtubeLink: String) {
             val timeoutMillis = 2 * 7 * 24L * 3600L * 1000L
             if (cacheFile.exists && System.currentTimeMillis() - cacheFile.lastModified < timeoutMillis) {
                 try {
-                    val lines = cacheFile.readText().split("\n")
+                    val lines = cacheFile.readTextSync().split("\n")
                     decipherJsFileName = lines[0]
                     decipherFunctionName = lines[1]
                     decipherFunctions = lines[2]

@@ -2,11 +2,11 @@ package me.anno.remsstudio.animation
 
 import me.anno.animation.Interpolation
 import me.anno.animation.Type
-import me.anno.config.DefaultStyle.black3
 import me.anno.gpu.GFX.glThread
 import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
+import me.anno.maths.Maths
 import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.RemsStudio.root
 import me.anno.remsstudio.animation.AnimationMaths.mul
@@ -14,6 +14,7 @@ import me.anno.remsstudio.animation.AnimationMaths.mulAdd
 import me.anno.remsstudio.animation.Keyframe.Companion.getWeights
 import me.anno.remsstudio.animation.drivers.AnimationDriver
 import me.anno.remsstudio.utils.WrongClassType
+import me.anno.utils.Color.black3
 import me.anno.utils.structures.lists.UnsafeArrayList
 import me.anno.utils.types.AnyToDouble.getDouble
 import org.apache.logging.log4j.LogManager
@@ -143,7 +144,7 @@ class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
             }
             var index = keyframes.binarySearch { it.time.compareTo(time) }
             if (index < 0) index = -1 - index
-            val interpolation = keyframes.getOrNull(index)?.interpolation ?: Interpolation.SPLINE
+            val interpolation = keyframes.getOrNull(clamp(index, 0, keyframes.lastIndex))?.interpolation ?: Interpolation.SPLINE
             val newFrame = Keyframe(time, value, interpolation)
             keyframes.add(newFrame)
             sort()

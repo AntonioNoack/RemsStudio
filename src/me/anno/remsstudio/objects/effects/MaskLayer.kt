@@ -6,7 +6,6 @@ import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.GFXState.renderDefault
 import me.anno.gpu.GFXState.useFrame
 import me.anno.gpu.framebuffer.FBStack
-import me.anno.gpu.framebuffer.Frame
 import me.anno.gpu.framebuffer.Framebuffer
 import me.anno.gpu.shader.Renderer
 import me.anno.gpu.shader.effects.BokehBlur
@@ -25,14 +24,12 @@ import me.anno.remsstudio.objects.geometric.Circle
 import me.anno.remsstudio.objects.geometric.Polygon
 import me.anno.ui.Panel
 import me.anno.ui.base.SpyPanel
-import me.anno.ui.base.Visibility
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector4f
-import org.lwjgl.opengl.GL11C.*
 import java.net.URL
 
 open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
@@ -328,7 +325,7 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
 
         fun typeSpecific(panel: Panel, isVisible: (MaskType) -> Boolean) {
             mask += panel
-            mask += SpyPanel(style) { panel.visibility = Visibility[isVisible(type)] }
+            mask += SpyPanel(style) { panel.isVisible = isVisible(type) }
         }
 
         mask += vi("Size", "How large pixelated pixels or blur should be", effectSize, style)
@@ -373,8 +370,8 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
         editor += vi("Show Masked", "for debugging purposes", null, showMasked, style) { showMasked = it }
 
         list += SpyPanel(style) {
-            greenScreen.visibility = Visibility[type == MaskType.GREEN_SCREEN]
-            transition.visibility = Visibility[type == MaskType.TRANSITION]
+            greenScreen.isVisible = type == MaskType.GREEN_SCREEN
+            transition.isVisible = type == MaskType.TRANSITION
         }
 
     }

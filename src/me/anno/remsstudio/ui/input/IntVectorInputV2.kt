@@ -7,10 +7,11 @@ import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.studio.StudioBase
 import me.anno.studio.StudioBase.Companion.workspace
-import me.anno.ui.base.Visibility
 import me.anno.ui.input.IntVectorInput
 import me.anno.ui.style.Style
-import org.joml.*
+import org.joml.Vector2i
+import org.joml.Vector3i
+import org.joml.Vector4i
 
 class IntVectorInputV2(
     style: Style, title: String, visibilityKey: String, type: Type,
@@ -89,7 +90,7 @@ class IntVectorInputV2(
         val focused1 = titleView?.isInFocus == true
         if (RemsStudio.hideUnusedProperties) {
             val focused2 = focused1 || owningProperty == Selection.selectedProperty
-            valueList.visibility = if (focused2) Visibility.VISIBLE else Visibility.GONE
+            valueList.isVisible = if (focused2) true else false
         }
         super.onDraw(x0, y0, x1, y1)
     }

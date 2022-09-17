@@ -1,11 +1,11 @@
 package me.anno.remsstudio.ui.editor.cutting
 
-import me.anno.config.DefaultStyle
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.Video
 import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.studio.StudioBase.Companion.addEvent
+import me.anno.utils.Color.white4
 import org.joml.Vector4f
 
 class LayerViewComputer(private val view: LayerView) {
@@ -42,7 +42,7 @@ class LayerViewComputer(private val view: LayerView) {
 
             val leftTime = view.getTimeAt(x0.toFloat())
             val dt = TimelinePanel.dtHalfLength * 2.0 / view.w
-            val white = DefaultStyle.white4
+            val white = white4
 
             val size = transforms.size
 

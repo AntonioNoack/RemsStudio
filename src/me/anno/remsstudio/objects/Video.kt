@@ -48,7 +48,6 @@ import me.anno.remsstudio.objects.modes.editorFPS
 import me.anno.studio.StudioBase
 import me.anno.ui.Panel
 import me.anno.ui.base.SpyPanel
-import me.anno.ui.base.Visibility
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.text.UpdatingTextPanel
@@ -75,7 +74,10 @@ import me.anno.video.ffmpeg.FFMPEGMetadata.Companion.getMeta
 import me.anno.video.ffmpeg.IsFFMPEGOnly.isFFMPEGOnlyExtension
 import me.anno.video.formats.gpu.GPUFrame
 import org.apache.logging.log4j.LogManager
-import org.joml.*
+import org.joml.Matrix4f
+import org.joml.Matrix4fArrayList
+import org.joml.Vector3f
+import org.joml.Vector4f
 import java.net.URL
 import kotlin.math.*
 
@@ -356,7 +358,6 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
     private fun drawVideo(meta: FFMPEGMetadata, stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
         val duration = meta.duration
-        println("drawing video, setting duration to $duration")
         lastDuration = duration
 
         val forceAuto = isFinalRendering && forceAutoScale
@@ -673,7 +674,6 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
                     if (file != lastAddedEndKeyframesFile) {
                         lastAddedEndKeyframesFile = file
                     }
-                    println("updating video/audio, setting duration to ${meta.duration}")
                     lastDuration = meta.duration
                 }
                 if (meta == null) {
@@ -901,9 +901,9 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
             val state = hasAudio.toInt(1) + hasImage.toInt(2) + hasVideo.toInt(4) + hasImSeq.toInt(8)
             if (state != lastState) {
                 lastState = state
-                audioPanels.forEach { it.visibility = if (hasAudio) Visibility.VISIBLE else Visibility.GONE }
-                videoPanels.forEach { it.visibility = if (hasVideo) Visibility.VISIBLE else Visibility.GONE }
-                imagePanels.forEach { it.visibility = if (hasImage) Visibility.VISIBLE else Visibility.GONE }
+                for(p in audioPanels) p.isVisible = hasAudio
+                for(p in videoPanels) p.isVisible = hasVideo
+                for(p in imagePanels) p.isVisible = hasImage
                 list.invalidateLayout()
             }
         }

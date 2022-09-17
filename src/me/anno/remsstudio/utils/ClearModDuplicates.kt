@@ -44,7 +44,7 @@ fun main() {
                 }
             } else {
                 zos.putNextEntry(ZipEntry(path))
-                zos.write(file.readBytes())
+                zos.write(file.readBytesSync())
                 zos.closeEntry()
             }
         }
