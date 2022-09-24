@@ -52,8 +52,11 @@ All the following libraries currently are part of Rem's Engine, and therefore ar
 
 ## Build
 
-To build Rem's Studio, I am using Intellij Idea (the community edition is free). It should work in other IDEs as well,
-you just need to add Rem's Engine as a '.jar' library. In Intellij Idea set the memory of the compiler (Settings/Build/Compiler) to more
+To build Rem's Studio, I am using Intellij Idea (the community edition is free).
+It should work in other IDEs as well, you just need to add Rem's Engine as a '.jar' library.
+If you don't know, which one to pick, use the Universal one.
+
+In Intellij Idea set the memory of the compiler (Settings/Build/Compiler) to more
 than 700 MB, as it becomes awfully slow with that amount, or even crashes.
 
 The main class for starting the video editor is me.anno.remsstudio.Runner.

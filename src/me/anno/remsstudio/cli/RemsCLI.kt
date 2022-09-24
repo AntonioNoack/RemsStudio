@@ -27,9 +27,7 @@ import me.anno.utils.types.Strings.isBlank2
 import me.anno.utils.types.Strings.parseTimeOrNull
 import org.apache.commons.cli.*
 import org.apache.logging.log4j.LogManager
-import org.lwjgl.opengl.GL30C
-import java.io.File
-import java.net.URL
+import org.lwjgl.opengl.GL11C
 import java.util.*
 
 object RemsCLI {
@@ -161,9 +159,11 @@ object RemsCLI {
                 height,
                 false
             ) { isDone = true }
+
             Rendering.RenderType.AUDIO -> Rendering.renderAudio(
                 false
             ) { isDone = true }
+
             Rendering.RenderType.FRAME -> Rendering.renderFrame(
                 width,
                 height,
@@ -178,9 +178,9 @@ object RemsCLI {
             GFX.resetFBStack()
             Engine.updateTime()
             Cache.update()
-            bindTexture(GL30C.GL_TEXTURE_2D, 0)
+            bindTexture(GL11C.GL_TEXTURE_2D, 0)
             // BlendDepth.reset()
-            GL30C.glDisable(GL30C.GL_CULL_FACE)
+            GL11C.glDisable(GL11C.GL_CULL_FACE)
             GFX.check()
             Frame.reset()
             GFX.workGPUTasks(false)
@@ -244,12 +244,9 @@ object RemsCLI {
         } else defaultValue
     }
 
-    fun readText(source: String): String {
-        return when {
-            source.startsWith("text://", true) -> source.substring(7)
-            source.contains("://") -> URL(source).readText()
-            else -> File(source).readText()
-        }
+    private fun readText(source: String): String {
+        return if (source.startsWith("text://", true)) source.substring(7)
+        else getReference(source).readTextSync()
     }
 
     private fun printHelp(options: Options) {

@@ -1,7 +1,7 @@
 package me.anno.remsstudio.objects.meshes
 
 import me.anno.animation.Type
-import me.anno.cache.instances.OldMeshCache.getMesh
+import me.anno.cache.instances.OldMeshCache
 import me.anno.config.DefaultConfig
 import me.anno.ecs.Entity
 import me.anno.ecs.components.anim.AnimRenderer
@@ -70,7 +70,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             load: (MeshData) -> Unit,
             getData: (MeshData) -> Any?
         ): MeshData? {
-            val meshData1 = getMesh(file, key, 1000, true) { _, _ ->
+            val meshData1 = OldMeshCache.getEntry(file, key, 1000, true) { _, _ ->
                 val meshData = MeshData()
                 try {
                     load(meshData)

@@ -1,13 +1,13 @@
 package me.anno.remsstudio.objects
 
 import me.anno.gpu.drawing.GFXx3D.uploadAttractors0
-import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.gpu.shader.Shader
 import me.anno.gpu.shader.ShaderLib.colorForceFieldBuffer
 import me.anno.gpu.shader.ShaderLib.maxColorForceFields
 import me.anno.gpu.shader.ShaderLib.uvForceFieldBuffer
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
+import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.attractors.EffectColoring
 import me.anno.remsstudio.objects.attractors.EffectMorphing
 import me.anno.ui.base.groups.PanelListY
@@ -16,8 +16,6 @@ import me.anno.ui.style.Style
 import me.anno.utils.types.Floats.put3
 import org.joml.Vector3f
 import org.joml.Vector4f
-import org.lwjgl.opengl.GL20C.glUniform3fv
-import org.lwjgl.opengl.GL20C.glUniform4fv
 import kotlin.math.abs
 import kotlin.math.sqrt
 
@@ -107,7 +105,7 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                     buffer.put(position.z)
                 }
                 buffer.position(0)
-                glUniform3fv(loc1, buffer)
+                shader.v3fs(loc1, buffer)
             }
             val loc2 = shader["forceFieldUVSpecs"]
             if (loc2 > -1) {
@@ -125,7 +123,7 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                     buffer.put(sharpness)
                 }
                 buffer.position(0)
-                glUniform4fv(loc2, buffer)
+                shader.v4fs(loc2, buffer)
             }
         }
 
@@ -169,7 +167,7 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                 buffer.put(color.w)
             }
             buffer.position(0)
-            glUniform4fv(shader["forceFieldColors"], buffer)
+            shader.v4fs("forceFieldColors", buffer)
             buffer.position(0)
             for (attractor in attractors) {
                 val localTime = attractor.lastLocalTime
@@ -179,7 +177,7 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                 buffer.put(weight)
             }
             buffer.position(0)
-            glUniform4fv(shader["forceFieldPositionsNWeights"], buffer)
+            shader.v4fs("forceFieldPositionsNWeights", buffer)
             buffer.position(0)
             val sx = if (this is Video) 1f / lastW else 1f
             val sy = if (this is Video) 1f / lastH else 1f
@@ -193,7 +191,7 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                 buffer.put(power)
             }
             buffer.position(0)
-            glUniform4fv(shader["forceFieldColorPowerSizes"], buffer)
+            shader.v4fs("forceFieldColorPowerSizes", buffer)
         }
 
     }

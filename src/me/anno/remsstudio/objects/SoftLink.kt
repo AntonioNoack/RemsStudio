@@ -33,7 +33,6 @@ import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector4f
-import org.lwjgl.opengl.GL11C.*
 import kotlin.math.roundToInt
 
 class SoftLink(var file: FileReference) : GFXTransform(null) {
