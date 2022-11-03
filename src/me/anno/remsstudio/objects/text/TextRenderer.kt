@@ -10,6 +10,7 @@ import me.anno.remsstudio.Selection
 import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.remsstudio.objects.attractors.EffectMorphing
 import me.anno.remsstudio.objects.modes.TextRenderMode
+import me.anno.remsstudio.objects.text.Text.Companion.DEFAULT_FONT_HEIGHT
 import me.anno.ui.editor.sceneView.Grid
 import me.anno.utils.pooling.JomlPools
 import me.anno.utils.types.Strings.isBlank2
@@ -84,7 +85,7 @@ object TextRenderer {
         val shadowColor = element.shadowColor[time]
         if (shadowColor.w >= 1f / 255f) {
             val shadowSmoothness = element.shadowSmoothness[time]
-            val shadowOffset = element.shadowOffset[time] * (1f / TextMesh.DEFAULT_FONT_HEIGHT)
+            val shadowOffset = element.shadowOffset[time] * (1f / DEFAULT_FONT_HEIGHT)
             stack.next {
                 stack.translate(shadowOffset)
                 val tintedShadowColor = JomlPools.vec4f.create()

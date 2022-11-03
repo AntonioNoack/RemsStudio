@@ -90,7 +90,7 @@ class IntVectorInputV2(
         val focused1 = titleView?.isInFocus == true
         if (RemsStudio.hideUnusedProperties) {
             val focused2 = focused1 || owningProperty == Selection.selectedProperty
-            valueList.isVisible = if (focused2) true else false
+            valueList.isVisible = focused2
         }
         super.onDraw(x0, y0, x1, y1)
     }

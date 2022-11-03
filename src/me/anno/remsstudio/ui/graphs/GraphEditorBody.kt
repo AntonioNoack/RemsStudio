@@ -3,10 +3,10 @@ package me.anno.remsstudio.ui.graphs
 import me.anno.animation.Interpolation
 import me.anno.remsstudio.animation.Keyframe
 import me.anno.animation.Type
+import me.anno.gpu.drawing.DrawRectangles.drawBorder
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.drawing.DrawTexts
 import me.anno.gpu.drawing.DrawTextures.drawTexture
-import me.anno.gpu.drawing.GFXx2D.drawBorder
 import me.anno.gpu.texture.TextureLib.colorShowTexture
 import me.anno.input.Input.isControlDown
 import me.anno.input.Input.isShiftDown

@@ -102,6 +102,7 @@ class SceneTab(var file: FileReference?, var scene: Transform, history: History?
                     TextWriter.save(listOf(scene, history), dst, workspace)
                     file = dst
                     hasChanged = false
+                    LOGGER.info("Saved!")
                     onSuccess()
                 }
             } catch (e: Exception) {

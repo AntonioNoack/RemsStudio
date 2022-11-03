@@ -8,7 +8,7 @@ import me.anno.gpu.buffer.StaticBuffer
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.Filtering
 import me.anno.gpu.texture.TextureLib.whiteTexture
-import me.anno.image.ImageGPUCache.getImage
+import me.anno.image.ImageGPUCache
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
@@ -50,7 +50,7 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val inset = clamp(starNess[time], 0f, 1f)
-        val image = getImage(texture, 5000, true)
+        val image = ImageGPUCache[texture, 5000, true]
         if (image == null && texture.hasValidName() && GFX.isFinalRendering) throw MissingFrameException(texture)
         val texture = image ?: whiteTexture
         val count = vertexCount[time]//.roundToInt()

@@ -7,7 +7,6 @@ import me.anno.config.DefaultConfig
 import me.anno.fonts.FontManager
 import me.anno.fonts.FontManager.TextCache
 import me.anno.fonts.PartResult
-import me.anno.fonts.mesh.TextMesh.Companion.DEFAULT_FONT_HEIGHT
 import me.anno.fonts.mesh.TextMesh.Companion.DEFAULT_LINE_HEIGHT
 import me.anno.fonts.mesh.TextMeshGroup
 import me.anno.fonts.mesh.TextRepBase
@@ -43,6 +42,8 @@ import kotlin.streams.toList
 open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableElement {
 
     companion object {
+
+        val DEFAULT_FONT_HEIGHT = 32
 
         val tabSpaceType = Type.FLOAT_PLUS.withDefaultValue(4f)
         val lineBreakType = Type.FLOAT_PLUS.withDefaultValue(0f)

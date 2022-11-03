@@ -6,10 +6,12 @@ import me.anno.Engine.gameTime
 import me.anno.audio.openal.ALBase
 import me.anno.audio.openal.AudioManager
 import me.anno.audio.openal.AudioTasks
+import me.anno.cache.instances.PDFPlugin
 import me.anno.config.DefaultConfig
 import me.anno.config.DefaultStyle.baseTheme
+import me.anno.extensions.ExtensionLoader
 import me.anno.gpu.GFX
-import me.anno.gpu.WindowX
+import me.anno.gpu.OSWindow
 import me.anno.input.ActionManager
 import me.anno.input.Input.keyUpCtr
 import me.anno.installer.Installer.checkInstall
@@ -109,9 +111,10 @@ import me.anno.utils.OS
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
-object RemsStudio : StudioBase(true, "Rem's Studio", 10110) {
+object RemsStudio : StudioBase(true, "Rem's Studio", 10111) {
 
     val defaultWindowStack get() = GFX.someWindow.windowStack
+    var hideUnusedProperties = false
 
     // private val LOGGER = LogManager.getLogger(RemsStudio::class)
 
@@ -148,6 +151,7 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10110) {
     }
 
     override fun onGameInit() {
+        ExtensionLoader.loadInternally(PDFPlugin::class)
         gfxSettings = GFXSettings.get(DefaultConfig["editor.gfx", GFXSettings.LOW.id], GFXSettings.LOW)
         workspace = DefaultConfig["workspace.dir", getReference(OS.documents, configName)]
         checkInstall()
@@ -266,7 +270,7 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10110) {
         updateLastLocalTime(root, editorTime)
     }
 
-    override fun onGameLoop(window: WindowX, w: Int, h: Int) {
+    override fun onGameLoop(window: OSWindow, w: Int, h: Int) {
         DefaultConfig.saveMaybe("main.config")
         baseTheme.values.saveMaybe("style.config")
         Selection.update()

@@ -279,7 +279,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
                 // draw the current texture
                 val localTime = isLooping[time, duration]
 
-                val frame = ImageGPUCache.getImage(meta.getImage(localTime), 5L, true)
+                val frame = ImageGPUCache[meta.getImage(localTime), 5L, true]
                 if (frame == null || !frame.isCreated) onMissingImageOrFrame((localTime * 1000).toInt())
                 else {
                     lastW = frame.w
@@ -485,7 +485,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
                 // calculate required scale? no, without animation, we don't need to scale it down ;)
                 getVideoFrame(file, 1, 0, 1, 1.0, imageTimeout, true)
             else -> // some image
-                ImageGPUCache.getImage(file, imageTimeout, true)
+                ImageGPUCache.get(file, imageTimeout, true)
         }
     }
 
@@ -518,7 +518,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
             }
             else -> {// some image
                 val tiling = tiling[time]
-                val texture = ImageGPUCache.getImage(file, imageTimeout, true)
+                val texture = ImageGPUCache[file, imageTimeout, true]
                 if (texture == null || !texture.isCreated) onMissingImageOrFrame(0)
                 else {
                     texture.rotation?.apply(stack)
@@ -606,14 +606,14 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
 
                         if (index1 >= index0) {
                             for (i in index0..index1) {
-                                ImageGPUCache.getImage(meta.getImage(i), videoFrameTimeout, true)
+                                ImageGPUCache.get(meta.getImage(i), videoFrameTimeout, true)
                             }
                         } else {
                             for (i in index1 until meta.matches.size) {
-                                ImageGPUCache.getImage(meta.getImage(i), videoFrameTimeout, true)
+                                ImageGPUCache.get(meta.getImage(i), videoFrameTimeout, true)
                             }
                             for (i in 0 until index0) {
-                                ImageGPUCache.getImage(meta.getImage(i), videoFrameTimeout, true)
+                                ImageGPUCache.get(meta.getImage(i), videoFrameTimeout, true)
                             }
                         }
 

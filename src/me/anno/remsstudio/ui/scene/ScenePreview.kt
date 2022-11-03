@@ -31,10 +31,8 @@ import kotlin.math.atan2
 class ScenePreview(style: Style) : PanelList(null, style.getChild("sceneView")), ISceneView {
 
     init {
-
         weight = 1f
         backgroundColor = 0
-
     }
 
     val camera = nullCamera ?: Camera()
@@ -90,7 +88,7 @@ class ScenePreview(style: Style) : PanelList(null, style.getChild("sceneView")),
 
     override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
 
-        GFX.check()
+        // GFX.check()
 
         updatePosition()
 

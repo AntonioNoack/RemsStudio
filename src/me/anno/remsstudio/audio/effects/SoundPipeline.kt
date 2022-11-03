@@ -1,5 +1,9 @@
 package me.anno.remsstudio.audio.effects
 
+import me.anno.io.ISaveable
+import me.anno.io.Saveable
+import me.anno.io.base.BaseWriter
+import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.audio.effects.falloff.ExponentialFalloff
 import me.anno.remsstudio.audio.effects.falloff.LinearFalloff
 import me.anno.remsstudio.audio.effects.falloff.SquareFalloff
@@ -7,13 +11,10 @@ import me.anno.remsstudio.audio.effects.impl.AmplitudeEffect
 import me.anno.remsstudio.audio.effects.impl.EchoEffect
 import me.anno.remsstudio.audio.effects.impl.EqualizerEffect
 import me.anno.remsstudio.audio.effects.impl.PitchEffect
-import me.anno.io.ISaveable
-import me.anno.io.Saveable
-import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
 import me.anno.studio.Inspectable
-import me.anno.remsstudio.RemsStudio
+import me.anno.ui.Panel
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.stacked.Option
@@ -40,11 +41,27 @@ class SoundPipeline() : Saveable(), Inspectable {
             "Effects Stack",
             "Effects can be added with RMB, are applied one after another",
             options.map { gen ->
-                option { gen().apply { audio = this@SoundPipeline.audio }}
+                option { gen().apply { audio = this@SoundPipeline.audio } }
             },
             effects,
+            {
+                if (it is SoundEffect) {
+                    option { it }
+                } else null
+            },
             style
         ) {
+
+            override fun setValue(value: List<Inspectable>, notify: Boolean): Panel {
+                if (value !== effects) {
+                    effects.clear()
+                    effects.addAll(value.filterIsInstance<SoundEffect>())
+                }
+                return this
+            }
+
+            override val lastValue: List<Inspectable>
+                get() = effects
 
             override fun onAddComponent(component: Inspectable, index: Int) {
                 component as SoundEffect
@@ -62,12 +79,6 @@ class SoundPipeline() : Saveable(), Inspectable {
                 RemsStudio.largeChange("Remove ${component.displayName}") {
                     effects.remove(component)
                 }
-            }
-
-            override fun getOptionFromInspectable(inspectable: Inspectable): Option? {
-                return if (inspectable is SoundEffect) {
-                    option { inspectable }
-                } else null
             }
 
         }

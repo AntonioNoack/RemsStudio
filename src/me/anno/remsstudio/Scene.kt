@@ -14,7 +14,10 @@ import me.anno.gpu.GFXState.renderPurely
 import me.anno.gpu.GFXState.useFrame
 import me.anno.gpu.blending.BlendMode
 import me.anno.gpu.drawing.DrawRectangles.drawRect
-import me.anno.gpu.framebuffer.*
+import me.anno.gpu.framebuffer.FBStack
+import me.anno.gpu.framebuffer.Framebuffer
+import me.anno.gpu.framebuffer.IFramebuffer
+import me.anno.gpu.framebuffer.NullFramebuffer
 import me.anno.gpu.shader.BaseShader
 import me.anno.gpu.shader.GLSLType
 import me.anno.gpu.shader.Renderer
@@ -44,7 +47,6 @@ import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Camera.Companion.DEFAULT_VIGNETTE_STRENGTH
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.Transform.Companion.drawUICircle
-import me.anno.remsstudio.objects.Transform.Companion.xAxis
 import me.anno.remsstudio.objects.effects.ToneMappers
 import me.anno.remsstudio.ui.editor.ISceneView
 import me.anno.ui.editor.sceneView.Gizmos.drawGizmo
@@ -406,9 +408,8 @@ object Scene {
          * */
         val lutShader = lutShader.value
         lutShader.use()
-        lut.bind(1, GPUFiltering.LINEAR)
+        lut.bind(1, GPUFiltering.LINEAR, Clamping.CLAMP)
         lutBuffer.bindTextures(0, GPUFiltering.TRULY_NEAREST, Clamping.CLAMP)
-        lut.clamping(false)
         flat01.draw(lutShader)
         GFX.check()
 

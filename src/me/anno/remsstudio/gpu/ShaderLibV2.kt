@@ -4,6 +4,7 @@ import me.anno.gpu.shader.BaseShader
 import me.anno.gpu.shader.GLSLType
 import me.anno.gpu.shader.ShaderLib
 import me.anno.gpu.shader.ShaderLib.v3DMasked
+import me.anno.gpu.shader.ShaderLib.v3DlMasked
 import me.anno.gpu.shader.ShaderLib.y3DMasked
 import me.anno.gpu.shader.builder.Variable
 import me.anno.gpu.shader.builder.VariableMode
@@ -77,14 +78,13 @@ object ShaderLibV2 {
                 "}"
         shader3DMasked =
             BaseShader(
-                "3d-masked", listOf(), v3DMasked, y3DMasked, listOf(
+                "3d-masked", v3DlMasked, v3DMasked, y3DMasked, listOf(
                     Variable(GLSLType.V3F, "finalColor", VariableMode.OUT),
                     Variable(GLSLType.V1F, "finalAlpha", VariableMode.OUT)
                 ), f3DMasked
             )
         shader3DMasked.setTextureIndices(listOf("maskTex", "tex", "tex2"))
         shader3DMasked.ignoreNameWarnings("tiling")
-
 
     }
 

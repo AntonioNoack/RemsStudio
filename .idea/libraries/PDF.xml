@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="PDF">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../VideoStudio/out/artifacts/PDF/PDF.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
