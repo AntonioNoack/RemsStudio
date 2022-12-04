@@ -11,6 +11,7 @@ import me.anno.config.DefaultConfig
 import me.anno.config.DefaultStyle.baseTheme
 import me.anno.extensions.ExtensionLoader
 import me.anno.gpu.GFX
+import me.anno.gpu.GFXBase
 import me.anno.gpu.OSWindow
 import me.anno.input.ActionManager
 import me.anno.input.Input.keyUpCtr

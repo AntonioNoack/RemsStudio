@@ -190,7 +190,7 @@ object RemsStudioUILayouts {
     fun createDefaultMainUI(style: Style): Panel {
 
         val customUI = CustomList(true, style)
-        customUI.setWeight(10f)
+        customUI.weight = 10f
 
         val animationWindow = CustomList(false, style)
         customUI.add(animationWindow, 2f)
@@ -208,7 +208,7 @@ object RemsStudioUILayouts {
                 library, style
             ), 0.5f
         )
-        animationWindow.setWeight(1f)
+        animationWindow.weight = 1f
 
         val timeline = GraphEditor(style)
         customUI.add(CustomContainer(timeline, library, style), 0.25f)

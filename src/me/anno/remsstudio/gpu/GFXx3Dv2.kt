@@ -6,10 +6,11 @@ import me.anno.gpu.buffer.SimpleBuffer
 import me.anno.gpu.buffer.SimpleBuffer.Companion.circleBuffer
 import me.anno.gpu.buffer.StaticBuffer
 import me.anno.gpu.drawing.GFXx3D
+import me.anno.gpu.drawing.GFXx3D.shader3DCircle
+import me.anno.gpu.drawing.GFXx3D.shader3DText
 import me.anno.gpu.drawing.UVProjection
 import me.anno.gpu.shader.Shader
 import me.anno.gpu.shader.ShaderLib
-import me.anno.gpu.shader.ShaderLib.shader3DText
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.Filtering
 import me.anno.gpu.texture.Texture2D
@@ -245,7 +246,7 @@ object GFXx3Dv2 {
         endDegrees: Float,
         color: Vector4f
     ) {
-        val shader = ShaderLib.shader3DCircle.value
+        val shader = shader3DCircle.value
         shader.use()
         GFXx2Dv2.defineAdvancedGraphicalFeatures(shader, that, time)
         shader3DUniforms(shader, stack, 1, 1, color, null, Filtering.NEAREST, null)

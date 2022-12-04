@@ -16,7 +16,8 @@ class GraphEditor(style: Style) : PanelListY(style) {
 
     init {
         this += controls
-        this += body.setWeight(1f)
+        body.weight = 1f
+        this += body
         val cc = controls.child as PanelList
         for (type in Interpolation.values()) {
             cc += object : TextButton(type.symbol, true, style) {

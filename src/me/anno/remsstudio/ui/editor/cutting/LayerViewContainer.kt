@@ -17,7 +17,7 @@ class LayerViewContainer(style: Style) : ScrollPanelY(Padding(0), AxisAlignment.
     private val layers = content.child as PanelListY
 
     init {
-        content.setWeight(1f)
+        content.weight = 1f
         layers += addLayerButton
         for (i in 0 until LayerView.defaultLayerCount) {
             addLayer()

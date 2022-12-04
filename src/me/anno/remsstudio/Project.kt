@@ -183,8 +183,13 @@ class Project(var name: String, val file: FileReference) : Saveable() {
                         for (i in 2 until arr.size) {
                             obj.add(load(arr[i] as? JsonArray) ?: continue)
                         }
-                        obj.setWeight(weight)
-                    } else CustomContainer(obj, library, style).setWeight(weight)
+                        obj.weight = weight
+                        obj
+                    } else {
+                        val container = CustomContainer(obj, library, style)
+                        container.weight = weight
+                        container
+                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                     null

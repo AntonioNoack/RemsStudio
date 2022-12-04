@@ -1,6 +1,7 @@
 package me.anno.remsstudio
 
 import me.anno.gpu.GFX
+import me.anno.gpu.GFXBase
 import me.anno.io.files.FileReference
 import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.files.InvalidRef
@@ -40,6 +41,11 @@ import kotlin.math.roundToInt
 object Rendering {
 
     var isRendering = false
+        set(value) {
+            GFXBase.mayIdle = !value
+            field = value
+        }
+
     val div = 4
 
     private val LOGGER = LogManager.getLogger(Rendering::class)
