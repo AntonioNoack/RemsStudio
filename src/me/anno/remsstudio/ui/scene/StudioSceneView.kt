@@ -49,6 +49,7 @@ import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.style.Style
 import me.anno.utils.Color.black
 import me.anno.utils.types.Booleans.toInt
+import me.anno.utils.types.Floats.toRadians
 import me.anno.utils.types.Vectors.plus
 import me.anno.utils.types.Vectors.times
 import me.anno.utils.types.Vectors.toVec3f
@@ -61,6 +62,7 @@ import java.lang.Math.toDegrees
 import kotlin.math.atan2
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.tan
 
 // todo disable ui circles via some check-button at the top bar
 
@@ -258,7 +260,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         val white = -1
         drawBorder(x, y, w, h, white, bth)
         drawBorder(x + bth, y + bth, w - bt, h - bt, black, bth)
-        // filled with scene background color anyways
+        // filled with scene background color anyway
         // drawRect(x + bt, y + bt, w - 2 * bt, h - 2 * bt, deepDark)
 
         val x00 = x + dx
@@ -371,9 +373,9 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         velocity.mul(1f - dt)
         velocity.mulAdd(dt, acceleration)
 
-        if (velocity.x != 0f || velocity.y != 0f || velocity.z != 0f) {
+        if (velocity.lengthSquared() > 0f) {
             val oldPosition = camera.position[cameraTime]
-            val step = (velocity * dt)
+            val step = velocity * dt
             val step2 = cameraTransform.transformDirection(step)
             val newPosition = oldPosition + step2
             if (camera == nullCamera) {
@@ -514,7 +516,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                 else pos1
                 invalidateDrawing()
                 RemsStudio.incrementalChange("Move Object") {
-                    selected.position.addKeyframe(localTime, oldPosition + localDelta)
+                    selected.position.addKeyframe(localTime, oldPosition.add(localDelta))
                     invalidateUI(false)
                 }
 
@@ -823,6 +825,15 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                 val delta = -dy * shiftSlowdown
                 val factor = pow(1.02f, delta)
                 val newOrbitDistance = radius * factor
+                if (isLocked2D) {
+                    // zoom in on point in 2D using mouse position
+                    val fov = (factor - 1f) * radius * tan(camera.fovYDegrees[cameraTime].toRadians() * 0.5f) * 2f / h
+                    val dx2 = +(this.x - x + this.w * 0.5f) * fov
+                    val dy2 = -(this.y - y + this.h * 0.5f) * fov
+                    val oldPos = camera.position[cameraTime]
+                    oldPos.add(dx2, dy2, 0f)
+                    camera.putValue(camera.position, oldPos, false)
+                }
                 camera.putValue(camera.orbitRadius, newOrbitDistance, false)
                 if (camera == nullCamera) {
                     camera.putValue(camera.farZ, camera.farZ[cameraTime] * factor, false)

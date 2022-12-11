@@ -3,9 +3,9 @@ package me.anno.remsstudio.objects.models
 import me.anno.gpu.GFX
 import me.anno.gpu.buffer.Attribute
 import me.anno.gpu.buffer.StaticBuffer
-import me.anno.remsstudio.objects.Transform
-import me.anno.ui.editor.sceneView.Grid
 import me.anno.maths.Maths
+import me.anno.maths.Maths.PIf
+import me.anno.ui.editor.sceneView.Grid
 import org.joml.Matrix4fArrayList
 import org.joml.Vector4f
 import kotlin.math.abs
@@ -76,12 +76,12 @@ object SpeakerModel {
             // mark the speaker with yellow,
             // and let it face upwards (+y) to symbolize, that it's global
             color.z *= 0.8f // yellow
-            stack.rotate(-1.5708f, Transform.xAxis)
+            stack.rotateX(-PIf * 0.5f)
             Grid.drawBuffer(stack, color, speakerModel)
         }
     }
 
-    fun destroy(){
+    fun destroy() {
         speakerModel.destroy()
     }
 

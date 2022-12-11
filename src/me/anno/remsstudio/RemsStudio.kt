@@ -42,6 +42,10 @@ import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.style.Style
 import me.anno.utils.OS
 
+// todo Rem's Studio Lite: don't output images, just execute chained ffmpeg commands
+// try to support as many features as possible with just ffmpeg
+// goal: hyper speed
+
 // todo isolate and remove certain frequencies from audio
 // todo visualize audio frequency, always!!!, from 25Hz to 48kHz
 // inspiration: https://www.youtube.com/watch?v=RA5UiLYWdbM&ab_channel=TomScott
@@ -108,11 +112,14 @@ import me.anno.utils.OS
 
 // todo bug: cutting (control+x) only cuts one
 
-// todo zoom in on point in 2D using mouse position
+// todo bug: shift clicking names toggles things in tree view... why ever
+// todo bug: shift should select from-to, not two element
+// todo bug?: controls should select things one by one
+// todo bug: video icons are shifted left.. why?
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
-object RemsStudio : StudioBase(true, "Rem's Studio", 10112) {
+object RemsStudio : StudioBase(true, "Rem's Studio", 10113) {
 
     val defaultWindowStack get() = GFX.someWindow.windowStack
     var hideUnusedProperties = false

@@ -705,7 +705,7 @@ open class Transform() : Saveable(),
         } catch (e: Exception) {
             LOGGER.warn(asString)
             e.printStackTrace()
-            throw RuntimeException("Failed to parse!")
+            throw RuntimeException("Failed to parse '$asString'!")
         }
     }
 
@@ -860,13 +860,6 @@ open class Transform() : Saveable(),
             }
         }
 
-        // these values MUST NOT be changed
-        // they are universal constants, and are used
-        // within shaders, too
-        val xAxis = Vector3f(1f, 0f, 0f)
-        val yAxis = Vector3f(0f, 1f, 0f)
-        val zAxis = Vector3f(0f, 0f, 1f)
-
         val nextClickId = AtomicInteger()
 
         fun String.toTransform() = TextReader.read(this, workspace, true).first() as? Transform
@@ -877,6 +870,5 @@ open class Transform() : Saveable(),
         val dilationType = Type(1.0, 1, 1f, true, true, ::castToDouble2, ::castToDouble)
 
     }
-
 
 }

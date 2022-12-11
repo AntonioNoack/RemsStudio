@@ -167,7 +167,7 @@ object RemsStudioUILayouts {
                 windowStack,
                 NameDesc("Rem's Studio is being developed\nby Antonio Noack\nfrom Jena, Germany", "", "")
             )
-            // e.g. the info, why I created it
+            // e.g., the info, why I created it
             // that it is Open Source
         }
 
