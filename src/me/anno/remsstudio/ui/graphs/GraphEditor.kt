@@ -57,6 +57,6 @@ class GraphEditor(style: Style) : PanelListY(style) {
         children[0].isVisible = selectedProperty?.isAnimated == true
     }
 
-    override val className: String = "GraphEditor"
+    override val className get() = "GraphEditor"
 
 }

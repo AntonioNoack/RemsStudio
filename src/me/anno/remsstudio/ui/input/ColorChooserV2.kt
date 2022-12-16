@@ -26,7 +26,7 @@ class ColorChooserV2(style: Style, withAlpha: Boolean, val property: AnimatedPro
             return clone
         }
 
-        override val className: String = "ColorPaletteV2"
+        override val className get() = "ColorPaletteV2"
 
     }
 
@@ -51,6 +51,6 @@ class ColorChooserV2(style: Style, withAlpha: Boolean, val property: AnimatedPro
         return clone
     }
 
-    override val className: String = "ColorChooserV2"
+    override val className get() = "ColorChooserV2"
 
 }

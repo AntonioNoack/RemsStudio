@@ -84,6 +84,6 @@ class Chapter(parent: Transform?) : GFXTransform(parent) {
             }
     }
 
-    override val className: String = "Chapter"
+    override val className get() = "Chapter"
 
 }

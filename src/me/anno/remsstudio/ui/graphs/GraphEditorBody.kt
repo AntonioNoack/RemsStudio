@@ -783,7 +783,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         }
     }
 
-    override val className: String = "GraphEditorBody"
+    override val className get() = "GraphEditorBody"
 
     companion object {
         private val LOGGER = LogManager.getLogger(GraphEditorBody::class)

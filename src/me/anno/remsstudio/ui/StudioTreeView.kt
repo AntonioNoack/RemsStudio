@@ -1,7 +1,6 @@
 package me.anno.remsstudio.ui
 
 import me.anno.config.DefaultConfig
-import me.anno.config.DefaultStyle
 import me.anno.io.files.InvalidRef
 import me.anno.io.text.TextWriter
 import me.anno.io.utils.StringMap
@@ -96,8 +95,12 @@ class StudioTreeView(style: Style) :
 
     override fun selectElementMaybe(element: Transform?) {
         // if already selected, don't inspect that property/driver
-        if (Selection.selectedTransform == element) Selection.clear()
-        selectElement(element)
+        if (Selection.selectedTransform == element &&
+            (Selection.selectedProperty != null ||
+                    (Selection.selectedInspectable != null && Selection.selectedInspectable != element))
+        ) {
+            Selection.clear()
+        } else selectElement(element)
     }
 
     override fun focusOnElement(element: Transform) {

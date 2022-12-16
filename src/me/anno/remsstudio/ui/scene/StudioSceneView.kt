@@ -843,6 +843,6 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         }
     }
 
-    override val className: String = "StudioSceneView"
+    override val className get() = "StudioSceneView"
 
 }

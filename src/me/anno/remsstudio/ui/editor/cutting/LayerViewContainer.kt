@@ -33,6 +33,6 @@ class LayerViewContainer(style: Style) : ScrollPanelY(Padding(0), AxisAlignment.
         layers.children.add(addLayerButton)
     }
 
-    override val className: String = "LayerViewContainer"
+    override val className get() = "LayerViewContainer"
 
 }

@@ -134,7 +134,11 @@ abstract class AnimationDriver : Saveable(), Inspectable {
                     add { PerlinNoiseDriver() }),
                 MenuOption(
                     NameDesc("Custom", "Specify your own formula", "obj.driver.custom"),
-                    add { FunctionDriver() })
+                    add { FunctionDriver() }),
+                MenuOption( // todo only add for time?
+                    NameDesc("Rhythm", "Map timestamps to musical rhythm for satisfying timelapses","obj.driver.rhythm"),
+                    add { RhythmDriver() }
+                )
             )
             if (oldDriver != null) {
                 options.add(0,

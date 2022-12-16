@@ -24,6 +24,7 @@ import me.anno.remsstudio.audio.effects.impl.PitchEffect
 import me.anno.io.ISaveable.Companion.registerCustomClass
 import me.anno.io.SaveableArray
 import me.anno.io.utils.StringMap
+import me.anno.remsstudio.animation.drivers.RhythmDriver
 import me.anno.remsstudio.objects.*
 import me.anno.remsstudio.objects.attractors.EffectColoring
 import me.anno.remsstudio.objects.attractors.EffectMorphing
@@ -80,6 +81,7 @@ object RemsRegistry {
         registerCustomClass(HarmonicDriver())
         registerCustomClass(PerlinNoiseDriver())
         registerCustomClass(FunctionDriver())
+        registerCustomClass(RhythmDriver())
         registerCustomClass(SceneTabData())
         registerCustomClass(EffectColoring())
         registerCustomClass(EffectMorphing())

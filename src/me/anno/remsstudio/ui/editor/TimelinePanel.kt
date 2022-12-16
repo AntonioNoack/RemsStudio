@@ -351,6 +351,6 @@ open class TimelinePanel(style: Style) : Panel(style) {
 
     }
 
-    override val className: String = "TimelinePanel"
+    override val className get() = "TimelinePanel"
 
 }

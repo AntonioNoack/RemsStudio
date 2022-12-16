@@ -103,6 +103,6 @@ class IntVectorInputV2(
         return clone
     }
 
-    override val className: String = "IntVectorInputV2"
+    override val className get() = "IntVectorInputV2"
 
 }

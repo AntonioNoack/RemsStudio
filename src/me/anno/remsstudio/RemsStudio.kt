@@ -9,6 +9,7 @@ import me.anno.audio.openal.AudioTasks
 import me.anno.cache.instances.PDFPlugin
 import me.anno.config.DefaultConfig
 import me.anno.config.DefaultStyle.baseTheme
+import me.anno.ecs.prefab.PrefabCache
 import me.anno.extensions.ExtensionLoader
 import me.anno.gpu.GFX
 import me.anno.gpu.GFXBase
@@ -154,6 +155,7 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10113) {
     }
 
     override fun loadConfig() {
+        PrefabCache.disablePrefabs = true
         RemsRegistry.init()
         RemsConfig.init()
     }
@@ -270,8 +272,6 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10113) {
     var root = Transform()
 
     var currentlyDrawnCamera: Camera? = nullCamera
-
-    val selection = ArrayList<String>()
 
     override fun onGameLoopStart() {
         updateEditorTime()

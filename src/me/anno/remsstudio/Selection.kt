@@ -1,11 +1,11 @@
 package me.anno.remsstudio
 
-import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.io.ISaveable
 import me.anno.io.find.PropertyFinder
+import me.anno.remsstudio.RemsStudio.root
+import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
 import me.anno.studio.Inspectable
-import me.anno.remsstudio.RemsStudio.root
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.utils.structures.maps.BiMap
 import org.apache.logging.log4j.LogManager
@@ -21,9 +21,9 @@ object Selection {
     val selectedTransform: Transform? get() = st
     val selectedInspectable: Inspectable? get() = si
 
-    var sp: AnimatedProperty<*>? = null
-    var st: Transform? = null
-    var si: Inspectable? = null
+    private var sp: AnimatedProperty<*>? = null
+    private var st: Transform? = null
+    private var si: Inspectable? = null
 
     var selectedUUID = -1
     var selectedPropName: String? = null
@@ -58,7 +58,8 @@ object Selection {
     }
 
     fun select(transform: Transform?, property: ISaveable?) {
-
+        if (transform === st && property === sp) return
+        if (Math.random() < 0.5 && transform == null && property == null) TODO()
         if (transform != null) {
             val loi = transform.listOfInheritance.toList()
             if (loi.withIndex().any { (index, t) -> index > 0 && t.areChildrenImmutable }) {
