@@ -43,6 +43,8 @@ import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.style.Style
 import me.anno.utils.OS
 
+// todo bug: settings are not calculating size correctly until resize
+
 // todo Rem's Studio Lite: don't output images, just execute chained ffmpeg commands
 // try to support as many features as possible with just ffmpeg
 // goal: hyper speed

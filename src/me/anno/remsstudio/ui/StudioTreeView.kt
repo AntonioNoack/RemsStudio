@@ -1,6 +1,8 @@
 package me.anno.remsstudio.ui
 
 import me.anno.config.DefaultConfig
+import me.anno.config.DefaultConfig.style
+import me.anno.gpu.drawing.DrawTexts.getTextSizeX
 import me.anno.io.files.InvalidRef
 import me.anno.io.text.TextWriter
 import me.anno.io.utils.StringMap
@@ -17,18 +19,22 @@ import me.anno.remsstudio.objects.Rectangle
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.Transform.Companion.toTransform
 import me.anno.remsstudio.objects.effects.MaskLayer
+import me.anno.ui.base.Font
 import me.anno.ui.base.menu.Menu
 import me.anno.ui.base.menu.MenuOption
+import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.treeView.TreeView
 import me.anno.ui.editor.treeView.TreeViewPanel
 import me.anno.ui.style.Style
 import me.anno.utils.Color.black
 import me.anno.utils.Color.toARGB
 import me.anno.utils.structures.lists.UpdatingList
+import me.anno.utils.types.Strings.joinChars
 import org.apache.logging.log4j.LogManager
 import org.joml.Vector3f
 import org.joml.Vector4f
 import java.util.*
+import kotlin.streams.toList
 
 // todo select multiple elements, filter for common properties, and apply them all together :)
 
@@ -42,9 +48,7 @@ class StudioTreeView(style: Style) :
 
     override fun stringifyForCopy(element: Transform): String = TextWriter.toText(element, InvalidRef)
 
-    override fun getSymbol(element: Transform): String {
-        return element.symbol
-    }
+    override fun getSymbol(element: Transform) = element.symbol
 
     override fun removeChild(parent: Transform, child: Transform) {
         parent.removeChild(child)
@@ -182,6 +186,38 @@ class StudioTreeView(style: Style) :
     }
 
     companion object {
+
+        @JvmStatic
+        fun main(args: Array<String>) {
+            // test for layout width bugs
+            // works now :)
+            val s = 1024
+            println("\uD83C\uDF9E️" == "\uD83C\uDF9E")
+            val font0 = Font("Verdana", 15)
+            val font1 = Font("Segoe UI Emoji", 15)
+            println(listOf(127902).joinChars())
+            println(listOf(127902).joinChars().codePoints().toList())
+            println(getTextSizeX(font0, listOf(127902).joinChars(), s, s))
+            println(getTextSizeX(font1, listOf(127902).joinChars(), s, s))
+            println(getTextSizeX(font0, listOf(65039).joinChars(), s, s))
+            println(getTextSizeX(font1, listOf(65039).joinChars(), s, s))
+            println("\uD83C\uDF9E️")
+            println("\uD83C\uDF9E️".codePoints().toList())
+            println("xx " + listOf(127902).joinChars().length)
+            println("xx " + listOf(65039).joinChars().length)
+            println("xx " + "\uD83C\uDF9E️".length + "\uD83C\uDF9E".length + " xx " + "\uD83C\uDF9E️".codePoints().toList().joinChars().length)
+            println("xx " + "\uD83C\uDF9E️".codePoints().toList().joinChars().codePoints().toList())
+            println(getTextSizeX(font0, "\uD83C\uDF9E️", s, s))
+            println(getTextSizeX(font1, "\uD83C\uDF9E️", s, s))
+            println("\uD83C\uDFA5️")
+            println("\uD83C\uDFA5️".codePoints().toList())
+            println(getTextSizeX(font0, "\uD83C\uDFA5️", s, s))
+            println(getTextSizeX(font1, "\uD83C\uDFA5️", s, s))
+            println(getTextSizeX(font0, "\uD83C\uDFA5", s, s))
+            println(getTextSizeX(font1, "\uD83C\uDFA5", s, s))
+            val tp = TextPanel("\uD83C\uDFA5️", style)
+            println(tp.font)
+        }
 
         fun zoomToObject(obj: Transform) {
             // instead of asking for the name, move the camera towards the target

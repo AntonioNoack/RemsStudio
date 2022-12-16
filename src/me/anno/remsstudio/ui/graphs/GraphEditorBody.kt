@@ -552,7 +552,6 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             if (button.isLeft) {
                 isSelecting = isShiftDown
                 if (!isSelecting) {
-                    println("onMouseDown without selecting -> clear")
                     selectedKeyframes.clear()
                 }
                 val keyframeChannel = getKeyframeAt(x, y)
