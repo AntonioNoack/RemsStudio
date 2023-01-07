@@ -21,6 +21,7 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.documents.SiteSelection.parseSites
 import me.anno.remsstudio.objects.lists.Element
 import me.anno.remsstudio.objects.lists.SplittableElement
+import me.anno.studio.Inspectable
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
@@ -171,18 +172,24 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
     }
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(list, style, getGroup)
+        super.createInspector(inspected, list, style, getGroup)
+        val c = inspected.filterIsInstance<PDFDocument>()
         val doc = getGroup("Document", "", "docs")
-        doc += vi("Path", "", null, file, style) { file = it }
-        doc += vi("Pages", "", null, selectedSites, style) { selectedSites = it }
-        doc += vi("Padding", "", padding, style)
-        doc += vi("Direction", "Top-Bottom/Left-Right in Degrees", direction, style)
-        doc += vi("Editor Quality", "", Type.FLOAT_PLUS, editorQuality, style) { editorQuality = it }
-        doc += vi("Render Quality", "", Type.FLOAT_PLUS, renderQuality, style) { renderQuality = it }
+        doc += vi(inspected, "Path", "", null, file, style) { for (x in c) x.file = it }
+        doc += vi(inspected, "Pages", "", null, selectedSites, style) { for (x in c) x.selectedSites = it }
+        doc += vis(inspected, c, "Padding", "", c.map { it.padding }, style)
+        doc += vis(inspected, c, "Direction", "Top-Bottom/Left-Right in Degrees", c.map { it.direction }, style)
+        doc += vi(inspected, "Editor Quality", "", Type.FLOAT_PLUS, editorQuality, style) {
+            for (x in c) x.editorQuality = it
+        }
+        doc += vi(inspected, "Render Quality", "", Type.FLOAT_PLUS, renderQuality, style) {
+            for (x in c) x.renderQuality = it
+        }
     }
 
     override fun save(writer: BaseWriter) {

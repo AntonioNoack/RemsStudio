@@ -10,6 +10,7 @@ import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.attractors.EffectColoring
 import me.anno.remsstudio.objects.attractors.EffectMorphing
+import me.anno.studio.Inspectable
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
@@ -43,13 +44,17 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
     }
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(list, style, getGroup)
+        super.createInspector(inspected, list, style, getGroup)
+        val c = inspected.filterIsInstance<GFXTransform>()
         val fx = getGroup("Effects", "Visual Effects Settings", "effects")
-        fx += vi("Coloring: Base Color", "Base color for coloring", attractorBaseColor, style)
+        fx += vis(inspected, c, "Coloring: Base Color", "Base color for coloring",
+            c.map { it.attractorBaseColor }, style
+        )
     }
 
     open fun transformLocally(pos: Vector3f, time: Double): Vector3f {

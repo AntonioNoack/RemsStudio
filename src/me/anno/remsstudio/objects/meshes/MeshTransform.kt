@@ -24,10 +24,12 @@ import me.anno.mesh.MeshData
 import me.anno.mesh.assimp.AnimGameItem
 import me.anno.mesh.assimp.AnimatedMeshesLoader
 import me.anno.mesh.vox.VOXReader
+import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.meshes.MeshDataV2.drawAssimp2
+import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.groups.UpdatingContainer
@@ -205,28 +207,30 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
     var lastModel: AnimGameItem? = null
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
 
-        super.createInspector(list, style, getGroup)
+        super.createInspector(inspected, list, style, getGroup)
+        val c = inspected.filterIsInstance<MeshTransform>()
 
-        list += vi("File", "", null, file, style) { file = it }
+        list += vi(inspected, "File", "", null, file, style) { for (x in c) x.file = it }
         list += vi(
-            "Scale Correction, 10^N",
+            inspected, "Scale Correction, 10^N",
             "Often file formats are incorrect in size by a factor of 100. Use +/- 2 to correct this issue easily",
             Type.INT, powerOf10Correction, style
-        ) { powerOf10Correction = it }
+        ) { for (x in c) x.powerOf10Correction = it }
 
         list += vi(
-            "Normalize Scale", "A quicker fix than manually finding the correct scale",
+            inspected, "Normalize Scale", "A quicker fix than manually finding the correct scale",
             null, normalizeScale, style
-        ) { normalizeScale = it }
+        ) { for (x in c) x.normalizeScale = it }
         list += vi(
-            "Center Mesh", "If your mesh is off-center, this corrects it",
+            inspected, "Center Mesh", "If your mesh is off-center, this corrects it",
             null, centerMesh, style
-        ) { centerMesh = it }
+        ) { for (x in c) x.centerMesh = it }
 
         // the list of available animations depends on the model
         // but still, it's like an enum: only a certain set of animations is available
@@ -248,7 +252,9 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                         NameDesc(currentValue),
                         options, style
                     ).setChangeListener { value, _, _ ->
-                        putValue(animation, value, true)
+                        RemsStudio.incrementalChange("Change MeshTransform.animation Value") {
+                            for (x in c) x.putValue(x.animation, value, false)
+                        }
                     }
                 } else TextPanel("No animations found!", style)
             }

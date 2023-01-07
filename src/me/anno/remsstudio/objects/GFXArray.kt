@@ -6,6 +6,7 @@ import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.modes.ArraySelectionMode
+import me.anno.studio.Inspectable
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
@@ -132,37 +133,45 @@ class GFXArray(parent: Transform? = null) : GFXTransform(parent) {
     override fun drawChildrenAutomatically() = false
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(list, style, getGroup)
-
+        super.createInspector(inspected, list, style, getGroup)
+        val c = inspected.filterIsInstance<GFXArray>()
         // todo create apply button?
         // todo we need to be able to insert properties...
         // todo replace? :D, # String Array
 
         val child = getGroup("Per-Child Transform", "For the n-th child, it is applied (n-1) times.", "per-child")
-        child += vi(
-            "Offset/Child",
-            "",
-            "array.offset",
-            perChildTranslation,
-            style
+        child += vis(
+            inspected, c, "Offset/Child", "Translation from one child to the next", "array.offset",
+            c.map { it.perChildTranslation }, style
         )
-        child += vi("Rotation/Child", "", "array.rotation", perChildRotation, style)
-        child += vi("Scale/Child", "", "array.scale", perChildScale, style)
-        child += vi("Delay/Child", "Temporal delay between each child", "array.delay", perChildDelay, style)
+        child += vis(
+            inspected, c, "Rotation/Child", "Rotation from one child to the next", "array.rotation",
+            c.map { it.perChildRotation }, style
+        )
+        child += vis(
+            inspected, c, "Scale/Child", "Scale factor from one child to the next", "array.scale",
+            c.map { it.perChildScale }, style
+        )
+        child += vis(
+            inspected, c, "Delay/Child", "Temporal delay from one child to the next", "array.delay",
+            c.map { it.perChildDelay }, style
+        )
 
         val instances = getGroup("Instances", "", "children")
-        instances += vi("Instance Count", "", "array.instanceCount", instanceCount, style)
-        instances += vi("Selection Mode", "", "array.selectionMode", null, selectionMode, style) { selectionMode = it }
-        instances += vi(
-            "Selection Seed",
+        instances += vis(inspected, c, "Instance Count", "", "array.instanceCount", c.map { it.instanceCount }, style)
+        instances += vi(inspected, "Selection Mode", "", "array.selectionMode", null, selectionMode, style) {
+            for (x in c) x.selectionMode = it
+        }
+        instances += vis(
+            inspected, c, "Selection Seed",
             "Only for randomized selection mode; change it, if you have bad luck, or copies of this array, which shall look different",
             "array.selectionSeed",
-            selectionSeed,
-            style
+            c.map { it.selectionSeed }, style
         )
 
     }

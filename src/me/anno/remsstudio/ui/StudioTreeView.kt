@@ -36,8 +36,6 @@ import org.joml.Vector4f
 import java.util.*
 import kotlin.streams.toList
 
-// todo select multiple elements, filter for common properties, and apply them all together :)
-
 class StudioTreeView(style: Style) :
     TreeView<Transform>(
         UpdatingList {

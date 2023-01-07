@@ -19,6 +19,7 @@ import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.gpu.GFXx3Dv2.draw3DPolygon
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
+import me.anno.studio.Inspectable
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
@@ -84,32 +85,46 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
     }
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(list, style, getGroup)
+        super.createInspector(inspected, list, style, getGroup)
+        val c = inspected.filterIsInstance<Polygon>()
+
+
         val geo = getGroup("Geometry", "", "geometry")
-        geo += vi("Vertex Count", "Quads, Triangles, all possible", "polygon.vertexCount", vertexCount, style)
-        geo += vi("Star-ness", "Works best with even vertex count", "polygon.star-ness", starNess, style)
+        geo += vis(
+            inspected, c, "Vertex Count", "Quads, Triangles, all possible", "polygon.vertexCount",
+            c.map { it.vertexCount }, style
+        )
+        geo += vis(
+            inspected, c, "Star-ness", "Works best with even vertex count", "polygon.star-ness",
+            c.map { it.starNess }, style
+        )
         geo += vi(
-            "Auto-Align",
+            inspected, "Auto-Align",
             "Rotate 45°/90, and scale a bit; for rectangles", "polygon.autoAlign",
             null, autoAlign, style
-        ) { autoAlign = it }
-        geo += vi("Extrude", "Makes it 3D", "polygon.extrusion", null, is3D, style) { is3D = it }
+        ) { for (x in c) x.autoAlign = it }
+        geo += vi(inspected, "Extrude", "Makes it 3D", "polygon.extrusion", null, is3D, style) {
+            for (x in c) x.is3D = it
+        }
+
         val tex = getGroup("Pattern", "", "texture")
         tex += vi(
-            "Pattern Texture",
+            inspected, "Pattern Texture",
             "For patterns like gradients radially; use a mask layer for images with polygon shape", "polygon.pattern",
             null, texture, style
-        ) { texture = it }
+        ) { for (x in c) x.texture = it }
         tex += vi(
-            "Filtering",
+            inspected, "Filtering",
             "Pixelated or soft look of pixels?",
             "texture.filtering",
             null, filtering, style
-        ) { filtering = it }
+        ) { for (x in c) x.filtering = it }
+
     }
 
     override fun save(writer: BaseWriter) {

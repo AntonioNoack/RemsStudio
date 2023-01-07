@@ -1,14 +1,15 @@
 package me.anno.remsstudio.objects
 
-import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.remsstudio.audio.effects.SoundPipeline
-import me.anno.remsstudio.audio.AudioFileStreamOpenAL2
+import me.anno.animation.LoopingState
 import me.anno.audio.openal.AudioTasks
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
-import me.anno.animation.LoopingState
+import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.audio.AudioFileStreamOpenAL2
+import me.anno.remsstudio.audio.effects.SoundPipeline
+import me.anno.studio.Inspectable
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
@@ -63,7 +64,7 @@ abstract class Audio(var file: FileReference = InvalidRef, parent: Transform? = 
 
     override fun onDestroy() {
         super.onDestroy()
-        AudioTasks.addTask("stop",1) { stopPlayback() }
+        AudioTasks.addTask("stop", 1) { stopPlayback() }
     }
 
     // we need a flag, whether we draw in editor mode or not -> GFX.isFinalRendering
@@ -81,15 +82,20 @@ abstract class Audio(var file: FileReference = InvalidRef, parent: Transform? = 
     }
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(list, style, getGroup)
-        val pipeline = pipeline
-        pipeline.effects.forEach { it.audio = this }
-        pipeline.audio = this
-        pipeline.createInspector(list, style, getGroup)
+        super.createInspector(inspected, list, style, getGroup)
+        if (inspected.size == 1) { // else not really supported well
+            val pipeline = pipeline
+            for (it in pipeline.effects) {
+                it.audio = this
+            }
+            pipeline.audio = this
+            pipeline.createInspector(list, style, getGroup)
+        }
     }
 
     override fun save(writer: BaseWriter) {

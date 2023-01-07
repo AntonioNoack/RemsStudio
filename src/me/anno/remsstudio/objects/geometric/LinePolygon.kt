@@ -21,13 +21,17 @@ import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.attractors.EffectColoring
 import me.anno.remsstudio.objects.attractors.EffectMorphing
+import me.anno.studio.Inspectable
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
 import me.anno.utils.types.Vectors.minus
 import me.anno.utils.types.Vectors.mulAlpha
 import me.anno.utils.types.Vectors.times
-import org.joml.*
+import org.joml.Matrix4f
+import org.joml.Matrix4fArrayList
+import org.joml.Vector3f
+import org.joml.Vector4f
 import kotlin.math.floor
 
 /**
@@ -70,17 +74,22 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
     }
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(list, style, getGroup)
+        super.createInspector(inspected, list, style, getGroup)
+        val c = inspected.filterIsInstance<LinePolygon>()
         val group = getGroup("Line", "Properties of the line", "line")
-        group += vi("Start Offset", "", startOffset, style)
-        group += vi("End Offset", "", endOffset, style)
-        group += vi("Line Strength", "", lineStrength, style)
-        group += vi("Is Closed", "", isClosed, style)
-        group += vi("Fading", "How much the last points fade, if the offsets exclude everything", fadingOnEnd, style)
+        group += vis(inspected, c, "Start Offset", "", c.map { it.startOffset }, style)
+        group += vis(inspected, c, "End Offset", "", c.map { it.endOffset }, style)
+        group += vis(inspected, c, "Line Strength", "", c.map { it.lineStrength }, style)
+        group += vis(inspected, c, "Is Closed", "", c.map { it.isClosed }, style)
+        group += vis(
+            inspected, c, "Fading", "How much the last points fade, if the offsets exclude everything",
+            c.map { it.fadingOnEnd }, style
+        )
     }
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {

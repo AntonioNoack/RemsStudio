@@ -5,6 +5,7 @@ import me.anno.remsstudio.audio.effects.SoundEffect
 import me.anno.remsstudio.audio.effects.Time
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
+import me.anno.remsstudio.Selection
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.animation.AnimatedProperty
@@ -29,8 +30,9 @@ class EchoEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        list += audio.vi("Offset", "Distance of 1st echo in seconds", offset, style)
-        list += audio.vi("Falloff", "How much is reflected, the less, the faster the echo fades away", falloff, style)
+        val inspected = listOf(audio)
+        list += audio.vi(inspected,"Offset", "Distance of 1st echo in seconds", offset, style)
+        list += audio.vi(inspected,"Falloff", "How much is reflected, the less, the faster the echo fades away", falloff, style)
     }
 
     override fun save(writer: BaseWriter) {

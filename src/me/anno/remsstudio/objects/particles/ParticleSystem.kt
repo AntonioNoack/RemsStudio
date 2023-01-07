@@ -18,6 +18,7 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.distributions.*
 import me.anno.remsstudio.objects.forces.ForceField
 import me.anno.remsstudio.objects.forces.impl.BetweenParticleGravity
+import me.anno.studio.Inspectable
 import me.anno.ui.base.SpyPanel
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
@@ -297,22 +298,30 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
     var selectedDistribution: AnimatedDistribution = spawnPosition
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
 
-        super.createInspector(list, style, getGroup)
+        super.createInspector(inspected, list, style, getGroup)
+        val c = inspected.filterIsInstance<ParticleSystem>()
 
         var viCtr = 0
-        fun vi(name: String, description: String, property: AnimatedDistribution) {
+        fun vi(c: List<ParticleSystem>, name: String, description: String, properties: List<AnimatedDistribution>) {
+            val property = properties.first()
             fun getName() = "$name: ${property.distribution.className.split("Distribution").first()}"
             val group = getGroup(getName(), "", "$viCtr")
             group.setTooltip(description)
             group.addChild(SpyPanel(style) {
                 if (group.isAnyChildInFocus) {
-                    val needsUpdate = selectedDistribution !== property
-                    selectedDistribution = property
+                    var needsUpdate = false
+                    for (i in c.indices) {
+                        if (c[i].selectedDistribution !== properties[i]) {
+                            c[i].selectedDistribution = properties[i]
+                            needsUpdate = true
+                        }
+                    }
                     if (needsUpdate) invalidateUI(true)
                 }
             })
@@ -326,46 +335,46 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
                             val sample = generator()
                             MenuOption(NameDesc(sample.displayName, sample.description, "")) {
                                 RemsStudio.largeChange("Change $name Distribution") {
-                                    property.distribution = generator()
+                                    for (p in properties) p.distribution = generator()
                                 }
                                 clearCache()
                                 group.content.clear()
                                 group.titlePanel.text = getName()
-                                property.createInspector(group.content, this, style)
+                                property.createInspector(inspected, c, properties, group.content, this, style)
                             }
                         }
                     )
                     true
                 } else false
             }
-            property.createInspector(group.content, this, style)
+            property.createInspector(inspected, c, properties, group.content, this, style)
             viCtr++
         }
 
-        fun vt(name: String, title: String, description: String, obj: AnimatedDistribution) {
-            vi(Dict[title, "obj.particles.$name"], Dict[description, "obj.particles.$name.desc"], obj)
+        fun vt(name: String, title: String, description: String, obj: List<AnimatedDistribution>) {
+            vi(c, Dict[title, "obj.particles.$name"], Dict[description, "obj.particles.$name.desc"], obj)
         }
 
-        vt("lifeTime", "Life Time", "How many seconds a particle is visible", lifeTime)
-        vt("initPosition", "Initial Position", "Where the particles spawn", spawnPosition)
-        vt("initVelocity", "Initial Velocity", "How fast the particles are, when they are spawned", spawnVelocity)
-        vi("Initial Rotation", "How the particles are rotated initially", spawnRotation)
-        vi("Rotation Velocity", "How fast the particles are rotating", spawnRotationVelocity)
+        vt("lifeTime", "Life Time", "How many seconds a particle is visible", c.map { it.lifeTime })
+        vt("initPosition", "Initial Position", "Where the particles spawn", c.map { it.spawnPosition })
+        vt("initVelocity", "Initial Velocity", "How fast the particles are, when they are spawned",
+            c.map { it.spawnVelocity })
+        vi(c, "Initial Rotation", "How the particles are rotated initially", c.map { it.spawnRotation })
+        vi(c, "Rotation Velocity", "How fast the particles are rotating", c.map { it.spawnRotationVelocity })
 
-        vi("Color", "Initial particle color", spawnColor)
-        vi("Opacity", "Initial particle opacity (1-transparency)", spawnOpacity)
-        vi("Size", "Initial particle size", spawnSize)
+        vi(c, "Color", "Initial particle color", c.map { it.spawnColor })
+        vi(c, "Opacity", "Initial particle opacity (1-transparency)", c.map { it.spawnOpacity })
+        vi(c, "Size", "Initial particle size", c.map { it.spawnSize })
 
         val general = getGroup("Particle System", "", "particles")
 
-        general += vi("Spawn Rate", "How many particles are spawned per second", "", spawnRate, style)
-
+        general += vis(inspected,c, "Spawn Rate", "How many particles are spawned per second", "", c.map { it.spawnRate }, style)
         general += vi(
-            "Simulation Step",
+            inspected,"Simulation Step",
             "Larger values are faster, while smaller values are more accurate for forces",
             Type.DOUBLE, simulationStep, style
         ) {
-            if (it > 1e-9) simulationStep = it
+            if (it > 1e-9) for (x in c) x.simulationStep = it
             clearCache()
         }
 
@@ -373,20 +382,16 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
         // general += vi("Fade Out", "Time before death, from which is starts to fade away", fadeOut, style)
 
         general += BooleanInput("Show Children", showChildren, false, style)
-            .setChangeListener { showChildren = it }
-            .setIsSelectedListener { show(null) }
+            .setChangeListener { for (x in c) x.showChildren = it }
+            .setIsSelectedListener { show(inspected, null) }
 
-        general += vi(
-            "Seed",
-            "The seed for all randomness",
-            null, seed, style
-        ) {
-            seed = it
+        general += vi(inspected,"Seed", "The seed for all randomness", null, seed, style) {
+            for (x in c) x.seed = it
             clearCache()
         }
 
         general += TextButton("Reset Cache", false, style)
-            .addLeftClickListener { clearCache() }
+            .addLeftClickListener { for (x in c) x.clearCache() }
 
     }
 

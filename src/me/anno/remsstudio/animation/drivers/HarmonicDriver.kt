@@ -6,6 +6,7 @@ import me.anno.language.translation.Dict
 import me.anno.remsstudio.objects.Transform
 import me.anno.parser.SimpleExpressionParser.parseDouble
 import me.anno.parser.SimpleExpressionParser.preparse
+import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.TextInput
@@ -28,12 +29,13 @@ class HarmonicDriver : AnimationDriver() {
     }
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: MutableList<Panel>,
         transform: Transform,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(list, transform, style, getGroup)
+        super.createInspector(inspected, list, transform, style, getGroup)
         val name = getDisplayName()
         list += TextInput(name, "", harmonicsFormula, style.getChild("deep"))
             .addChangeListener { harmonicsFormula = it; updateHarmonics() }

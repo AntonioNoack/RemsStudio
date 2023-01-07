@@ -9,6 +9,7 @@ import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
+import me.anno.studio.Inspectable
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
@@ -18,9 +19,9 @@ import org.joml.Vector4f
 
 open class Circle(parent: Transform? = null) : GFXTransform(parent) {
 
-    var innerRadius = AnimatedProperty.float01()
-    var startDegrees = AnimatedProperty(Type.ANGLE, 0f)
-    var endDegrees = AnimatedProperty(Type.ANGLE, 360f)
+    val innerRadius = AnimatedProperty.float01()
+    val startDegrees = AnimatedProperty(Type.ANGLE, 0f)
+    val endDegrees = AnimatedProperty(Type.ANGLE, 360f)
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         GFXx3Dv2.draw3DCircle(this, time, stack, innerRadius[time], startDegrees[time], endDegrees[time], color)
@@ -31,15 +32,17 @@ open class Circle(parent: Transform? = null) : GFXTransform(parent) {
     }
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(list, style, getGroup)
+        super.createInspector(inspected, list, style, getGroup)
+        val c = inspected.filterIsInstance<Circle>()
         val geo = getGroup("Geometry", "", "geometry")
-        geo += vi("Inner Radius", "Relative size of hole in the middle", innerRadius, style)
-        geo += vi("Start Degrees", "To cut a piece out of the circle", startDegrees, style)
-        geo += vi("End Degrees", "To cut a piece out of the circle", endDegrees, style)
+        geo += vis(inspected, c, "Inner Radius", "Relative size of hole in the middle", c.map { it.innerRadius }, style)
+        geo += vis(inspected, c, "Start Degrees", "To cut a piece out of the circle", c.map { it.startDegrees }, style)
+        geo += vis(inspected, c, "End Degrees", "To cut a piece out of the circle", c.map { it.endDegrees }, style)
     }
 
     override fun save(writer: BaseWriter) {

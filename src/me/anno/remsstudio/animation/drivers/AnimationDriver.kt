@@ -64,18 +64,19 @@ abstract class AnimationDriver : Saveable(), Inspectable {
     override fun isDefaultValue() = false
 
     open fun createInspector(
+        inspected: List<Inspectable>,
         list: MutableList<Panel>,
         transform: Transform,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
         list += transform.vi(
-            "Amplitude",
+            inspected, "Amplitude",
             "Scale of randomness", "driver.amplitude",
             amplitude, style
         )
         list += transform.vi(
-            "Frequency",
+            inspected, "Frequency",
             "How fast it's changing", "driver.frequency",
             Type.DOUBLE, frequency, style
         ) { frequency = it }
@@ -117,7 +118,8 @@ abstract class AnimationDriver : Saveable(), Inspectable {
             Dict["Driver Inspector", "driver.inspector.title"],
             style
         )
-        createInspector(list.children, selectedTransform!!, style, getGroup)
+        val t = selectedTransform!!
+        createInspector(listOf(t), list.children, t, style, getGroup)
     }
 
     companion object {
@@ -136,7 +138,11 @@ abstract class AnimationDriver : Saveable(), Inspectable {
                     NameDesc("Custom", "Specify your own formula", "obj.driver.custom"),
                     add { FunctionDriver() }),
                 MenuOption( // todo only add for time?
-                    NameDesc("Rhythm", "Map timestamps to musical rhythm for satisfying timelapses","obj.driver.rhythm"),
+                    NameDesc(
+                        "Rhythm",
+                        "Map timestamps to musical rhythm for satisfying timelapses",
+                        "obj.driver.rhythm"
+                    ),
                     add { RhythmDriver() }
                 )
             )

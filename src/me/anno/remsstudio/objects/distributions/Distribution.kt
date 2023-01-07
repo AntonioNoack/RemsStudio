@@ -10,17 +10,20 @@ import me.anno.ui.base.groups.PanelList
 import me.anno.ui.editor.sceneView.Grid
 import me.anno.ui.style.Style
 import me.anno.utils.types.Vectors.mulAlpha
-import org.joml.*
-import java.util.Random
+import org.joml.Matrix4fArrayList
+import org.joml.Vector2f
+import org.joml.Vector3f
+import org.joml.Vector4f
+import java.util.*
 
-abstract class Distribution(val displayName: String, val description: String) : Saveable(),
-    InspectableAttribute {
+abstract class Distribution(val displayName: String, val description: String) :
+    Saveable(), InspectableAttribute {
 
     constructor(displayName: String, description: String, dictPath: String) :
             this(Dict[displayName, dictPath], Dict[description, "$dictPath.desc"])
 
     /**
-     * used by nearly all distributions anyways
+     * used by nearly all distributions anyway
      * */
     val random = Random()
 
@@ -44,8 +47,9 @@ abstract class Distribution(val displayName: String, val description: String) : 
 
     override fun createInspector(list: PanelList, actor: Transform, style: Style) {
         val properties = listProperties()
-        properties.forEach { property ->
+        for (property in properties) {
             list += actor.vi(
+                listOf(actor),
                 property.title,
                 property.description,
                 property.pType.type,
@@ -81,6 +85,10 @@ abstract class Distribution(val displayName: String, val description: String) : 
 
     override fun equals(other: Any?): Boolean {
         return other?.javaClass === javaClass && other.toString() == toString()
+    }
+
+    override fun hashCode(): Int {
+        return toString().hashCode()
     }
 
     companion object {

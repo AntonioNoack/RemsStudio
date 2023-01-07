@@ -22,7 +22,7 @@ import me.anno.remsstudio.objects.lists.Element
 import me.anno.remsstudio.objects.lists.SplittableElement
 import me.anno.remsstudio.objects.modes.TextMode
 import me.anno.remsstudio.objects.modes.TextRenderMode
-import me.anno.remsstudio.objects.text.TextInspector.createInspectorWithoutSuperImpl
+import me.anno.studio.Inspectable
 import me.anno.ui.base.Font
 import me.anno.ui.base.constraints.AxisAlignment
 import me.anno.ui.base.groups.PanelListY
@@ -293,19 +293,21 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
     }
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(list, style, getGroup)
-        createInspectorWithoutSuper(list, style, getGroup)
+        super.createInspector(inspected, list, style, getGroup)
+        createInspectorWithoutSuper(inspected, list, style, getGroup)
     }
 
     fun createInspectorWithoutSuper(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
-    ) = createInspectorWithoutSuperImpl(list, style, getGroup)
+    ) = createInspectorWithoutSuperImpl(inspected, list, style, getGroup)
 
     fun getSelfWithShadows() = getShadows() + this
 

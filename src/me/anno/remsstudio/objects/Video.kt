@@ -45,6 +45,7 @@ import me.anno.remsstudio.objects.lists.SplittableElement
 import me.anno.remsstudio.objects.models.SpeakerModel.drawSpeakers
 import me.anno.remsstudio.objects.modes.VideoType
 import me.anno.remsstudio.objects.modes.editorFPS
+import me.anno.studio.Inspectable
 import me.anno.studio.StudioBase
 import me.anno.ui.Panel
 import me.anno.ui.base.SpyPanel
@@ -101,8 +102,8 @@ import kotlin.math.*
 /**
  * Images, Cubemaps, Videos, Audios, joint into one
  * */
-class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio(file, parent),
-    SplittableElement {
+class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
+    Audio(file, parent), SplittableElement {
 
     // uv
     val tiling = AnimatedProperty.tiling()
@@ -737,12 +738,14 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
     }
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
 
-        super.createInspector(list, style, getGroup)
+        super.createInspector(inspected, list, style, getGroup)
+        val c = inspected.filterIsInstance<Video>()
 
         // to hide elements, which are not usable / have no effect
         val videoPanels = ArrayList<Panel>()
@@ -787,34 +790,40 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
         infoGroup += aud(UpdatingTextPanel(250, style) { "Sample Rate: ${meta?.audioSampleRate} samples/s" })
         infoGroup += aud(UpdatingTextPanel(250, style) { "Sample Count: ${meta?.audioSampleCount} samples" })
 
-        list += vi("File Location", "Source file of this video", null, file, style) { newFile -> file = newFile }
+        list += vi(inspected,"File Location", "Source file of this video", null, file, style) { newFile ->
+            for (x in c) x.file = newFile
+        }
+
 
         val uvMap = getGroup("Texture", "", "uvs")
-        uvMap += img(vi("Tiling", "(tile count x, tile count y, offset x, offset y)", tiling, style))
+        uvMap += img(
+            vis(
+                inspected,  c, "Tiling", "(tile count x, tile count y, offset x, offset y)",
+                c.map { it.tiling }, style
+            )
+        )
         uvMap += img(
             vi(
-                "UV-Projection", "Can be used for 360°-Videos",
+                inspected,"UV-Projection", "Can be used for 360°-Videos",
                 null, uvProjection.value, style
-            ) { uvProjection.value = it })
+            ) { for (x in c) x.uvProjection.value = it })
         uvMap += img(
             vi(
-                "Filtering", "Pixelated look?", "texture.filtering",
+                inspected,"Filtering", "Pixelated look?", "texture.filtering",
                 null, filtering.value, style
-            ) { filtering.value = it })
+            ) { for (x in c) x.filtering.value = it })
         uvMap += img(
             vi(
-                "Clamping",
-                "For tiled images",
-                "texture.clamping",
+                inspected,"Clamping", "For tiled images", "texture.clamping",
                 null, clampMode.value, style
-            ) { clampMode.value = it })
+            ) { for (x in c) x.clampMode.value = it })
 
         val time = getGroup("Time", "", "time")
         time += vi(
-            "Looping Type", "Whether to repeat the song/video", "video.loopingType",
+            inspected,"Looping Type", "Whether to repeat the song/video", "video.loopingType",
             null, isLooping.value, style
         ) {
-            isLooping.value = it
+            for (x in c) x.isLooping.value = it
             AudioManager.requestUpdate()
         }
 
@@ -830,8 +839,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
             videoScales.map { NameDesc(it.key) },
             style
         )
-            .setChangeListener { _, index, _ -> videoScale.value = videoScales[index].value }
-            .setIsSelectedListener { show(null) })
+            .setChangeListener { _, index, _ -> for (x in c) x.videoScale.value = videoScales[index].value }
+            .setIsSelectedListener { show(inspected, null) })
 
         editor += vid(EnumInput(
             "Preview FPS",
@@ -841,8 +850,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
                 .map { NameDesc(it.toString()) },
             style
         )
-            .setChangeListener { _, index, _ -> editorVideoFPS.value = editorFPS[index] }
-            .setIsSelectedListener { show(null) })
+            .setChangeListener { _, index, _ -> for (x in c) x.editorVideoFPS.value = editorFPS[index] }
+            .setIsSelectedListener { show(inspected, null) })
 
         quality() += vid(
             FloatInput(
@@ -852,19 +861,20 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
                         "Cannot handle more than two adjacent blank frames",
                 blankFrameThreshold, Type.FLOAT_03, style
             )
-                .setChangeListener { blankFrameThreshold = it.toFloat() }
-                .setIsSelectedListener { show(null) })
+                .setChangeListener { for (x in c) x.blankFrameThreshold = it.toFloat() }
+                .setIsSelectedListener { show(inspected, null) })
 
 
         ColorGrading.createInspector(
-            this, cgPower, cgSaturation, cgSlope, cgOffsetAdd, cgOffsetSub,
+            inspected, c, c.map { it.cgPower }, c.map { it.cgSaturation }, c.map { it.cgSlope },
+            c.map { it.cgOffsetAdd }, c.map { it.cgOffsetSub },
             { img(it) }, getGroup, style
         )
 
         val audio = getGroup("Audio", "", "audio")
-        audio += aud(vi("Amplitude", "How loud it is", "audio.amplitude", amplitude, style))
-        audio += aud(vi("Is 3D Sound", "Sound becomes directional", "audio.3d", null, is3D, style) {
-            is3D = it
+        audio += aud(vis(inspected,c, "Amplitude", "How loud it is", "audio.amplitude", c.map { it.amplitude }, style))
+        audio += aud(vi(inspected,"Is 3D Sound", "Sound becomes directional", "audio.3d", null, is3D, style) {
+            for (x in c) x.is3D = it
             AudioManager.requestUpdate()
         })
 
@@ -901,9 +911,9 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) : Audio
             val state = hasAudio.toInt(1) + hasImage.toInt(2) + hasVideo.toInt(4) + hasImSeq.toInt(8)
             if (state != lastState) {
                 lastState = state
-                for(p in audioPanels) p.isVisible = hasAudio
-                for(p in videoPanels) p.isVisible = hasVideo
-                for(p in imagePanels) p.isVisible = hasImage
+                for (p in audioPanels) p.isVisible = hasAudio
+                for (p in videoPanels) p.isVisible = hasVideo
+                for (p in imagePanels) p.isVisible = hasImage
                 list.invalidateLayout()
             }
         }

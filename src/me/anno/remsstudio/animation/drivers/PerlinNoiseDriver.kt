@@ -7,6 +7,7 @@ import me.anno.maths.Maths.clamp
 import me.anno.maths.noise.FullNoise
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
+import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
@@ -36,21 +37,22 @@ class PerlinNoiseDriver : AnimationDriver() {
         if (octaves >= 0) 1f else 1f + falloff * getMaxValue(falloff, octaves - 1)
 
     fun getValue(time: Double, noise: FullNoise, falloff: Double, step: Int): Double {
-        var value0 = noise[time.toFloat(),step.toFloat()].toDouble()
+        var value0 = noise[time.toFloat(), step.toFloat()].toDouble()
         if (step > 0) value0 += falloff * getValue(2.0 * time, noise, falloff, step - 1)
         return value0
     }
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: MutableList<Panel>,
         transform: Transform,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(list, transform, style, getGroup)
-        list += transform.vi("Octaves", "Levels of Detail", Type.INT_PLUS, octaves, style) { octaves = it }
-        list += transform.vi("Seed", "", Type.LONG, seed, style) { seed = it }
-        list += transform.vi("Falloff", "Changes high-frequency weight", falloff, style)
+        super.createInspector(inspected, list, transform, style, getGroup)
+        list += transform.vi(inspected, "Octaves", "Levels of Detail", Type.INT_PLUS, octaves, style) { octaves = it }
+        list += transform.vi(inspected, "Seed", "", Type.LONG, seed, style) { seed = it }
+        list += transform.vi(inspected, "Falloff", "Changes high-frequency weight", falloff, style)
     }
 
     override fun save(writer: BaseWriter) {

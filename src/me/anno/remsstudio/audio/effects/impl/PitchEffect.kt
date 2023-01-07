@@ -1,18 +1,18 @@
 package me.anno.remsstudio.audio.effects.impl
 
 import audacity.soundtouch.TimeDomainStretch
+import me.anno.animation.Type
+import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
+import me.anno.io.base.BaseWriter
+import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.SoundEffect
 import me.anno.remsstudio.audio.effects.Time
-import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
-import me.anno.animation.Type
-import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
-import me.anno.maths.Maths.clamp
 import me.anno.utils.types.Casting.castToFloat2
 import kotlin.math.abs
 
@@ -33,12 +33,17 @@ class PitchEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
         // todo effect broken, dragging not working?
+        val inspected = listOf(audio)
         list += audio.vi(
-            "Inverse Speed",
-            "Making something play faster, increases the pitch; this is undone by this node",
+            inspected,
+            "Inverse Speed", "Making something play faster, increases the pitch; this is undone by this node",
             null, inverseSpeed, style
         ) { inverseSpeed = it }
-        list += audio.vi("Value", "Pitch height, if Inverse Speed = false", pitchType, pitch, style) { pitch = it }
+        list += audio.vi(
+            inspected,
+            "Value", "Pitch height, if Inverse Speed = false",
+            pitchType, pitch, style
+        ) { pitch = it }
     }
 
     var inverseSpeed = false

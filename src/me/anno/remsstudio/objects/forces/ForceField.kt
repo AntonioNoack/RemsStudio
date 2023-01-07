@@ -3,6 +3,7 @@ package me.anno.remsstudio.objects.forces
 import me.anno.config.DefaultConfig
 import me.anno.language.translation.Dict
 import me.anno.maths.Maths
+import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.forces.impl.*
 import me.anno.remsstudio.objects.inspectable.InspectableAnimProperty
@@ -10,6 +11,7 @@ import me.anno.remsstudio.objects.models.ArrowModel
 import me.anno.remsstudio.objects.particles.Particle
 import me.anno.remsstudio.objects.particles.ParticleState
 import me.anno.remsstudio.objects.particles.ParticleSystem
+import me.anno.studio.Inspectable
 import me.anno.ui.base.groups.PanelList
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -43,25 +45,36 @@ abstract class ForceField(val displayName: String, val descriptionI: String) : T
 
     open fun listProperties() = listOf(
         // include it for convenience
-        InspectableAnimProperty(
-            strength,
-            "Strength",
-            "How much effect this force has"
-        )
+        InspectableAnimProperty(strength, "Strength", "How much effect this force has")
     )
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(list, style, getGroup)
-        createInspector(getGroup("Force Field", "", "forces").content, style)
+        super.createInspector(inspected, list, style, getGroup)
+        createInspector(inspected.filterIsInstance<ForceField>(), getGroup("Force Field", "", "forces").content, style)
     }
 
-    fun createInspector(list: PanelList, style: Style) {
+    fun createInspector(inspected: List<ForceField>, list: PanelList, style: Style) {
+        val properties = HashMap<Pair<ForceField, String>, AnimatedProperty<*>>()
+        for (ins in inspected) {
+            for (p in ins.listProperties()) {
+                properties[Pair(ins, p.title)] = p.value
+            }
+        }
         for (property in listProperties()) {
-            list += vi(property.title, property.description, property.value, style)
+            val title = property.title
+            val matching = inspected.mapNotNull {
+                val p = properties[Pair(it, title)]
+                if (p != null) Pair(it, p) else null
+            }
+            list += vis(
+                inspected, matching.map { it.first }, property.title, property.description,
+                matching.map { it.second }, style
+            )
         }
     }
 

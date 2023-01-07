@@ -11,6 +11,7 @@ import me.anno.io.base.BaseWriter
 import me.anno.io.files.InvalidRef
 import me.anno.io.text.TextWriter
 import me.anno.remsstudio.objects.text.Text
+import me.anno.studio.Inspectable
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
@@ -27,12 +28,13 @@ class TextParticles : ParticleSystem() {
     override fun needsChildren() = false
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(list, style, getGroup)
-        text.createInspectorWithoutSuper(list, style, getGroup)
+        super.createInspector(inspected, list, style, getGroup)
+        text.createInspectorWithoutSuper(inspected, list, style, getGroup)
     }
 
     override fun createParticle(index: Int, time: Double): Particle? {

@@ -2,21 +2,24 @@ package me.anno.remsstudio.objects.text
 
 import me.anno.config.DefaultConfig
 import me.anno.language.translation.Dict
+import me.anno.maths.Maths.fract
 import me.anno.remsstudio.objects.Transform
+import me.anno.studio.Inspectable
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.TextInputML
 import me.anno.ui.style.Style
-import me.anno.maths.Maths.fract
 import org.joml.Matrix4fArrayList
 import org.joml.Vector4f
 import java.net.URL
 import java.util.*
 import kotlin.math.floor
 
-class Timer(parent: Transform? = null): Text("", parent) {
+class Timer(parent: Transform? = null) : Text("", parent) {
 
-    init { forceVariableBuffer = true } // saves buffer creation
+    init {
+        forceVariableBuffer = true
+    } // saves buffer creation
 
     // todo extra start value in a date format?
 
@@ -58,17 +61,17 @@ class Timer(parent: Transform? = null): Text("", parent) {
         var d = h / 24
 
         s %= 60
-        if(s < 0){
+        if (s < 0) {
             s += 60
             m--
         }
         m %= 60
-        if(m < 0){
+        if (m < 0) {
             m += 60
             h--
         }
         h %= 24
-        if(h < 0){
+        if (h < 0) {
             h += 24
             d--
         }
@@ -97,12 +100,19 @@ class Timer(parent: Transform? = null): Text("", parent) {
 
     }
 
-    fun Long.f2() = if(this < 10) "0$this" else this.toString()
+    fun Long.f2() = if (this < 10) "0$this" else this.toString()
 
-    override fun createInspector(list: PanelListY, style: Style, getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory) {
-        super.createInspector(list, style, getGroup)
+    override fun createInspector(
+        inspected: List<Inspectable>,
+        list: PanelListY,
+        style: Style,
+        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+    ) {
+        super.createInspector(inspected, list, style, getGroup)
         list.children.removeIf { it is TextInputML && it.base.placeholder == "Text" }
-        list += vi("Format", "ss=sec, mm=min, hh=hours, dd=days, s3=millis", null, format, style){ format = it }
+        list += vi(inspected, "Format", "ss=sec, mm=min, hh=hours, dd=days, s3=millis", null, format, style) {
+            for (x in inspected) if (x is Timer) x.format = it
+        }
     }
 
     override val className get() = "Timer"

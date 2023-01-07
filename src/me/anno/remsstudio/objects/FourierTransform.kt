@@ -1,10 +1,7 @@
 package me.anno.remsstudio.objects
 
-import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.animation.LoopingState
 import me.anno.animation.Type
-import me.anno.remsstudio.audio.AudioFXCache2
-import me.anno.remsstudio.audio.effects.Domain
-import me.anno.remsstudio.audio.effects.Time
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.drawing.GFXx2D.getSize
 import me.anno.gpu.drawing.GFXx2D.getSizeX
@@ -13,18 +10,22 @@ import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
-import me.anno.animation.LoopingState
-import me.anno.ui.base.groups.PanelListY
-import me.anno.ui.editor.SettingCategory
-import me.anno.ui.style.Style
 import me.anno.maths.Maths
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.fract
 import me.anno.maths.Maths.max
 import me.anno.maths.Maths.mix
+import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.audio.AudioFXCache2
+import me.anno.remsstudio.audio.effects.Domain
+import me.anno.remsstudio.audio.effects.Time
+import me.anno.studio.Inspectable
+import me.anno.ui.base.groups.PanelListY
+import me.anno.ui.editor.SettingCategory
+import me.anno.ui.style.Style
 import me.anno.utils.files.LocalFile.toGlobalFile
-import me.anno.video.ffmpeg.FFMPEGMetadata
 import me.anno.video.MissingFrameException
+import me.anno.video.ffmpeg.FFMPEGMetadata
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
@@ -244,45 +245,47 @@ class FourierTransform : Transform() {
     }
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(list, style, getGroup)
+        super.createInspector(inspected, list, style, getGroup)
+        val c = inspected.filterIsInstance<FourierTransform>()
         val fourier = getGroup("Fourier Transform", "", "fourier")
-        fourier.addChild(vi("Audio File", "", null, file, style) { file = it })
+        fourier.addChild(vi(inspected, "Audio File", "", null, file, style) { for (x in c) x.file = it })
         fourier.addChild(
             vi(
-                "Sample Rate", "What the highest frequency should be",
+                inspected, "Sample Rate", "What the highest frequency should be",
                 // higher frequencies are eliminated, because we interpolate samples (I think...)
                 sampleRateType, sampleRate, style
-            ) { sampleRate = max(64, it) })
+            ) { for (x in c) x.sampleRate = max(64, it) })
         fourier.addChild(
             vi(
-                "Buffer Size",
+                inspected, "Buffer Size",
                 "Should be at least twice the buffer size, 'Resolution' of the fourier transform, and length of samples per batch",
                 bufferSizeType,
                 bufferSize,
                 style
-            ) { bufferSize = max(64, it) })
+            ) { for (x in c) x.bufferSize = max(64, it) })
         fourier.addChild(
             vi(
-                "Buffer Min", "Use only a part of the fourier transform; -1 = disabled",
+                inspected, "Buffer Min", "Use only a part of the fourier transform; -1 = disabled",
                 null, minBufferIndex, style
-            ) { minBufferIndex = it })
+            ) { for (x in c) x.minBufferIndex = it })
         fourier.addChild(
             vi(
-                "Buffer Max", "Use only a part of the fourier transform; -1 = disabled",
+                inspected, "Buffer Max", "Use only a part of the fourier transform; -1 = disabled",
                 null, maxBufferIndex, style
-            ) { maxBufferIndex = it })
+            ) { for (x in c) x.maxBufferIndex = it })
         val amplitude = getGroup("Amplitude", "", "amplitude")
-        amplitude.addChild(vi("Position, Linear", "", posLin, style))
-        amplitude.addChild(vi("Position, Logarithmic", "", posLog, style))
-        amplitude.addChild(vi("Rotation, Linear", "", rotLin, style))
-        amplitude.addChild(vi("Rotation, Logarithmic", "", rotLog, style))
-        amplitude.addChild(vi("Scale, Offset", "", scaOff, style))
-        amplitude.addChild(vi("Scale, Linear", "", scaLin, style))
-        amplitude.addChild(vi("Scale, Logarithmic", "", scaLog, style))
+        amplitude.addChild(vis(inspected, c, "Position, Linear", "", c.map { it.posLin }, style))
+        amplitude.addChild(vis(inspected, c, "Position, Logarithmic", "", c.map { it.posLog }, style))
+        amplitude.addChild(vis(inspected, c, "Rotation, Linear", "", c.map { it.rotLin }, style))
+        amplitude.addChild(vis(inspected, c, "Rotation, Logarithmic", "", c.map { it.rotLog }, style))
+        amplitude.addChild(vis(inspected, c, "Scale, Offset", "", c.map { it.scaOff }, style))
+        amplitude.addChild(vis(inspected, c, "Scale, Linear", "", c.map { it.scaLin }, style))
+        amplitude.addChild(vis(inspected, c, "Scale, Logarithmic", "", c.map { it.scaLog }, style))
     }
 
     override fun drawChildrenAutomatically(): Boolean = false

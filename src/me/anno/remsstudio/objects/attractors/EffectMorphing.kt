@@ -1,11 +1,12 @@
 package me.anno.remsstudio.objects.attractors
 
-import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.config.DefaultConfig
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
+import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
+import me.anno.studio.Inspectable
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
@@ -21,14 +22,16 @@ class EffectMorphing : Transform() {
     override val symbol get() = DefaultConfig["ui.symbol.fx.morphing", "\uD83D\uDCA0"]
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(list, style, getGroup)
+        super.createInspector(inspected, list, style, getGroup)
+        val c = inspected.filterIsInstance<EffectMorphing>()
         val fx = getGroup("Effect", "", "effects")
-        fx += vi("Strength", "The effective scale", influence, style)
-        fx += vi("Sharpness", "How sharp the lens effect is", sharpness, style)
+        fx += vis(inspected, c, "Strength", "The effective scale", c.map { it.influence }, style)
+        fx += vis(inspected, c, "Sharpness", "How sharp the lens effect is", c.map { it.sharpness }, style)
     }
 
     override fun save(writer: BaseWriter) {

@@ -1,12 +1,13 @@
 package me.anno.remsstudio.objects.distributions
 
+import me.anno.animation.Type
 import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
-import me.anno.remsstudio.objects.inspectable.InspectableVector
-import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.animation.Type
+import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.objects.inspectable.InspectableVector
+import me.anno.studio.Inspectable
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.style.Style
 import me.anno.utils.structures.ValueWithDefault
@@ -15,7 +16,6 @@ import org.joml.Vector2f
 import org.joml.Vector3f
 import org.joml.Vector4f
 import java.util.*
-import kotlin.collections.ArrayList
 
 class AnimatedDistribution(
     distribution: Distribution = ConstantDistribution(),
@@ -50,15 +50,29 @@ class AnimatedDistribution(
     lateinit var properties: List<InspectableVector>
 
     fun createInspector(
+        inspected0: List<Inspectable>,
+        c: List<Transform>,
+        inspected: List<AnimatedDistribution>,
         list: PanelListY,
         transform: Transform,
         style: Style
     ) {
         if (lastDist !== distribution) update()
-        properties.forEachIndexed { index, property ->
-            if(property.pType == InspectableVector.PType.ROTATION) channels[index].type = Type.ROT_YXZ
-            if(property.pType == InspectableVector.PType.SCALE) channels[index].type = Type.SCALE
-            list += transform.vi(property.title, property.description, channels[index], style)
+        for (ins in inspected) {
+            val properties = ins.properties
+            for (index in properties.indices) {
+                val property = properties[index]
+                if (property.pType == InspectableVector.PType.ROTATION) channels[index].type = Type.ROT_YXZ
+                if (property.pType == InspectableVector.PType.SCALE) channels[index].type = Type.SCALE
+            }
+        }
+        val properties = properties
+        for (index in properties.indices) {
+            val property = properties[index]
+            // could this crash? only if another property had differing amounts of channels
+            list += transform.vis(inspected0, c, property.title, property.description,
+                inspected.map { it.channels[index] }, style
+            )
         }
     }
 
@@ -69,8 +83,9 @@ class AnimatedDistribution(
     fun copyFrom(data: AnimatedDistribution) {
         distribution = data.distribution
         update()
-        data.channels.forEachIndexed { index, channel ->
-            setChannel(index, channel)
+        val channels = data.channels
+        for (index in channels.indices) {
+            setChannel(index, channels[index])
         }
     }
 

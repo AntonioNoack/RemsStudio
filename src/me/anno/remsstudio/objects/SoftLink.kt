@@ -1,12 +1,11 @@
 package me.anno.remsstudio.objects
 
-import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.animation.Type
 import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.GFXState.useFrame
+import me.anno.gpu.drawing.UVProjection
 import me.anno.gpu.framebuffer.FBStack
-import me.anno.gpu.framebuffer.Frame
 import me.anno.gpu.shader.Renderer
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.Filtering
@@ -15,11 +14,13 @@ import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
 import me.anno.language.translation.Dict
-import me.anno.gpu.drawing.UVProjection
-import me.anno.remsstudio.objects.text.Text
+import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Scene
+import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.gpu.GFXx3Dv2.draw3DVideo
+import me.anno.remsstudio.objects.text.Text
 import me.anno.remsstudio.ui.StudioFileImporter.addChildFromFile
+import me.anno.studio.Inspectable
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.files.FileContentImporter
@@ -172,38 +173,53 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
     }
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(list, style, getGroup)
+        super.createInspector(inspected, list, style, getGroup)
+        val c = inspected.filterIsInstance<SoftLink>()
         val link = getGroup("Link Data", "", "softLink")
-        link += vi("File", "Where the data is to be loaded from", "", null, file, style) { file = it }
+        link += vi(inspected, "File", "Where the data is to be loaded from", "", null, file, style) {
+            for (x in c) x.file = it
+        }
         link += vi(
-            "Camera Index", "Which camera should be chosen, 0 = none, 1 = first, ...", "",
+            inspected, "Camera Index", "Which camera should be chosen, 0 = none, 1 = first, ...", "",
             Type.INT_PLUS, cameraIndex, style
-        ) { cameraIndex = it }
+        ) { for (x in c) x.cameraIndex = it }
         list += FrameSizeInput(
             "Resolution",
-            resolution[lastLocalTime].run { "${x.roundToInt()} x ${y.roundToInt()}" },
+            resolution[lastLocalTime].run { "${x.roundToInt()} x ${y.roundToInt()}" }, style
+        )
+            .setChangeListener { w, h ->
+                RemsStudio.incrementalChange("Change Resolution") {
+                    // share vector?
+                    for (x in c) x.putValue(x.resolution, Vector2f(w.toFloat(), h.toFloat()), false)
+                }
+            }
+            .setIsSelectedListener { show(inspected, resolution) }
+        list += vis(
+            inspected,
+            c,
+            "Tiling",
+            "(tile count x, tile count y, offset x, offset y)",
+            c.map { it.tiling },
             style
         )
-            .setChangeListener { w, h -> putValue(resolution, Vector2f(w.toFloat(), h.toFloat()), true) }
-            .setIsSelectedListener { show(resolution) }
-        list += vi("Tiling", "(tile count x, tile count y, offset x, offset y)", tiling, style)
         list += vi(
-            "UV-Projection", "Can be used for 360°-Videos", null, uvProjection.value, style
-        ) { uvProjection.value = it }
-        list +=
-            vi(
-                "Filtering", "Pixelated look?", "texture.filtering", null, filtering.value, style
-            ) { filtering.value = it }
-        list +=
-            vi(
-                "Clamping", "For tiled images", "texture.clamping", null, clampMode.value, style
-            ) { clampMode.value = it }
+            inspected, "UV-Projection", "Can be used for 360°-Videos", null, uvProjection.value, style
+        ) { for (x in c) x.uvProjection.value = it }
+        list += vi(
+            inspected, "Filtering", "Pixelated look?", "texture.filtering", null, filtering.value, style
+        ) { for (x in c) x.filtering.value = it }
+        list += vi(
+            inspected, "Clamping", "For tiled images", "texture.clamping", null, clampMode.value, style
+        ) { for (x in c) x.clampMode.value = it }
         // not ready yet
-        link += vi("Enable Postprocessing", "", "", null, renderToTexture, style) { renderToTexture = it }
+        link += vi(inspected, "Enable Postprocessing", "", "", null, renderToTexture, style) {
+            for (x in c) x.renderToTexture = it
+        }
     }
 
     override fun save(writer: BaseWriter) {

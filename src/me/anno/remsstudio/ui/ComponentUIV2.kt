@@ -11,6 +11,7 @@ import me.anno.remsstudio.ui.input.ColorInputV2
 import me.anno.remsstudio.ui.input.FloatInputV2
 import me.anno.remsstudio.ui.input.FloatVectorInputV2
 import me.anno.remsstudio.ui.input.IntInputV2
+import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.input.*
 import me.anno.ui.style.Style
@@ -32,6 +33,7 @@ object ComponentUIV2 {
      * */
     @Suppress("unchecked_cast") // all casts are checked in all known use-cases ;)
     fun <V> vi(
+        inspected: List<Inspectable>,
         self: Transform,
         title: String, ttt: String,
         type: Type?, value: V,
@@ -44,7 +46,7 @@ object ComponentUIV2 {
                         setValue(it as V)
                     }
                 }
-                .setIsSelectedListener { self.show(null) }
+                .setIsSelectedListener { self.show(inspected, null) }
                 .setTooltip(ttt)
             is Int -> IntInput(title, title, value, type ?: Type.INT, style)
                 .setChangeListener {
@@ -52,7 +54,7 @@ object ComponentUIV2 {
                         setValue(it.toInt() as V)
                     }
                 }
-                .setIsSelectedListener { self.show(null) }
+                .setIsSelectedListener { self.show(inspected, null) }
                 .setTooltip(ttt)
             is Long -> IntInput(title, title, value, type ?: Type.LONG, style)
                 .setChangeListener {
@@ -60,7 +62,7 @@ object ComponentUIV2 {
                         setValue(it as V)
                     }
                 }
-                .setIsSelectedListener { self.show(null) }
+                .setIsSelectedListener { self.show(inspected, null) }
                 .setTooltip(ttt)
             is Float -> FloatInput(title, title, value, type ?: Type.FLOAT, style)
                 .setChangeListener {
@@ -68,7 +70,7 @@ object ComponentUIV2 {
                         setValue(it.toFloat() as V)
                     }
                 }
-                .setIsSelectedListener { self.show(null) }
+                .setIsSelectedListener { self.show(inspected, null) }
                 .setTooltip(ttt)
             is Double -> FloatInput(title, title, value, type ?: Type.DOUBLE, style)
                 .setChangeListener {
@@ -76,7 +78,7 @@ object ComponentUIV2 {
                         setValue(it as V)
                     }
                 }
-                .setIsSelectedListener { self.show(null) }
+                .setIsSelectedListener { self.show(inspected, null) }
                 .setTooltip(ttt)
             is Vector2f -> FloatVectorInput(title, title, value, type ?: Type.VEC2, style)
                 .addChangeListener { x, y, _, _ ->
@@ -84,7 +86,7 @@ object ComponentUIV2 {
                         setValue(Vector2f(x.toFloat(), y.toFloat()) as V)
                     }
                 }
-                .setIsSelectedListener { self.show(null) }
+                .setIsSelectedListener { self.show(inspected, null) }
                 .setTooltip(ttt)
             is Vector3f ->
                 if (type == Type.COLOR3) {
@@ -94,7 +96,7 @@ object ComponentUIV2 {
                                 setValue(Vector3f(r, g, b) as V)
                             }
                         }
-                        .setIsSelectedListener { self.show(null) }
+                        .setIsSelectedListener { self.show(inspected, null) }
                         .setTooltip(ttt)
                 } else {
                     FloatVectorInput(title, title, value, type ?: Type.VEC3, style)
@@ -103,7 +105,7 @@ object ComponentUIV2 {
                                 setValue(Vector3f(x.toFloat(), y.toFloat(), z.toFloat()) as V)
                             }
                         }
-                        .setIsSelectedListener { self.show(null) }
+                        .setIsSelectedListener { self.show(inspected, null) }
                         .setTooltip(ttt)
                 }
             is Vector4f -> {
@@ -114,7 +116,7 @@ object ComponentUIV2 {
                                 setValue(Vector4f(r, g, b, a) as V)
                             }
                         }
-                        .setIsSelectedListener { self.show(null) }
+                        .setIsSelectedListener { self.show(inspected, null) }
                         .setTooltip(ttt)
                 } else {
                     FloatVectorInput(title, title, value, type, style)
@@ -123,7 +125,7 @@ object ComponentUIV2 {
                                 setValue(Vector4f(x.toFloat(), y.toFloat(), z.toFloat(), w.toFloat()) as V)
                             }
                         }
-                        .setIsSelectedListener { self.show(null) }
+                        .setIsSelectedListener { self.show(inspected, null) }
                         .setTooltip(ttt)
                 }
             }
@@ -133,7 +135,7 @@ object ComponentUIV2 {
                         setValue(Quaternionf(x, y, z, w) as V)
                     }
                 }
-                .setIsSelectedListener { self.show(null) }
+                .setIsSelectedListener { self.show(inspected, null) }
                 .setTooltip(ttt)
             is String -> TextInputML(title, value, style)
                 .addChangeListener {
@@ -141,7 +143,7 @@ object ComponentUIV2 {
                         setValue(it as V)
                     }
                 }
-                .setIsSelectedListener { self.show(null) }
+                .setIsSelectedListener { self.show(inspected, null) }
                 .setTooltip(ttt)
             is FileReference -> FileInput(title, style, value, emptyList())
                 .setChangeListener {
@@ -149,7 +151,7 @@ object ComponentUIV2 {
                         setValue(it as V)
                     }
                 }
-                .setIsSelectedListener { self.show(null) }
+                .setIsSelectedListener { self.show(inspected, null) }
                 .setTooltip(ttt)
             is BlendMode -> {
                 val values = blendModes.values
@@ -163,7 +165,7 @@ object ComponentUIV2 {
                             setValue(valueNames[index].first as V)
                         }
                     }
-                    .setIsSelectedListener { self.show(null) }
+                    .setIsSelectedListener { self.show(inspected, null) }
                     .setTooltip(ttt)
             }
             is Enum<*> -> {
@@ -174,7 +176,7 @@ object ComponentUIV2 {
                             setValue(values[index] as V)
                         }
                     }
-                    .setIsSelectedListener { self.show(null) }
+                    .setIsSelectedListener { self.show(inspected, null) }
                     .setTooltip(ttt)
             }
             is ValueWithDefaultFunc<*>, is ValueWithDefault<*> -> throw IllegalArgumentException("Must pass value, not ValueWithDefault(Func)!")
@@ -198,11 +200,12 @@ object ComponentUIV2 {
      * modifies the AnimatedProperty-Object, so no callback is needed
      * */
     fun vi(
+        inspected: List<Inspectable>,
         self: Transform,
         title: String, ttt: String, values: AnimatedProperty<*>, style: Style
     ): Panel {
         val time = self.lastLocalTime
-        val sl = { self.show(values) }
+        val sl = { self.show(inspected, values) }
         return when (val value = values[time]) {
             is Int -> IntInputV2(title, title, values, time, style)
                 .setChangeListener {
@@ -218,7 +221,7 @@ object ComponentUIV2 {
                         self.putValue(values, it, false)
                     }
                 }
-                .setIsSelectedListener { self.show(values) }
+                .setIsSelectedListener(sl)
                 .setTooltip(ttt)
             is Float -> FloatInputV2(title, title, values, time, style)
                 .setChangeListener {
@@ -304,6 +307,164 @@ object ComponentUIV2 {
                 .addChangeListener { x, y, z, w ->
                     RemsStudio.incrementalChange("Set $title to ($x,$y,$z,$w)", title) {
                         self.putValue(values, Quaternionf(x, y, z, w), false)
+                    }
+                }
+                .setIsSelectedListener(sl)
+                .setTooltip(ttt)
+            else -> throw RuntimeException("Type $value not yet implemented!")
+        }
+    }
+
+    /**
+     * creates a panel with the correct input for the type, and sets the default values:
+     * title, tool tip text, type, start value
+     * modifies the AnimatedProperty-Object, so no callback is needed
+     * */
+    fun vis(
+        inspected: List<Inspectable>,
+        selves: List<Transform>,
+        title: String, ttt: String,
+        allValues: List<AnimatedProperty<*>>,
+        style: Style
+    ): Panel {
+        val values = allValues[0]
+        val self = selves[0]
+        val time = self.lastLocalTime
+        val sl = { self.show(inspected, values) }
+        return when (val value = values[time]) {
+            is Int -> IntInputV2(title, title, values, time, style)
+                .setChangeListener {
+                    RemsStudio.incrementalChange("Set $title to $it", title) {
+                        val ii = it.toInt()
+                        for (i in allValues.indices) {
+                            selves[i].putValue(allValues[i], ii, false)
+                        }
+                    }
+                }
+                .setIsSelectedListener(sl)
+                .setTooltip(ttt)
+            is Long -> IntInputV2(title, title, values, time, style)
+                .setChangeListener {
+                    RemsStudio.incrementalChange("Set $title to $it", title) {
+                        for (i in allValues.indices) {
+                            selves[i].putValue(allValues[i], it, false)
+                        }
+                    }
+                }
+                .setIsSelectedListener(sl)
+                .setTooltip(ttt)
+            is Float -> FloatInputV2(title, title, values, time, style)
+                .setChangeListener {
+                    RemsStudio.incrementalChange("Set $title to $it", title) {
+                        val ii = it.toFloat()
+                        for (i in allValues.indices) {
+                            selves[i].putValue(allValues[i], ii, false)
+                        }
+                    }
+                }
+                .setIsSelectedListener(sl)
+                .setTooltip(ttt)
+            is Double -> FloatInputV2(title, title, values, time, style)
+                .setChangeListener {
+                    RemsStudio.incrementalChange("Set $title to $it", title) {
+                        for (i in allValues.indices) {
+                            selves[i].putValue(allValues[i], it, false)
+                        }
+                    }
+                }
+                .setIsSelectedListener(sl)
+                .setTooltip(ttt)
+            is Vector2f -> FloatVectorInputV2(title, values, time, style)
+                .addChangeListener { x, y, _, _ ->
+                    RemsStudio.incrementalChange("Set $title to ($x,$y)", title) {
+                        // multiple instances?
+                        for (i in allValues.indices) {
+                            selves[i].putValue(allValues[i], Vector2f(x.toFloat(), y.toFloat()), false)
+                        }
+                    }
+                }
+                .setIsSelectedListener(sl)
+                .setTooltip(ttt)
+            is Vector3f ->
+                if (values.type == Type.COLOR3) {
+                    ColorInputV2(style, title, title, Vector4f(value, 1f), false, values)
+                        .setChangeListener { r, g, b, _ ->
+                            RemsStudio.incrementalChange("Set $title to ${Vector3f(r, g, b).toHexColor()}", title) {
+                                // multiple instances?
+                                for (i in allValues.indices) {
+                                    selves[i].putValue(allValues[i], Vector3f(r, g, b), false)
+                                }
+                            }
+                        }
+                        .setResetListener { toColor(values.defaultValue) }
+                        .setIsSelectedListener(sl)
+                        .setTooltip(ttt)
+                } else {
+                    FloatVectorInputV2(title, values, time, style)
+                        .addChangeListener { x, y, z, _ ->
+                            println("changed v3 $x $y $z")
+                            RemsStudio.incrementalChange("Set $title to ($x,$y,$z)", title) {
+                                // multiple instances?
+                                for (i in allValues.indices) {
+                                    selves[i].putValue(
+                                        allValues[i],
+                                        Vector3f(x.toFloat(), y.toFloat(), z.toFloat()),
+                                        false
+                                    )
+                                }
+                            }
+                        }
+                        .setIsSelectedListener(sl)
+                        .setTooltip(ttt)
+                }
+            is Vector4f -> {
+                if (values.type == Type.COLOR) {
+                    ColorInputV2(style, title, title, value, true, values)
+                        .setChangeListener { r, g, b, a ->
+                            RemsStudio.incrementalChange("Set $title to ${Vector4f(r, g, b, a).toHexColor()}", title) {
+                                // multiple instances?
+                                for (i in allValues.indices) {
+                                    selves[i].putValue(allValues[i], Vector4f(r, g, b, a), false)
+                                }
+                            }
+                        }
+                        .setResetListener { toColor(values.defaultValue) }
+                        .setIsSelectedListener(sl)
+                        .setTooltip(ttt)
+                } else {
+                    FloatVectorInputV2(title, values, time, style)
+                        .addChangeListener { x, y, z, w ->
+                            RemsStudio.incrementalChange("Set $title to ($x,$y,$z,$w)", title) {
+                                // multiple instances?
+                                for (i in allValues.indices) {
+                                    selves[i].putValue(
+                                        allValues[i],
+                                        Vector4f(x.toFloat(), y.toFloat(), z.toFloat(), w.toFloat()),
+                                        false
+                                    )
+                                }
+                            }
+                        }
+                        .setIsSelectedListener(sl)
+                        .setTooltip(ttt)
+                }
+            }
+            is String -> TextInputML(title, value, style)
+                .addChangeListener {
+                    RemsStudio.incrementalChange("Set $title to $it") {
+                        for (i in allValues.indices) {
+                            selves[i].putValue(allValues[i], it, false)
+                        }
+                    }
+                }
+                .setIsSelectedListener(sl)
+                .setTooltip(ttt)
+            is Quaternionf -> FloatVectorInputV2(title, values, time, style)
+                .addChangeListener { x, y, z, w ->
+                    RemsStudio.incrementalChange("Set $title to ($x,$y,$z,$w)", title) {
+                        for (i in allValues.indices) {
+                            selves[i].putValue(allValues[i],  Quaternionf(x, y, z, w), false)
+                        }
                     }
                 }
                 .setIsSelectedListener(sl)

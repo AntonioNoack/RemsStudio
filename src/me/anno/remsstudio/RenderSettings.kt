@@ -5,7 +5,7 @@ import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX
 import me.anno.io.files.InvalidRef
 import me.anno.language.translation.NameDesc
-import me.anno.remsstudio.objects.Transform
+import me.anno.maths.Maths.mixARGB
 import me.anno.remsstudio.RemsStudio.editorTime
 import me.anno.remsstudio.RemsStudio.project
 import me.anno.remsstudio.RemsStudio.targetDuration
@@ -17,6 +17,8 @@ import me.anno.remsstudio.Rendering.renderAudio
 import me.anno.remsstudio.Rendering.renderFrame
 import me.anno.remsstudio.Rendering.renderPart
 import me.anno.remsstudio.Rendering.renderSetPercent
+import me.anno.remsstudio.objects.Transform
+import me.anno.studio.Inspectable
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.text.TextPanel
@@ -27,7 +29,6 @@ import me.anno.ui.input.FileInput
 import me.anno.ui.input.FloatInput
 import me.anno.ui.input.IntInput
 import me.anno.ui.style.Style
-import me.anno.maths.Maths.mixARGB
 import me.anno.utils.Color.black
 import me.anno.utils.process.DelayedTask
 import me.anno.video.ffmpeg.FFMPEGEncodingBalance
@@ -41,6 +42,7 @@ object RenderSettings : Transform() {
     override val defaultDisplayName: String = "Render Settings"
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
@@ -50,13 +52,13 @@ object RenderSettings : Transform() {
 
         list += TextPanel(defaultDisplayName, style)
             .apply { focusTextColor = textColor }
-        list += vi("Duration", "Video length in seconds", Type.FLOAT_PLUS, targetDuration, style) {
+        list += vi(inspected, "Duration", "Video length in seconds", Type.FLOAT_PLUS, targetDuration, style) {
             project.targetDuration = it
             save()
         }
 
         list += vi(
-            "Relative Frame Size (%)", "For rendering tests, in percent",
+            inspected, "Relative Frame Size (%)", "For rendering tests, in percent",
             Type.FLOAT_PERCENT, project.targetSizePercentage, style
         ) {
             project.targetSizePercentage = it
@@ -102,7 +104,7 @@ object RenderSettings : Transform() {
         // todo still cannot be animated... why???
         // todo why is the field not showing up?
         val mbs = vi(
-            "Motion-Blur-Steps",
+            inspected, "Motion-Blur-Steps",
             "0,1 = no motion blur, e.g. 16 = decent motion blur, sub-frames per frame",
             project.motionBlurSteps, style
         ) as IntInput
@@ -114,7 +116,7 @@ object RenderSettings : Transform() {
         list += mbs
 
         val shp = vi(
-            "Shutter-Percentage",
+            inspected, "Shutter-Percentage",
             "[Motion Blur] 1 = full frame is used; 0.1 = only 1/10th of a frame time is used",
             project.shutterPercentage, style
         ) as FloatInput

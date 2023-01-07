@@ -4,6 +4,7 @@ import me.anno.input.Input.setClipboardContent
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
+import me.anno.studio.Inspectable
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
@@ -70,11 +71,12 @@ class Chapter(parent: Transform?) : GFXTransform(parent) {
     }
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(list, style, getGroup)
+        super.createInspector(inspected, list, style, getGroup)
         list += UpdatingTextPanel(500, style) { "Start time: ${createTimestamp(getChapterTime().roundToInt())}" }
         list += UpdatingTextPanel(500, style) { getNiceText() }
             .addRightClickListener {

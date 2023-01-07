@@ -22,6 +22,7 @@ import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.geometric.Circle
 import me.anno.remsstudio.objects.geometric.Polygon
+import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.base.SpyPanel
 import me.anno.ui.base.groups.PanelListY
@@ -315,59 +316,83 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
     }
 
     override fun createInspector(
+        inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(list, style, getGroup)
+        super.createInspector(inspected, list, style, getGroup)
+        val c = inspected.filterIsInstance<MaskLayer>()
         val mask = getGroup("Mask Settings", "Masks are multipurpose objects", "mask")
-        mask += vi("Type", "Specifies what kind of mask it is", null, type, style) { type = it }
+        mask += vi(inspected, "Type", "Specifies what kind of mask it is", null, type, style) {
+            for (x in c) x.type = it
+        }
 
         fun typeSpecific(panel: Panel, isVisible: (MaskType) -> Boolean) {
             mask += panel
-            mask += SpyPanel(style) { panel.isVisible = isVisible(type) }
+            mask += SpyPanel(style) {
+                val types = c.map { it.type }.toSet()
+                panel.isVisible = types.any { isVisible(it) }
+            }
         }
 
-        mask += vi("Size", "How large pixelated pixels or blur should be", effectSize, style)
-        mask += vi("Invert Mask", "Changes transparency with opacity", null, isInverted, style) { isInverted = it }
-        mask += vi("Use Color / Transparency", "Should the color influence the masked?", useMaskColor, style)
-        typeSpecific(vi("Effect Center", "", effectOffset, style)) {
+        mask += vis(
+            inspected,
+            c,
+            "Size",
+            "How large pixelated pixels or blur should be",
+            c.map { it.effectSize },
+            style
+        )
+        mask += vi(
+            inspected, "Invert Mask", "Changes transparency with opacity",
+            null, isInverted, style
+        ) { for (x in c) x.isInverted = it }
+        mask += vis(
+            inspected, c, "Use Color / Transparency", "Should the color influence the masked?",
+            c.map { it.useMaskColor }, style
+        )
+        typeSpecific(vis(inspected, c, "Effect Center", "", c.map { it.effectOffset }, style)) {
             when (it) {
                 MaskType.RADIAL_BLUR_1, MaskType.RADIAL_BLUR_2 -> true
                 else -> false
             }
         }
-        typeSpecific(vi("Blur Threshold", "", blurThreshold, style)) {
+        typeSpecific(vis(inspected, c, "Blur Threshold", "", c.map { it.blurThreshold }, style)) {
             when (it) {
                 MaskType.GAUSSIAN_BLUR, MaskType.BLOOM -> true
                 else -> false
             }
         }
         mask += vi(
-            "Make Huge", "Scales the mask, without affecting the children", null,
-            isFullscreen, style
-        ) { isFullscreen = it }
+            inspected, "Make Huge", "Scales the mask, without affecting the children",
+            null, isFullscreen, style
+        ) { for (x in c) x.isFullscreen = it }
         mask += vi(
-            "Use MSAA(!)",
+            inspected, "Use MSAA(!)",
             "MSAA is experimental, may not always work",
-            null,
-            useExperimentalMSAA,
-            style
-        ) { useExperimentalMSAA = it }
+            null, useExperimentalMSAA, style
+        ) { for (x in c) x.useExperimentalMSAA = it }
 
         val greenScreen =
             getGroup("Green Screen", "Type needs to be green-screen; cuts out a specific color", "greenScreen")
-        greenScreen += vi("Similarity", "", greenScreenSimilarity, style)
-        greenScreen += vi("Smoothness", "", greenScreenSmoothness, style)
-        greenScreen += vi("Spill Value", "", greenScreenSpillValue, style)
-        greenScreen += vi("Invert Mask 2", "", null, isInverted2, style) { isInverted2 = it }
+        greenScreen += vis(inspected, c, "Similarity", "", c.map { it.greenScreenSimilarity }, style)
+        greenScreen += vis(inspected, c, "Smoothness", "", c.map { it.greenScreenSmoothness }, style)
+        greenScreen += vis(inspected, c, "Spill Value", "", c.map { it.greenScreenSpillValue }, style)
+        greenScreen += vi(inspected, "Invert Mask 2", "", null, isInverted2, style) { for (x in c) x.isInverted2 = it }
 
         val transition = getGroup("Transition", "Type needs to be transition", "transition")
-        transition += vi("Progress", "", transitionProgress, style)
-        transition += vi("Smoothness", "", transitionSmoothness, style)
+        transition += vis(inspected, c, "Progress", "", c.map { it.transitionProgress }, style)
+        transition += vis(inspected, c, "Smoothness", "", c.map { it.transitionSmoothness }, style)
         val editor = getGroup("Editor", "", "editor")
-        editor += vi("Show Mask", "for debugging purposes; shows the stencil", null, showMask, style) { showMask = it }
-        editor += vi("Show Masked", "for debugging purposes", null, showMasked, style) { showMasked = it }
+        editor += vi(
+            inspected, "Show Mask", "for debugging purposes; shows the stencil",
+            null, showMask, style
+        ) { for (x in c) x.showMask = it }
+        editor += vi(
+            inspected, "Show Masked", "for debugging purposes",
+            null, showMasked, style
+        ) { for (x in c) x.showMasked = it }
 
         list += SpyPanel(style) {
             greenScreen.isVisible = type == MaskType.GREEN_SCREEN
