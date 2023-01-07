@@ -12,7 +12,6 @@ import me.anno.config.DefaultStyle.baseTheme
 import me.anno.ecs.prefab.PrefabCache
 import me.anno.extensions.ExtensionLoader
 import me.anno.gpu.GFX
-import me.anno.gpu.GFXBase
 import me.anno.gpu.OSWindow
 import me.anno.input.ActionManager
 import me.anno.input.Input.keyUpCtr
@@ -122,7 +121,7 @@ import me.anno.utils.OS
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
-object RemsStudio : StudioBase(true, "Rem's Studio", 10114) {
+object RemsStudio : StudioBase(true, "Rem's Studio", 10115) {
 
     val defaultWindowStack get() = GFX.someWindow.windowStack
     var hideUnusedProperties = false

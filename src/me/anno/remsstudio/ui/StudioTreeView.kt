@@ -40,7 +40,11 @@ import kotlin.streams.toList
 
 class StudioTreeView(style: Style) :
     TreeView<Transform>(
-        UpdatingList { listOf(nullCamera!!, RemsStudio.root) },
+        UpdatingList {
+            val nc = nullCamera
+            if (nc == null) listOf(RemsStudio.root)
+            else listOf(nc, RemsStudio.root)
+        },
         StudioFileImporter, true, style
     ) {
 
@@ -48,7 +52,9 @@ class StudioTreeView(style: Style) :
 
     override fun stringifyForCopy(element: Transform): String = TextWriter.toText(element, InvalidRef)
 
-    override fun getSymbol(element: Transform) = element.symbol
+    override fun getSymbol(element: Transform): String {
+        return element.symbol
+    }
 
     override fun removeChild(parent: Transform, child: Transform) {
         parent.removeChild(child)
