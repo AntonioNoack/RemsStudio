@@ -26,7 +26,7 @@ object TextInspector {
 
         list += vi("Text", "", "", text, style)
         /*list += TextInputML("Text", style, text[lastLocalTime])
-            .setChangeListener {
+            .addChangeListener {
                 RemsStudio.incrementalChange("text") {
                     getSelfWithShadows().forEach { c ->
                         c.putValue(c.text, it, true)

@@ -629,7 +629,6 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         return true
     }
 
-
     override fun onMouseMoved(x: Float, y: Float, dx: Float, dy: Float) {
         val draggedKeyframe = draggedKeyframe
         val selectedProperty = selectedProperty
