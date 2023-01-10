@@ -36,6 +36,9 @@ import org.joml.Vector4f
 import java.util.*
 import kotlin.streams.toList
 
+// todo multiselect is broken:
+//  - calls click -> checks focus -> calls select -> removes others?
+
 class StudioTreeView(style: Style) :
     TreeView<Transform>(
         UpdatingList {
@@ -97,18 +100,22 @@ class StudioTreeView(style: Style) :
         return !immutable
     }
 
-    override fun selectElement(element: Transform?) {
-        Selection.selectTransform(element)
+    override fun selectElements(elements: List<Transform>) {
+        Selection.selectTransform(elements)
     }
 
-    override fun selectElementMaybe(element: Transform?) {
+    override fun selectElementsMaybe(elements: List<Transform>) {
         // if already selected, don't inspect that property/driver
-        if (Selection.selectedTransform == element &&
-            (Selection.selectedProperty != null ||
-                    (Selection.selectedInspectable != null && Selection.selectedInspectable != element))
+        if (Selection.selectedTransforms == elements &&
+            (Selection.selectedProperties != null ||
+                    (Selection.selectedInspectables.isNotEmpty() && Selection.selectedInspectables != elements))
         ) {
+            println("matches, so clearing")
             Selection.clear()
-        } else selectElement(element)
+        } else {
+            println("selecting elements: ${elements.map { it.name }}, ${elements.size}")
+            selectElements(elements)
+        }
     }
 
     override fun focusOnElement(element: Transform) {
@@ -209,7 +216,10 @@ class StudioTreeView(style: Style) :
             println("\uD83C\uDF9E️".codePoints().toList())
             println("xx " + listOf(127902).joinChars().length)
             println("xx " + listOf(65039).joinChars().length)
-            println("xx " + "\uD83C\uDF9E️".length + "\uD83C\uDF9E".length + " xx " + "\uD83C\uDF9E️".codePoints().toList().joinChars().length)
+            println(
+                "xx " + "\uD83C\uDF9E️".length + "\uD83C\uDF9E".length + " xx " + "\uD83C\uDF9E️".codePoints().toList()
+                    .joinChars().length
+            )
             println("xx " + "\uD83C\uDF9E️".codePoints().toList().joinChars().codePoints().toList())
             println(getTextSizeX(font0, "\uD83C\uDF9E️", s, s))
             println(getTextSizeX(font1, "\uD83C\uDF9E️", s, s))

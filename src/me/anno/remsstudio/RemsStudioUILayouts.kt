@@ -18,7 +18,7 @@ import me.anno.remsstudio.Rendering.renderAudio
 import me.anno.remsstudio.Rendering.renderPart
 import me.anno.remsstudio.Rendering.renderSetPercent
 import me.anno.remsstudio.Selection.selectTransform
-import me.anno.remsstudio.Selection.selectedTransform
+import me.anno.remsstudio.Selection.selectedTransforms
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.ui.StudioFileExplorer
 import me.anno.remsstudio.ui.StudioTreeView
@@ -72,7 +72,7 @@ object RemsStudioUILayouts {
         val helpTitle = Dict["Help", "ui.top.help"]
 
         options.addMajor(Dict["Add", "ui.top.add"]) {
-            openAddMenu(selectedTransform ?: root)
+            openAddMenu(selectedTransforms.firstOrNull() ?: root)
         }
 
         // todo complete translation
@@ -204,7 +204,7 @@ object RemsStudioUILayouts {
         animationWindow.add(CustomContainer(StudioSceneView(style), library, style), 2f)
         animationWindow.add(
             CustomContainer(
-                PropertyInspector({ Selection.selectedInspectable }, style, Unit),
+                PropertyInspector({ Selection.selectedInspectables  }, style),
                 library, style
             ), 0.5f
         )

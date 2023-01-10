@@ -337,7 +337,6 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
         }
 
         mask += vis(
-            inspected,
             c,
             "Size",
             "How large pixelated pixels or blur should be",
@@ -349,16 +348,16 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
             null, isInverted, style
         ) { for (x in c) x.isInverted = it }
         mask += vis(
-            inspected, c, "Use Color / Transparency", "Should the color influence the masked?",
-            c.map { it.useMaskColor }, style
+            c, "Use Color / Transparency", "Should the color influence the masked?", c.map { it.useMaskColor },
+            style
         )
-        typeSpecific(vis(inspected, c, "Effect Center", "", c.map { it.effectOffset }, style)) {
+        typeSpecific(vis(c, "Effect Center", "", c.map { it.effectOffset }, style)) {
             when (it) {
                 MaskType.RADIAL_BLUR_1, MaskType.RADIAL_BLUR_2 -> true
                 else -> false
             }
         }
-        typeSpecific(vis(inspected, c, "Blur Threshold", "", c.map { it.blurThreshold }, style)) {
+        typeSpecific(vis(c, "Blur Threshold", "", c.map { it.blurThreshold }, style)) {
             when (it) {
                 MaskType.GAUSSIAN_BLUR, MaskType.BLOOM -> true
                 else -> false
@@ -376,14 +375,14 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
 
         val greenScreen =
             getGroup("Green Screen", "Type needs to be green-screen; cuts out a specific color", "greenScreen")
-        greenScreen += vis(inspected, c, "Similarity", "", c.map { it.greenScreenSimilarity }, style)
-        greenScreen += vis(inspected, c, "Smoothness", "", c.map { it.greenScreenSmoothness }, style)
-        greenScreen += vis(inspected, c, "Spill Value", "", c.map { it.greenScreenSpillValue }, style)
+        greenScreen += vis(c, "Similarity", "", c.map { it.greenScreenSimilarity }, style)
+        greenScreen += vis(c, "Smoothness", "", c.map { it.greenScreenSmoothness }, style)
+        greenScreen += vis(c, "Spill Value", "", c.map { it.greenScreenSpillValue }, style)
         greenScreen += vi(inspected, "Invert Mask 2", "", null, isInverted2, style) { for (x in c) x.isInverted2 = it }
 
         val transition = getGroup("Transition", "Type needs to be transition", "transition")
-        transition += vis(inspected, c, "Progress", "", c.map { it.transitionProgress }, style)
-        transition += vis(inspected, c, "Smoothness", "", c.map { it.transitionSmoothness }, style)
+        transition += vis(c, "Progress", "", c.map { it.transitionProgress }, style)
+        transition += vis(c, "Smoothness", "", c.map { it.transitionSmoothness }, style)
         val editor = getGroup("Editor", "", "editor")
         editor += vi(
             inspected, "Show Mask", "for debugging purposes; shows the stencil",

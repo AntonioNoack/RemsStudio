@@ -2,6 +2,7 @@ package me.anno.remsstudio.objects.particles
 
 import me.anno.cache.CacheData
 import me.anno.cache.keys.TextSegmentKey
+import me.anno.fonts.FontManager
 import me.anno.fonts.FontManager.TextCache
 import me.anno.fonts.PartResult
 import me.anno.fonts.mesh.TextMesh
@@ -68,7 +69,8 @@ class TextParticles : ParticleSystem() {
             val keys = dataValue.second as List<TextSegmentKey>
             val lineSegmentsWithStyle = dataValue.first as PartResult
 
-            val exampleLayout = lineSegmentsWithStyle.exampleLayout
+            val font2 = FontManager.getFont(font)
+            val exampleLayout = font2.exampleLayout
             val scaleX = TextMesh.DEFAULT_LINE_HEIGHT / (exampleLayout.ascent + exampleLayout.descent)
             val scaleY = 1f / (exampleLayout.ascent + exampleLayout.descent)
             val width = lineSegmentsWithStyle.width * scaleX

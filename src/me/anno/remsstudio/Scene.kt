@@ -42,7 +42,7 @@ import me.anno.maths.Maths.PIf
 import me.anno.remsstudio.RemsStudio.currentCamera
 import me.anno.remsstudio.RemsStudio.gfxSettings
 import me.anno.remsstudio.RemsStudio.nullCamera
-import me.anno.remsstudio.Selection.selectedTransform
+import me.anno.remsstudio.Selection.selectedTransforms
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Camera.Companion.DEFAULT_VIGNETTE_STRENGTH
 import me.anno.remsstudio.objects.Transform
@@ -549,11 +549,11 @@ object Scene {
          * draw the selection ring for selected objects
          * draw it after everything else and without depth
          * */
-        if (!isFinalRendering && !isFakeColorRendering && selectedTransform != camera) { // seeing the own camera is irritating xD
-            val stack = stack
-            selectedTransform?.apply {
+        for (selectedTransform in selectedTransforms ?: return) {
+            if (!isFinalRendering && !isFakeColorRendering && selectedTransform != camera) { // seeing the own camera is irritating xD
+                val stack = stack
                 renderDefault {
-                    val (transform, _) = getGlobalTransformTime(time)
+                    val (transform, _) = selectedTransform.getGlobalTransformTime(time)
                     stack.next {
                         stack.mul(transform)
                         stack.scale(0.02f)
@@ -565,6 +565,5 @@ object Scene {
             }
         }
     }
-
 
 }

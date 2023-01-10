@@ -745,6 +745,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
     ) {
 
         super.createInspector(inspected, list, style, getGroup)
+        val t = inspected.filterIsInstance<Transform>()
         val c = inspected.filterIsInstance<Video>()
 
         // to hide elements, which are not usable / have no effect
@@ -798,8 +799,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         val uvMap = getGroup("Texture", "", "uvs")
         uvMap += img(
             vis(
-                inspected,  c, "Tiling", "(tile count x, tile count y, offset x, offset y)",
-                c.map { it.tiling }, style
+                c, "Tiling", "(tile count x, tile count y, offset x, offset y)", c.map { it.tiling },
+                style
             )
         )
         uvMap += img(
@@ -840,7 +841,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
             style
         )
             .setChangeListener { _, index, _ -> for (x in c) x.videoScale.value = videoScales[index].value }
-            .setIsSelectedListener { show(inspected, null) })
+            .setIsSelectedListener { show(t, null) })
 
         editor += vid(EnumInput(
             "Preview FPS",
@@ -851,7 +852,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
             style
         )
             .setChangeListener { _, index, _ -> for (x in c) x.editorVideoFPS.value = editorFPS[index] }
-            .setIsSelectedListener { show(inspected, null) })
+            .setIsSelectedListener { show(t, null) })
 
         quality() += vid(
             FloatInput(
@@ -862,7 +863,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 blankFrameThreshold, Type.FLOAT_03, style
             )
                 .setChangeListener { for (x in c) x.blankFrameThreshold = it.toFloat() }
-                .setIsSelectedListener { show(inspected, null) })
+                .setIsSelectedListener { show(t, null) })
 
 
         ColorGrading.createInspector(

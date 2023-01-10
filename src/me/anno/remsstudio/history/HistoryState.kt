@@ -26,14 +26,14 @@ class HistoryState() : Saveable() {
     var code: Any? = null
 
     var root: Transform? = null
-    var selectedUUID = -1
+    var selectedUUID: List<Int> = emptyList()
     var selectedPropName: String? = null
     var usedCameras = IntArray(0)
     var editorTime = 0.0
 
     override fun hashCode(): Int {
         var result = root.toString().hashCode()
-        result = 31 * result + selectedUUID
+        result = 31 * result + selectedUUID.hashCode()
         result = 31 * result + usedCameras.contentHashCode()
         result = 31 * result + editorTime.hashCode()
         return result
@@ -88,7 +88,7 @@ class HistoryState() : Saveable() {
         }
 
         state.title = title
-        state.selectedUUID = Selection.selectedTransform?.getUUID() ?: -1
+        state.selectedUUID = Selection.selectedTransforms?.map { it.getUUID() } ?: emptyList()
         state.usedCameras = defaultWindowStack.map { window ->
             window.panel.listOfAll.filterIsInstance<StudioSceneView>().map { it.camera.getUUID() }.toList()
         }.join().toIntArray()
@@ -107,7 +107,7 @@ class HistoryState() : Saveable() {
         super.save(writer)
         writer.writeObject(this, "root", root)
         writer.writeString("title", title)
-        writer.writeInt("selectedUUID", selectedUUID)
+        writer.writeIntArray("selectedUUIDs", selectedUUID.toIntArray())
         writer.writeIntArray("usedCameras", usedCameras)
         writer.writeDouble("editorTime", editorTime)
     }
@@ -128,14 +128,14 @@ class HistoryState() : Saveable() {
 
     override fun readInt(name: String, value: Int) {
         when (name) {
-            "selectedUUID" -> selectedUUID = value
+            "selectedUUID" -> selectedUUID = listOf(value)
             else -> super.readInt(name, value)
         }
     }
 
     override fun readLong(name: String, value: Long) {
         when (name) {
-            "selectedUUID" -> selectedUUID = value.toInt()
+            "selectedUUID" -> selectedUUID = listOf(value.toInt())
             else -> super.readLong(name, value)
         }
     }
@@ -143,6 +143,7 @@ class HistoryState() : Saveable() {
     override fun readIntArray(name: String, values: IntArray) {
         when (name) {
             "usedCameras" -> usedCameras = values
+            "selectedUUIDs" -> selectedUUID = values.toList()
             else -> super.readIntArray(name, values)
         }
     }

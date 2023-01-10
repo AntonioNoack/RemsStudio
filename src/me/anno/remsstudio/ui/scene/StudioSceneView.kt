@@ -30,8 +30,9 @@ import me.anno.remsstudio.RemsStudio.nullCamera
 import me.anno.remsstudio.RemsStudio.project
 import me.anno.remsstudio.Scene
 import me.anno.remsstudio.Selection
+import me.anno.remsstudio.Selection.select
 import me.anno.remsstudio.Selection.selectTransform
-import me.anno.remsstudio.Selection.selectedTransform
+import me.anno.remsstudio.Selection.selectedTransforms
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.effects.ToneMappers
@@ -209,14 +210,14 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
     var mode = SceneDragMode.MOVE
         set(value) {
             field = value
-            val selectedTransform = selectedTransform
-            if (selectedTransform != null) {
+            val selectedTransforms = selectedTransforms
+            if (selectedTransforms != null) {
                 Selection.select(
-                    selectedTransform,
+                    selectedTransforms,
                     when (value) {
-                        SceneDragMode.MOVE -> selectedTransform.position
-                        SceneDragMode.SCALE -> selectedTransform.scale
-                        SceneDragMode.ROTATE -> selectedTransform.rotationYXZ
+                        SceneDragMode.MOVE -> selectedTransforms.map { it.position }
+                        SceneDragMode.SCALE -> selectedTransforms.map { it.scale }
+                        SceneDragMode.ROTATE -> selectedTransforms.map { it.rotationYXZ }
                     }
                 )
             }
@@ -320,6 +321,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             Scene.draw(camera, root, dx, dy, width, height, editorTime, false, Renderer.depthRenderer, this)
         }
 
+        println("click: [${idBuffer.joinToString()}], [${depthBuffer.joinToString()}]")
         val bestResult = Screenshots.getClosestId(diameter, idBuffer, depthBuffer)
 
         // find the transform with the id to select it
@@ -465,6 +467,10 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
     private val camera2target = Matrix4f()
     private val target2camera = Matrix4f()
 
+    fun move(selected: List<Transform>, dx0: Float, dy0: Float) {
+        for (s in selected) move(s, dx0, dy0)
+    }
+
     fun move(selected: Transform, dx0: Float, dy0: Float) {
 
         if (!mayControlCamera) return
@@ -574,8 +580,8 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         // move stuff, if mouse is down and no touch is down
         if (Input.isLeftDown && touches.size < 2) {
             // move the object
-            val selected = selectedTransform
-            if (selected != null && selected != camera) {
+            val selected = selectedTransforms
+            if (selected != null && selected != listOf(camera)) {
                 move(selected, dx, dy)
             } else {
                 moveDirectly(-dx0, +dy0, 0f)
@@ -593,7 +599,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             return
         }
         // move the camera
-        val size = 20f * shiftSlowdown * (if (selectedTransform is Camera) -1f else 1f) / max(
+        val size = 20f * shiftSlowdown * (if (selectedTransforms?.all { it is Camera } == true) -1f else 1f) / max(
             GFX.someWindow.width,
             GFX.someWindow.height
         )
@@ -705,7 +711,6 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
     fun resolveClick(x: Float, y: Float, onClick: (Transform?) -> Unit) {
         val w = stableSize.stableWidth
         val h = stableSize.stableHeight
-        println("executing click $w x $h, ${this.w} x ${this.h}")
         addGPUTask("click", w, h) {
             try {
                 resolveClick(x, y, w, h, onClick)
@@ -798,9 +803,11 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
     }
 
     fun deleteSelectedTransform() {
+        val selectedTransforms = selectedTransforms ?: return
         invalidateDrawing()
         RemsStudio.largeChange("Deleted Component") {
-            selectedTransform?.destroy()
+            for (s in selectedTransforms) s.destroy()
+            select(emptyList<Transform>(), null)
         }
     }
 

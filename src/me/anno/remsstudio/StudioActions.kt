@@ -3,7 +3,6 @@ package me.anno.remsstudio
 import me.anno.Build
 import me.anno.engine.EngineActions
 import me.anno.gpu.GFX
-import me.anno.gpu.GFXBase
 import me.anno.gpu.GFXState
 import me.anno.gpu.debug.DebugGPUStorage
 import me.anno.input.ActionManager
@@ -113,12 +112,15 @@ object StudioActions {
                 } else false
             },
             "ToggleHideObject" to {
-                val obj = Selection.selectedTransform
-                if (obj != null) {
+                val transforms = Selection.selectedTransforms
+                if (transforms != null) {
                     RemsStudio.largeChange("Toggle Visibility") {
-                        obj.visibility = when (obj.visibility) {
+                        val newVis = when (transforms.firstOrNull()?.visibility) {
                             TransformVisibility.VISIBLE -> TransformVisibility.VIDEO_ONLY
                             else -> TransformVisibility.VISIBLE
+                        }
+                        for (s in transforms) {
+                            s.visibility = newVis
                         }
                     }
                     true

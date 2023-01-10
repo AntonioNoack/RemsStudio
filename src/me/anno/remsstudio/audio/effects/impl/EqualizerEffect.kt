@@ -30,9 +30,9 @@ class EqualizerEffect : SoundEffect(Domain.FREQUENCY_DOMAIN, Domain.FREQUENCY_DO
         for (index in frequencies) {
             val frequency = frequencies[index]
             list += audio.vi(
-                listOf(audio),
                 if (frequency > 999) "${frequency / 1000} kHz" else "$frequency Hz",
-                "Relative amplitude of this frequency, from -12dB to +12dB", sliders[index], style
+                "Relative amplitude of this frequency, from -12dB to +12dB",
+                sliders[index], style
             )
         }
     }

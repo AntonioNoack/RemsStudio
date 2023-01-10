@@ -94,7 +94,7 @@ open class TimelinePanel(style: Style) : Panel(style) {
 
         fun updateLocalTime() {
 
-            lastOwner = Selection.selectedTransform ?: lastOwner
+            lastOwner = Selection.selectedTransforms.firstOrNull() ?: lastOwner
 
             val owner = lastOwner
             val child2root = owner.listOfInheritance.toList()

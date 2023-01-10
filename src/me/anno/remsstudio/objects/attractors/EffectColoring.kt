@@ -35,8 +35,8 @@ class EffectColoring : Transform() {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<EffectColoring>()
         val fx = getGroup("Effect", "", "effect")
-        fx += vis(inspected, c, "Strength", "How much this color shall be used", c.map { it.influence }, style)
-        fx += vis(inspected, c, "Sharpness", "How sharp the circle is", c.map { it.sharpness }, style)
+        fx += vis(c, "Strength", "How much this color shall be used", c.map { it.influence }, style)
+        fx += vis(c, "Sharpness", "How sharp the circle is", c.map { it.sharpness }, style)
     }
 
     override fun save(writer: BaseWriter) {

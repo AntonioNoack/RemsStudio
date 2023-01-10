@@ -6,6 +6,7 @@ import me.anno.gpu.buffer.SimpleBuffer
 import me.anno.gpu.buffer.SimpleBuffer.Companion.circleBuffer
 import me.anno.gpu.buffer.StaticBuffer
 import me.anno.gpu.drawing.GFXx3D
+import me.anno.gpu.drawing.GFXx3D.circleParams
 import me.anno.gpu.drawing.GFXx3D.shader3DCircle
 import me.anno.gpu.drawing.GFXx3D.shader3DText
 import me.anno.gpu.drawing.UVProjection
@@ -13,12 +14,12 @@ import me.anno.gpu.shader.Shader
 import me.anno.gpu.shader.ShaderLib
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.Filtering
+import me.anno.gpu.texture.GPUFiltering
 import me.anno.gpu.texture.Texture2D
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Video
 import me.anno.remsstudio.objects.geometric.Polygon
-import me.anno.utils.types.Floats.toRadians
 import me.anno.video.formats.gpu.GPUFrame
 import ofx.mio.OpticalFlow
 import org.joml.Matrix4fArrayList
@@ -234,8 +235,27 @@ object GFXx3Dv2 {
         shader.v1i("colorCount", cc)
         shader.v1f("depth", depth * 0.00001f)
 
-        GFXx3D.drawOutlinedText(stack, offset, scale, texture, hasUVAttractors)
+        drawOutlinedText(stack, offset, scale, texture, hasUVAttractors)
 
+    }
+
+    private fun drawOutlinedText(
+        stack: Matrix4fArrayList,
+        offset: Vector2f,
+        scale: Vector2f,
+        texture: Texture2D,
+        hasUVAttractors: Boolean
+    ) {
+        val shader = ShaderLib.shaderSDFText.value
+        shader.use()
+        GFXx3D.transformUniform(shader, stack)
+        shader.v2f("offset", offset)
+        shader.v2f("scale", scale)
+        texture.bind(0, GPUFiltering.LINEAR, Clamping.CLAMP)
+        // if we have a force field applied, subdivide the geometry
+        val buffer = if (hasUVAttractors) SimpleBuffer.flat01CubeX10 else SimpleBuffer.flat01Cube
+        buffer.draw(shader)
+        GFX.check()
     }
 
     fun draw3DCircle(
@@ -250,23 +270,7 @@ object GFXx3Dv2 {
         shader.use()
         GFXx2Dv2.defineAdvancedGraphicalFeatures(shader, that, time)
         shader3DUniforms(shader, stack, 1, 1, color, null, Filtering.NEAREST, null)
-        var a0 = startDegrees
-        var a1 = endDegrees
-        // if the two arrows switch sides, flip the circle
-        if (a0 > a1) {// first start for checker pattern
-            val tmp = a0
-            a0 = a1
-            a1 = tmp - 360f
-        }
-        // fix edge resolution loss
-        if (a0 > a1 + 360) {
-            a0 = a1 + 360
-        } else if (a1 > a0 + 360) {
-            a1 = a0 + 360
-        }
-        val angle0 = a0.toRadians()
-        val angle1 = a1.toRadians()
-        shader.v3f("circleParams", 1f - innerRadius, angle0, angle1)
+        circleParams(innerRadius, startDegrees, endDegrees, shader)
         circleBuffer.draw(shader)
         GFX.check()
     }

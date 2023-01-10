@@ -182,8 +182,8 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
         val doc = getGroup("Document", "", "docs")
         doc += vi(inspected, "Path", "", null, file, style) { for (x in c) x.file = it }
         doc += vi(inspected, "Pages", "", null, selectedSites, style) { for (x in c) x.selectedSites = it }
-        doc += vis(inspected, c, "Padding", "", c.map { it.padding }, style)
-        doc += vis(inspected, c, "Direction", "Top-Bottom/Left-Right in Degrees", c.map { it.direction }, style)
+        doc += vis(c, "Padding", "", c.map { it.padding }, style)
+        doc += vis(c, "Direction", "Top-Bottom/Left-Right in Degrees", c.map { it.direction }, style)
         doc += vi(inspected, "Editor Quality", "", Type.FLOAT_PLUS, editorQuality, style) {
             for (x in c) x.editorQuality = it
         }

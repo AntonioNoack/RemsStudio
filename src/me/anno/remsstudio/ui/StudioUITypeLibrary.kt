@@ -48,7 +48,7 @@ class StudioUITypeLibrary : UITypeLibrary(typeList) {
             Dict["Scene View", "ui.customize.sceneView"] to { StudioSceneView(DefaultConfig.style) },
             Dict["Tree View", "ui.customize.treeView"] to { StudioTreeView(DefaultConfig.style) },
             Dict["Properties", "ui.customize.inspector"] to
-                    { PropertyInspector({ Selection.selectedInspectable }, DefaultConfig.style, Unit) },
+                    { PropertyInspector({ Selection.selectedInspectables }, DefaultConfig.style) },
             Dict["Cutting Panel", "ui.customize.cuttingPanel"] to { LayerViewContainer(DefaultConfig.style) },
             Dict["Timeline", "ui.customize.timeline"] to { TimelinePanel(DefaultConfig.style) },
             Dict["Animations", "ui.customize.graphEditor"] to { GraphEditor(DefaultConfig.style) },

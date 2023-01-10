@@ -20,7 +20,6 @@ import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.lists.Element
 import me.anno.remsstudio.objects.lists.SplittableElement
-import me.anno.remsstudio.objects.modes.TextMode
 import me.anno.remsstudio.objects.modes.TextRenderMode
 import me.anno.studio.Inspectable
 import me.anno.ui.base.Font
@@ -29,6 +28,8 @@ import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.style.Style
+import me.anno.utils.strings.StringHelper.smallCaps
+import me.anno.utils.structures.tuples.Quad
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
@@ -36,7 +37,6 @@ import java.net.URL
 import kotlin.streams.toList
 
 // todo background "color" in the shape of a plane? for selections and such
-
 // todo Kapitälchen
 
 open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableElement {
@@ -87,11 +87,17 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
     val startCursor = AnimatedProperty.int(-1)
     val endCursor = AnimatedProperty.int(-1)
 
+    // todo support lines around text like https://www.youtube.com/watch?v=iydG-e1dQGA
+    // todo this will influence the outline :)
+    // todo -> parametrize sdf ... second color channel
+    // val startDegrees = AnimatedProperty.float(0f)
+    // val endDegrees = AnimatedProperty.float(360f)
+
     // automatic line break after length x
     var lineBreakWidth = 0f
 
     // todo allow style by HTML/.md? :D
-    var textMode = TextMode.RAW
+    // var textMode = TextMode.RAW
 
     var relativeLineSpacing = AnimatedProperty.float(1f)
 
@@ -99,6 +105,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
     var relativeTabSize = 4f
 
     var font = Font("Verdana", DEFAULT_FONT_HEIGHT, false, false)
+    var smallCaps = false
     val charSpacing get() = font.size * relativeCharSpacing
     var forceVariableBuffer = false
 
@@ -125,13 +132,15 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
         if (text.isEmpty()) return null
         val awtFont = FontManager.getFont(font)
         val absoluteLineBreakWidth = lineBreakWidth * font.size * 2f / DEFAULT_LINE_HEIGHT
-        return awtFont.splitParts(text, font.size, relativeTabSize, relativeCharSpacing, absoluteLineBreakWidth, -1f)
+        val text2 = if (smallCaps) text.smallCaps() else text
+        return awtFont.splitParts(text2, font.size, relativeTabSize, relativeCharSpacing, absoluteLineBreakWidth, -1f)
     }
 
-    fun getVisualState(text: String): Any = Pair(
-        Triple(text, font, lineBreakWidth),
-        Triple(renderingMode, roundSDFCorners, charSpacing)
-    )
+    fun getVisualState(text: String): Any =
+        Quad(
+            renderingMode, roundSDFCorners, charSpacing,
+            Quad(text, font, smallCaps, lineBreakWidth)
+        )
 
     private val shallLoadAsync get() = !forceVariableBuffer
     fun getTextMesh(key: TextSegmentKey): TextRepBase? {
@@ -176,7 +185,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
     }
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
-        if (color.w >= 1f / 255f) TextRenderer.draw(this, stack, time, color) {
+        if (color.w >= 1f / 255f) TextRenderer.draw( this, stack, time, color) {
             super.onDraw(stack, time, color)
         }
     }

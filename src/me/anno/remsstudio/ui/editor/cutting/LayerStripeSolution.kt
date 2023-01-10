@@ -52,16 +52,16 @@ class LayerStripeSolution(
     // if video, draw a few frames in small
     // if audio, draw audio levels
 
-    fun draw(selectedTransform: Transform?, draggedTransform: Transform?) {
+    fun draw(selectedTransform: List<Transform>, draggedTransform: Transform?) {
         iteratorOverGradients(selectedTransform, draggedTransform, true, ::drawStripes, ::drawGradient, ::drawVideo)
     }
 
     fun keepResourcesLoaded() {
-        iteratorOverGradients(null, null, false, { _, _, _, _, _, _ -> }, { _, _, _, _, _, _ -> }, ::keepFrameLoaded)
+        iteratorOverGradients(emptyList(), null, false, { _, _, _, _, _, _ -> }, { _, _, _, _, _, _ -> }, ::keepFrameLoaded)
     }
 
     private fun iteratorOverGradients(
-        selectedTransform: Transform?, draggedTransform: Transform?,
+        selectedTransform: List<Transform>, draggedTransform: Transform?,
         drawAudio: Boolean,
         drawStripes: (x0: Int, x1: Int, y: Int, h: Int, offset: Int, color: Int) -> Unit,
         drawGradient: (x0: Int, x1: Int, y: Int, h: Int, c0: Int, c1: Int) -> Unit,

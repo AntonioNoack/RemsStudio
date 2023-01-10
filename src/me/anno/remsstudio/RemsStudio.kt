@@ -42,7 +42,19 @@ import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.style.Style
 import me.anno.utils.OS
 
-// todo bug: settings are not calculating size correctly until resize
+
+// todo bugs:
+//  - circle cannot be clicked
+
+
+// todo bug:
+//  - settings are not calculating size correctly until resize
+
+
+
+
+
+
 
 // todo Rem's Studio Lite: don't output images, just execute chained ffmpeg commands
 // try to support as many features as possible with just ffmpeg
@@ -121,7 +133,7 @@ import me.anno.utils.OS
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
-object RemsStudio : StudioBase(true, "Rem's Studio", 10115) {
+object RemsStudio : StudioBase(true, "Rem's Studio", 10115) { // todo reenable isShipped
 
     val defaultWindowStack get() = GFX.someWindow.windowStack
     var hideUnusedProperties = false
@@ -174,9 +186,13 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10115) {
     lateinit var welcomeUI: WelcomeUI
 
     override fun isSelected(obj: Any?): Boolean {
-        return obj == Selection.selectedInspectable ||
-                obj == Selection.selectedProperty ||
-                obj == Selection.selectedTransform
+        return contains(obj, Selection.selectedInspectables) ||
+                contains(obj, Selection.selectedProperties) ||
+                contains(obj, Selection.selectedTransforms)
+    }
+
+    private fun <V> contains(obj: Any?, list: List<V>?): Boolean {
+        return list != null && obj in list
     }
 
     override fun createUI() {
@@ -356,7 +372,7 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10115) {
         // todo test scene with ALL rendering/playback features
 
         Build.isDebug = false
-        Build.isShipped = true
+        // Build.isShipped = true
         Build.lock()
         if (args.isEmpty()) {
             run()

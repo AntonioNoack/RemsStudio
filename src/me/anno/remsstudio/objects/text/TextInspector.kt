@@ -3,6 +3,7 @@ package me.anno.remsstudio.objects.text
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.objects.Transform
 import me.anno.studio.Inspectable
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
@@ -20,6 +21,7 @@ fun Text.createInspectorWithoutSuperImpl(
     style: Style,
     getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
 ) {
+    val t = inspected.filterIsInstance<Transform>()
     val c = inspected.filterIsInstance<Text>()
 
     list += vis(inspected, c, "Text", "", "", c.map { it.text }, style)
@@ -41,7 +43,7 @@ fun Text.createInspectorWithoutSuperImpl(
             }
         }
         invalidate()
-    }.setIsSelectedListener { show(inspected, null) }
+    }.setIsSelectedListener { show(t, null) }
 
     fontGroup += BooleanInput("Italic", font.isItalic, false, style)
         .setChangeListener {
@@ -52,7 +54,7 @@ fun Text.createInspectorWithoutSuperImpl(
             }
             invalidate()
         }
-        .setIsSelectedListener { show(inspected, null) }
+        .setIsSelectedListener { show(t, null) }
     fontGroup += BooleanInput("Bold", font.isBold, false, style)
         .setChangeListener {
             RemsStudio.largeChange("Bold: $it") {
@@ -62,7 +64,17 @@ fun Text.createInspectorWithoutSuperImpl(
             }
             invalidate()
         }
-        .setIsSelectedListener { show(inspected, null) }
+        .setIsSelectedListener { show(t, null) }
+    fontGroup += BooleanInput("Small Caps", smallCaps, false, style)
+        .setChangeListener {
+            RemsStudio.largeChange("Small Caps: $it") {
+                for (x in c) for (e in x.getSelfWithShadows()) {
+                    e.smallCaps = it
+                }
+            }
+            invalidate()
+        }
+        .setIsSelectedListener { show(t, null) }
 
     val alignGroup = getGroup("Alignment", "", "alignment")
     fun align(title: String, value: List<AnimatedProperty<*>>) {
@@ -144,12 +156,12 @@ fun Text.createInspectorWithoutSuperImpl(
 
     val rpgEffects = getGroup("RPG Effects", "", "rpg-effects")
     rpgEffects += vis(
-        inspected, c, "Start Cursor", "The first character index to be drawn",
-        c.map { it.startCursor }, style
+        c, "Start Cursor", "The first character index to be drawn", c.map { it.startCursor },
+        style
     )
     rpgEffects += vis(
-        inspected, c, "End Cursor", "The last character index to be drawn; -1 = unlimited",
-        c.map { it.endCursor }, style
+        c, "End Cursor", "The last character index to be drawn; -1 = unlimited", c.map { it.endCursor },
+        style
     )
 
     val outline = getGroup("Outline", "", "outline")
@@ -180,8 +192,7 @@ fun Text.createInspectorWithoutSuperImpl(
         c.map { it.outlineSmoothness }, style
     )
     outline += vis(
-        inspected,
-        c, "Depth",
+        inspected, c, "Depth",
         "For non-merged SDFs to join close characters correctly; needs a distance from the background",
         "outline.depth",
         c.map { it.outlineDepth }, style
@@ -193,6 +204,8 @@ fun Text.createInspectorWithoutSuperImpl(
         for (x in c) x.roundSDFCorners = it
         invalidate()
     }
+    // outline += vis(inspected, c, "Start Angle", "", "", c.map { it.startDegrees }, style)
+    // outline += vis(inspected, c, "End Angle", "", "", c.map { it.endDegrees }, style)
 
     val shadows = getGroup("Shadow", "", "shadow")
     shadows += vis(inspected, c, "Color", "", "shadow.color", c.map { it.shadowColor }, style)

@@ -2,7 +2,7 @@ package me.anno.remsstudio.ui.graphs
 
 import me.anno.animation.Interpolation
 import me.anno.input.MouseButton
-import me.anno.remsstudio.Selection.selectedProperty
+import me.anno.remsstudio.Selection.selectedProperties
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelList
 import me.anno.ui.base.groups.PanelListY
@@ -24,6 +24,7 @@ class GraphEditor(style: Style) : PanelListY(style) {
                 override fun onMouseDown(x: Float, y: Float, button: MouseButton) {
                     println("textButton.onMouseDown")
                 }
+
                 override fun onUpdate() {
                     isVisible = body.selectedKeyframes.isNotEmpty()
                     super.onUpdate()
@@ -38,7 +39,7 @@ class GraphEditor(style: Style) : PanelListY(style) {
                 .setTooltip(if (type.description.isEmpty()) type.displayName else "${type.displayName}: ${type.description}")
                 .addLeftClickListener {
                     println("setting $type to ${body.selectedKeyframes}")
-                    for(it in body.selectedKeyframes) it.interpolation = type
+                    for (it in body.selectedKeyframes) it.interpolation = type
                     body.invalidateDrawing()
                 }
         }
@@ -54,7 +55,7 @@ class GraphEditor(style: Style) : PanelListY(style) {
             it.tick()
         }
 
-        children[0].isVisible = selectedProperty?.isAnimated == true
+        children[0].isVisible = selectedProperties?.firstOrNull()?.isAnimated == true
     }
 
     override val className get() = "GraphEditor"

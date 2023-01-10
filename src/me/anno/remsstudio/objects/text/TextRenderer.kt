@@ -1,6 +1,7 @@
 package me.anno.remsstudio.objects.text
 
 import me.anno.cache.keys.TextSegmentKey
+import me.anno.fonts.FontManager
 import me.anno.fonts.PartResult
 import me.anno.fonts.mesh.TextMesh
 import me.anno.fonts.signeddistfields.algorithm.SignedDistanceField
@@ -11,20 +12,27 @@ import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.remsstudio.objects.attractors.EffectMorphing
 import me.anno.remsstudio.objects.modes.TextRenderMode
 import me.anno.remsstudio.objects.text.Text.Companion.DEFAULT_FONT_HEIGHT
+import me.anno.ui.base.Font
 import me.anno.ui.editor.sceneView.Grid
 import me.anno.utils.pooling.JomlPools
 import me.anno.utils.types.Strings.isBlank2
 import me.anno.utils.types.Vectors.mulAlpha
 import me.anno.utils.types.Vectors.times
 import me.anno.video.MissingFrameException
-import org.joml.*
+import org.joml.Matrix4fArrayList
+import org.joml.Vector2f
+import org.joml.Vector3f
+import org.joml.Vector4f
 import java.awt.font.TextLayout
 import kotlin.math.max
 import kotlin.math.min
 
 object TextRenderer {
 
-    fun draw(element: Text, stack: Matrix4fArrayList, time: Double, color: Vector4f, superCall: () -> Unit) {
+    fun draw(
+        element: Text, stack: Matrix4fArrayList, time: Double, color: Vector4f,
+        superCall: () -> Unit
+    ) {
 
         val text = element.text[time]
         if (text.isBlank2()) {
@@ -35,7 +43,8 @@ object TextRenderer {
 
         val (lineSegmentsWithStyle, keys) = element.getSegments(text)
 
-        val exampleLayout = lineSegmentsWithStyle.exampleLayout
+        val font2 = FontManager.getFont(element.font)
+        val exampleLayout = font2.exampleLayout
         val scaleX = TextMesh.DEFAULT_LINE_HEIGHT / (exampleLayout.ascent + exampleLayout.descent)
         val scaleY = 1f / (exampleLayout.ascent + exampleLayout.descent)
         val width = lineSegmentsWithStyle.width * scaleX
@@ -70,7 +79,7 @@ object TextRenderer {
         }
 
         val lineBreakWidth = element.lineBreakWidth
-        if (lineBreakWidth > 0f && !GFX.isFinalRendering && Selection.selectedTransform === element) {
+        if (lineBreakWidth > 0f && !GFX.isFinalRendering && element in Selection.selectedTransforms) {
             // draw the borders
             // why 0.81? correct x-scale? (off by ca ~ x0.9)
             val x0 = dx + width * 0.5f
@@ -126,8 +135,8 @@ object TextRenderer {
     }
 
     /**
-     * if the alpha of a color is zero, it should be assigned the weighted sum if the neighbor colors
-     * or the shader needs to be improved
+     * if the alpha of a color is zero, it should be assigned the weighted sum if the neighbor colors,
+     * or the shader needs to be improved;
      * let's just try the easiest way to correct the issue in 99% of all cases
      * */
     private fun correctColors(color: Vector4f, oc0: Vector4f, oc1: Vector4f, oc2: Vector4f) {
@@ -321,7 +330,8 @@ object TextRenderer {
                         ),
                         floatArrayOf(-1e3f, outline.x, outline.y, outline.z, outline.w),
                         floatArrayOf(0f, smoothness.x, smoothness.y, smoothness.z, smoothness.w),
-                        outlineDepth, hasUVAttractors
+                        outlineDepth,
+                        hasUVAttractors,
                     )
 
                     firstTimeDrawing = false

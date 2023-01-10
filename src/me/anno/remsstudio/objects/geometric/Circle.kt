@@ -40,9 +40,9 @@ open class Circle(parent: Transform? = null) : GFXTransform(parent) {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<Circle>()
         val geo = getGroup("Geometry", "", "geometry")
-        geo += vis(inspected, c, "Inner Radius", "Relative size of hole in the middle", c.map { it.innerRadius }, style)
-        geo += vis(inspected, c, "Start Degrees", "To cut a piece out of the circle", c.map { it.startDegrees }, style)
-        geo += vis(inspected, c, "End Degrees", "To cut a piece out of the circle", c.map { it.endDegrees }, style)
+        geo += vis(c, "Inner Radius", "Relative size of hole in the middle", c.map { it.innerRadius }, style)
+        geo += vis(c, "Start Degrees", "To cut a piece out of the circle", c.map { it.startDegrees }, style)
+        geo += vis(c, "End Degrees", "To cut a piece out of the circle", c.map { it.endDegrees }, style)
     }
 
     override fun save(writer: BaseWriter) {

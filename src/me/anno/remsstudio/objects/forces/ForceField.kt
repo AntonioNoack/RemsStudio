@@ -72,8 +72,8 @@ abstract class ForceField(val displayName: String, val descriptionI: String) : T
                 if (p != null) Pair(it, p) else null
             }
             list += vis(
-                inspected, matching.map { it.first }, property.title, property.description,
-                matching.map { it.second }, style
+                matching.map { it.first }, property.title, property.description, matching.map { it.second },
+                style
             )
         }
     }

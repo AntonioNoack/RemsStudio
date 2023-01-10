@@ -82,13 +82,13 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<LinePolygon>()
         val group = getGroup("Line", "Properties of the line", "line")
-        group += vis(inspected, c, "Start Offset", "", c.map { it.startOffset }, style)
-        group += vis(inspected, c, "End Offset", "", c.map { it.endOffset }, style)
-        group += vis(inspected, c, "Line Strength", "", c.map { it.lineStrength }, style)
-        group += vis(inspected, c, "Is Closed", "", c.map { it.isClosed }, style)
+        group += vis(c, "Start Offset", "", c.map { it.startOffset }, style)
+        group += vis(c, "End Offset", "", c.map { it.endOffset }, style)
+        group += vis(c, "Line Strength", "", c.map { it.lineStrength }, style)
+        group += vis(c, "Is Closed", "", c.map { it.isClosed }, style)
         group += vis(
-            inspected, c, "Fading", "How much the last points fade, if the offsets exclude everything",
-            c.map { it.fadingOnEnd }, style
+            c, "Fading", "How much the last points fade, if the offsets exclude everything", c.map { it.fadingOnEnd },
+            style
         )
     }
 

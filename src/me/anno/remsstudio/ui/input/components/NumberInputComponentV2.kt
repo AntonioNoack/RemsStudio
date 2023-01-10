@@ -76,7 +76,7 @@ class NumberInputComponentV2(
             AnimationDriver.openDriverSelectionMenu(windowStack, oldDriver) { driver ->
                 RemsStudio.largeChange("Changed driver to ${driver?.className}") {
                     owningProperty.drivers[indexInProperty] = driver
-                    if (driver != null) Selection.selectProperty(driver)
+                    if (driver != null) Selection.selectProperty(listOf(driver))
                     else {
                         text = when (val numberInput = numberInput) {
                             is IntInput -> numberInput.stringify(numberInput.lastValue)

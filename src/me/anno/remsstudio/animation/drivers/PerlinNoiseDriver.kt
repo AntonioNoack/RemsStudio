@@ -45,14 +45,21 @@ class PerlinNoiseDriver : AnimationDriver() {
     override fun createInspector(
         inspected: List<Inspectable>,
         list: MutableList<Panel>,
-        transform: Transform,
+        transforms: List<Transform>,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(inspected, list, transform, style, getGroup)
-        list += transform.vi(inspected, "Octaves", "Levels of Detail", Type.INT_PLUS, octaves, style) { octaves = it }
-        list += transform.vi(inspected, "Seed", "", Type.LONG, seed, style) { seed = it }
-        list += transform.vi(inspected, "Falloff", "Changes high-frequency weight", falloff, style)
+        super.createInspector(inspected, list, transforms, style, getGroup)
+        val transform = transforms.first()
+        val c = inspected.filterIsInstance<PerlinNoiseDriver>()
+        list += transform.vi(inspected, "Octaves", "Levels of Detail", Type.INT_PLUS, octaves, style) {
+            for (x in c) x.octaves = it
+        }
+        list += transform.vi(inspected, "Seed", "", Type.LONG, seed, style) { for (x in c) x.seed = it }
+        list += transform.vis(
+            c.map { transform }, "Falloff", "Changes high-frequency weight", c.map { it.falloff },
+            style
+        )
     }
 
     override fun save(writer: BaseWriter) {

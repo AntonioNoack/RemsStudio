@@ -8,7 +8,7 @@ import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.Selection.select
 import me.anno.remsstudio.Selection.selectProperty
-import me.anno.remsstudio.Selection.selectedTransform
+import me.anno.remsstudio.Selection.selectedTransforms
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
 import me.anno.studio.Inspectable
@@ -66,24 +66,23 @@ abstract class AnimationDriver : Saveable(), Inspectable {
     open fun createInspector(
         inspected: List<Inspectable>,
         list: MutableList<Panel>,
-        transform: Transform,
+        transforms: List<Transform>,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        list += transform.vi(
-            inspected, "Amplitude",
-            "Scale of randomness", "driver.amplitude",
-            amplitude, style
+        val transform = transforms[0]
+        list += transform.vis(
+            listOf(transform), listOf(transform), "Amplitude", "Scale of randomness",
+            "driver.amplitude", listOf(amplitude), style
         )
         list += transform.vi(
-            inspected, "Frequency",
-            "How fast it's changing", "driver.frequency",
+            inspected, "Frequency", "How fast it's changing", "driver.frequency",
             Type.DOUBLE, frequency, style
         ) { frequency = it }
     }
 
-    fun show(toShow: AnimatedProperty<*>?) {
-        select(selectedTransform!!, toShow)
+    fun show(toShow: List<AnimatedProperty<*>>?) {
+        select(selectedTransforms, toShow)
     }
 
     override fun save(writer: BaseWriter) {
@@ -118,8 +117,8 @@ abstract class AnimationDriver : Saveable(), Inspectable {
             Dict["Driver Inspector", "driver.inspector.title"],
             style
         )
-        val t = selectedTransform!!
-        createInspector(listOf(t), list.children, t, style, getGroup)
+        val t = selectedTransforms!!
+        createInspector(t, list.children, t, style, getGroup)
     }
 
     companion object {
@@ -149,7 +148,7 @@ abstract class AnimationDriver : Saveable(), Inspectable {
             if (oldDriver != null) {
                 options.add(0,
                     MenuOption(NameDesc("Customize", "Change the driver properties", "driver.edit")) {
-                        selectProperty(oldDriver)
+                        selectProperty(listOf(oldDriver))
                     })
                 options += MenuOption(
                     NameDesc("Remove Driver", "Changes back to keyframe-animation", "driver.remove")

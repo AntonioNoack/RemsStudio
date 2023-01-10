@@ -52,8 +52,9 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<GFXTransform>()
         val fx = getGroup("Effects", "Visual Effects Settings", "effects")
-        fx += vis(inspected, c, "Coloring: Base Color", "Base color for coloring",
-            c.map { it.attractorBaseColor }, style
+        fx += vis(
+            c, "Coloring: Base Color", "Base color for coloring", c.map { it.attractorBaseColor },
+            style
         )
     }
 

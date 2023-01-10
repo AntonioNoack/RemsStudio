@@ -179,6 +179,7 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
+        val t = inspected.filterIsInstance<Transform>()
         val c = inspected.filterIsInstance<SoftLink>()
         val link = getGroup("Link Data", "", "softLink")
         link += vi(inspected, "File", "Where the data is to be loaded from", "", null, file, style) {
@@ -198,13 +199,9 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
                     for (x in c) x.putValue(x.resolution, Vector2f(w.toFloat(), h.toFloat()), false)
                 }
             }
-            .setIsSelectedListener { show(inspected, resolution) }
+            .setIsSelectedListener { show(t, t.map { (it as? SoftLink)?.resolution }) }
         list += vis(
-            inspected,
-            c,
-            "Tiling",
-            "(tile count x, tile count y, offset x, offset y)",
-            c.map { it.tiling },
+            c, "Tiling", "(tile count x, tile count y, offset x, offset y)", c.map { it.tiling },
             style
         )
         list += vi(

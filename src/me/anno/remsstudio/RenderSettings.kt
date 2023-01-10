@@ -104,9 +104,9 @@ object RenderSettings : Transform() {
         // todo still cannot be animated... why???
         // todo why is the field not showing up?
         val mbs = vi(
-            inspected, "Motion-Blur-Steps",
-            "0,1 = no motion blur, e.g. 16 = decent motion blur, sub-frames per frame",
-            project.motionBlurSteps, style
+            "Motion-Blur-Steps", "0,1 = no motion blur, e.g. 16 = decent motion blur, sub-frames per frame",
+            project.motionBlurSteps,
+            style
         ) as IntInput
         val mbsListener = mbs.changeListener
         mbs.setChangeListener {
@@ -116,9 +116,9 @@ object RenderSettings : Transform() {
         list += mbs
 
         val shp = vi(
-            inspected, "Shutter-Percentage",
-            "[Motion Blur] 1 = full frame is used; 0.1 = only 1/10th of a frame time is used",
-            project.shutterPercentage, style
+            "Shutter-Percentage", "[Motion Blur] 1 = full frame is used; 0.1 = only 1/10th of a frame time is used",
+            project.shutterPercentage,
+            style
         ) as FloatInput
         val shpListener = shp.changeListener
         shp.setChangeListener {

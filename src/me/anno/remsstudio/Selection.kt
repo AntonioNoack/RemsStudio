@@ -17,72 +17,88 @@ object Selection {
 
     private val LOGGER = LogManager.getLogger(Selection::class)
 
-    val selectedProperty: AnimatedProperty<*>? get() = sp
-    val selectedTransform: Transform? get() = st
-    val selectedInspectable: Inspectable? get() = si
+    var selectedProperties: List<AnimatedProperty<*>?>? = null
+        private set
 
-    private var sp: AnimatedProperty<*>? = null
-    private var st: Transform? = null
-    private var si: Inspectable? = null
+    var selectedTransforms: List<Transform> = emptyList()
+        private set
 
-    var selectedUUID = -1
+    var selectedInspectables: List<Inspectable> = emptyList()
+        private set
+
+    var selectedUUIDs = emptyList<Int>()
     var selectedPropName: String? = null
     var needsUpdate = true
 
     fun clear() {
-        selectedUUID = -1
+        selectedUUIDs = emptyList()
         selectedPropName = null
         needsUpdate = true
     }
 
-    fun select(uuid: Int, name: String?) {
-        selectedUUID = uuid
+    fun select(uuids: List<Int>, name: String?) {
+        selectedUUIDs = uuids
         selectedPropName = name
         needsUpdate = true
     }
 
-    fun selectProperty(property: ISaveable) {
-        if (selectedProperty == property) {
-            select(selectedTransform!!, null)
-        } else select(selectedTransform!!, property)
+    fun selectProperty(property: List<ISaveable?>) {
+        if (selectedProperties == property) {
+            select(selectedTransforms, null)
+        } else select(selectedTransforms, property)
+    }
+
+    fun selectTransform(transform: List<Transform>) {
+        select(transform, null)
     }
 
     fun selectTransform(transform: Transform?) {
-        select(transform, null)
+        select(if (transform != null) listOf(transform) else emptyList(), null)
     }
 
-    fun selectTransformMaybe(transform: Transform?) {
-        // if already selected, don't inspect that property/driver
-        if (selectedTransform == transform) clear()
-        select(transform, null)
+    fun select(transform: Transform, property: ISaveable?) {
+        select(listOf(transform), if (property != null) listOf(property) else null)
     }
 
-    fun select(transform: Transform?, property: ISaveable?) {
-        if (transform === st && property === sp) return
-        if (Math.random() < 0.5 && transform == null && property == null) TODO()
-        if (transform != null) {
+    fun select(transforms0: List<Transform>, properties: List<ISaveable?>?) {
+        if (same(transforms0, selectedTransforms) && same(properties, selectedProperties)) return
+        val transforms = transforms0.map { transform ->
             val loi = transform.listOfInheritance.toList()
-            if (loi.withIndex().any { (index, t) -> index > 0 && t.areChildrenImmutable }) {
-                val lot = loi.last { it.areChildrenImmutable }
-                LOGGER.info("Selected immutable element ${transform.name}, selecting the parent ${lot.name}")
-                select(lot, null)
-                return
+            var replacement: Transform? = null
+            for (i in loi.lastIndex downTo 1) {
+                if (loi[i].areChildrenImmutable) {
+                    replacement = loi[i]
+                    LOGGER.info("Selected immutable element ${transform.name}, selecting the parent ${replacement.name}")
+                    break
+                }
             }
+            replacement ?: transform
         }
 
-        if (st == transform && sp == property) return
-        val newName = if (transform == null || property == null) null else PropertyFinder.getName(transform, property)
+        if (selectedTransforms == transforms && selectedProperties == properties) return
+        val newName = if (properties == null || properties[0] == null) null
+        else PropertyFinder.getName(transforms[0], properties[0]!!)
         val propName = newName ?: selectedPropName
         // LOGGER.info("$newName:$propName from ${transform?.className}:${property?.className}")
-        RemsStudio.largeChange("Select ${transform?.name ?: "Nothing"}:$propName") {
-            selectedUUID = getIdFromTransform(transform)
+        RemsStudio.largeChange("Select ${transforms.firstOrNull()?.name ?: "Nothing"}:$propName") {
+            selectedUUIDs = transforms.map { getIdFromTransform(it) }
             selectedPropName = propName
-            st = transform
-            val property2 =
-                if (transform == null) property else PropertyFinder.getValue(transform, selectedPropName ?: "")
-            si = property2 as? Inspectable ?: transform
-            sp = property2 as? AnimatedProperty<*>
+            selectedTransforms = transforms
+            val property2 = transforms.map { PropertyFinder.getValue(it, selectedPropName ?: "") }
+            selectedInspectables = property2.withIndex().map { (i, it) -> it as? Inspectable ?: transforms[i] }
+            selectedProperties = property2.map { it as? AnimatedProperty<*> }
         }
+    }
+
+    fun <V> same(l0: List<V>?, l1: List<V>?): Boolean {
+        if (l0 === l1) return true
+        if (l0 == null || l1 == null) return false
+        if (l0.size != l1.size) return false
+        for (i in l0.indices) {
+            if (l0[i] !== l1[i])
+                return false
+        }
+        return true
     }
 
     fun update() {
@@ -93,16 +109,18 @@ object Selection {
         } else {
 
             // re-find the selected transform and property...
-            st = getTransformFromId()
-            val selectedTransform = st
+            selectedTransforms = getTransformsFromId()
+            val selectedTransforms = selectedTransforms
             val selectedPropName = selectedPropName
-            if (selectedTransform != null && selectedPropName != null) {
-                val value = PropertyFinder.getValue(selectedTransform, selectedPropName)
-                sp = value as? AnimatedProperty<*>
-                si = value as? Inspectable
+            if (selectedTransforms != null && selectedPropName != null) {
+                val values = selectedTransforms.map {
+                    PropertyFinder.getValue(it, selectedPropName)
+                }
+                selectedProperties = values.map { it as? AnimatedProperty<*> }
+                selectedInspectables = values.mapNotNull { it as? Inspectable }
             } else {
-                sp = null
-                si = st
+                selectedProperties = null
+                selectedInspectables = this.selectedTransforms ?: emptyList()
             }
 
             invalidateUI(true)
@@ -121,11 +139,13 @@ object Selection {
         return id
     }
 
-    private fun getTransformFromId(): Transform? {
-        return when {
-            selectedUUID < 0 -> null
-            selectedUUID < specialIdOffset -> root.listOfAll.getOrNull(selectedUUID)
-            else -> specialIds.reverse.getOrDefault(selectedUUID, null)
+    private fun getTransformsFromId(): List<Transform> {
+        return selectedUUIDs.mapNotNull { selectedUUID ->
+            when {
+                selectedUUID < 0 -> null
+                selectedUUID < specialIdOffset -> root.listOfAll.getOrNull(selectedUUID)
+                else -> specialIds.reverse.getOrDefault(selectedUUID, null)
+            }
         }
     }
 

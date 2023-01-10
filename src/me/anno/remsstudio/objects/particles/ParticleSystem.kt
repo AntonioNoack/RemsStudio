@@ -383,7 +383,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
 
         general += BooleanInput("Show Children", showChildren, false, style)
             .setChangeListener { for (x in c) x.showChildren = it }
-            .setIsSelectedListener { show(inspected, null) }
+            .setIsSelectedListener { show(inspected.filterIsInstance<Transform>(), null) }
 
         general += vi(inspected,"Seed", "The seed for all randomness", null, seed, style) {
             for (x in c) x.seed = it

@@ -31,11 +31,11 @@ class HarmonicDriver : AnimationDriver() {
     override fun createInspector(
         inspected: List<Inspectable>,
         list: MutableList<Panel>,
-        transform: Transform,
+        transforms: List<Transform>,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(inspected, list, transform, style, getGroup)
+        super.createInspector(inspected, list, transforms, style, getGroup)
         val name = getDisplayName()
         list += TextInput(name, "", harmonicsFormula, style.getChild("deep"))
             .addChangeListener { harmonicsFormula = it; updateHarmonics() }

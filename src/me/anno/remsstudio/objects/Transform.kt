@@ -21,8 +21,6 @@ import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.editorTime
 import me.anno.remsstudio.Scene
 import me.anno.remsstudio.Selection.select
-import me.anno.remsstudio.Selection.selectTransform
-import me.anno.remsstudio.Selection.selectedTransform
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.modes.TransformVisibility
 import me.anno.remsstudio.objects.particles.ParticleSystem
@@ -173,7 +171,8 @@ open class Transform() : Saveable(),
             weightI.value = value
         }
 
-    fun putValue(list: AnimatedProperty<*>, value: Any, updateHistory: Boolean) {
+    fun putValue(list: AnimatedProperty<*>?, value: Any, updateHistory: Boolean) {
+        list ?: return
         val time = global2Kf(editorTime)
         if (updateHistory) {
             RemsStudio.incrementalChange("Change Keyframe Value") {
@@ -194,9 +193,8 @@ open class Transform() : Saveable(),
         child.parent = this
     }
 
-    fun show(selves: List<Inspectable>, anim: AnimatedProperty<*>?) {
-        // todo fix this: keep all selected
-        if (selves.size == 1) select(this, anim)
+    fun show(selves: List<Transform>, anim: List<AnimatedProperty<*>?>?) {
+        select(selves, anim)
     }
 
     private val tmp0 = Vector4f()
@@ -232,10 +230,10 @@ open class Transform() : Saveable(),
 
         list += TextInput("Name ($className)", "", name, style)
             .addChangeListener { for (x in c) name = it.ifEmpty { "-" } }
-            .setIsSelectedListener { show(inspected, null) }
+            .setIsSelectedListener { show(c, null) }
         list += TextInputML("Comment", comment, style)
             .addChangeListener { for (x in c) comment = it }
-            .setIsSelectedListener { show(inspected, null) }
+            .setIsSelectedListener { show(c, null) }
 
         val warningPanel = UpdatingTextPanel(500, style) { lastWarning }
         warningPanel.textColor = warningPanel.textColor.mulARGB(0xffff3333.toInt())
@@ -258,36 +256,39 @@ open class Transform() : Saveable(),
         // todo else show sth like ---
         list += TextInput("Tags", "", tags, style)
             .addChangeListener { for (x in c) x.tags = it }
-            .setIsSelectedListener { show(inspected, null) }
+            .setIsSelectedListener { show(c, null) }
             .setTooltip("For Search | Not implemented yet")
 
         // transforms
         val transform = getGroup("Transform", "Translation Scale, Rotation, Skewing", "transform")
-        transform += vis(inspected, c, "Position", "Location of this object", c.map { it.position }, style)
-        transform += vis(inspected, c, "Scale", "Makes it bigger/smaller", c.map { it.scale }, style)
-        transform += vis(inspected, c, "Rotation", "Pitch,Yaw,Roll", c.map { it.rotationYXZ }, style)
-        transform += vis(inspected, c, "Skew", "Transform it similar to a shear", c.map { it.skew }, style)
+        transform += vis(c, "Position", "Location of this object", c.map { it.position }, style)
+        transform += vis(c, "Scale", "Makes it bigger/smaller", c.map { it.scale }, style)
+        transform += vis(c, "Rotation", "Pitch,Yaw,Roll", c.map { it.rotationYXZ }, style)
+        transform += vis(c, "Skew", "Transform it similar to a shear", c.map { it.skew }, style)
         transform += vis(
-            inspected, c, "Alignment with Camera", "0 = in 3D, 1 = looking towards the camera; billboards",
-            c.map { it.alignWithCamera }, style
+            c,
+            "Alignment with Camera",
+            "0 = in 3D, 1 = looking towards the camera; billboards",
+            c.map { it.alignWithCamera },
+            style
         )
 
         // color
         val colorGroup = getGroup("Color", "", "color")
-        colorGroup += vis(inspected, c, "Color", "Tint, applied to this & children", c.map { it.color }, style)
+        colorGroup += vis(c, "Color", "Tint, applied to this & children", c.map { it.color }, style)
         colorGroup += vis(
-            inspected, c, "Color Multiplier", "To make things brighter than usually possible",
-            c.map { it.colorMultiplier }, style
+            c, "Color Multiplier", "To make things brighter than usually possible", c.map { it.colorMultiplier },
+            style
         )
 
         val ufd = usesFadingDifferently()
         if (ufd || getStartTime().isFinite()) colorGroup += vis(
-            inspected, c, "Fade In", "Transparency at the start",
-            c.map { it.fadeIn }, style
+            c, "Fade In", "Transparency at the start", c.map { it.fadeIn },
+            style
         )
         if (ufd || getEndTime().isFinite()) colorGroup += vis(
-            inspected, c, "Fade Out", "Transparency at the end",
-            c.map { it.fadeOut }, style
+            c, "Fade Out", "Transparency at the end", c.map { it.fadeOut },
+            style
         )
 
         // kind of color...
@@ -295,7 +296,8 @@ open class Transform() : Saveable(),
 
         // time
         val timeGroup = getGroup("Time", "", "time")
-        timeGroup += vis(inspected, "Start Time", "Delay the animation", "", null,
+        timeGroup += vis(
+            inspected, "Start Time", "Delay the animation", "", null,
             c.map { it.timeOffset }, style
         )
         timeGroup += vis(
@@ -303,8 +305,8 @@ open class Transform() : Saveable(),
             dilationType, c.map { it.timeDilation }, style
         )
         timeGroup += vis(
-            inspected, c, "Advanced Time", "Add acceleration/deceleration to your elements",
-            c.map { it.timeAnimated }, style
+            c, "Advanced Time", "Add acceleration/deceleration to your elements", c.map { it.timeAnimated },
+            style
         )
 
         val editorGroup = getGroup("Editor", "", "editor")
@@ -720,11 +722,6 @@ open class Transform() : Saveable(),
         return parentTransform to localTime
     }
 
-    /*fun removeFromParent() {
-        parent?.removeChild(this)
-        parent = null
-    }*/
-
     override fun isDefaultValue() = false
 
     fun clone() = clone(workspace)
@@ -816,14 +813,13 @@ open class Transform() : Saveable(),
     }
 
     fun vi(
-        inspected: List<Inspectable>,
         title: String,
         ttt: String,
         dictSubPath: String,
         values: AnimatedProperty<*>,
         style: Style
     ): Panel {
-        return vi(inspected, Dict[title, "obj.$dictSubPath"], Dict[ttt, "obj.$dictSubPath.desc"], values, style)
+        return vi(Dict[title, "obj.$dictSubPath"], Dict[ttt, "obj.$dictSubPath.desc"], values, style)
     }
 
     fun vis(
@@ -836,7 +832,6 @@ open class Transform() : Saveable(),
         style: Style
     ): Panel {
         return vis(
-            inspected,
             selves,
             Dict[title, "obj.$dictSubPath"],
             Dict[ttt, "obj.$dictSubPath.desc"],
@@ -850,26 +845,21 @@ open class Transform() : Saveable(),
      * title, tool tip text, type, start value
      * modifies the AnimatedProperty-Object, so no callback is needed
      * */
-    fun vi(inspected: List<Inspectable>, title: String, ttt: String, values: AnimatedProperty<*>, style: Style): Panel {
-        return ComponentUIV2.vi(inspected, this, title, ttt, values, style)
+    fun vi(title: String, ttt: String, values: AnimatedProperty<*>, style: Style): Panel {
+        return ComponentUIV2.vi(this, title, ttt, values, style)
     }
 
     fun vis(
-        inspected: List<Inspectable>,
         selves: List<Transform>,
         title: String,
         ttt: String,
-        values: List<AnimatedProperty<*>>,
+        values: List<AnimatedProperty<*>?>,
         style: Style
     ): Panel {
-        return ComponentUIV2.vis(inspected, selves, title, ttt, values, style)
+        return ComponentUIV2.vis(selves, title, ttt, values, style)
     }
 
-    override fun onDestroy() {
-        if (selectedTransform === this) {
-            selectTransform(null)
-        }
-    }
+    override fun onDestroy() {}
 
     override fun destroy() {
         removeFromParent()
@@ -946,6 +936,13 @@ open class Transform() : Saveable(),
     open fun getRelativeSize() = Vector3f(1f)
 
     companion object {
+
+        inline fun <reified C> List<Transform>.map2(mapper: (C) -> AnimatedProperty<*>): List<AnimatedProperty<*>?> {
+            return map {
+                if (it is C) mapper(it)
+                else null
+            }
+        }
 
         fun drawUICircle(stack: Matrix4fArrayList, scale: Float = 0.02f, inner: Float = 0.7f, color: Vector4f) {
             // draw a small symbol to indicate pivot

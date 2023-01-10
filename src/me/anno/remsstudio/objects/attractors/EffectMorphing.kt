@@ -30,8 +30,8 @@ class EffectMorphing : Transform() {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<EffectMorphing>()
         val fx = getGroup("Effect", "", "effects")
-        fx += vis(inspected, c, "Strength", "The effective scale", c.map { it.influence }, style)
-        fx += vis(inspected, c, "Sharpness", "How sharp the lens effect is", c.map { it.sharpness }, style)
+        fx += vis(c, "Strength", "The effective scale", c.map { it.influence }, style)
+        fx += vis(c, "Sharpness", "How sharp the lens effect is", c.map { it.sharpness }, style)
     }
 
     override fun save(writer: BaseWriter) {

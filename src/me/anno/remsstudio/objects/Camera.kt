@@ -149,12 +149,12 @@ class Camera(parent: Transform? = null) : Transform(parent) {
 
         val dist = getGroup("Distortion", "Transforms the image", "distortion")
         dist += vis(
-            inspected, c, "Distortion", "Params: R², R⁴, Scale",
-            c.map { it.distortion }, style
+            c, "Distortion", "Params: R², R⁴, Scale", c.map { it.distortion },
+            style
         )
         dist += vis(
-            inspected, c, "Distortion Offset", "Moves the center of the distortion",
-            c.map { it.distortionOffset }, style
+            c, "Distortion Offset", "Moves the center of the distortion", c.map { it.distortionOffset },
+            style
         )
 
 

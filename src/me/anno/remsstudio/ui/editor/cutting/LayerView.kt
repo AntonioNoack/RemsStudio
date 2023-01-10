@@ -21,7 +21,7 @@ import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.isPlaying
 import me.anno.remsstudio.Selection.select
 import me.anno.remsstudio.Selection.selectTransform
-import me.anno.remsstudio.Selection.selectedTransform
+import me.anno.remsstudio.Selection.selectedTransforms
 import me.anno.remsstudio.animation.Keyframe
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.Video
@@ -154,7 +154,7 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
         this.solution?.apply {
             this.y0 = y
             this.y1 = y + h
-            draw(selectedTransform, draggedTransform)
+            draw(selectedTransforms, draggedTransform)
         }
 
         val draggedTransform = draggedTransform
@@ -164,7 +164,7 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
             if (isHovered) {
                 val window = window!!
                 val hovered = getTransformAt(window.mouseX, window.mouseY)
-                    ?: if (selectedTransform?.timelineSlot?.value == timelineSlot) selectedTransform else null
+                    ?: selectedTransforms.firstOrNull { it.timelineSlot.value == timelineSlot }
                 hoveredTransform = hovered
                 if (hovered != null) drawLines(x0, y0, x1, y1, hovered)
             }
@@ -266,7 +266,9 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
 
     override fun onDeleteKey(x: Float, y: Float) {
         RemsStudio.largeChange("Deleted Component") {
-            selectedTransform?.destroy()
+            for (selectedTransform in selectedTransforms)
+                selectedTransform.destroy()
+            select(emptyList<Transform>(), null)
         }
     }
 
