@@ -139,7 +139,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
     fun getVisualState(text: String): Any =
         Quad(
             renderingMode, roundSDFCorners, charSpacing,
-            Quad(text, font, smallCaps, lineBreakWidth)
+            Quad(text, font, smallCaps, Pair(lineBreakWidth, relativeTabSize))
         )
 
     private val shallLoadAsync get() = !forceVariableBuffer
@@ -185,7 +185,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
     }
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
-        if (color.w >= 1f / 255f) TextRenderer.draw( this, stack, time, color) {
+        if (color.w >= 1f / 255f) TextRenderer.draw(this, stack, time, color) {
             super.onDraw(stack, time, color)
         }
     }
@@ -203,9 +203,12 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
 
         // basic settings
         writer.writeObject(this, "text", text)
+
+        // font
         writer.writeString("font", font.name)
         writer.writeBoolean("isItalic", font.isItalic)
         writer.writeBoolean("isBold", font.isBold)
+        writer.writeBoolean("smallCaps", smallCaps)
 
         // alignment
         writer.writeObject(this, "textAlignment", textAlignment)
@@ -274,6 +277,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
             "isBold" -> font = font.withBold(value)
             "isItalic" -> font = font.withItalic(value)
             "roundSDFCorners" -> roundSDFCorners = value
+            "smallCaps" -> smallCaps = value
             else -> super.readBoolean(name, value)
         }
         invalidate()

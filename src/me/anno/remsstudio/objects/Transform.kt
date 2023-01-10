@@ -12,6 +12,7 @@ import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
+import me.anno.io.files.InvalidRef
 import me.anno.io.text.TextReader
 import me.anno.io.text.TextWriter
 import me.anno.language.translation.Dict
@@ -724,7 +725,7 @@ open class Transform() : Saveable(),
 
     override fun isDefaultValue() = false
 
-    fun clone() = clone(workspace)
+    fun clone() = clone(InvalidRef)
     open fun clone(workspace: FileReference): Transform {
         val asString = try {
             TextWriter.toText(this, workspace)
