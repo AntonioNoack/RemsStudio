@@ -7,10 +7,7 @@ import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.audio.effects.falloff.ExponentialFalloff
 import me.anno.remsstudio.audio.effects.falloff.LinearFalloff
 import me.anno.remsstudio.audio.effects.falloff.SquareFalloff
-import me.anno.remsstudio.audio.effects.impl.AmplitudeEffect
-import me.anno.remsstudio.audio.effects.impl.EchoEffect
-import me.anno.remsstudio.audio.effects.impl.EqualizerEffect
-import me.anno.remsstudio.audio.effects.impl.PitchEffect
+import me.anno.remsstudio.audio.effects.impl.*
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
 import me.anno.studio.Inspectable
@@ -171,7 +168,8 @@ class SoundPipeline() : Saveable(), Inspectable {
             { PitchEffect() },
             { SquareFalloff() },
             { LinearFalloff() },
-            { ExponentialFalloff() }
+            { ExponentialFalloff() },
+            { NoiseSuppressionEffect() }
         )
 
     }

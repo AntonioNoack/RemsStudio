@@ -17,14 +17,11 @@ import me.anno.remsstudio.audio.effects.SoundPipeline
 import me.anno.remsstudio.audio.effects.falloff.ExponentialFalloff
 import me.anno.remsstudio.audio.effects.falloff.LinearFalloff
 import me.anno.remsstudio.audio.effects.falloff.SquareFalloff
-import me.anno.remsstudio.audio.effects.impl.AmplitudeEffect
-import me.anno.remsstudio.audio.effects.impl.EchoEffect
-import me.anno.remsstudio.audio.effects.impl.EqualizerEffect
-import me.anno.remsstudio.audio.effects.impl.PitchEffect
 import me.anno.io.ISaveable.Companion.registerCustomClass
 import me.anno.io.SaveableArray
 import me.anno.io.utils.StringMap
 import me.anno.remsstudio.animation.drivers.RhythmDriver
+import me.anno.remsstudio.audio.effects.impl.*
 import me.anno.remsstudio.objects.*
 import me.anno.remsstudio.objects.attractors.EffectColoring
 import me.anno.remsstudio.objects.attractors.EffectMorphing
@@ -93,6 +90,7 @@ object RemsRegistry {
         registerCustomClass(SquareFalloff())
         registerCustomClass(LinearFalloff())
         registerCustomClass(ExponentialFalloff())
+        registerCustomClass(NoiseSuppressionEffect())
         registerCustomClass(AnimatedDistribution())
         registerCustomClass(GaussianDistribution())
         registerCustomClass(ConstantDistribution())

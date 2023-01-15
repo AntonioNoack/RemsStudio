@@ -49,9 +49,9 @@ fun main() {
 
     print(func)
 
-    val t0 = Time(0.0, 0.0)
-    val t1 = Time(time, time)
-    val result = AudioFXCache2.getBuffer(audio, camera, t0, t1, bufferSize, Domain.TIME_DOMAIN, false)
+    val result = AudioFXCache2.getBuffer(audio, camera, bufferSize, Domain.TIME_DOMAIN, false) {
+        Time( time * it)
+    }
     print(result)
 
 }

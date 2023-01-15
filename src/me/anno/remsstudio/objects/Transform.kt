@@ -679,7 +679,7 @@ open class Transform() : Saveable(),
         return this
     }
 
-    fun getLocalTransform(globalTime: Double, reference: Transform): Matrix4f {
+    fun getLocalTransform(globalTime: Double, reference: Transform?): Matrix4f {
         val (parentTransform, parentTime) =
             if (reference === parent) Matrix4f() to globalTime
             else parent?.getGlobalTransformTime(globalTime) ?: (Matrix4f() to globalTime)
@@ -688,14 +688,14 @@ open class Transform() : Saveable(),
         return parentTransform
     }
 
-    fun getLocalTime(globalTime: Double, reference: Transform): Double {
+    fun getLocalTime(globalTime: Double, reference: Transform?): Double {
         val parentTime =
             if (reference === parent) globalTime
             else parent?.getGlobalTime(globalTime) ?: globalTime
         return getLocalTime(parentTime)
     }
 
-    fun getLocalTransformTime(globalTime: Double, reference: Transform): Pair<Matrix4f, Double> {
+    fun getLocalTransformTime(globalTime: Double, reference: Transform?): Pair<Matrix4f, Double> {
         val (parentTransform, parentTime) =
             if (reference === parent) Matrix4f() to globalTime
             else parent?.getGlobalTransformTime(globalTime) ?: (Matrix4f() to globalTime)

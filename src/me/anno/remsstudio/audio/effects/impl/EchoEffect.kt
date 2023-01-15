@@ -29,7 +29,6 @@ class EchoEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        val inspected = listOf(audio)
         list += audio.vi("Offset", "Distance of 1st echo in seconds", offset, style)
         list += audio.vi("Falloff", "How much is reflected, the less, the faster the echo fades away", falloff, style)
     }
@@ -70,6 +69,8 @@ class EchoEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
         time0: Time,
         time1: Time
     ) {
+
+        // todo this this mixing stereo channels randomly???
 
         val bufferSize = dataDst.size
 

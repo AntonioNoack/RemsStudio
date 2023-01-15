@@ -50,15 +50,12 @@ import me.anno.utils.OS
 // todo bug:
 //  - settings are not calculating size correctly until resize
 
+// todo noise suppression: automatic noise detection (?) or manual
+//  and then map all noise, where audio is avgly below a certain level to zero
 
 
 
 
-
-
-// todo Rem's Studio Lite: don't output images, just execute chained ffmpeg commands
-// try to support as many features as possible with just ffmpeg
-// goal: hyper speed
 
 // todo isolate and remove certain frequencies from audio
 // todo visualize audio frequency, always!!!, from 25Hz to 48kHz

@@ -37,7 +37,6 @@ import java.net.URL
 import kotlin.streams.toList
 
 // todo background "color" in the shape of a plane? for selections and such
-// todo Kapitälchen
 
 open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableElement {
 

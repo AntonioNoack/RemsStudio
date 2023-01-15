@@ -38,7 +38,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
 
     data class EffectKey(val effect: SoundEffect, val data: Any, val previous: EffectKey?)
 
-    data class PipelineKey(
+    class PipelineKey(
         val file: FileReference,
         val time0: Time,
         val time1: Time,
@@ -46,7 +46,8 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
         val is3D: Boolean,
         val audioAlphaSerialized: String,
         val repeat: LoopingState,
-        val effectKey: EffectKey?
+        val effectKey: EffectKey?,
+        val getTime: (i: Int) -> Time
     ) {
 
         val hashCode = calculateHashCode()
@@ -54,15 +55,19 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
             return hashCode
         }
 
-        val previousKey = if (effectKey == null) null
+        val lastEffectKey = if (effectKey == null) null
         else PipelineKey(
             file, time0, time1, bufferSize, is3D,
-            audioAlphaSerialized, repeat, effectKey.previous
+            audioAlphaSerialized, repeat, effectKey.previous,
+            getTime
         )
 
         fun withDelta(deltaIndex: Int): PipelineKey {
             if (deltaIndex == 0) return this
-            TODO()
+            return PipelineKey(
+                file, getTime(deltaIndex), getTime(deltaIndex + 1),
+                bufferSize, is3D, audioAlphaSerialized, repeat, effectKey
+            ) { getTime(it + deltaIndex) }
         }
 
         override fun equals(other: Any?): Boolean {
@@ -92,7 +97,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
             result = 31 * result + audioAlphaSerialized.hashCode()
             result = 31 * result + repeat.hashCode()
             result = 31 * result + (effectKey?.hashCode() ?: 0)
-            result = 31 * result + (previousKey?.hashCode() ?: 0)
+            result = 31 * result + (lastEffectKey?.hashCode() ?: 0)
             return result
         }
 
@@ -192,7 +197,10 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
         source: Audio,
         destination: Camera,
         key: PipelineKey
-    ): AudioData = getRawData(source.forcedMeta!!, source, destination, key)
+    ): AudioData = getRawData(
+        source.forcedMeta ?: throw IllegalStateException("Invalid meta for ${source.file}"),
+        source, destination, key
+    )
 
     fun getRawData(
         meta: FFMPEGMetadata,
@@ -249,7 +257,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
             } else {
                 // get previous data, and process it
                 val effect = effectKey.effect
-                val previousKey = pipelineKey.previousKey!!
+                val previousKey = pipelineKey.lastEffectKey!!
                 val left = FAPool[bufferSize, true, true]
                 val right = FAPool[bufferSize, true, true]
                 val cachedSolutions = HashMap<Int, Pair<FloatArray, FloatArray>>()
@@ -270,23 +278,23 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
 
     fun getBuffer(
         source: Audio, destination: Camera,
-        time0: Time, time1: Time,
         bufferSize: Int,
-        async: Boolean
-    ) = getBuffer(source, destination, getKey(source, destination, time0, time1, bufferSize), async)
+        async: Boolean,
+        getTime: (i: Int) -> Time
+    ) = getBuffer(source, destination, getKey(source, destination, bufferSize, getTime), async)
 
     fun getBuffer(
         source: Audio, destination: Camera,
-        time0: Time, time1: Time, bufferSize: Int,
+        bufferSize: Int,
         domain: Domain,
-        async: Boolean
-    ) = getBuffer(source, destination, getKey(source, destination, time0, time1, bufferSize), domain, async)
+        async: Boolean,
+        getTime: (i: Int) -> Time
+    ) = getBuffer(source, destination, getKey(source, destination, bufferSize, getTime), domain, async)
 
-    fun getBuffer(index: Long, stream: AudioFileStream2, async: Boolean): Pair<FloatArray, FloatArray>? {
-        val t0 = stream.getTime(index)
-        val t1 = stream.getTime(index + 1)
-        return getBuffer(stream.source, stream.destination, t0, t1, bufferSize, Domain.TIME_DOMAIN, async)
-    }
+    fun getBuffer(index: Long, stream: AudioFileStream2, async: Boolean): Pair<FloatArray, FloatArray>? =
+        getBuffer(stream.source, stream.destination, bufferSize, Domain.TIME_DOMAIN, async) {
+            stream.getTime(index + it)
+        }
 
     fun getRange(
         bufferSize: Int,
@@ -364,12 +372,10 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
 
                         val bufferIndex = Math.floorDiv(i, bufferSize.toLong())
                         if (i == index0 || lastBufferIndex != bufferIndex) {
-                            val time0 = getTime(bufferIndex, source)
-                            val time1 = getTime(bufferIndex + 1, source)
                             buffer = getBuffer(
-                                source, destination, time0, time1, bufferSize,
+                                source, destination, bufferSize,
                                 Domain.TIME_DOMAIN, false
-                            )!!
+                            ) { getTime(bufferIndex + it, source) }!!
                             lastBufferIndex = bufferIndex
                         }
 
@@ -398,9 +404,11 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
     }
 
     fun getKey(
-        source: Audio, destination: Camera,
-        time0: Time, time1: Time, bufferSize: Int
+        source: Audio, destination: Camera, bufferSize: Int,
+        getTime: (i: Int) -> Time
     ): PipelineKey {
+        val time0 = getTime(0)
+        val time1 = getTime(1)
         var effectKeyI: EffectKey? = null
         val pipeline = source.pipeline
         for (effect in pipeline.effects) {
@@ -411,7 +419,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
             source.file, time0, time1, bufferSize, source.is3D,
             "${source.amplitude},${source.color}",
             source.isLooping.value,
-            effectKeyI
+            effectKeyI, getTime
         )
     }
 
