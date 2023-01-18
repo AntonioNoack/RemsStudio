@@ -49,9 +49,9 @@ class StudioTreeView(style: Style) :
         StudioFileImporter, true, style
     ) {
 
-    override fun getDragType(element: Transform): String = "Transform"
+    override fun getDragType(element: Transform) = "Transform"
 
-    override fun stringifyForCopy(element: Transform): String = TextWriter.toText(element, InvalidRef)
+    override fun stringifyForCopy(element: Transform) = TextWriter.toText(element, InvalidRef)
 
     override fun getSymbol(element: Transform): String {
         return element.symbol

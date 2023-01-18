@@ -126,8 +126,8 @@ class EchoEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
         return clone
     }
 
-    override val displayName: String = "Echo Effect"
-    override val description: String = "Repeats the sound"
+    override val displayName get() = "Echo Effect"
+    override val description get() = "Repeats the sound"
     override val className get() = "EchoEffect"
 
 }

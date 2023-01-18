@@ -64,7 +64,7 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
         }
 
     override val className get() = "PDFDocument"
-    override val symbol: String = "\uD83D\uDDCE"
+    override val symbol get() = "\uD83D\uDDCE"
 
     fun getSelectedSitesList() = parseSites(selectedSites)
 

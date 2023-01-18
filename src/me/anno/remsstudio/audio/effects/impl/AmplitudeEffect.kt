@@ -62,8 +62,8 @@ class AmplitudeEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
         list += SpacerPanel(0, 0, style) // nothing, but it must not be empty, soo...
     }
 
-    override val displayName: String = "Amplitude"
-    override val description: String = "Changes the volume"
+    override val displayName get() = "Amplitude"
+    override val description get() = "Changes the volume"
     override val className get() = "AmplitudeEffect"
 
 }

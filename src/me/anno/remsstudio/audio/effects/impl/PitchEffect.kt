@@ -134,8 +134,8 @@ class PitchEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
         return clone
     }
 
-    override val displayName: String = "Pitch Change"
-    override val description: String = "Changes how high the frequencies are"
+    override val displayName get() = "Pitch Change"
+    override val description get() = "Changes how high the frequencies are"
     override val className get() = "PitchEffect"
 
 }

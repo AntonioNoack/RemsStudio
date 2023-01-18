@@ -342,7 +342,7 @@ class FourierTransform : Transform() {
     }
 
     override val className get() = "FourierTransform"
-    override val defaultDisplayName: String = "Fourier Transform"
+    override val defaultDisplayName get() = "Fourier Transform"
 
     companion object {
         val sampleRateType =

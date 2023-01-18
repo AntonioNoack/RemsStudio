@@ -39,7 +39,7 @@ object RenderSettings : Transform() {
 
     // render queue?
 
-    override val defaultDisplayName: String = "Render Settings"
+    override val defaultDisplayName get() = "Render Settings"
 
     override fun createInspector(
         inspected: List<Inspectable>,

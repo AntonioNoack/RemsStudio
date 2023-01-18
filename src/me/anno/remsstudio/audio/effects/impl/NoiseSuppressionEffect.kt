@@ -4,6 +4,7 @@ import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.maths.Maths.clamp
+import me.anno.maths.Maths.min
 import me.anno.maths.Maths.mix
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.audio.effects.Domain
@@ -11,15 +12,19 @@ import me.anno.remsstudio.audio.effects.SoundEffect
 import me.anno.remsstudio.audio.effects.Time
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
+import me.anno.studio.StudioBase.Companion.addEvent
+import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
+import me.anno.ui.input.FloatInput
 import me.anno.ui.style.Style
+import me.anno.utils.LOGGER
+import me.anno.video.ffmpeg.FFMPEGStream.Companion.getAudioSequence
+import kotlin.concurrent.thread
 import kotlin.math.sqrt
 
 class NoiseSuppressionEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
 
-    // todo implement auto noise level detection
-    // var automaticNoiseLevelDetection = false
     private val noiseLevel = AnimatedProperty.floatPlus() // maybe should be in dB...
 
     override fun getStateAsImmutableKey(source: Audio, destination: Camera, time0: Time, time1: Time): Any {
@@ -81,7 +86,51 @@ class NoiseSuppressionEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAI
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        list += audio.vi("Noise Level", "All audio below this relative level will be silenced", noiseLevel, style)
+        val nlp = audio.vi("Noise Level", "All audio below this relative level will be silenced", noiseLevel, style)
+        list += nlp
+        list += TextButton("Detect Noise Level", false, style)
+            .apply {
+                tooltip = "Scans the first 10 seconds of audio for the lowest volume"
+                addLeftClickListener {
+                    // auto noise level detection
+                    val meta = audio.forcedMeta
+                    if (meta != null) {
+                        // make this async to prevent lag
+                        thread(name = "Noise Level") {
+                            val duration = min(10.0, meta.audioDuration)
+                            val numSamples = min((duration * meta.audioSampleRate).toLong(), meta.audioSampleCount)
+                            // if audio is short, subdivide buffers, so we get more decision freedom on histogram
+                            val subdivisions = min(1000, numSamples / 200).toInt()
+                            val histogram = IntArray(subdivisions)
+                            // average values inside buffer
+                            val sampleRate = meta.audioSampleRate
+                            val stereoData = getAudioSequence(audio.file, 0.0, duration, sampleRate).soundBuffer?.data
+                            if (stereoData != null) {
+                                var k0 = 0
+                                for (j in 0 until subdivisions) {
+                                    var sum = 0L
+                                    val k1 = (j + 1) * stereoData.capacity() / subdivisions
+                                    for (k in k0 until k1) {
+                                        val vk = stereoData[k]
+                                        sum += vk * vk // should fit into an integer :)
+                                    }
+                                    histogram[j] = sqrt(sum / (k1 - k0).toDouble()).toInt()
+                                    k0 = k1
+                                }
+
+                                histogram.sort()
+
+                                val percentileLevel = histogram[(subdivisions + 3) / 5] / 32767f
+                                addEvent {
+                                    (nlp as FloatInput)
+                                        .setValue(percentileLevel, true)
+                                }
+
+                            } else LOGGER.warn("Data is null")
+                        }
+                    } else LOGGER.warn("Metadata is null")
+                }
+            }
     }
 
     override fun save(writer: BaseWriter) {
@@ -94,8 +143,8 @@ class NoiseSuppressionEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAI
         else super.readObject(name, value)
     }
 
-    override val displayName: String = "Noise Suppression"
-    override val description: String = "Removes noise; only works if noise is pretty quiet"
+    override val displayName get() = "Noise Suppression"
+    override val description get() = "Removes noise; only works if noise is pretty quiet"
     override val className get() = "NoiseSuppressionEffect"
 
 }

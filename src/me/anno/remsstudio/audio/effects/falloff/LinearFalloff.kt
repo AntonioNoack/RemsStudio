@@ -13,8 +13,8 @@ class LinearFalloff() : Falloff() {
         return max(0f, 1f - 0.5f * relativeDistance)
     }
 
-    override val displayName: String = "Linear Falloff"
-    override val description: String = "Sound falloff ~ 1-distance"
+    override val displayName get() = "Linear Falloff"
+    override val description get() = "Sound falloff ~ 1-distance"
     override fun clone(): SoundEffect = LinearFalloff(halfDistance)
 
     override val className get() = "LinearFalloffEffect"

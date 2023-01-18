@@ -144,7 +144,6 @@ class AudioStreamRaw2(
         // (superfluous calculations)
 
         // time += dt
-        val sampleCount = bufferSize
 
         // todo get higher/lower quality, if it's sped up/slowed down?
         // rare use-case...
@@ -152,7 +151,7 @@ class AudioStreamRaw2(
         // sound recorded at 0.01x speed is really rare, and at the edge (10Hz -> 10.000Hz)
         // slower frequencies can't be that easily recorded (besides the song/noise of wind (alias air pressure zones changing))
 
-        val dtx = (time1 - time0) / sampleCount
+        val dtx = (time1 - time0) / bufferSize
         val ffmpegSampleRate = ffmpegSampleRate
 
         val local0 = globalToLocalTime(time0)
@@ -165,8 +164,8 @@ class AudioStreamRaw2(
 
         val updateInterval = min(bufferSize, 1024)
 
-        val leftBuffer = FAPool[sampleCount, true, true]
-        val rightBuffer = FAPool[sampleCount, true, true]
+        val leftBuffer = FAPool[bufferSize, true, true]
+        val rightBuffer = FAPool[bufferSize, true, true]
 
         val s0 = ShortPair()
         val s1 = ShortPair()
@@ -184,7 +183,7 @@ class AudioStreamRaw2(
         var sampleIndex = -1
         var indexI = ffmpegSampleRate * local0
 
-        while (++sampleIndex < sampleCount) {
+        while (++sampleIndex < bufferSize) {
 
             if (sampleIndex % updateInterval == 0) {
 

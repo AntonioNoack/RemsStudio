@@ -486,7 +486,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 // calculate required scale? no, without animation, we don't need to scale it down ;)
                 getVideoFrame(file, 1, 0, 1, 1.0, imageTimeout, true)
             else -> // some image
-                ImageGPUCache.get(file, imageTimeout, true)
+                ImageGPUCache[file, imageTimeout, true]
         }
     }
 
