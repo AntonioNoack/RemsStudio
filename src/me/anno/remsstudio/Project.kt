@@ -253,7 +253,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
     var ffmpegBalance = FFMPEGEncodingBalance[config["target.encodingBalance", 0.5f]]
 
     override val className get() = "Project"
-    override val approxSize = 1000
+    override val approxSize get() = 1000
     override fun isDefaultValue() = false
 
     fun open() {}

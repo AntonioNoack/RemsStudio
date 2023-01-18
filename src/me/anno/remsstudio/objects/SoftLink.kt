@@ -271,8 +271,7 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
         }
     }
 
-    override val areChildrenImmutable: Boolean = true
-
+    override val areChildrenImmutable get() = true
     override val defaultDisplayName get() = Dict["Linked Object", "obj.softLink"]
     override val className get() = "SoftLink"
 

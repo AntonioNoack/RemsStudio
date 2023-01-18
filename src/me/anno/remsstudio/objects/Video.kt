@@ -607,14 +607,14 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
 
                         if (index1 >= index0) {
                             for (i in index0..index1) {
-                                ImageGPUCache.get(meta.getImage(i), videoFrameTimeout, true)
+                                ImageGPUCache[meta.getImage(i), videoFrameTimeout, true]
                             }
                         } else {
                             for (i in index1 until meta.matches.size) {
-                                ImageGPUCache.get(meta.getImage(i), videoFrameTimeout, true)
+                                ImageGPUCache[meta.getImage(i), videoFrameTimeout, true]
                             }
                             for (i in 0 until index0) {
-                                ImageGPUCache.get(meta.getImage(i), videoFrameTimeout, true)
+                                ImageGPUCache[meta.getImage(i), videoFrameTimeout, true]
                             }
                         }
 
@@ -631,6 +631,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
             }
             VideoType.AUDIO -> {
             }
+            VideoType.UNKNOWN -> {}
             else -> throw RuntimeException("Todo implement resource loading for $type")
         }
 
@@ -669,7 +670,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         }
         lastWarning = null
         when (type) {
-            VideoType.VIDEO, VideoType.AUDIO -> {
+            VideoType.VIDEO, VideoType.AUDIO, VideoType.UNKNOWN -> {
                 val meta = meta
                 if (meta != null && meta.hasVideo) {
                     if (file != lastAddedEndKeyframesFile) {
@@ -677,11 +678,18 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                     }
                     lastDuration = meta.duration
                 }
-                if (meta == null) {
+                type = if (meta == null) {
                     lastWarning = if (file.exists) {
                         "Video file is invalid"
                     } else {
                         "File does not exist"
+                    }
+                    VideoType.UNKNOWN
+                } else {
+                    when (file.extension.getImportType()) {
+                        "Video" -> VideoType.VIDEO
+                        "Audio" -> VideoType.AUDIO
+                        else -> VideoType.IMAGE
                     }
                 }
             }
@@ -727,6 +735,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                     if (meta != null) lastDuration = meta.duration
                     drawSpeakers(stack, Vector4f(color), is3D, amplitude[time])
                 }
+                VideoType.UNKNOWN -> {}
                 else -> throw RuntimeException("$type needs visualization") // for the future
             }
 
@@ -791,7 +800,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         infoGroup += aud(UpdatingTextPanel(250, style) { "Sample Rate: ${meta?.audioSampleRate} samples/s" })
         infoGroup += aud(UpdatingTextPanel(250, style) { "Sample Count: ${meta?.audioSampleCount} samples" })
 
-        list += vi(inspected,"File Location", "Source file of this video", null, file, style) { newFile ->
+        list += vi(inspected, "File Location", "Source file of this video", null, file, style) { newFile ->
             for (x in c) x.file = newFile
         }
 
@@ -805,23 +814,23 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         )
         uvMap += img(
             vi(
-                inspected,"UV-Projection", "Can be used for 360°-Videos",
+                inspected, "UV-Projection", "Can be used for 360°-Videos",
                 null, uvProjection.value, style
             ) { for (x in c) x.uvProjection.value = it })
         uvMap += img(
             vi(
-                inspected,"Filtering", "Pixelated look?", "texture.filtering",
+                inspected, "Filtering", "Pixelated look?", "texture.filtering",
                 null, filtering.value, style
             ) { for (x in c) x.filtering.value = it })
         uvMap += img(
             vi(
-                inspected,"Clamping", "For tiled images", "texture.clamping",
+                inspected, "Clamping", "For tiled images", "texture.clamping",
                 null, clampMode.value, style
             ) { for (x in c) x.clampMode.value = it })
 
         val time = getGroup("Time", "", "time")
         time += vi(
-            inspected,"Looping Type", "Whether to repeat the song/video", "video.loopingType",
+            inspected, "Looping Type", "Whether to repeat the song/video", "video.loopingType",
             null, isLooping.value, style
         ) {
             for (x in c) x.isLooping.value = it
@@ -873,8 +882,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         )
 
         val audio = getGroup("Audio", "", "audio")
-        audio += aud(vis(inspected,c, "Amplitude", "How loud it is", "audio.amplitude", c.map { it.amplitude }, style))
-        audio += aud(vi(inspected,"Is 3D Sound", "Sound becomes directional", "audio.3d", null, is3D, style) {
+        audio += aud(vis(inspected, c, "Amplitude", "How loud it is", "audio.amplitude", c.map { it.amplitude }, style))
+        audio += aud(vi(inspected, "Is 3D Sound", "Sound becomes directional", "audio.3d", null, is3D, style) {
             for (x in c) x.is3D = it
             AudioManager.requestUpdate()
         })
@@ -901,7 +910,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
 
         var lastState = -1
         list += SpyPanel(style) {
-            val isValid = file.hasValidName()
+            val meta = meta
+            val isValid = file.hasValidName() && meta != null
             val hasAudio = isValid && meta?.hasAudio == true
             val hasImage = isValid && type != VideoType.AUDIO
             val hasVideo = isValid && when (type) {
@@ -975,6 +985,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 VideoType.IMAGE -> DefaultConfig["ui.symbol.image", "\uD83D\uDDBC️️"]
                 VideoType.VIDEO -> DefaultConfig["ui.symbol.video", "\uD83C\uDF9E️"]
                 VideoType.IMAGE_SEQUENCE -> DefaultConfig["ui.symbol.imageSequence", "\uD83C\uDF9E️"]
+                VideoType.UNKNOWN -> "?"
             }
         }
 

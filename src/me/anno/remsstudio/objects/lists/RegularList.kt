@@ -180,6 +180,6 @@ class RegularList(parent: Transform? = null) : GFXTransform(parent) {
     }
 
     override val className get() = "RegularList"
-    override val defaultDisplayName = Dict["List", "obj.list"]
+    override val defaultDisplayName get() = Dict["List", "obj.list"]
 
 }

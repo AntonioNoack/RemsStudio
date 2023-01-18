@@ -407,7 +407,7 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
         }
     }
 
-    override val defaultDisplayName = "Mask Layer"
+    override val defaultDisplayName get() = "Mask Layer"
     override val className get() = "MaskLayer"
 
     companion object {

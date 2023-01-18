@@ -39,7 +39,7 @@ abstract class ForceField(val displayName: String, val descriptionI: String) : T
         get() = descriptionI
 
     override fun isDefaultValue() = false
-    override val approxSize = 25
+    override val approxSize get() = 25
 
     abstract fun getForce(state: ParticleState, time: Double, particles: List<Particle>): Vector3f
 

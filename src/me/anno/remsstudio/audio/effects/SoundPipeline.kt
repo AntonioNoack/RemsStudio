@@ -122,7 +122,7 @@ class SoundPipeline() : Saveable(), Inspectable {
     }
 
     override val className get() = "SoundPipeline"
-    override val approxSize = 100
+    override val approxSize get() = 100
     override fun isDefaultValue() = effects.isEmpty()
 
     fun clone(): SoundPipeline {

@@ -19,7 +19,7 @@ class VideoPreviewPanel(
         backgroundColor = 0xff777777.toInt()
     }
 
-    override val onMovementHideTooltip: Boolean = false
+    override val onMovementHideTooltip get() = false
 
     override fun calculateSize(w: Int, h: Int) {
         minW = width

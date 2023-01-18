@@ -60,7 +60,7 @@ abstract class Distribution(val displayName: String, val description: String) :
     }
 
     override fun isDefaultValue() = false
-    override val approxSize = 20
+    override val approxSize get() = 20
 
     fun Vector2f.mul(size: Vector4f) = mul(size.x, size.y)
     fun Vector2f.add(delta: Vector4f) = add(delta.x, delta.y)
