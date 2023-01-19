@@ -11,6 +11,7 @@ import me.anno.gpu.shader.Renderer
 import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
+import me.anno.io.base.InvalidFormatException
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
 import me.anno.io.text.TextReader
@@ -962,7 +963,11 @@ open class Transform() : Saveable(),
 
         val nextClickId = AtomicInteger()
 
-        fun String.toTransform() = TextReader.read(this, workspace, true).first() as? Transform
+        fun String.toTransform() = try {
+            TextReader.readFirstOrNull<Transform>(this, workspace, true)
+        } catch (e: InvalidFormatException) {
+            null
+        }
 
         const val minAlpha = 0.5f / 255f
         private val LOGGER = LogManager.getLogger(Transform::class)

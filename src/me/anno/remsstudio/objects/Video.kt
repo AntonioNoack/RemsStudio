@@ -1,14 +1,21 @@
 package me.anno.remsstudio.objects
 
+import at.huber.youtube.AudioCodec
+import at.huber.youtube.Format
+import at.huber.youtube.VideoCodec
+import at.huber.youtube.YouTubeMeta
 import me.anno.animation.LoopingState
 import me.anno.animation.Type
 import me.anno.audio.openal.AudioManager
 import me.anno.audio.openal.AudioTasks
 import me.anno.cache.data.ImageData.Companion.imageTimeout
+import me.anno.cache.data.VideoData
 import me.anno.cache.data.VideoData.Companion.framesPerContainer
 import me.anno.cache.instances.OldMeshCache
+import me.anno.cache.instances.VideoCache
 import me.anno.cache.instances.VideoCache.getVideoFrame
 import me.anno.cache.instances.VideoCache.getVideoFrameWithoutGenerator
+import me.anno.cache.keys.VideoFramesKey
 import me.anno.config.DefaultConfig
 import me.anno.ecs.annotations.Range
 import me.anno.gpu.GFX
@@ -22,15 +29,20 @@ import me.anno.gpu.texture.TextureLib
 import me.anno.gpu.texture.TextureLib.colorShowTexture
 import me.anno.image.ImageGPUCache
 import me.anno.io.ISaveable
+import me.anno.io.Streams.copy
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
+import me.anno.io.files.Signature
+import me.anno.io.files.WebRef
+import me.anno.io.zip.SignatureFile
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.fract
 import me.anno.maths.Maths.mix
 import me.anno.maths.Maths.pow
+import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.isPaused
 import me.anno.remsstudio.RemsStudio.nullCamera
 import me.anno.remsstudio.RemsStudio.targetHeight
@@ -45,12 +57,16 @@ import me.anno.remsstudio.objects.lists.SplittableElement
 import me.anno.remsstudio.objects.models.SpeakerModel.drawSpeakers
 import me.anno.remsstudio.objects.modes.VideoType
 import me.anno.remsstudio.objects.modes.editorFPS
+import me.anno.remsstudio.yt.YTCache
+import me.anno.remsstudio.yt.YTCache.getId
 import me.anno.studio.Inspectable
 import me.anno.studio.StudioBase
+import me.anno.studio.StudioBase.Companion.addEvent
 import me.anno.ui.Panel
 import me.anno.ui.base.SpyPanel
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
+import me.anno.ui.base.menu.Menu.openMenuByPanels
 import me.anno.ui.base.text.UpdatingTextPanel
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.SettingCategory
@@ -58,6 +74,8 @@ import me.anno.ui.input.EnumInput
 import me.anno.ui.input.FloatInput
 import me.anno.ui.style.Style
 import me.anno.utils.Clipping
+import me.anno.utils.files.Files
+import me.anno.utils.structures.Compare.ifSame
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
 import me.anno.utils.structures.ValueWithDefaultFunc
@@ -79,7 +97,9 @@ import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
+import java.io.InputStream
 import java.net.URL
+import kotlin.concurrent.thread
 import kotlin.math.*
 
 // game, where everything is explicitly rendered on 5-10 cubemaps first? lol
@@ -105,6 +125,28 @@ import kotlin.math.*
 class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
     Audio(file, parent), SplittableElement {
 
+    companion object {
+
+        private val LOGGER = LogManager.getLogger(Video::class)
+
+        private val forceAutoScale get() = DefaultConfig["rendering.video.forceAutoScale", true]
+        private val forceFullScale get() = DefaultConfig["rendering.video.forceFullScale", false]
+
+        val videoScaleNames = BiMap<String, Int>(10)
+
+        init {
+            videoScaleNames["Auto"] = 0
+            videoScaleNames["Original"] = 1
+            for (i in listOf(2, 3, 4, 6, 8, 12, 16, 32, 64)) {
+                videoScaleNames["1/$i"] = i
+            }
+        }
+
+        val videoFrameTimeout get() = if (isFinalRendering) 2000L else 10000L
+        val tiling16x9 = Vector4f(8f, 4.5f, 0f, 0f)
+
+    }
+
     // uv
     val tiling = AnimatedProperty.tiling()
     val uvProjection = ValueWithDefault(UVProjection.Planar)
@@ -117,18 +159,82 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
     val videoScale = ValueWithDefaultFunc { DefaultConfig["default.video.scale", 1] }
 
     var lastFile: FileReference? = null
+    var lastMeta: FFMPEGMetadata? = null
     var lastDuration = 10.0
+
     var imageSequenceMeta: ImageSequenceMeta? = null
     val imSeqExampleMeta get() = imageSequenceMeta?.matches?.firstOrNull()?.first?.run { getMeta(this, true) }
 
-    var type = VideoType.IMAGE
+    var ytMeta: FFMPEGMetadata? = null
+    var ytInfo: YouTubeMeta? = null
+    var ytId: String? = null
+
+    var type = VideoType.UNKNOWN
 
     @Range(0.0, 3.0)
     var blankFrameThreshold = 0f
 
+    fun getYTFrame(
+        scale: Int,
+        frameIndex: Int,
+        bufferLength: Int,
+        fps: Double,
+        timeout: Long,
+        async: Boolean
+    ): GPUFrame? {
+        val meta = ytMeta ?: return null
+        val info = ytInfo ?: return null
+        val bv = info.bestVideo ?: return null
+        val h = max(1, bv.key.height / scale)
+        // find the best video for that scale and don't generate proxies
+        val closestMatch = info.links
+            .map { it to abs(ln(max(it.key.height, 0).toFloat() / h)) }
+            .minWith { a, b ->
+                // todo find source with closest fps
+                a.second.compareTo(b.second)
+                    .ifSame {
+                        // highest fps for now
+                        b.first.key.fps
+                            .compareTo(a.first.key.fps)
+                    }
+            }
+        val file = object : FileReference(closestMatch.first.value.absolutePath), SignatureFile {
+            override val exists: Boolean get() = true
+            override val lastModified: Long get() = 0L
+            override val lastAccessed: Long get() = 0L
+            override var signature: Signature? = Signature("media", 0)
+            override val isDirectory: Boolean get() = false
+            override fun delete(): Boolean = throw NotImplementedError()
+            override fun getChild(name: String) = throw NotImplementedError()
+            override fun getParent() = throw NotImplementedError()
+            override fun length() = throw NotImplementedError()
+            override fun mkdirs() = throw NotImplementedError()
+            override fun outputStream(append: Boolean) = throw NotImplementedError()
+            override fun renameTo(newName: FileReference) = throw NotImplementedError()
+            override fun toUri() = throw NotImplementedError()
+            override fun inputStream(lengthLimit: Long, callback: (it: InputStream?, exc: Exception?) -> Unit) =
+                throw NotImplementedError()
+        }
+        val localIndex = frameIndex % bufferLength
+        val bufferIndex = frameIndex / bufferLength
+        val needsToBeCreated = true
+        val key = VideoFramesKey(file, 1, bufferIndex, bufferLength, fps)
+        val videoData = VideoCache.getEntryLimited(
+            key, timeout, async, VideoCache.videoGenLimit
+        ) {
+            VideoData(
+                file, "media", meta.videoWidth, meta.videoHeight, 1,
+                key.bufferIndex, key.frameLength, key.fps,
+                0, key.fps,
+                (key.fps * meta.videoDuration).toInt(),
+            )
+        } as? VideoData ?: return null
+        return videoData.getFrame(localIndex, needsToBeCreated)
+    }
+
     override fun getDocumentationURL(): URL? = when (type) {
         VideoType.IMAGE -> URL("https://remsstudio.phychi.com/?s=learn/images")
-        VideoType.VIDEO, VideoType.IMAGE_SEQUENCE -> URL("https://remsstudio.phychi.com/?s=learn/videos")
+        VideoType.VIDEO, VideoType.IMAGE_SEQUENCE, VideoType.YOUTUBE -> URL("https://remsstudio.phychi.com/?s=learn/videos")
         else -> null
     }
 
@@ -143,6 +249,23 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         when (type) {
             VideoType.VIDEO, VideoType.AUDIO -> {
                 super.startPlayback(globalTime, speed, camera)
+            }
+            VideoType.YOUTUBE -> {
+                // get YouTube link, and play audio
+                stopPlayback()
+                val meta = ytInfo
+                if (meta != null) {
+                    val src = meta.bestAudio?.value
+                    if (src != null) {
+                        val proxy = Video()
+                        proxy.file = src
+                        proxy.lastFile = src
+                        proxy.lastMeta = proxy.forcedMeta
+                        proxy.type = VideoType.AUDIO
+                        proxy.startPlayback(globalTime, speed, camera)
+                        component = proxy.component
+                    }
+                }
             }
             else -> {
                 // image and image sequence cannot contain audio,
@@ -356,7 +479,10 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
 
     private var lastFrame: GPUFrame? = null
 
-    private fun drawVideo(meta: FFMPEGMetadata, stack: Matrix4fArrayList, time: Double, color: Vector4f) {
+    private fun drawVideo(
+        meta: FFMPEGMetadata, stack: Matrix4fArrayList, time: Double, color: Vector4f,
+        getFrame: (zoomLevel: Int, frameIndex0: Int, videoFPS: Double) -> GPUFrame?
+    ) {
 
         val duration = meta.duration
         lastDuration = duration
@@ -399,7 +525,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 val frameIndexD = localTime * videoFPS
 
                 val frameIndex0 = floor(frameIndexD).toInt() % frameCount
-                val frame0 = getFrame(zoomLevel, meta, frameIndex0, videoFPS)
+                val frame0 = getFrame(zoomLevel, frameIndex0, videoFPS)
 
                 val filtering = this@Video.filtering.value
                 val clamp = this@Video.clampMode.value
@@ -420,7 +546,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 } else {
                     val interpolation = fract(frameIndexD).toFloat()
                     val frameIndex1 = ceil(frameIndexD).toInt() % frameCount
-                    val frame1 = getFrame(zoomLevel, meta, frameIndex1, videoFPS)
+                    val frame1 = getFrame(zoomLevel, frameIndex1, videoFPS)
                     if (frame0 != null && frame1 != null) {
                         lastW = meta.videoWidth
                         lastH = meta.videoHeight
@@ -544,7 +670,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         when (val type = type) {
             VideoType.VIDEO -> {
 
-                val meta = getMeta(file, true)
+                val meta = meta
                 if (meta != null) {
 
                     val sourceFPS = meta.videoFPS
@@ -621,6 +747,50 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                     }
                 }
             }
+            VideoType.YOUTUBE -> {
+
+                val meta = ytMeta!!
+
+                val sourceFPS = meta.videoFPS
+                val duration = meta.videoDuration
+                val isLooping = isLooping.value
+
+                if (sourceFPS > 0.0) {
+                    if (maxT >= 0.0 && (isLooping != LoopingState.PLAY_ONCE || minT < duration)) {
+
+                        // use full fps when rendering to correctly render at max fps with time dilation
+                        // issues arise, when multiple frames should be interpolated together into one
+                        // at this time, we chose the center frame only.
+                        val videoFPS =
+                            if (isFinalRendering) sourceFPS else min(sourceFPS, editorVideoFPS.value.toDouble())
+
+                        // calculate how many buffers are required from start to end
+                        // clamp to max number of buffers, or maybe 20
+                        val buff0 = (minT * videoFPS).toInt()
+                        val buff1 = (maxT * videoFPS).toInt()
+                        val steps = clamp(2 + (buff1 - buff0) / framesPerContainer, 2, 20)
+
+                        val frameCount = max(1, (duration * videoFPS).roundToInt())
+
+                        var lastBuffer = -1
+                        for (step in 0 until steps) {
+                            val f0 = mix(minT, maxT, step / (steps - 1.0))
+                            val localTime0 = isLooping[f0, duration]
+                            val frameIndex = (localTime0 * videoFPS).toInt()
+                            if (frameIndex < 0 || frameIndex >= frameCount) continue
+                            val buffer = frameIndex / framesPerContainer
+                            if (buffer != lastBuffer) {
+                                lastBuffer = buffer
+                                getYTFrame(
+                                    max(1, zoomLevel), frameIndex, framesPerContainer,
+                                    videoFPS, videoFrameTimeout, true
+                                )
+                            }
+                        }
+
+                    }
+                }
+            }
             // nothing to do for image and audio
             VideoType.IMAGE -> {
                 val texture = getImage()
@@ -651,57 +821,90 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
 
     fun update(file: FileReference, hasValidName: Boolean) {
         if (!hasValidName) return
-        if (file !== lastFile) {
+        val meta = ytMeta ?: meta
+        if (file !== lastFile || meta !== lastMeta) {
             lastFile = file
-            type = if (file.name.contains(imageSequenceIdentifier)) {
+            lastMeta = meta
+            ytId = YTCache.getId(file)
+            type = if (file !is WebRef && file.name.contains(imageSequenceIdentifier)) {
+                // async in the future?
+                val imageSequenceMeta = ImageSequenceMeta(file)
+                this.imageSequenceMeta = imageSequenceMeta
                 VideoType.IMAGE_SEQUENCE
-            } else {
+            } else if (ytId != null) {
+                VideoType.YOUTUBE
+            } else if (meta == null) {
                 when (file.extension.getImportType()) {
                     "Video" -> VideoType.VIDEO
                     "Audio" -> VideoType.AUDIO
                     else -> VideoType.IMAGE
                 }
+            } else {
+                if (meta.hasVideo) {
+                    if (meta.videoFrameCount > 1) VideoType.VIDEO
+                    else VideoType.IMAGE
+                } else if (meta.hasAudio) VideoType.AUDIO
+                else VideoType.UNKNOWN
             }
-            // async in the future?
-            if (type == VideoType.IMAGE_SEQUENCE) {
-                val imageSequenceMeta = ImageSequenceMeta(file)
-                this.imageSequenceMeta = imageSequenceMeta
-            }
-        }
-        lastWarning = null
-        when (type) {
-            VideoType.VIDEO, VideoType.AUDIO, VideoType.UNKNOWN -> {
-                val meta = meta
-                if (meta != null && meta.hasVideo) {
-                    if (file != lastAddedEndKeyframesFile) {
-                        lastAddedEndKeyframesFile = file
+            lastWarning = null
+            ytInfo = null
+            ytMeta = null
+            when (type) {
+                VideoType.VIDEO, VideoType.AUDIO, VideoType.UNKNOWN -> {
+                    if (meta != null && meta.hasVideo) {
+                        if (file != lastAddedEndKeyframesFile) {
+                            lastAddedEndKeyframesFile = file
+                        }
+                        lastDuration = meta.duration
                     }
-                    lastDuration = meta.duration
-                }
-                type = if (meta == null) {
-                    lastWarning = if (file.exists) {
-                        "Video file is invalid"
+                    type = if (meta == null) {
+                        lastWarning = if (file.exists) {
+                            "Video file is invalid"
+                        } else {
+                            "File does not exist"
+                        }
+                        VideoType.UNKNOWN
                     } else {
-                        "File does not exist"
-                    }
-                    VideoType.UNKNOWN
-                } else {
-                    when (file.extension.getImportType()) {
-                        "Video" -> VideoType.VIDEO
-                        "Audio" -> VideoType.AUDIO
-                        else -> VideoType.IMAGE
+                        when (file.extension.getImportType()) {
+                            "Video" -> VideoType.VIDEO
+                            "Audio" -> VideoType.AUDIO
+                            else -> VideoType.IMAGE
+                        }
                     }
                 }
+                VideoType.IMAGE_SEQUENCE -> {
+                    val meta2 = imageSequenceMeta!!
+                    if (!meta2.isValid) lastWarning = "No image sequence matches found"
+                }
+                VideoType.YOUTUBE -> {
+                    val info = YTCache.getYTMeta(ytId!!)
+                    ytInfo = info
+                    if (info != null) {
+                        val ffm = FFMPEGMetadata(InvalidRef, "media")
+                        ffm.videoHeight = info.links.maxOfOrNull { it.key.height } ?: 0
+                        ffm.videoWidth = ffm.videoHeight // idk
+                        val duration = info.videoLengthSeconds + 1.0
+                        ffm.videoDuration = duration
+                        ffm.audioDuration = duration
+                        ffm.duration = duration
+                        ffm.audioChannels = 2
+                        ffm.audioSampleRate = 44100 // idk
+                        ffm.audioSampleCount = (ffm.audioSampleRate * duration).toLong()
+                        ffm.videoFPS = (info.links.maxOfOrNull { it.key.fps } ?: 0).toDouble()
+                        ffm.videoFrameCount = (ffm.videoFPS * duration).toInt()
+                        ffm.hasAudio = info.bestAudio != null
+                        ffm.hasVideo = info.bestVideo != null
+                        ytMeta = ffm
+                        lastMeta = ffm
+                        // todo when video is changed, name doesn't change in PropertyInspector until the panel is resized
+                    }
+                }
+                VideoType.IMAGE -> {
+                    // todo check if the image is valid...
+                }
+                // it was a critical bug, oh
+                else -> Unit
             }
-            VideoType.IMAGE_SEQUENCE -> {
-                val meta = imageSequenceMeta!!
-                if (!meta.isValid) lastWarning = "No image sequence matches found"
-            }
-            VideoType.IMAGE -> {
-                // todo check if the image is valid...
-            }
-            // it was a critical bug, oh
-            else -> Unit
         }
     }
 
@@ -718,7 +921,9 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 VideoType.VIDEO -> {
                     val meta = meta
                     if (meta != null && meta.hasVideo) {
-                        drawVideo(meta, stack, time, color)
+                        drawVideo(meta, stack, time, color) { zoom, index, fps ->
+                            getFrame(zoom, meta, index, fps)
+                        }
                     }
                     // very intrusive :/
                     /*if(meta?.hasAudio == true){
@@ -734,6 +939,15 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                     val meta = meta
                     if (meta != null) lastDuration = meta.duration
                     drawSpeakers(stack, Vector4f(color), is3D, amplitude[time])
+                }
+                VideoType.YOUTUBE -> {
+                    // render youtube frame :)
+                    val meta = ytMeta
+                    if (meta != null && meta.hasVideo) {
+                        drawVideo(meta, stack, time, color) { zoom, index, fps ->
+                            getYTFrame(zoom, index, framesPerContainer, fps, videoFrameTimeout, true)
+                        }
+                    }
                 }
                 VideoType.UNKNOWN -> {}
                 else -> throw RuntimeException("$type needs visualization") // for the future
@@ -781,29 +995,125 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         infoGroup += UpdatingTextPanel(250, style) { "Type: ${type.name}" }
         infoGroup += UpdatingTextPanel(250, style) {
             if (type == VideoType.IMAGE) null
-            else "Duration: ${(meta?.duration ?: imageSequenceMeta?.duration).formatTime2(2)}"
+            else "Duration: ${(lastMeta?.duration ?: imageSequenceMeta?.duration).formatTime2(2)}"
         }
-        infoGroup += vid(UpdatingTextPanel(250, style) { "Video Duration: ${meta?.videoDuration.formatTime2(2)}" })
+        infoGroup += vid(UpdatingTextPanel(250, style) { "Video Duration: ${lastMeta?.videoDuration.formatTime2(2)}" })
         infoGroup += img(UpdatingTextPanel(250, style) {
-            val meta = meta ?: imSeqExampleMeta
+            val meta = lastMeta ?: imSeqExampleMeta
             val frame = getImage() as? Texture2D
             val w = max(meta?.videoWidth ?: 0, frame?.w ?: 0)
             val h = max(meta?.videoHeight ?: 0, frame?.h ?: 0)
             "Resolution: $w x $h"
         })
-        infoGroup += vid(UpdatingTextPanel(250, style) { "Frame Rate: ${meta?.videoFPS?.f2()} frames/s" })
+        infoGroup += vid(UpdatingTextPanel(250, style) { "Frame Rate: ${lastMeta?.videoFPS?.f2()} frames/s" })
         infoGroup += img(UpdatingTextPanel(250, style) {
-            "Frame Count: ${meta?.videoFrameCount ?: imageSequenceMeta?.frameCount}"
+            "Frame Count: ${lastMeta?.videoFrameCount ?: imageSequenceMeta?.frameCount}"
         })
         // infoGroup += vid(UpdatingTextPanel(250, style) { "Video Start Time: ${meta?.videoStartTime}s" })
-        infoGroup += aud(UpdatingTextPanel(250, style) { "Audio Duration: ${meta?.audioDuration.formatTime2(2)}" })
-        infoGroup += aud(UpdatingTextPanel(250, style) { "Sample Rate: ${meta?.audioSampleRate} samples/s" })
-        infoGroup += aud(UpdatingTextPanel(250, style) { "Sample Count: ${meta?.audioSampleCount} samples" })
+        infoGroup += aud(UpdatingTextPanel(250, style) { "Audio Duration: ${lastMeta?.audioDuration.formatTime2(2)}" })
+        infoGroup += aud(UpdatingTextPanel(250, style) { "Sample Rate: ${lastMeta?.audioSampleRate} samples/s" })
+        infoGroup += aud(UpdatingTextPanel(250, style) { "Sample Count: ${lastMeta?.audioSampleCount} samples" })
 
         list += vi(inspected, "File Location", "Source file of this video", null, file, style) { newFile ->
-            for (x in c) x.file = newFile
-        }
+            val ytId = getId(newFile)
+            if (ytId != null) {
+                // todo ask what to download
+                // todo then create a link here to both files...
+                thread(name = "YTMetaDownload") {
+                    LOGGER.debug("Waiting for list of resources")
+                    val sources = YTCache.getYTMeta(ytId)
+                    if (sources.bestAudio != null || sources.bestVideo != null) {
+                        addEvent {
 
+                            val none = NameDesc("None")
+
+                            var audioRes: Format? = null
+                            var videoRes: Format? = null
+                            val entries = sources.links.keys.toList()
+                            val audios = entries.filter { it.audioCodec != AudioCodec.NONE }
+                                .sortedWith { a, b ->
+                                    a.audioCodec.compareTo(b.audioCodec)
+                                        .ifSame { a.audioBitrate.compareTo(b.audioBitrate) }
+                                }
+                            val audio = EnumInput(
+                                NameDesc("Audio"),
+                                none,
+                                audios.map { NameDesc(it.toAudioString()) } + none,
+                                style)
+                                .setChangeListener { _, index, _ ->
+                                    audioRes = audios.getOrNull(index)
+                                }
+
+                            val videos = entries.filter { it.videoCodec != VideoCodec.NONE }
+                                .sortedWith { a, b ->
+                                    a.height.compareTo(b.height)
+                                        .ifSame {
+                                            a.fps.compareTo(b.fps)
+                                                .ifSame { a.videoCodec.compareTo(b.videoCodec) }
+                                        }
+                                }
+                            val video = EnumInput(
+                                NameDesc("Video"),
+                                none,
+                                videos.map { NameDesc(it.toVideoString()) } + none,
+                                style)
+                                .setChangeListener { _, index, _ ->
+                                    videoRes = videos.getOrNull(index)
+                                }
+
+                            val okButton = TextButton(
+                                "Download",
+                                "Downloads the resources, and combines them if necessary",
+                                false,
+                                style
+                            ).addLeftClickListener {
+                                val a = audioRes
+                                val v = videoRes
+                                if (a != null || v != null) {
+                                    thread(name = "YT-Download") {
+                                        val newLinks = YTCache.getYTMeta(ytId)
+                                        val a2 = newLinks.links[a]
+                                        val v2 = newLinks.links[v]
+                                        if (a2 != null && v2 != null && (a2 != v2)) {
+                                            // todo download, combine, and link
+                                        } else {
+                                            // download and link
+                                            val r = a ?: v!!
+                                            val r2 = a2 ?: v2!!
+                                            val folder = StudioBase.instance!!.getPersistentStorage()
+                                            val file0 = folder.getChild("$ytId-${r.id}.${r.ext}")
+                                            val file1 = Files.findNextFile(file0, 3, '-', 1)
+                                            println(r)
+                                            println(r2)
+                                            r2.inputStream { it, exc ->
+                                                if(it != null){
+                                                    it.copy(file1.outputStream())
+                                                    addEvent {
+                                                        RemsStudio.largeChange("Change Source") {
+                                                            file = file1
+                                                            invalidateUI(true)
+                                                        }
+                                                    }
+                                                }
+                                                exc?.printStackTrace()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            openMenuByPanels(
+                                GFX.someWindow.windowStack, NameDesc("Choose Resource to download"),
+                                listOf(audio, video, okButton)
+                            )
+                        }
+                    } else LOGGER.debug("Video could not be downloaded!")
+
+                }
+            } else {
+                for (x in c) x.file = newFile
+            }
+        }
 
         val uvMap = getGroup("Texture", "", "uvs")
         uvMap += img(
@@ -910,12 +1220,12 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
 
         var lastState = -1
         list += SpyPanel(style) {
-            val meta = meta
+            val meta = lastMeta
             val isValid = file.hasValidName() && meta != null
             val hasAudio = isValid && meta?.hasAudio == true
             val hasImage = isValid && type != VideoType.AUDIO
             val hasVideo = isValid && when (type) {
-                VideoType.IMAGE_SEQUENCE, VideoType.VIDEO -> true
+                VideoType.IMAGE_SEQUENCE, VideoType.VIDEO, VideoType.YOUTUBE -> true
                 else -> false
             } && meta?.hasVideo == true
             val hasImSeq = isValid && type == VideoType.IMAGE_SEQUENCE
@@ -974,8 +1284,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
     override val defaultDisplayName: String
         get() {
             // file can be null
-            return if (file != null && file.hasValidName()) file.name
-            else Dict["Video", "obj.video"]
+            return ytInfo?.title ?: (if (file != null && file.hasValidName()) file.name
+            else Dict["Video", "obj.video"])
         }
 
     override val symbol: String
@@ -986,31 +1296,9 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 VideoType.VIDEO -> DefaultConfig["ui.symbol.video", "\uD83C\uDF9E️"]
                 VideoType.IMAGE_SEQUENCE -> DefaultConfig["ui.symbol.imageSequence", "\uD83C\uDF9E️"]
                 VideoType.UNKNOWN -> "?"
+                VideoType.YOUTUBE -> "▶️"
             }
         }
-
-    companion object {
-
-
-        private val LOGGER = LogManager.getLogger(Video::class)
-
-        private val forceAutoScale get() = DefaultConfig["rendering.video.forceAutoScale", true]
-        private val forceFullScale get() = DefaultConfig["rendering.video.forceFullScale", false]
-
-        val videoScaleNames = BiMap<String, Int>(10)
-
-        init {
-            videoScaleNames["Auto"] = 0
-            videoScaleNames["Original"] = 1
-            for (i in listOf(2, 3, 4, 6, 8, 12, 16, 32, 64)) {
-                videoScaleNames["1/$i"] = i
-            }
-        }
-
-        val videoFrameTimeout get() = if (isFinalRendering) 2000L else 10000L
-        val tiling16x9 = Vector4f(8f, 4.5f, 0f, 0f)
-
-    }
 
     override fun getSplittingModes(): List<String> {
         return listOf("Video", "Audio", "Both")

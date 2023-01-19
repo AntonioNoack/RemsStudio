@@ -10,9 +10,9 @@ import me.anno.utils.Sleep
 
 fun main() {
 
-    // todo create a graph of how long it takes to decode 1 .. 1024 frames of a video file
-    // todo check at the start and at the end of the video: what is the overhead
-    // todo short vs long video? idk...
+    // create a graph of how long it takes to decode 1 .. 1024 frames of a video file
+    // check at the start and at the end of the video: what is the overhead
+    // short vs long video? idk...
 
     // doesn't matter, still 1frame/40s for 1.6GB file, and 9 min + 23 s length, 35211 frames (60 fps)
     // val folderExternal = File("E:\\Videos\\")

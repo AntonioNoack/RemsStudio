@@ -41,20 +41,13 @@ import me.anno.ui.editor.WelcomeUI
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.style.Style
 import me.anno.utils.OS
-
+import me.anno.video.ffmpeg.FFMPEGMetaParser
 
 // todo bugs:
-//  - circle cannot be clicked
-
-
-// todo bug:
+//  - camera cannot be clicked
+//  - sometimes delete-key isn't registered as such
 //  - settings are not calculating size correctly until resize
-
-// todo noise suppression: automatic noise detection (?) or manual
-//  and then map all noise, where audio is avgly below a certain level to zero
-
-
-
+//  - multiselect is broken: calls click -> checks focus -> calls select -> removes others?
 
 
 // todo isolate and remove certain frequencies from audio
@@ -366,11 +359,15 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10115) { // todo reenable i
     @JvmStatic
     fun main(args: Array<String>) {
 
-        // todo test scene with ALL rendering/playback features
+        // todo unit-test scene with ALL rendering/playback features
 
         Build.isDebug = false
-        // Build.isShipped = true
+        Build.isShipped = true
         Build.lock()
+
+        // todo remove
+        FFMPEGMetaParser.debug = true
+
         if (args.isEmpty()) {
             run()
         } else {

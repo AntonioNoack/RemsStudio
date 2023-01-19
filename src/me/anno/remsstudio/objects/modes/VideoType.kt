@@ -5,5 +5,6 @@ enum class VideoType {
     IMAGE,
     VIDEO,
     AUDIO,
-    IMAGE_SEQUENCE
+    IMAGE_SEQUENCE,
+    YOUTUBE
 }

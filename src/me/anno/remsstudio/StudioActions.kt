@@ -289,7 +289,7 @@ object StudioActions {
         register["ConsoleInput.downArrow.typed", "MoveDown"]
 
         register["PanelListX.leftArrow.typed", "Previous"]
-        register["PanelListX.rightArray.typed", "Next"]
+        register["PanelListX.rightArrow.typed", "Next"]
         register["PanelListY.upArrow.typed", "Previous"]
         register["PanelListY.downArrow.typed", "Next"]
 

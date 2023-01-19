@@ -37,7 +37,7 @@ class EqualizerEffect : SoundEffect(Domain.FREQUENCY_DOMAIN, Domain.FREQUENCY_DO
         }
     }
 
-    val range = pow(10f, 2.4f) // +/- 12dB
+    private val range = pow(10f, 2.4f) // +/- 12dB
 
     // val frequencies = 32 .. 16000 = 2 ^ (5 .. 14)
     val frequencies = Array(10) {

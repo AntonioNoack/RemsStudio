@@ -36,9 +36,6 @@ import org.joml.Vector4f
 import java.util.*
 import kotlin.streams.toList
 
-// todo multiselect is broken:
-//  - calls click -> checks focus -> calls select -> removes others?
-
 class StudioTreeView(style: Style) :
     TreeView<Transform>(
         UpdatingList {

@@ -9,10 +9,6 @@ package me.anno.remsstudio;
 // done particle systems
 // done move entries in tree
 
-import me.anno.cache.instances.PDFCache;
-import me.anno.cache.instances.PDFPlugin;
-import me.anno.extensions.ExtensionLoader;
-import me.anno.extensions.ExtensionManager;
 import me.anno.remsstudio.cli.RemsCLI;
 
 public class Runner {

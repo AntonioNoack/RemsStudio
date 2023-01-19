@@ -321,7 +321,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             Scene.draw(camera, root, dx, dy, width, height, editorTime, false, Renderer.depthRenderer, this)
         }
 
-        println("click: [${idBuffer.joinToString()}], [${depthBuffer.joinToString()}]")
+        // println("click: [${idBuffer.joinToString()}], [${depthBuffer.joinToString()}]")
         val bestResult = Screenshots.getClosestId(diameter, idBuffer, depthBuffer)
 
         // find the transform with the id to select it

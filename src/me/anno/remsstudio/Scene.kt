@@ -161,16 +161,13 @@ object Scene {
                     "}"
         )
 
-        // todo Tone Mapping on Video objects for performance improvements (doesn't need fp framebuffer)
-
         lutShader = createShader(
             "lut", simplestVertexShader, uvList, "" +
                     "uniform sampler2D tex;\n" +
                     "uniform sampler3D lut;\n" +
-                    // "uniform float time;\n" +
                     noiseFunc +
                     "void main(){" +
-                    "   vec4 c0 = texture(tex, uv);\n" +//vec4(uv, time, 1.0);//
+                    "   vec4 c0 = texture(tex, uv);\n" +
                     "   vec3 color = clamp(c0.rgb, 0.0, 1.0);\n" +
                     "   gl_FragColor = vec4(texture(lut, color.rbg).rgb, c0.a);\n" +
                     "}", listOf("tex", "lut")

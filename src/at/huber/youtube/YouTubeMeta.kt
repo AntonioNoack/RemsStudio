@@ -1,10 +1,12 @@
 package at.huber.youtube
 
 import at.huber.youtube.Format.Companion.findFormat
+import me.anno.cache.ICacheData
 import me.anno.io.Streams.readText
 import me.anno.io.config.ConfigBasics.cacheFolder
 import me.anno.io.files.FileReference
 import me.anno.io.files.FileReference.Companion.getReference
+import me.anno.io.files.WebRef
 import me.anno.io.json.JsonArray
 import me.anno.io.json.JsonNode
 import me.anno.io.json.JsonReader
@@ -13,9 +15,11 @@ import me.anno.remsstudio.RemsRegistry
 import me.anno.remsstudio.RemsStudio
 import me.anno.utils.Clock
 import me.anno.utils.OS.desktop
+import me.anno.utils.structures.Compare.ifSame
 import me.anno.video.VideoProxyCreator
 import org.apache.logging.log4j.LogManager
 import java.io.IOException
+import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLDecoder
@@ -24,12 +28,12 @@ import javax.script.ScriptEngineManager
 import javax.script.ScriptException
 
 /**
- * youtube sources extractor from https://github.com/HaarigerHarald/android-youtubeExtractor,
+ * YouTube sources extractor from https://github.com/HaarigerHarald/android-youtubeExtractor,
  * adjusted to our needs, and a little beautified, where possible
- * @param youtubeLink the youtube page link or video id
+ * @param youtubeLink the YouTube page link or video id
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-class YouTubeMeta(youtubeLink: String) {
+class YouTubeMeta(youtubeLink: String) : ICacheData {
 
     companion object {
 
@@ -143,7 +147,18 @@ class YouTubeMeta(youtubeLink: String) {
             return node.get(key) != null
         }
 
-        private fun loadDataFromURL(urlString: String): String {
+        fun loadDataFromURL2(urlString: String): InputStream {
+            val url = URL(urlString)
+            val urlConnection = url.openConnection() as HttpURLConnection
+            urlConnection.setRequestProperty("User-Agent", USER_AGENT)
+            try {
+                return urlConnection.inputStream
+            } finally {
+                urlConnection.disconnect()
+            }
+        }
+
+        fun loadDataFromURL(urlString: String): String {
             val url = URL(urlString)
             val urlConnection = url.openConnection() as HttpURLConnection
             urlConnection.setRequestProperty("User-Agent", USER_AGENT)
@@ -341,6 +356,44 @@ class YouTubeMeta(youtubeLink: String) {
         null
     } ?: emptyMap()
 
+    init {
+        println("#$videoId")
+        for ((key, value) in links)
+            println("$key: $value")
+    }
+
+    val bestVideo = links.maxWithOrNull { a, b ->
+        val ak = a.key
+        val bk = b.key
+        ak.height.compareTo(bk.height)
+            .ifSame {
+                ak.fps.compareTo(bk.fps)
+                    .ifSame {
+                        // reversed
+                        bk.videoCodec.compareTo(ak.videoCodec)
+                    }
+            }
+    }
+
+    val bestAudio = links.maxWithOrNull { a, b ->
+        // what is the best quality?
+        val ak = a.key
+        val bk = b.key
+        ak.audioBitrate.compareTo(bk.audioBitrate)
+    }
+
+    val bestBoth = links.filter {
+        val k = it.key
+        k.audioCodec != AudioCodec.NONE && k.videoCodec != VideoCodec.NONE
+    }.maxWithOrNull { a, b ->
+        val ak = a.key
+        val bk = b.key
+        ak.height.compareTo(bk.height)
+            .ifSame { ak.audioBitrate.compareTo(bk.audioBitrate) }
+    }
+
+    override fun destroy() {}
+
     override fun toString() = "YouTubeMeta{videoId='$videoId', title='$title, author='$author', channelId='$channelId" +
             "', videoLength=$videoLengthSeconds, viewCount=$viewCount, isLiveStream=$isLiveStream, links=$links}"
 
@@ -361,6 +414,10 @@ class YouTubeMeta(youtubeLink: String) {
         }
     }
 
+    fun String.formatURL() = this
+        .replace("\\u0026", "&")
+        .replace("\u000E", "&")
+
     private fun decodeSource(
         sourceJson: JsonNode,
         sources: HashMap<Format, String>,
@@ -371,7 +428,7 @@ class YouTubeMeta(youtubeLink: String) {
         if (format != null) {
             val url = sourceJson.getString("url")
             if (url != null) {
-                sources[format] = url.replace("\\u0026", "&")
+                sources[format] = url
             } else {
                 val cipher = sourceJson.getString("signatureCipher")
                 if (cipher != null) {
@@ -388,7 +445,7 @@ class YouTubeMeta(youtubeLink: String) {
         } else LOGGER.warn("Unknown format type $itag")
     }
 
-    fun loadMetadata(videoId: String?): HashMap<Format, String>? {
+    fun loadMetadata(videoId: String?): Map<Format, FileReference>? {
         videoId ?: return null
         val pageHtml = loadDataFromURL(WATCH_BASE_URL + videoId)
         var mat = patPlayerResponse.matcher(pageHtml)
@@ -450,7 +507,7 @@ class YouTubeMeta(youtubeLink: String) {
                     }
                 }
             }
-            if (sources.isNotEmpty()) return sources
+            if (sources.isNotEmpty()) return sources.mapValues { WebRef(it.value.formatURL(), emptyMap()) }
             else if (LOGGING) LOGGER.debug(pageHtml)
         } else {
             LOGGER.debug("ytPlayerResponse was not found")

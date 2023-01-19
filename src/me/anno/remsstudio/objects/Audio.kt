@@ -2,6 +2,7 @@ package me.anno.remsstudio.objects
 
 import me.anno.animation.LoopingState
 import me.anno.audio.openal.AudioTasks
+import me.anno.cache.instances.VideoCache
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
@@ -9,6 +10,7 @@ import me.anno.io.files.InvalidRef
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.audio.AudioFileStreamOpenAL2
 import me.anno.remsstudio.audio.effects.SoundPipeline
+import me.anno.remsstudio.yt.YTCache
 import me.anno.studio.Inspectable
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -16,7 +18,9 @@ import me.anno.ui.style.Style
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
 import me.anno.utils.structures.ValueWithDefaultFunc
+import me.anno.video.ffmpeg.FFMPEGMetadata
 import me.anno.video.ffmpeg.FFMPEGMetadata.Companion.getMeta
+import me.anno.video.formats.gpu.GPUFrame
 import org.joml.Matrix4fArrayList
 import org.joml.Vector4f
 
@@ -35,8 +39,8 @@ abstract class Audio(var file: FileReference = InvalidRef, parent: Transform? = 
 
     var is3D = false
 
-    val meta get() = getMeta(file, true)
-    val forcedMeta get() = getMeta(file, false)
+    open val meta get() = getMeta(file, true)
+    open val forcedMeta get() = getMeta(file, false)
 
     var needsUpdate = true
     var component: AudioFileStreamOpenAL2? = null
@@ -77,7 +81,7 @@ abstract class Audio(var file: FileReference = InvalidRef, parent: Transform? = 
         // to do we need to invalidate buffers, if we touch the custom timeline mode, or accelerate/decelerate audio... -> half done
         // how should we generate left/right audio? -> we need to somehow do this in software, too, for rendering -> started
 
-        getMeta(file, true) // just in case we need it ;)
+        meta // just in case we need it ;)
 
     }
 

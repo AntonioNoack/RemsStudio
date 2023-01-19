@@ -88,7 +88,11 @@ abstract class Distribution(val displayName: String, val description: String) :
     }
 
     override fun hashCode(): Int {
-        return toString().hashCode()
+        return System.identityHashCode(this)
+    }
+
+    override fun toString(): String {
+        return "${javaClass.name}@${System.identityHashCode(this)}"
     }
 
     companion object {

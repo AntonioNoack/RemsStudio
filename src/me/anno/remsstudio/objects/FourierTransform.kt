@@ -251,7 +251,7 @@ class FourierTransform : Transform() {
         val t = inspected.filterIsInstance<Transform>()
         val c = t.filterIsInstance<FourierTransform>()
         val fourier = getGroup("Fourier Transform", "", "fourier")
-        fourier.addChild(vi(inspected, "Audio File", "", null, file, style) { for (x in c) x.file = it })
+        list.addChild(vi(inspected, "Audio File", "", null, file, style) { for (x in c) x.file = it })
         fourier.addChild(
             vi(
                 inspected, "Sample Rate", "What the highest frequency should be",

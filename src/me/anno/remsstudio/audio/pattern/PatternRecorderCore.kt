@@ -29,6 +29,12 @@ import org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE
 import kotlin.math.abs
 import kotlin.math.min
 
+/**
+ * record/define musical pattern
+ *  - then extract high points of an audio signal/allow markers
+ *  - and then cut or synchronize (speed-change) the points :3
+ * https://www.youtube.com/watch?v=sff_2WMOLrs&t=1212s
+ * */
 class PatternRecorderCore(val tp: TextInput) : Panel(style) {
 
     val times = ArrayList<Double>()
