@@ -79,14 +79,14 @@ object RemsStudioUILayouts {
         // todo option to save/load/restore layout
         options.addAction(configTitle, Dict["Settings", "ui.top.config.settings"]) {
             val panel = ConfigPanel(DefaultConfig, false, style)
-            val window = createReloadWindow(panel, true) { createEditorUI(welcomeUI) }
+            val window = createReloadWindow(panel, transparent = false, fullscreen = true) { createEditorUI(welcomeUI) }
             panel.create()
             windowStack.push(window)
         }
 
         options.addAction(configTitle, Dict["Style", "ui.top.config.style"]) {
             val panel = ConfigPanel(DefaultConfig.style.values, true, style)
-            val window = createReloadWindow(panel, true) { createEditorUI(welcomeUI) }
+            val window = createReloadWindow(panel, transparent = false, fullscreen = true) { createEditorUI(welcomeUI) }
             panel.create()
             windowStack.push(window)
         }
@@ -204,7 +204,7 @@ object RemsStudioUILayouts {
         animationWindow.add(CustomContainer(StudioSceneView(style), library, style), 2f)
         animationWindow.add(
             CustomContainer(
-                PropertyInspector({ Selection.selectedInspectables  }, style),
+                PropertyInspector({ Selection.selectedInspectables }, style),
                 library, style
             ), 0.5f
         )

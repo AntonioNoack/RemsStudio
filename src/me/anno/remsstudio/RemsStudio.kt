@@ -43,10 +43,11 @@ import me.anno.ui.style.Style
 import me.anno.utils.OS
 import me.anno.video.ffmpeg.FFMPEGMetaParser
 
+// todo when rendering low-res images: for nearest-interpolated textures use interpolation on the edges of pixels
+
 // todo bugs:
 //  - camera cannot be clicked
 //  - sometimes delete-key isn't registered as such
-//  - settings are not calculating size correctly until resize
 //  - multiselect is broken: calls click -> checks focus -> calls select -> removes others?
 
 
@@ -55,8 +56,6 @@ import me.anno.video.ffmpeg.FFMPEGMetaParser
 // inspiration: https://www.youtube.com/watch?v=RA5UiLYWdbM&ab_channel=TomScott
 
 // todo use YouTube videos as a video source?
-
-// todo when rendering low-res images: for nearest-interpolated textures use interpolation on the edges of pixels
 
 // todo scripting?...
 // todo gizmos
@@ -364,9 +363,6 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10115) { // todo reenable i
         Build.isDebug = false
         Build.isShipped = true
         Build.lock()
-
-        // todo remove
-        FFMPEGMetaParser.debug = true
 
         if (args.isEmpty()) {
             run()
