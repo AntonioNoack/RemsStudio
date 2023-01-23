@@ -41,9 +41,6 @@ import me.anno.ui.editor.WelcomeUI
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.style.Style
 import me.anno.utils.OS
-import me.anno.video.ffmpeg.FFMPEGMetaParser
-
-// todo when rendering low-res images: for nearest-interpolated textures use interpolation on the edges of pixels
 
 // todo bugs:
 //  - camera cannot be clicked
@@ -122,7 +119,7 @@ import me.anno.video.ffmpeg.FFMPEGMetaParser
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
-object RemsStudio : StudioBase(true, "Rem's Studio", 10115) { // todo reenable isShipped
+object RemsStudio : StudioBase(true, "Rem's Studio", 10116) { // todo reenable isShipped
 
     val defaultWindowStack get() = GFX.someWindow.windowStack
     var hideUnusedProperties = false
