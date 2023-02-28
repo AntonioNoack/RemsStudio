@@ -6,7 +6,6 @@ import me.anno.remsstudio.objects.inspectable.InspectableAnimProperty
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.forces.types.RelativeForceField
 import me.anno.maths.Maths.pow
-import me.anno.utils.types.Vectors.times
 import org.joml.Vector3f
 
 class GravityField : RelativeForceField(

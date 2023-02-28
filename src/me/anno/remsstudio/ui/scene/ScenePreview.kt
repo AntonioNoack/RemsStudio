@@ -22,8 +22,6 @@ import me.anno.ui.base.groups.PanelList
 import me.anno.ui.style.Style
 import me.anno.utils.Color.black
 import me.anno.utils.types.Floats.toDegrees
-import me.anno.utils.types.Vectors.minus
-import me.anno.utils.types.Vectors.times
 import org.joml.Vector3f
 import java.util.*
 import kotlin.math.atan2

@@ -2,8 +2,6 @@ package me.anno.remsstudio.objects.models
 
 import me.anno.gpu.buffer.Attribute
 import me.anno.gpu.buffer.StaticBuffer
-import me.anno.utils.types.Vectors.minus
-import me.anno.utils.types.Vectors.plus
 import org.joml.Vector3f
 import kotlin.math.PI
 import kotlin.math.cos

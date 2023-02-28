@@ -6,10 +6,11 @@ import me.anno.remsstudio.audio.AudioCreatorV2
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
+import me.anno.ui.base.progress.ProgressBar
 import me.anno.video.VideoAudioCreator
 import me.anno.video.VideoCreator
 
-class VideoAudioCreatorV2(
+fun videoAudioCreatorV2(
     videoCreator: VideoCreator,
     scene: Transform,
     camera: Camera,
@@ -18,10 +19,20 @@ class VideoAudioCreatorV2(
     audioSources: List<Audio>,
     motionBlurSteps: AnimatedProperty<Int>,
     shutterPercentage: AnimatedProperty<Float>,
-    output: FileReference
-) : VideoAudioCreator(
+    output: FileReference,
+    progress: ProgressBar
+) = VideoAudioCreator(
     videoCreator,
-    VideoBackgroundTaskV2(videoCreator, scene, camera, motionBlurSteps, shutterPercentage),
-    AudioCreatorV2(scene, camera, audioSources, durationSeconds, sampleRate),
+    VideoBackgroundTaskV2(videoCreator, scene, camera, motionBlurSteps, shutterPercentage, progress),
+    object : AudioCreatorV2(scene, camera, audioSources, durationSeconds, sampleRate, progress) {
+        override fun hasStreams(): Boolean {// will be starting
+            val answer = super.hasStreams()
+            if (answer && !progress.isCancelled) {// this is hacky :/
+                progress.progress = 0.0
+                progress.total = durationSeconds * sampleRate
+            }
+            return answer
+        }
+    },
     output
 )

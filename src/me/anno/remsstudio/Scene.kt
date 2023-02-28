@@ -51,10 +51,6 @@ import me.anno.remsstudio.objects.effects.ToneMappers
 import me.anno.remsstudio.ui.editor.ISceneView
 import me.anno.ui.editor.sceneView.Gizmos.drawGizmo
 import me.anno.ui.editor.sceneView.Grid
-import me.anno.utils.types.Vectors.is000
-import me.anno.utils.types.Vectors.is1111
-import me.anno.utils.types.Vectors.minus
-import me.anno.utils.types.Vectors.times
 import me.anno.video.MissingFrameException
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList

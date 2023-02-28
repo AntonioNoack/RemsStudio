@@ -14,7 +14,7 @@ import me.anno.remsstudio.objects.effects.MaskType
 
 object ShaderLibV2 {
     
-    fun case(case: Int, path: String) = ResourceHelper.loadResource(path).readText()
+    private fun case(case: Int, path: String) = ResourceHelper.loadResource(path).readText()
         .trim().run {
             replace("\r", "")
         }.run {

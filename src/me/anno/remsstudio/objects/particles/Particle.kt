@@ -7,8 +7,6 @@ import me.anno.remsstudio.objects.forces.ForceField
 import me.anno.utils.structures.lists.UnsafeArrayList
 import me.anno.utils.types.Floats.f2
 import me.anno.utils.types.Floats.toRadians
-import me.anno.utils.types.Vectors.plus
-import me.anno.utils.types.Vectors.times
 import me.anno.video.MissingFrameException
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f

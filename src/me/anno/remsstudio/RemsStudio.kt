@@ -42,15 +42,18 @@ import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.style.Style
 import me.anno.utils.OS
 
+// todo add progress bar for rendering, and make it cancellable
+
 // todo bugs:
 //  - camera cannot be clicked
 //  - sometimes delete-key isn't registered as such
 //  - multiselect is broken: calls click -> checks focus -> calls select -> removes others?
+//  - Bokeh blur is broken
 
 
 // todo isolate and remove certain frequencies from audio
 // todo visualize audio frequency, always!!!, from 25Hz to 48kHz
-// inspiration: https://www.youtube.com/watch?v=RA5UiLYWdbM&ab_channel=TomScott
+// inspiration: https://www.youtube.com/watch?v=RA5UiLYWdbM
 
 // todo use YouTube videos as a video source?
 

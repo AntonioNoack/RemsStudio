@@ -18,7 +18,7 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.Video
 import me.anno.remsstudio.objects.modes.VideoType
 import me.anno.remsstudio.video.FrameTaskV2
-import me.anno.remsstudio.video.VideoAudioCreatorV2
+import me.anno.remsstudio.video.videoAudioCreatorV2
 import me.anno.ui.base.menu.Menu.ask
 import me.anno.ui.base.menu.Menu.msg
 import me.anno.ui.base.menu.Menu.openMenu
@@ -31,7 +31,6 @@ import me.anno.video.ffmpeg.FFMPEGEncodingBalance
 import me.anno.video.ffmpeg.FFMPEGEncodingType
 import me.anno.video.ffmpeg.FFMPEGMetadata.Companion.getMeta
 import org.apache.logging.log4j.LogManager
-import java.io.File
 import kotlin.concurrent.thread
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -117,25 +116,29 @@ object Rendering {
             if (audioSources.isEmpty()) targetOutputFile else tmpFile
         )
 
-        val creator = VideoAudioCreatorV2(
+        val progress = GFX.someWindow.addProgressBar(
+            "Rendering", "Frames",
+            totalFrameCount.toDouble()
+        )
+        val videoAudioCreator = videoAudioCreatorV2(
             videoCreator, scene, findCamera(scene), duration, sampleRate, audioSources,
-            motionBlurSteps, shutterPercentage, targetOutputFile
+            motionBlurSteps, shutterPercentage, targetOutputFile, progress
         )
 
-        creator.onFinished = {
+        videoAudioCreator.onFinished = {
+            // todo sometimes the "pipe fails", and that is reported as a green bar -> needs to be red (cancelled)
+            //  this happens after something has been cancelled :/ -> FFMPEG not closed down?
             isRendering = false
+            progress.finish()
             callback()
         }
 
         videoCreator.init()
-        creator.start()
+        videoAudioCreator.start()
 
     }
 
-    fun getTmpFile(file: File) =
-        File(file.parentFile, file.nameWithoutExtension + ".tmp." + targetOutputFile.extension)
-
-    fun getTmpFile(file: FileReference) =
+    private fun getTmpFile(file: FileReference) =
         getReference(file.getParent(), file.nameWithoutExtension + ".tmp." + targetOutputFile.extension)
 
     fun renderFrame(width: Int, height: Int, time: Double, ask: Boolean, callback: () -> Unit) {
@@ -163,7 +166,7 @@ object Rendering {
 
     }
 
-    fun findCamera(scene: Transform): Camera {
+    private fun findCamera(scene: Transform): Camera {
         val cameras = scene.listOfAll.filterIsInstance<Camera>()
         return cameras.firstOrNull() ?: RemsStudio.nullCamera ?: Camera()
     }
@@ -180,7 +183,7 @@ object Rendering {
         }
 
         if (video == InvalidRef || !video.exists || video == targetOutputFile) {
-            // ask which video should be selected
+            // ask, which video should be selected
             val videos = root.listOfAll.filterIsInstance<Video>()
                 .filter {
                     it.file != InvalidRef && it.file.exists &&
@@ -225,9 +228,11 @@ object Rendering {
             // if empty, skip?
             LOGGER.info("Found ${audioSources.size} audio sources")
 
-            AudioCreatorV2(scene, findCamera(scene), audioSources, duration, sampleRate).apply {
+            val progress = GFX.someWindow.addProgressBar("Audio Override", "Samples", duration * sampleRate)
+            AudioCreatorV2(scene, findCamera(scene), audioSources, duration, sampleRate, progress).apply {
                 onFinished = {
                     isRendering = false
+                    progress.finish()
                     callback()
                 }
                 thread(name = "Rendering::renderAudio()") {
@@ -260,9 +265,11 @@ object Rendering {
 
         // todo if is empty, send a warning instead of doing something
 
-        AudioCreatorV2(scene, findCamera(scene), audioSources, duration, sampleRate).apply {
+        val progress = GFX.someWindow.addProgressBar("Audio Export", "Samples", duration * sampleRate)
+        AudioCreatorV2(scene, findCamera(scene), audioSources, duration, sampleRate, progress).apply {
             onFinished = {
                 isRendering = false
+                progress.finish()
                 callback()
             }
             thread(name = "Rendering::renderAudio()") {

@@ -51,9 +51,6 @@ import me.anno.ui.style.Style
 import me.anno.utils.Color.black
 import me.anno.utils.types.Booleans.toInt
 import me.anno.utils.types.Floats.toRadians
-import me.anno.utils.types.Vectors.plus
-import me.anno.utils.types.Vectors.times
-import me.anno.utils.types.Vectors.toVec3f
 import org.apache.logging.log4j.LogManager
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
@@ -497,15 +494,17 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         val target2camera = target2camera.set(camera2target).invert()
 
         // where the object is on screen
-        val targetZonUI = target2camera.transform(Vector4f(0f, 0f, 0f, 1f)).toVec3f()
+        val v0 = target2camera.transform(Vector4f(0f, 0f, 0f, 1f))
+        val targetZonUI = Vector3f(v0.x, v0.y, v0.z)
         val targetZ = -targetZonUI.z
         val shiftSlowdown = shiftSlowdown
         val speed = shiftSlowdown * 2 * targetZ / h * pow(0.02f, camera.orthographicness[cameraTime])
         val dx = dx0 * speed
         val dy = dy0 * speed
-        val pos1 = camera2target.transform(
+        val pos1v = camera2target.transform(
             Vector4f(targetZonUI.x + dx, targetZonUI.y - dy, targetZonUI.z, 1f)
-        ).toVec3f()
+        )
+        val pos1 = Vector3f(pos1v.x,pos1v.y,pos1v.z)
 
         val delta0 = dx0 - dy0
         val delta = dx - dy

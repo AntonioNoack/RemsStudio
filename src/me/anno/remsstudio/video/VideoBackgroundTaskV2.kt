@@ -5,15 +5,18 @@ import me.anno.remsstudio.Scene
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
+import me.anno.ui.base.progress.ProgressBar
 import me.anno.video.VideoBackgroundTask
 import me.anno.video.VideoCreator
+import kotlin.math.min
 
 class VideoBackgroundTaskV2(
     video: VideoCreator,
     val scene: Transform,
     val camera: Camera,
     val motionBlurSteps: AnimatedProperty<Int>,
-    val shutterPercentage: AnimatedProperty<Float>
+    val shutterPercentage: AnimatedProperty<Float>,
+    val progressBar: ProgressBar
 ) : VideoBackgroundTask(video) {
 
     override fun getMotionBlurSteps(time: Double): Int {
@@ -25,8 +28,10 @@ class VideoBackgroundTaskV2(
     }
 
     override fun renderScene(time: Double, flipY: Boolean, renderer: Renderer) {
+        isCancelled = progressBar.isCancelled
+        progressBar.progress = min(time * creator.fps, progressBar.total * 0.99)
         Scene.draw(
-            camera, scene, 0, 0, video.w, video.h, time,
+            camera, scene, 0, 0, creator.w, creator.h, time,
             true, renderer, null
         )
     }

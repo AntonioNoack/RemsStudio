@@ -31,7 +31,7 @@ fun main() {
     for (i in 0 until steps) {
         val f = i * 1.0 / steps
         val v = animation.getValueAt(f) as Vector4f
-        LOGGER.info("$f: ${v.print()}")
+        LOGGER.info("$f: $v")
     }
 
 }

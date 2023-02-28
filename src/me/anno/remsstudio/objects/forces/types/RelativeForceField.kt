@@ -3,8 +3,6 @@ package me.anno.remsstudio.objects.forces.types
 import me.anno.remsstudio.objects.forces.ForceField
 import me.anno.remsstudio.objects.particles.Particle
 import me.anno.remsstudio.objects.particles.ParticleState
-import me.anno.utils.types.Vectors.minus
-import me.anno.utils.types.Vectors.times
 import org.joml.Vector3f
 
 abstract class RelativeForceField(displayName: String, description: String, dictSubPath: String) :

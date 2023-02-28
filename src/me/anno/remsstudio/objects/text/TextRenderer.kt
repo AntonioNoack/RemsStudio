@@ -12,12 +12,9 @@ import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.remsstudio.objects.attractors.EffectMorphing
 import me.anno.remsstudio.objects.modes.TextRenderMode
 import me.anno.remsstudio.objects.text.Text.Companion.DEFAULT_FONT_HEIGHT
-import me.anno.ui.base.Font
 import me.anno.ui.editor.sceneView.Grid
 import me.anno.utils.pooling.JomlPools
 import me.anno.utils.types.Strings.isBlank2
-import me.anno.utils.types.Vectors.mulAlpha
-import me.anno.utils.types.Vectors.times
 import me.anno.video.MissingFrameException
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
