@@ -15,11 +15,8 @@ class FloatInputV2(
     type: Type,
     private val owningProperty: AnimatedProperty<*>
 ) : FloatInput(
-    style,
-    title,
-    visibilityKey,
-    type,
-    NumberInputComponentV2(owningProperty, visibilityKey, style)
+    title, visibilityKey, type, style,
+    NumberInputComponentV2(owningProperty, visibilityKey, style),
 ) {
 
     private val indexInProperty get() = indexInParent
