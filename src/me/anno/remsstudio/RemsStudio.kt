@@ -42,8 +42,6 @@ import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.style.Style
 import me.anno.utils.OS
 
-// todo add progress bar for rendering, and make it cancellable
-
 // todo bugs:
 //  - camera cannot be clicked
 //  - sometimes delete-key isn't registered as such
@@ -62,12 +60,7 @@ import me.anno.utils.OS
 
 // Launch4j
 
-// todo configurable background color (render settings)
 // todo scene settings: render duration & size and such should be inside there as well
-
-
-// todo when mixing strings, \n and spaces have a special role:
-// todo - substring should not be longer in a line than the total
 
 // todo settings should open in a window, that does not cover everything, just maybe 90%
 
@@ -104,7 +97,7 @@ import me.anno.utils.OS
 // todo splines for the polygon line
 
 // todo sketching: draw frame by frame, only save x,y,radius?
-// todo record drawing, and use meta-ball like shapes (maybe)
+//  record drawing, and use meta-ball like shapes (maybe)
 
 // todo translations for everything...
 // todo limit the history to entries with 5x the same name? how exactly?...
@@ -122,7 +115,7 @@ import me.anno.utils.OS
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
-object RemsStudio : StudioBase(true, "Rem's Studio", 10116) { // todo reenable isShipped
+object RemsStudio : StudioBase(true, "Rem's Studio", 10117) {
 
     val defaultWindowStack get() = GFX.someWindow.windowStack
     var hideUnusedProperties = false
