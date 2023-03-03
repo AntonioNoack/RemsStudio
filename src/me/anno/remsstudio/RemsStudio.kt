@@ -43,6 +43,7 @@ import me.anno.ui.style.Style
 import me.anno.utils.OS
 
 // todo bugs:
+//  - TreeView looks empty at the start (it isn't)
 //  - camera cannot be clicked
 //  - sometimes delete-key isn't registered as such
 //  - multiselect is broken: calls click -> checks focus -> calls select -> removes others?
@@ -61,8 +62,6 @@ import me.anno.utils.OS
 // Launch4j
 
 // todo scene settings: render duration & size and such should be inside there as well
-
-// todo settings should open in a window, that does not cover everything, just maybe 90%
 
 // todo if a resource is requested, and there is a mutex limitation, it should be rejected instead of queued
 // so we don't put strain on the cpu & memory, if we don't really need the resource
@@ -111,7 +110,6 @@ import me.anno.utils.OS
 // todo bug: shift clicking names toggles things in tree view... why ever
 // todo bug: shift should select from-to, not two element
 // todo bug?: controls should select things one by one
-// todo bug: video icons are shifted left.. why?
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 

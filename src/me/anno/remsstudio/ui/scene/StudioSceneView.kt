@@ -208,16 +208,14 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         set(value) {
             field = value
             val selectedTransforms = selectedTransforms
-            if (selectedTransforms != null) {
-                Selection.select(
-                    selectedTransforms,
-                    when (value) {
-                        SceneDragMode.MOVE -> selectedTransforms.map { it.position }
-                        SceneDragMode.SCALE -> selectedTransforms.map { it.scale }
-                        SceneDragMode.ROTATE -> selectedTransforms.map { it.rotationYXZ }
-                    }
-                )
-            }
+            select(
+                selectedTransforms,
+                when (value) {
+                    SceneDragMode.MOVE -> selectedTransforms.map { it.position }
+                    SceneDragMode.SCALE -> selectedTransforms.map { it.scale }
+                    SceneDragMode.ROTATE -> selectedTransforms.map { it.rotationYXZ }
+                }
+            )
         }
 
     var velocity = Vector3f()

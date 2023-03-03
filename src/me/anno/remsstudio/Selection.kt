@@ -76,7 +76,7 @@ object Selection {
         }
 
         if (selectedTransforms == transforms && selectedProperties == properties) return
-        val newName = if (properties == null || properties[0] == null) null
+        val newName = if (properties == null || properties.isEmpty() || properties[0] == null) null
         else PropertyFinder.getName(transforms[0], properties[0]!!)
         val propName = newName ?: selectedPropName
         // LOGGER.info("$newName:$propName from ${transform?.className}:${property?.className}")
