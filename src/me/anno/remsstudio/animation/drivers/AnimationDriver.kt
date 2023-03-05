@@ -117,7 +117,7 @@ abstract class AnimationDriver : Saveable(), Inspectable {
             Dict["Driver Inspector", "driver.inspector.title"],
             style
         )
-        val t = selectedTransforms!!
+        val t = selectedTransforms
         createInspector(t, list.children, t, style, getGroup)
     }
 

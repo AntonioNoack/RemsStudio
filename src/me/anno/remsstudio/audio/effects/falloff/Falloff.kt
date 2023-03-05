@@ -69,7 +69,7 @@ abstract class Falloff : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
         list.add(audio.vi(
-            selectedTransforms!!, "Half Distance",
+            selectedTransforms, "Half Distance",
             "Distance, where the amplitude is 50%",
             Type.FLOAT_PLUS_EXP,
             halfDistance,

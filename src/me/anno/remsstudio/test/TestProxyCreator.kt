@@ -13,6 +13,6 @@ fun main() {
     RemsStudio.setupNames()
     RemsRegistry.init()
     RemsConfig.init()
-    getProxyFile(getReference(OS.videos, "GodRays.mp4"))
-    getProxyFile(getReference(downloads.getChild("Sonic Frontiers is an absolute mess.mp4")))
+    getProxyFile(getReference(OS.videos, "GodRays.mp4"), 0)
+    getProxyFile(getReference(downloads.getChild("Sonic Frontiers is an absolute mess.mp4")), 0)
 }

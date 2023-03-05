@@ -76,7 +76,7 @@ class YouTubeMeta(youtubeLink: String) : ICacheData {
             println(ref.nameWithoutExtension)
             println(ref.name)
             println(ref.length())
-            val proxy = VideoProxyCreator.getProxyFile(ref)
+            val proxy = VideoProxyCreator.getProxyFile(ref, 0)
             println(proxy)
         }
 

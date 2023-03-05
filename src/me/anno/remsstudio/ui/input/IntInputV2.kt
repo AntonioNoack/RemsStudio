@@ -10,14 +10,15 @@ import org.joml.Vector3i
 import org.joml.Vector4i
 
 class IntInputV2(
-    style: Style, title: String, visibilityKey: String,
+    title: String, visibilityKey: String,
     type: Type, private val owningProperty: AnimatedProperty<*>,
-) : IntInput(style, title, visibilityKey, type, NumberInputComponentV2(owningProperty, visibilityKey, style)) {
+    style: Style,
+) : IntInput(title, visibilityKey, type, style, NumberInputComponentV2(owningProperty, visibilityKey, style)) {
 
     constructor(
         title: String, visibilityKey: String,
         owningProperty: AnimatedProperty<*>, time: Double, style: Style
-    ) : this(style, title, visibilityKey, owningProperty.type, owningProperty) {
+    ) : this(title, visibilityKey, owningProperty.type, owningProperty, style) {
         when (val value = owningProperty[time]) {
             is Int -> setValue(value, false)
             is Long -> setValue(value, false)
@@ -44,7 +45,7 @@ class IntInputV2(
     }
 
     override fun clone(): IntInputV2 {
-        val clone = IntInputV2(style, title, visibilityKey, type, owningProperty)
+        val clone = IntInputV2(title, visibilityKey, type, owningProperty, style)
         copy(clone)
         return clone
     }

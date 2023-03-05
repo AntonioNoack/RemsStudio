@@ -29,7 +29,6 @@ import me.anno.remsstudio.RemsStudio.lastTouchedCamera
 import me.anno.remsstudio.RemsStudio.nullCamera
 import me.anno.remsstudio.RemsStudio.project
 import me.anno.remsstudio.Scene
-import me.anno.remsstudio.Selection
 import me.anno.remsstudio.Selection.select
 import me.anno.remsstudio.Selection.selectTransform
 import me.anno.remsstudio.Selection.selectedTransforms
@@ -502,7 +501,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         val pos1v = camera2target.transform(
             Vector4f(targetZonUI.x + dx, targetZonUI.y - dy, targetZonUI.z, 1f)
         )
-        val pos1 = Vector3f(pos1v.x,pos1v.y,pos1v.z)
+        val pos1 = Vector3f(pos1v.x, pos1v.y, pos1v.z)
 
         val delta0 = dx0 - dy0
         val delta = dx - dy
@@ -596,7 +595,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             return
         }
         // move the camera
-        val size = 20f * shiftSlowdown * (if (selectedTransforms?.all { it is Camera } == true) -1f else 1f) / max(
+        val size = 20f * shiftSlowdown * (if (selectedTransforms.all { it is Camera }) -1f else 1f) / max(
             GFX.someWindow.width,
             GFX.someWindow.height
         )
@@ -799,8 +798,9 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         deleteSelectedTransform()
     }
 
-    fun deleteSelectedTransform() {
-        val selectedTransforms = selectedTransforms ?: return
+    private fun deleteSelectedTransform() {
+        val selectedTransforms = selectedTransforms
+        if (selectedTransforms.isEmpty()) return
         invalidateDrawing()
         RemsStudio.largeChange("Deleted Component") {
             for (s in selectedTransforms) s.destroy()

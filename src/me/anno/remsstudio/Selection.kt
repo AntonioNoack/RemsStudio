@@ -112,7 +112,7 @@ object Selection {
             selectedTransforms = getTransformsFromId()
             val selectedTransforms = selectedTransforms
             val selectedPropName = selectedPropName
-            if (selectedTransforms != null && selectedPropName != null) {
+            if (selectedTransforms.isNotEmpty() && selectedPropName != null) {
                 val values = selectedTransforms.map {
                     PropertyFinder.getValue(it, selectedPropName)
                 }
@@ -120,7 +120,7 @@ object Selection {
                 selectedInspectables = values.mapNotNull { it as? Inspectable }
             } else {
                 selectedProperties = null
-                selectedInspectables = this.selectedTransforms ?: emptyList()
+                selectedInspectables = selectedTransforms
             }
 
             invalidateUI(true)

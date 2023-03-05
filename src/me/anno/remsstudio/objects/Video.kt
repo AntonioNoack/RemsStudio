@@ -450,7 +450,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
             if (time >= 0.0 && (isLooping != LoopingState.PLAY_ONCE || time <= duration)) {
 
                 val rawZoomLevel = meta.videoWidth / width
-                val zoomLevel = getCacheableZoomLevel(rawZoomLevel)
+                val scale = max(1, getCacheableZoomLevel(rawZoomLevel))
 
                 val videoFPS = min(sourceFPS, editorVideoFPS.value.toDouble())
                 val frameCount = max(1, (duration * videoFPS).roundToInt())
@@ -460,7 +460,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 val frameIndex = (localTime * videoFPS).toInt() % frameCount
 
                 val frame = getVideoFrame(
-                    file, max(1, zoomLevel), frameIndex,
+                    file, scale, frameIndex,
                     framesPerContainer, videoFPS, videoFrameTimeout, meta,
                     true
                 )
@@ -1086,7 +1086,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                                             println(r)
                                             println(r2)
                                             r2.inputStream { it, exc ->
-                                                if(it != null){
+                                                if (it != null) {
                                                     it.copy(file1.outputStream())
                                                     addEvent {
                                                         RemsStudio.largeChange("Change Source") {
