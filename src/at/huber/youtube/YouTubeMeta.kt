@@ -7,8 +7,6 @@ import me.anno.io.config.ConfigBasics.cacheFolder
 import me.anno.io.files.FileReference
 import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.files.WebRef
-import me.anno.io.json.JsonArray
-import me.anno.io.json.JsonNode
 import me.anno.io.json.JsonReader
 import me.anno.remsstudio.RemsConfig
 import me.anno.remsstudio.RemsRegistry
@@ -16,6 +14,8 @@ import me.anno.remsstudio.RemsStudio
 import me.anno.utils.Clock
 import me.anno.utils.OS.desktop
 import me.anno.utils.structures.Compare.ifSame
+import me.anno.utils.types.AnyToInt.getInt
+import me.anno.utils.types.AnyToLong.getLong
 import me.anno.video.VideoProxyCreator
 import org.apache.logging.log4j.LogManager
 import java.io.IOException
@@ -143,8 +143,8 @@ class YouTubeMeta(youtubeLink: String) : ICacheData {
             }
         }
 
-        private fun hasKey(node: JsonNode, key: String): Boolean {
-            return node.get(key) != null
+        private fun hasKey(node: HashMap<String, Any?>, key: String): Boolean {
+            return node[key] != null
         }
 
         fun loadDataFromURL2(urlString: String): InputStream {
@@ -398,16 +398,16 @@ class YouTubeMeta(youtubeLink: String) : ICacheData {
             "', videoLength=$videoLengthSeconds, viewCount=$viewCount, isLiveStream=$isLiveStream, links=$links}"
 
     private fun decodeFormats(
-        formats: JsonArray,
+        formats: List<*>,
         sources: HashMap<Format, String>,
         encodedSources: HashMap<Format, String>
     ) {
-        for (o in formats.content) {
-            val format = o as JsonNode
+        for (o in formats) {
+            val format = o as HashMap<*, *>
             // FORMAT_STREAM_TYPE_OTF(otf=1) requires downloading the init fragment (adding `&sq=0` to the URL)
             // and parsing emsg box to determine the number of fragments that
             // would subsequently requested with (`&sq=N`) (cf. youtube-dl)
-            val type = format.getString("type")
+            val type = format["type"]
             if ("FORMAT_STREAM_TYPE_OTF" != type) {
                 decodeSource(format, sources, encodedSources)
             }
@@ -419,19 +419,19 @@ class YouTubeMeta(youtubeLink: String) : ICacheData {
         .replace("\u000E", "&")
 
     private fun decodeSource(
-        sourceJson: JsonNode,
+        sourceJson: HashMap<*, *>,
         sources: HashMap<Format, String>,
         encodedSources: HashMap<Format, String>
     ) {
-        val itag = sourceJson.getInt("itag")
+        val itag = getInt(sourceJson["itag"], 0)
         val format = findFormat(itag)
         if (format != null) {
-            val url = sourceJson.getString("url")
-            if (url != null) {
+            val url = sourceJson["url"]
+            if (url is String) {
                 sources[format] = url
             } else {
-                val cipher = sourceJson.getString("signatureCipher")
-                if (cipher != null) {
+                val cipher = sourceJson["signatureCipher"]
+                if (cipher is String) {
                     val mat = patSigEncUrl.matcher(cipher)
                     val matSig = patSignature.matcher(cipher)
                     if (mat.find() && matSig.find()) {
@@ -457,29 +457,32 @@ class YouTubeMeta(youtubeLink: String) : ICacheData {
             val jsonSource = mat.group(1)
             val jsonData = JsonReader(jsonSource).readObject()
 
-            val streamingData = jsonData.get("streamingData")
-            if (streamingData != null) {
-                val formats = streamingData.get("formats")
-                if (formats is JsonArray) {
+            val streamingData = jsonData["streamingData"]
+            if (streamingData is HashMap<*, *>) {
+                val formats = streamingData["formats"]
+                if (formats is List<*>) {
                     decodeFormats(formats, sources, encodedSources)
                 } else LOGGER.warn("Missing formats")
                 val adaptiveFormats = streamingData.get("adaptiveFormats")
-                if (adaptiveFormats is JsonArray) {
+                if (adaptiveFormats is List<*>) {
                     decodeFormats(adaptiveFormats, sources, encodedSources)
                 } else LOGGER.warn("Missing adaptive formats")
             }
 
-            val videoDetails = jsonData.get("videoDetails")
-            if (videoDetails != null) {
+            val videoDetails = jsonData["videoDetails"]
+            if (videoDetails is Map<*, *>) {
                 // why would we need it again?
                 // videoId = getString(videoDetails, "videoId")
-                title = videoDetails.getString("title")
-                author = videoDetails.getString("author")
-                channelId = videoDetails.getString("channelId")
-                videoLengthSeconds = videoDetails.getLong("lengthSeconds")
-                viewCount = videoDetails.getLong("viewCount")
-                isLiveStream = videoDetails.getBool("isLiveContent")
-                shortDescription = videoDetails.getString("shortDescription")
+                title = videoDetails["title"] as? String
+                author = videoDetails["author"] as? String
+                channelId = videoDetails["channelId"] as? String
+                videoLengthSeconds = getLong(videoDetails["lengthSeconds"], 0)
+                viewCount = getLong(videoDetails["viewCount"], 0)
+                isLiveStream = when (videoDetails["isLiveContent"]) {
+                    "1", "true", true -> true
+                    else -> false
+                }
+                shortDescription = videoDetails["shortDescription"] as? String
             } else LOGGER.warn("Video details is null")
 
             if (encodedSources.isNotEmpty()) {

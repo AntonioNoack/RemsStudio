@@ -22,7 +22,7 @@ class NumberInputComponentV2(
     val indexInProperty get() = indexInParent - 1
 
     init {
-        setResetListener { AnyToDouble.getDouble(owningProperty.type.defaultValue, indexInProperty).toString() }
+        setResetListener { AnyToDouble.getDouble(owningProperty.type.defaultValue, indexInProperty, 0.0).toString() }
     }
 
     val numberInput get() = parent as NumberInput<*>
@@ -53,7 +53,7 @@ class NumberInputComponentV2(
         if (lastTime != editorTime && owningProperty.isAnimated) {
             lastTime = editorTime
             val valueVec = owningProperty[editorTime]
-            val value = AnyToDouble.getDouble(valueVec, indexInProperty)
+            val value = AnyToDouble.getDouble(valueVec, indexInProperty, 0.0)
             when (val numberInput = numberInput) {
                 is IntInput -> numberInput.setValue(value.toLong(), false)
                 is FloatInput -> numberInput.setValue(value, false)

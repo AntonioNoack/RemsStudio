@@ -46,7 +46,7 @@ class IntInputV2(
 
     override fun clone(): IntInputV2 {
         val clone = IntInputV2(title, visibilityKey, type, owningProperty, style)
-        copy(clone)
+        copyInto(clone)
         return clone
     }
 

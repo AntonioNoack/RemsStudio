@@ -38,7 +38,7 @@ import me.anno.utils.Color.black
 import me.anno.utils.Color.mulAlpha
 import me.anno.utils.Color.toARGB
 import me.anno.utils.Color.white
-import me.anno.utils.types.AnyToFloat.get
+import me.anno.utils.types.AnyToFloat.getFloat
 import org.apache.logging.log4j.LogManager
 import org.joml.*
 import kotlin.math.abs
@@ -159,7 +159,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         fun add(value: Any?) {
             value ?: return
             for (i in 0 until property.type.components) {
-                add(value[i])
+                add(getFloat(value, i, 0f))
             }
         }
         if (property.isAnimated) {
@@ -281,8 +281,8 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                         val endX = getXAt(kf2Global(first.time)).toFloat()
                         val endValue = first.value!!
                         for (i in 0 until channelCount) {
-                            val startY = getYAt(startValue[i]).toFloat()
-                            val endY = getYAt(endValue[i]).toFloat()
+                            val startY = getYAt(getFloat(startValue, i, 0f)).toFloat()
+                            val endY = getYAt(getFloat(endValue, i, 0f)).toFloat()
                             drawSmoothLine(
                                 x0.toFloat(), startY, endX, endY,
                                 this.x, this.y, this.w, this.h, valueColors[i], 0.5f
@@ -297,7 +297,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         } else {
             val value = property.defaultValue!!
             for (i in 0 until channelCount) {
-                val y = getYAt(value[i]).toFloat()
+                val y = getYAt(getFloat(value, i, 0f)).toFloat()
                 drawSmoothLine(
                     x0.toFloat(), y, x1.toFloat(), y,
                     this.x, this.y, this.w, this.h,
@@ -318,7 +318,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             }
 
             for (i in 0 until channelCount) {
-                val value = keyValue!![i]
+                val value = getFloat(keyValue, i, 0f)
                 yValues[i] = getYAt(value).roundToInt()
             }
 
@@ -359,8 +359,8 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                         val startX = getXAt(kf2Global(last.time)).toFloat()
                         val startValue = last.value!!
                         for (i in 0 until channelCount) {
-                            val endY = getYAt(endValue[i]).toFloat()
-                            val startY = getYAt(startValue[i]).toFloat()
+                            val endY = getYAt(getFloat(endValue, i, 0f)).toFloat()
+                            val startY = getYAt(getFloat(startValue, i, 0f)).toFloat()
                             drawSmoothLine(
                                 startX, startY, x1.toFloat(), endY,
                                 this.x, this.y, this.w, this.h, valueColors[i], 0.5f
@@ -433,10 +433,10 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         val t0 = getTimeAt(minX.toFloat())
         for (i in 0 until channelCount) {
             var lastX = minX
-            var lastY = getYAt(property[global2Kf(t0)]!![i]).toFloat()
+            var lastY = getYAt(getFloat(property[global2Kf(t0)], i, 0f)).toFloat()
             fun addLine(xHere: Int, tGlobalHere: Double) {
                 val value = property[global2Kf(tGlobalHere)]!!
-                val yHere = getYAt(value[i]).toFloat()
+                val yHere = getYAt(getFloat(value, i, 0f)).toFloat()
                 if (xHere > lastX && xHere >= x0 && lastX < x1) {
                     drawSmoothLine(
                         lastX.toFloat(), lastY, xHere.toFloat(), yHere,

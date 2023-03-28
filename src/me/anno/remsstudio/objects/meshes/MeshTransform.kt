@@ -20,7 +20,6 @@ import me.anno.io.files.InvalidRef
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.pow
-import me.anno.mesh.MeshData
 import me.anno.mesh.assimp.AnimGameItem
 import me.anno.mesh.assimp.AnimatedMeshesLoader
 import me.anno.mesh.vox.VOXReader
@@ -28,7 +27,6 @@ import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.objects.meshes.MeshDataV2.drawAssimp2
 import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.base.groups.PanelListY
@@ -178,22 +176,6 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                         false, this, stack, time, color,
                         animation[time], true, centerMesh, normalizeScale, false
                     )
-                    /*Input.isKeyDown('l') -> {// line debugging
-                        GFXState.geometryShader.use(lineGeometry) {
-                            data.drawAssimp2(
-                                false, this, stack, time, color,
-                                animation[time], true, centerMesh, normalizeScale, false
-                            )
-                        }
-                    }
-                    Input.isKeyDown('n') -> {// normal debugging
-                        GFXState.geometryShader.use(cullFaceColoringGeometry) {
-                            data.drawAssimp2(
-                                false, this, stack, time, color,
-                                animation[time], true, centerMesh, normalizeScale, false
-                            )
-                        }
-                    }*/
                     else -> data.drawAssimp2(
                         false, this, stack, time, color,
                         animation[time], true, centerMesh, normalizeScale, true

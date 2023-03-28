@@ -44,9 +44,9 @@ class FloatInputV2(
     override fun getValue(value: Any): Double {
         return when (value) {
             is Vector2f, is Vector3f, is Vector4f,
-            is Quaternionf -> AnyToFloat.getFloat(value, indexInProperty).toDouble()
+            is Quaternionf -> AnyToFloat.getFloat(value, indexInProperty, 0f).toDouble()
             is Vector2d, is Vector3d, is Vector4d,
-            is Quaterniond -> AnyToDouble.getDouble(value, indexInProperty)
+            is Quaterniond -> AnyToDouble.getDouble(value, indexInProperty, 0.0)
             else -> super.getValue(value)
         }
     }
@@ -60,7 +60,7 @@ class FloatInputV2(
 
     override fun clone(): FloatInputV2 {
         val clone = FloatInputV2(style, title, visibilityKey, type, owningProperty)
-        copy(clone)
+        copyInto(clone)
         return clone
     }
 

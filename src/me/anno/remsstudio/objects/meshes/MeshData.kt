@@ -1,17 +1,21 @@
 package me.anno.remsstudio.objects.meshes
 
+import me.anno.cache.ICacheData
 import me.anno.engine.ui.render.ECSShaderLib
 import me.anno.gpu.drawing.GFXx3D
 import me.anno.gpu.shader.ShaderLib
-import me.anno.mesh.MeshData
 import me.anno.mesh.MeshUtils
 import me.anno.mesh.assimp.AnimGameItem
 import me.anno.remsstudio.objects.GFXTransform
 import org.joml.*
 
-object MeshDataV2 {
+class MeshData : ICacheData {
 
-    fun MeshData.drawAssimp2(
+    var assimpModel: AnimGameItem? = null
+    var lastWarning: String? = null
+    override fun destroy() {}
+
+    fun drawAssimp2(
         useECSShader: Boolean,
         transform: GFXTransform?,
         cameraMatrix: Matrix4fArrayList,
@@ -73,5 +77,4 @@ object MeshDataV2 {
         // todo draw indexed as lines: use a geometry shader, which converts 3 vertices into 3 lines
 
     }
-
 }

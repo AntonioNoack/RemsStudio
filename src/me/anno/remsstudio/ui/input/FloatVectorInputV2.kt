@@ -108,7 +108,7 @@ class FloatVectorInputV2(
 
     override fun clone(): FloatVectorInputV2 {
         val clone = FloatVectorInputV2(title, visibilityKey, type, owningProperty, style)
-        copy(clone)
+        copyInto(clone)
         return clone
     }
 

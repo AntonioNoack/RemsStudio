@@ -175,7 +175,7 @@ class AudioFileStreamOpenAL2(
                 ALBase.check()
                 val soundBuffer = SoundBuffer()
                 ALBase.check()
-                soundBuffer.loadRawStereo16(stereoBuffer, sb0, playbackSampleRate)
+                soundBuffer.loadRaw16(stereoBuffer, sb0, playbackSampleRate, AL_FORMAT_STEREO16)
                 soundBuffer.ensureData()
                 buffers.add(soundBuffer)
 

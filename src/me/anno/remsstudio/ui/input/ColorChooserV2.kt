@@ -22,7 +22,7 @@ class ColorChooserV2(style: Style, withAlpha: Boolean, val property: AnimatedPro
 
         override fun clone(): ColorPaletteV2 {
             val clone = ColorPaletteV2(style)
-            copy(clone)
+            copyInto(clone)
             return clone
         }
 
@@ -47,7 +47,7 @@ class ColorChooserV2(style: Style, withAlpha: Boolean, val property: AnimatedPro
 
     override fun clone(): ColorChooserV2 {
         val clone = ColorChooserV2(style, withAlpha, property)
-        copy(clone)
+        copyInto(clone)
         return clone
     }
 

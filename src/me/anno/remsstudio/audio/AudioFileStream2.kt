@@ -36,7 +36,7 @@ open class AudioFileStream2(
     val destination: Camera,
     speed: Double,
     playbackSampleRate: Int = 48000
-) : AudioFileStream(file, repeat, startIndex, meta, speed, playbackSampleRate) {
+) : AudioFileStream(file, repeat, startIndex, meta, speed, playbackSampleRate, true, false, true) {
 
     constructor(audio: Audio, speed: Double, globalTime: Double, playbackSampleRate: Int, listener: Camera) :
             this(

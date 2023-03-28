@@ -200,7 +200,8 @@ object Scene {
     var lGCTInverted = Matrix4f()
     var usesFPBuffers = false
 
-    val mayUseMSAA get() = if (isFinalRendering) DefaultConfig["rendering.useMSAA", true] else DefaultConfig["ui.editor.useMSAA", gfxSettings["ui.editor.useMSAA"]]
+    val mayUseMSAA get() = if (isFinalRendering) DefaultConfig["rendering.useMSAA", true]
+    else DefaultConfig["ui.editor.useMSAA", gfxSettings.data["ui.editor.useMSAA", true]]
 
     // rendering must be done in sync with the rendering thread (OpenGL limitation) anyways, so one object is enough
     val stack = Matrix4fArrayList()

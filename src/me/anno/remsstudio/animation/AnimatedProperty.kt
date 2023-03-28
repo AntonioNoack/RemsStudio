@@ -6,7 +6,6 @@ import me.anno.gpu.GFX.glThread
 import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
-import me.anno.maths.Maths
 import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.RemsStudio.root
 import me.anno.remsstudio.animation.AnimationMaths.mul
@@ -144,7 +143,8 @@ class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
             }
             var index = keyframes.binarySearch { it.time.compareTo(time) }
             if (index < 0) index = -1 - index
-            val interpolation = keyframes.getOrNull(clamp(index, 0, keyframes.lastIndex))?.interpolation ?: Interpolation.SPLINE
+            val interpolation =
+                keyframes.getOrNull(clamp(index, 0, keyframes.lastIndex))?.interpolation ?: Interpolation.SPLINE
             val newFrame = Keyframe(time, value, interpolation)
             keyframes.add(newFrame)
             sort()
@@ -239,10 +239,10 @@ class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
         val animatedValue = getAnimatedValue(time)
         if (!hasDrivers) return animatedValue
         val v = animatedValue ?: defaultValue ?: 0.0
-        val v0 = getDouble(v, 0)
-        val v1 = getDouble(v, 1)
-        val v2 = getDouble(v, 2)
-        val v3 = getDouble(v, 3)
+        val v0 = getDouble(v, 0, 0.0)
+        val v1 = getDouble(v, 1, 0.0)
+        val v2 = getDouble(v, 2, 0.0)
+        val v3 = getDouble(v, 3, 0.0)
         // replace the components, which have drivers, with the driver values
         @Suppress("UNCHECKED_CAST", "USELESS_CAST")
         return when (animatedValue) {

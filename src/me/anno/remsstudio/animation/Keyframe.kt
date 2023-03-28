@@ -41,7 +41,7 @@ class Keyframe<V>(var time: Double, var value: V, var interpolation: Interpolati
     }
 
     fun getChannelAsFloat(index: Int): Float {
-        return AnyToFloat.getFloat(value!!, index)
+        return AnyToFloat.getFloat(value!!, index, 0f)
     }
 
     override fun readDouble(name: String, value: Double) {
