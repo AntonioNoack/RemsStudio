@@ -1,6 +1,7 @@
 package me.anno.remsstudio
 
 import me.anno.config.DefaultConfig
+import me.anno.gpu.drawing.UVProjection
 import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.utils.StringMap
 import me.anno.remsstudio.objects.*
@@ -10,7 +11,6 @@ import me.anno.remsstudio.objects.effects.MaskLayer
 import me.anno.remsstudio.objects.geometric.Circle
 import me.anno.remsstudio.objects.geometric.Polygon
 import me.anno.remsstudio.objects.meshes.MeshTransform
-import me.anno.gpu.drawing.UVProjection
 import me.anno.remsstudio.objects.particles.ParticleSystem
 import me.anno.remsstudio.objects.particles.TextParticles
 import me.anno.remsstudio.objects.text.Text
@@ -56,6 +56,9 @@ object RemsConfig {
 
     fun newInstances() {
 
+        if (DefaultConfig["createNewInstancesList"] is StringMap)
+            return
+
         val tick = Clock()
 
         val newInstances: Map<String, Transform> = mapOf(
@@ -98,7 +101,7 @@ object RemsConfig {
         )
 
         val value = StringMap(16, false).addAll(newInstances)
-        DefaultConfig["createNewInstancesList", value]
+        DefaultConfig["createNewInstancesList"] = value
 
         tick.stop("new instances list")
 

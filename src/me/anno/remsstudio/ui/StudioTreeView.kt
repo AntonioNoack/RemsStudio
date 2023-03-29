@@ -91,10 +91,8 @@ class StudioTreeView(style: Style) :
             (Selection.selectedProperties != null ||
                     (Selection.selectedInspectables.isNotEmpty() && Selection.selectedInspectables != elements))
         ) {
-            println("matches, so clearing")
             Selection.clear()
         } else {
-            println("selecting elements: ${elements.map { it.name }}, ${elements.size}")
             selectElements(elements)
         }
     }
