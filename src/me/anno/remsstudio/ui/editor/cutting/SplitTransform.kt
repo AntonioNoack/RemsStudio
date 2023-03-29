@@ -44,4 +44,11 @@ object SplitTransform {
         second.color.addKeyframe(localTime, color)
     }
 
+    fun Transform.addAfter(child: Transform) {
+        val p = parent!!
+        val index = p.children.indexOf(this)
+        p.children.add(index + 1, child)
+        child.parent = p
+    }
+
 }

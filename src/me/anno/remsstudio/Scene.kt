@@ -356,26 +356,15 @@ object Scene {
         if (lut == null && needsLUT && isFinalRendering) throw MissingFrameException(lutFile)
 
         if (buffer is Framebuffer && needsTemporaryBuffer) {
-
             renderPurely {
-
                 if (needsBloom) {
                     buffer = applyBloom(buffer, w, h, bloomSize, bloomIntensity, bloomThreshold)
                 }
-
                 if (lut != null) {
                     drawWithLUT(buffer, isFakeColorRendering, camera, cameraTime, w, h, flipY, lut)
                 } else {
                     drawWithoutLUT(buffer, isFakeColorRendering, camera, cameraTime, w, h, flipY)
                 }
-
-                /*useFrame(x0, y0, w, h, false) {
-                    if (lut != null) {
-                        drawWithLUT(buffer!!, isFakeColorRendering, camera, cameraTime, w, h, flipY, lut)
-                    } else {
-                        drawWithoutLUT(buffer!!, isFakeColorRendering, camera, cameraTime, w, h, flipY)
-                    }
-                }*/
             }
         }
     }

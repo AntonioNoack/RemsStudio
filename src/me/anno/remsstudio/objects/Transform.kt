@@ -626,55 +626,6 @@ open class Transform() : Saveable(),
     override val className get() = "Transform"
     override val approxSize get() = 1024 + listOfAll.count()
 
-    /*fun contains(t: Transform): Boolean {
-        if (t === this) return true
-        if (children != null) {// can be null on init
-            for (child in children) {
-                if (child === t || child.contains(t)) return true
-            }
-        }
-        return false
-    }*/
-
-    /*override fun addBefore(child: Transform) {
-        val p = parent!!
-        val index = p.children.indexOf(this)
-        p.children.add(index, child)
-        child.parent = p
-    }
-
-    override fun addAfter(child: Transform) {
-        val p = parent!!
-        val index = p.children.indexOf(this)
-        p.children.add(index + 1, child)
-        child.parent = p
-    }
-
-    override fun addChild(child: Transform) {
-        if (
-            glThread != null &&
-            Thread.currentThread() != glThread &&
-            this in root.listOfAll
-        ) throw RuntimeException("Called from wrong thread!")
-        if (child.contains(this)) throw RuntimeException("this cannot contain its parent!")
-        child.parent?.removeChild(child)
-        child.parent = this
-        children += child
-    }
-
-    override fun removeChild(child: Transform) {
-        child.parent = null
-        children.remove(child)
-    }*/
-
-    /*fun stringify(): String {
-        val myParent = parent
-        parent = null
-        val data = TextWriter.toText(this)
-        parent = myParent
-        return data
-    }*/
-
     fun setName(name: String): Transform {
         this.name = name
         return this

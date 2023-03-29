@@ -138,17 +138,24 @@ class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
                         }
                     }
                 }
+                var index = keyframes.binarySearch { it.time.compareTo(time) }
+                if (index < 0) index = -1 - index
+                val interpolation =
+                    keyframes.getOrNull(clamp(index, 0, keyframes.lastIndex))?.interpolation ?: Interpolation.SPLINE
+                val newFrame = Keyframe(time, value, interpolation)
+                keyframes.add(newFrame)
+                sort()
+                return newFrame
             } else {
-                keyframes.clear()
+                if (keyframes.size >= 1) {
+                    keyframes[0].value = value
+                    return keyframes[0]
+                } else {
+                    val newFrame = Keyframe(time, value, Interpolation.SPLINE)
+                    keyframes.add(newFrame)
+                    return newFrame
+                }
             }
-            var index = keyframes.binarySearch { it.time.compareTo(time) }
-            if (index < 0) index = -1 - index
-            val interpolation =
-                keyframes.getOrNull(clamp(index, 0, keyframes.lastIndex))?.interpolation ?: Interpolation.SPLINE
-            val newFrame = Keyframe(time, value, interpolation)
-            keyframes.add(newFrame)
-            sort()
-            return newFrame
         }
     }
 
@@ -187,7 +194,13 @@ class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
         synchronized(this) {
             val size = keyframes.size
             return when {
-                size == 0 -> defaultValue
+                size == 0 -> return when (val v = defaultValue) {
+                    is Vector2f -> AnimationMaths.v2(dst).set(v) as V
+                    is Vector3f -> AnimationMaths.v3(dst).set(v) as V
+                    is Vector4f -> AnimationMaths.v4(dst).set(v) as V
+                    is Quaternionf -> AnimationMaths.q4(dst).set(v) as V
+                    else -> v
+                }
                 size == 1 || !isAnimated -> keyframes[0].value
                 else -> {
 

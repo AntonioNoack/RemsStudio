@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package me.anno.remsstudio.ui.scene
 
 import me.anno.Engine.deltaTime
@@ -274,15 +276,12 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         }
 
         GFX.clip2(x0, y0, x1, y1) {
-
             renderDefault {
                 for (control in controls) {
                     control.draw(x, y, w, h, x0, y0, x1, y1)
                 }
             }
-
             drawChildren(x0, y0, x1, y1)
-
         }
 
     }
@@ -339,16 +338,11 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
     // todo camera movement in orthographic view is a bit broken
 
     fun parseKeyInput() {
-
         if (!mayControlCamera) return
-
-        val dt = clamp(deltaTime, 0f, 0.1f)
-
-        move(dt)
-
+        moveCamera(clamp(deltaTime, 0f, 0.1f))
     }
 
-    fun moveDirectly(dx: Float, dy: Float, dz: Float) {
+    fun moveCamera(dx: Float, dy: Float, dz: Float) {
         val defaultFPS = 60f
         val dt = 0.2f
         val scale = defaultFPS * dt
@@ -357,7 +351,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         this.inputDz += dz * scale
     }
 
-    fun move(dt: Float) {
+    fun moveCamera(dt: Float) {
 
         val camera = camera
         val (cameraTransform, cameraTime) = camera.getGlobalTransformTime(editorTime)
@@ -440,14 +434,14 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                 }
             }
             3 -> {
-                // very slow... but we can move around with a single finger, so it shouldn't matter...
+                // very slow..., but we can move around with a single finger, so it shouldn't matter...
                 // move the camera around
                 val first = touches.values.first()
                 val speed = 10f / 3f
                 if (contains(first.x, first.y)) {
                     val dx = speed * touches.values.sumOf { (it.x - it.lastX).toDouble() }.toFloat() * size
                     val dy = speed * touches.values.sumOf { (it.y - it.lastY).toDouble() }.toFloat() * size
-                    move(camera, dx, dy)
+                    moveSelected(camera, dx, dy)
                     touches.forEach { it.value.update() }
                     invalidateDrawing()
                 }
@@ -461,11 +455,11 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
     private val camera2target = Matrix4f()
     private val target2camera = Matrix4f()
 
-    fun move(selected: List<Transform>, dx0: Float, dy0: Float) {
-        for (s in selected) move(s, dx0, dy0)
+    fun moveSelected(selected: List<Transform>, dx0: Float, dy0: Float) {
+        for (s in selected) moveSelected(s, dx0, dy0)
     }
 
-    fun move(selected: Transform, dx0: Float, dy0: Float) {
+    fun moveSelected(selected: Transform, dx0: Float, dy0: Float) {
 
         if (!mayControlCamera) return
         if (dx0 == 0f && dy0 == 0f) return
@@ -577,10 +571,10 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         if (Input.isLeftDown && touches.size < 2) {
             // move the object
             val selected = selectedTransforms
-            if (selected != null && selected != listOf(camera)) {
-                move(selected, dx, dy)
+            if (selected.isNotEmpty() && camera !in selected) {
+                moveSelected(selected, dx, dy)
             } else {
-                moveDirectly(-dx0, +dy0, 0f)
+                moveCamera(-dx0, +dy0, 0f)
             }
         }
     }
@@ -601,14 +595,14 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         )
         val dx0 = dx * size
         val dy0 = dy * size
-        val scaleFactor = -10f
+        val scaleFactor = 10f
         val camera = camera
         val cameraTime = cameraTime
         val oldRotation = camera.rotationYXZ[cameraTime]
         // if(camera.orthographicness[cameraTime] > 0.5f) scaleFactor = -scaleFactor
         invalidateDrawing()
         RemsStudio.incrementalChange("Turn Camera") {
-            camera.putValue(camera.rotationYXZ, oldRotation + Vector3f(dy0 * scaleFactor, dx0 * scaleFactor, 0f), false)
+            camera.putValue(camera.rotationYXZ, oldRotation.add(dy0 * scaleFactor, dx0 * scaleFactor, 0f), false)
             invalidateUI(false)
         }
     }
@@ -824,7 +818,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             val radius = camera.orbitRadius[cameraTime]
             if (radius == 0f) {
                 // no orbiting
-                moveDirectly(0f, 0f, -0.5f * dy)
+                moveCamera(0f, 0f, -0.5f * dy)
             } else {
                 val delta = -dy * shiftSlowdown
                 val factor = pow(1.02f, delta)

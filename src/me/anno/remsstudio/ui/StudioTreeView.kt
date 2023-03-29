@@ -24,7 +24,6 @@ import me.anno.ui.base.menu.Menu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.treeView.TreeView
-import me.anno.ui.editor.treeView.TreeViewPanel
 import me.anno.ui.style.Style
 import me.anno.utils.Color.black
 import me.anno.utils.Color.toARGB
@@ -47,12 +46,12 @@ class StudioTreeView(style: Style) :
     ) {
 
     override fun getDragType(element: Transform) = "Transform"
-
     override fun stringifyForCopy(element: Transform) = TextWriter.toText(element, InvalidRef)
-
-    override fun getSymbol(element: Transform): String {
-        return element.symbol
-    }
+    override fun getSymbol(element: Transform) = element.symbol
+    override fun isCollapsed(element: Transform) = element.isCollapsed
+    override fun getName(element: Transform) = element.name.ifBlank { element.defaultDisplayName }
+    override fun getParent(element: Transform) = element.parent
+    override fun getChildren(element: Transform) = element.children
 
     override fun removeChild(parent: Transform, child: Transform) {
         parent.removeChild(child)
@@ -62,24 +61,9 @@ class StudioTreeView(style: Style) :
         element.isCollapsedI.value = collapsed
     }
 
-    override fun isCollapsed(element: Transform): Boolean {
-        return element.isCollapsed
-    }
 
     override fun setName(element: Transform, name: String) {
         element.nameI.value = name
-    }
-
-    override fun getName(element: Transform): String {
-        return element.name.ifBlank { element.defaultDisplayName }
-    }
-
-    override fun getParent(element: Transform): Transform? {
-        return element.parent
-    }
-
-    override fun getChildren(element: Transform): List<Transform> {
-        return element.children
     }
 
     override fun destroy(element: Transform) {
@@ -157,41 +141,7 @@ class StudioTreeView(style: Style) :
         return true
     }
 
-    /*override fun onDeleteKey(x: Float, y: Float) {
-        val panel = list.children.firstOrNull { it.contains(x, y) }
-        if (panel is TreeViewPanel<*>) {
-            val element = panel.getElement() as Transform
-            val parent = getParent(element)
-            if (parent != null) {
-                RemsStudio.largeChange("Deleted Component ${getName(element)}") {
-                    removeChild(parent, element)
-                    for (it in element.listOfAll.toList()) destroy(it)
-                }
-            }
-        }
-    }*/
-
-    override fun isValidElement(element: Any?): Boolean {
-        return element is Transform
-    }
-
-    override fun toggleCollapsed(element: Transform) {
-        val name = getName(element)
-        val isCollapsed = isCollapsed(element)
-        RemsStudio.largeChange(if (isCollapsed) "Expanded $name" else "Collapsed $name") {
-            val target = !isCollapsed
-            // remove children from the selection???...
-            val targets = windowStack.inFocus.filterIsInstance<TreeViewPanel<*>>()
-            for (it in targets) {
-                @Suppress("unchecked_cast")
-                val element2 = it.getElement() as Transform
-                setCollapsed(element2, target)
-            }
-            if (targets.isEmpty()) {
-                setCollapsed(element, target)
-            }
-        }
-    }
+    override fun isValidElement(element: Any?) = element is Transform
 
     companion object {
 
@@ -240,16 +190,13 @@ class StudioTreeView(style: Style) :
             val cameraToWorld = camera.parent?.getGlobalTransform(time)
             val objectToWorld = obj.getGlobalTransform(time)
             val objectWorldPosition = objectToWorld.transformPosition(Vector3f(0f, 0f, 0f))
-            val objectCameraPosition = if (cameraToWorld == null) objectWorldPosition else cameraToWorld.invert()
-                .transformPosition(objectWorldPosition)
+            val objectCameraPosition = if (cameraToWorld == null) objectWorldPosition else (cameraToWorld.invert()
+                .transformPosition(objectWorldPosition))
             LOGGER.info(objectCameraPosition)
             // apply this movement
             RemsStudio.largeChange("Move Camera to Object") {
                 camera.position.addKeyframe(camera.lastLocalTime, objectCameraPosition)
             }
-            /* askName(this.x, this.y, NameDesc(), getElement().name, NameDesc("Change Name"), { textColor }) {
-                 getElement().name = it
-             }*/
         }
 
         private val LOGGER = LogManager.getLogger(StudioTreeView::class)
@@ -312,13 +259,10 @@ class StudioTreeView(style: Style) :
         RemsStudio.largeChange("Moved Component", run)
     }
 
-    override val className get() = "StudioTreeView"
-    override fun getIndexInParent(parent: Transform, child: Transform): Int {
-        return child.indexInParent
-    }
-
     override fun addChild(element: Transform, child: Any, index: Int) {
         element.addChild(index, child as Transform)
     }
+
+    override val className get() = "StudioTreeView"
 
 }

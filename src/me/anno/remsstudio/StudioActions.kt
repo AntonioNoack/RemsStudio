@@ -236,7 +236,6 @@ object StudioActions {
         register["FileEntry.left.double", "Enter|Open"]
         register["FileEntry.f2.down", "Rename"]
         register["FileEntry.right.down", "OpenOptions"]
-        // todo only when clicked...
         register["FileExplorerEntry.left.double", "Enter|Open"]
         register["FileExplorerEntry.f2.down", "Rename"]
         register["FileExplorerEntry.right.down", "OpenOptions"]

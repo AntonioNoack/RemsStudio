@@ -43,12 +43,12 @@ import me.anno.ui.style.Style
 import me.anno.utils.OS
 
 // todo bugs:
-//  - TreeView looks empty at the start (it isn't)
 //  - camera cannot be clicked
 //  - sometimes delete-key isn't registered as such
 //  - multiselect is broken: calls click -> checks focus -> calls select -> removes others?
 //  - Bokeh blur is broken
-
+//  - controls are mirrored
+//  - reordering elements sometimes breaks
 
 // todo isolate and remove certain frequencies from audio
 // todo visualize audio frequency, always!!!, from 25Hz to 48kHz
@@ -349,7 +349,7 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10117) {
     @JvmStatic
     fun main(args: Array<String>) {
 
-        // todo unit-test scene with ALL rendering/playback features
+        // todo integration-test scene with ALL rendering/playback features
 
         Build.isDebug = false
         Build.isShipped = true
