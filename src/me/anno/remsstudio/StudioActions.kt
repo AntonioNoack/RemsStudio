@@ -235,11 +235,17 @@ object StudioActions {
         register["FileEntry.left.press", "DragStart"]
         register["FileEntry.left.double", "Enter|Open"]
         register["FileEntry.f2.down", "Rename"]
-        // todo only when clicked...
         register["FileEntry.right.down", "OpenOptions"]
+        // todo only when clicked...
+        register["FileExplorerEntry.left.double", "Enter|Open"]
+        register["FileExplorerEntry.f2.down", "Rename"]
+        register["FileExplorerEntry.right.down", "OpenOptions"]
         register["FileExplorer.right.down", "OpenOptions"]
         register["FileExplorer.mouseBackward.down", "Back"]
         register["FileExplorer.mouseForward.down", "Forward"]
+        register["StudioFileExplorer.right.down", "OpenOptions"]
+        register["StudioFileExplorer.mouseBackward.down", "Back"]
+        register["StudioFileExplorer.mouseForward.down", "Forward"]
         register["FileExplorerEntry.left.double", "Enter"]
         register["TreeViewPanel.left.press", "DragStart"]
         register["TreeViewPanel.f2.down", "Rename"]
