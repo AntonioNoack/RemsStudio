@@ -217,10 +217,22 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
                 source, destination
             )
             val pair = stream.getBuffer(key.bufferSize, key.time0.globalTime, key.time1.globalTime)
-            AudioData(key, pair.first, pair.second, Domain.TIME_DOMAIN)
+            AudioData(key, convert(pair.first), convert(pair.second), Domain.TIME_DOMAIN)
         } as AudioData
         rawDataLimiter.release()
         return entry
+    }
+
+    fun convert(src: ShortArray): FloatArray {
+        val dst = FAPool[src.size, false, true]
+        for (idx in src.indices) dst[idx] = src[idx].toFloat()
+        return dst
+    }
+
+    fun convert(src: FloatArray): ShortArray {
+        val dst = SAPool[src.size, false, true]
+        for (idx in src.indices) dst[idx] = src[idx].toInt().toShort()
+        return dst
     }
 
     fun getBuffer0(

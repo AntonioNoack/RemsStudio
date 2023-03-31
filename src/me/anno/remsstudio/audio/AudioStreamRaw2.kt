@@ -1,13 +1,13 @@
 package me.anno.remsstudio.audio
 
 import me.anno.animation.LoopingState
-import me.anno.audio.AudioPools.FAPool
+import me.anno.audio.AudioPools.SAPool
 import me.anno.audio.AudioTransfer
 import me.anno.audio.SimpleTransfer
 import me.anno.audio.openal.SoundBuffer
 import me.anno.audio.streams.AudioStreamRaw.Companion.averageSamples
 import me.anno.audio.streams.AudioStreamRaw.Companion.ffmpegSliceSampleDuration
-import me.anno.audio.streams.StereoFloatStream
+import me.anno.audio.streams.StereoShortStream
 import me.anno.cache.instances.AudioCache
 import me.anno.cache.keys.AudioSliceKey
 import me.anno.io.files.FileReference
@@ -16,7 +16,6 @@ import me.anno.maths.Maths.mix
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Transform
 import me.anno.utils.Sleep.waitUntilDefined
-import me.anno.utils.structures.tuples.FloatPair
 import me.anno.utils.structures.tuples.ShortPair
 import me.anno.video.ffmpeg.FFMPEGMetadata
 import me.anno.video.ffmpeg.FFMPEGStream.Companion.getAudioSequence
@@ -32,7 +31,7 @@ class AudioStreamRaw2(
     val is3D: Boolean,
     val source: Audio?,
     val destination: Transform?
-) : StereoFloatStream {
+) : StereoShortStream {
 
     // todo if out of bounds, and not recoverable, just stop
 
@@ -134,7 +133,7 @@ class AudioStreamRaw2(
         bufferSize: Int,
         time0: Double,
         time1: Double
-    ): Pair<FloatArray, FloatArray> {
+    ): Pair<ShortArray, ShortArray> {
 
         // "[INFO:AudioStream] Working on buffer $queued"
         // LOGGER.info("$startTime/$bufferIndex")
@@ -164,13 +163,13 @@ class AudioStreamRaw2(
 
         val updateInterval = min(bufferSize, 1024)
 
-        val leftBuffer = FAPool[bufferSize, true, true]
-        val rightBuffer = FAPool[bufferSize, true, true]
+        val leftBuffer = SAPool[bufferSize, true, true]
+        val rightBuffer = SAPool[bufferSize, true, true]
 
         val s0 = ShortPair()
         val s1 = ShortPair()
         val s2 = ShortPair()
-        val dst = FloatPair()
+        val dst = ShortPair()
 
         // will be in first iteration
         var local1: Double
@@ -228,8 +227,10 @@ class AudioStreamRaw2(
             val approxFraction = (sampleIndex % updateInterval) * 1f / updateInterval
 
             // write the data
-            leftBuffer[sampleIndex] = transfer0.getLeft(dst, approxFraction, transfer1)
-            rightBuffer[sampleIndex] = transfer0.getRight(dst, approxFraction, transfer1)
+            val l0 = dst.first.toFloat()
+            val r0 = dst.second.toFloat()
+            leftBuffer[sampleIndex] = transfer0.getLeft(l0, r0, approxFraction, transfer1).toInt().toShort()
+            rightBuffer[sampleIndex] = transfer0.getRight(l0, r0, approxFraction, transfer1).toInt().toShort()
 
             indexI = indexJ
 
