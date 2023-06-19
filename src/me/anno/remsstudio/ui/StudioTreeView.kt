@@ -257,8 +257,9 @@ class StudioTreeView(style: Style) :
         RemsStudio.largeChange("Moved Component", run)
     }
 
-    override fun addChild(element: Transform, child: Any, index: Int) {
+    override fun addChild(element: Transform, child: Any, type: Char, index: Int): Boolean {
         element.addChild(index, child as Transform)
+        return true
     }
 
     override val className get() = "StudioTreeView"

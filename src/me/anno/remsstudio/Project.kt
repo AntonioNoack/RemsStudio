@@ -6,7 +6,6 @@ import me.anno.io.Saveable
 import me.anno.io.config.ConfigBasics
 import me.anno.io.files.FileReference
 import me.anno.io.files.FileReference.Companion.getReference
-import me.anno.io.json.JsonArray
 import me.anno.io.json.JsonReader
 import me.anno.io.json.JsonWriter
 import me.anno.io.text.TextReader
@@ -161,7 +160,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
             val types = library.types
             val notFound = HashSet<String>()
             val style = style
-            fun load(arr: JsonArray?): Panel? {
+            fun load(arr: List<*>?): Panel? {
                 arr ?: return null
                 return try {
                     val type = arr[0] as? String ?: return null
@@ -181,7 +180,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
                     val weight = castToFloat(arr[1]!!) ?: 1f
                     if (obj is CustomList) {
                         for (i in 2 until arr.size) {
-                            obj.add(load(arr[i] as? JsonArray) ?: continue)
+                            obj.add(load(arr[i] as? List<*>) ?: continue)
                         }
                         obj.weight = weight
                         obj

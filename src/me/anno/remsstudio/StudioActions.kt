@@ -113,7 +113,7 @@ object StudioActions {
             },
             "ToggleHideObject" to {
                 val transforms = Selection.selectedTransforms
-                if (transforms != null) {
+                if (transforms.isNotEmpty()) {
                     RemsStudio.largeChange("Toggle Visibility") {
                         val newVis = when (transforms.firstOrNull()?.visibility) {
                             TransformVisibility.VISIBLE -> TransformVisibility.VIDEO_ONLY

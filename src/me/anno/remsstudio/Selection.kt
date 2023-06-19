@@ -60,8 +60,9 @@ object Selection {
         select(listOf(transform), if (property != null) listOf(property) else null)
     }
 
-    fun select(transforms0: List<Transform>, properties: List<ISaveable?>?) {
-        if (same(transforms0, selectedTransforms) && same(properties, selectedProperties)) return
+    fun select(transforms0: List<Transform>, properties0: List<ISaveable?>?) {
+
+        if (same(transforms0, selectedTransforms) && same(properties0, selectedProperties)) return
         val transforms = transforms0.map { transform ->
             val loi = transform.listOfInheritance.toList()
             var replacement: Transform? = null
@@ -75,18 +76,45 @@ object Selection {
             replacement ?: transform
         }
 
-        if (selectedTransforms == transforms && selectedProperties == properties) return
-        val newName = if (properties == null || properties.isEmpty() || properties[0] == null) null
-        else PropertyFinder.getName(transforms[0], properties[0]!!)
+        if (same(transforms, selectedTransforms) && same(properties0, selectedProperties)) return
+        val newName = if (properties0 == null || properties0.isEmpty() || properties0[0] == null) null
+        else PropertyFinder.getName(transforms[0], properties0[0]!!)
         val propName = newName ?: selectedPropName
-        // LOGGER.info("$newName:$propName from ${transform?.className}:${property?.className}")
-        RemsStudio.largeChange("Select ${transforms.firstOrNull()?.name ?: "Nothing"}:$propName") {
-            selectedUUIDs = transforms.map { getIdFromTransform(it) }
-            selectedPropName = propName
-            selectedTransforms = transforms
-            val property2 = transforms.map { PropertyFinder.getValue(it, selectedPropName ?: "") }
-            selectedInspectables = property2.withIndex().map { (i, it) -> it as? Inspectable ?: transforms[i] }
-            selectedProperties = property2.map { it as? AnimatedProperty<*> }
+
+        val uuids = transforms.map { getIdFromTransform(it) }
+        val foundProperties = transforms.map { PropertyFinder.getValue(it, selectedPropName ?: "") }
+        val inspectables = foundProperties.withIndex().map { (i, it) -> it as? Inspectable ?: transforms[i] }
+        val properties = foundProperties.map { it as? AnimatedProperty<*> }
+
+        /*if (uuids != selectedUUIDs)
+            println("UUIDs changed $selectedUUIDs -> $uuids")
+        if (propName != selectedPropName)
+            println("PropName changed $selectedPropName -> $propName")
+        if (inspectables != selectedInspectables)
+            println("Inspectables changed $selectedInspectables -> $inspectables")
+        if (properties != selectedProperties)
+            println("Properties changed $selectedProperties -> $properties")
+        if (transforms != selectedTransforms)
+            println(
+                "Transforms changed ${selectedTransforms.map { System.identityHashCode(it) }} -> " +
+                        "${transforms.map { System.identityHashCode(it) }}"
+            )*/
+
+        if (
+            uuids != selectedUUIDs ||
+            propName != selectedPropName ||
+            inspectables != selectedInspectables ||
+            properties != selectedProperties ||
+            transforms != selectedTransforms
+        ) {
+            // LOGGER.info("$newName:$propName from ${transform?.className}:${property?.className}")
+            RemsStudio.largeChange("Select ${transforms.firstOrNull()?.name ?: "Nothing"}:$propName") {
+                selectedUUIDs = uuids
+                selectedPropName = propName
+                selectedInspectables = inspectables
+                selectedProperties = properties
+                selectedTransforms = transforms
+            }
         }
     }
 

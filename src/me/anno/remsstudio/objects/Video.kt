@@ -825,7 +825,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         if (file !== lastFile || meta !== lastMeta) {
             lastFile = file
             lastMeta = meta
-            ytId = YTCache.getId(file)
+            ytId = getId(file)
             type = if (file !is WebRef && file.name.contains(imageSequenceIdentifier)) {
                 // async in the future?
                 val imageSequenceMeta = ImageSequenceMeta(file)
@@ -879,25 +879,23 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 VideoType.YOUTUBE -> {
                     val info = YTCache.getYTMeta(ytId!!)
                     ytInfo = info
-                    if (info != null) {
-                        val ffm = FFMPEGMetadata(InvalidRef, "media")
-                        ffm.videoHeight = info.links.maxOfOrNull { it.key.height } ?: 0
-                        ffm.videoWidth = ffm.videoHeight // idk
-                        val duration = info.videoLengthSeconds + 1.0
-                        ffm.videoDuration = duration
-                        ffm.audioDuration = duration
-                        ffm.duration = duration
-                        ffm.audioChannels = 2
-                        ffm.audioSampleRate = 44100 // idk
-                        ffm.audioSampleCount = (ffm.audioSampleRate * duration).toLong()
-                        ffm.videoFPS = (info.links.maxOfOrNull { it.key.fps } ?: 0).toDouble()
-                        ffm.videoFrameCount = (ffm.videoFPS * duration).toInt()
-                        ffm.hasAudio = info.bestAudio != null
-                        ffm.hasVideo = info.bestVideo != null
-                        ytMeta = ffm
-                        lastMeta = ffm
-                        // todo when video is changed, name doesn't change in PropertyInspector until the panel is resized
-                    }
+                    val ffm = FFMPEGMetadata(InvalidRef, "media")
+                    ffm.videoHeight = info.links.maxOfOrNull { it.key.height } ?: 0
+                    ffm.videoWidth = ffm.videoHeight // idk
+                    val duration = info.videoLengthSeconds + 1.0
+                    ffm.videoDuration = duration
+                    ffm.audioDuration = duration
+                    ffm.duration = duration
+                    ffm.audioChannels = 2
+                    ffm.audioSampleRate = 44100 // idk
+                    ffm.audioSampleCount = (ffm.audioSampleRate * duration).toLong()
+                    ffm.videoFPS = (info.links.maxOfOrNull { it.key.fps } ?: 0).toDouble()
+                    ffm.videoFrameCount = (ffm.videoFPS * duration).toInt()
+                    ffm.hasAudio = info.bestAudio != null
+                    ffm.hasVideo = info.bestVideo != null
+                    ytMeta = ffm
+                    lastMeta = ffm
+                    // todo when video is changed, name doesn't change in PropertyInspector until the panel is resized
                 }
                 VideoType.IMAGE -> {
                     // todo check if the image is valid...

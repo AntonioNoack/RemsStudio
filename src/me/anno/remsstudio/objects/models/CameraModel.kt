@@ -9,6 +9,7 @@ import me.anno.utils.types.Floats.toRadians
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
+import org.lwjgl.opengl.GL11C
 import kotlin.math.tan
 
 object CameraModel {
@@ -88,7 +89,7 @@ object CameraModel {
         put(p10)
         put(p00)
 
-        lines()
+        drawMode = GL11C.GL_LINES
     }
 
 

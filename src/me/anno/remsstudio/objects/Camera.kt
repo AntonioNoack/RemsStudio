@@ -32,7 +32,7 @@ import org.joml.*
 class Camera(parent: Transform? = null) : Transform(parent) {
 
     // kind of done allow cameras to be merged
-    // kind of done allow cameras to film camera (post processing) -> create a stack of cameras/scenes?
+    // kind of done allow cameras to film camera (post-processing) -> create a stack of cameras/scenes?
     // by implementing SoftLink: scenes can be included in others
 
     // orthographic-ness by setting the camera back some amount, and narrowing the view

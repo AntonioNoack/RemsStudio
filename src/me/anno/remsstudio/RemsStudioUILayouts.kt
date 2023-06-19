@@ -92,7 +92,7 @@ object RemsStudioUILayouts {
         }
 
         options.addAction(configTitle, Dict["Language", "ui.top.config.language"]) {
-            Dict.selectLanguages(style).onMouseClicked(windowStack.mouseX, windowStack.mouseY, MouseButton.LEFT, false)
+            Dict.selectLanguage(style).onMouseClicked(windowStack.mouseX, windowStack.mouseY, MouseButton.LEFT, false)
         }
 
         options.addAction(configTitle, Dict["Open Config Folder", "ui.top.config.openFolder"]) {

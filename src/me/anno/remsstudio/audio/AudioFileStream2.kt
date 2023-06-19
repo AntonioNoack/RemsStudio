@@ -56,6 +56,7 @@ open class AudioFileStream2(
 
     override fun getBuffer(bufferIndex: Long): Pair<ShortArray?, ShortArray?> {
         val data = AudioFXCache2.getBuffer(bufferIndex, this, false)!!
+        // todo skip double conversion if possible...
         return Pair(convert(data.first), convert(data.second))
     }
 

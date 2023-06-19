@@ -8,6 +8,7 @@ import me.anno.maths.Maths.PIf
 import me.anno.ui.editor.sceneView.Grid
 import org.joml.Matrix4fArrayList
 import org.joml.Vector4f
+import org.lwjgl.opengl.GL11C.GL_LINES
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
@@ -54,7 +55,7 @@ object SpeakerModel {
             addLine(0.50f * scale, 0.01f * scale, 0.80f * scale, 0.30f * scale, dx[i], dy[i])
         }
 
-        lines()
+        drawMode = GL_LINES
 
     }
 

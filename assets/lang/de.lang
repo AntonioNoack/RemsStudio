@@ -14,7 +14,7 @@ obj.camera: Kamera
 obj.camera.fov: Sichtfeld
 obj.camera.fov.desc: Wie viel die Kamera sieht, als Winkel in Grad, vertikal
 obj.camera.toneMapping: Tone Mapping
-obj.camera.toneMapping.desc: Bildet rießige Helligkeitsunterschiede auf sRGB ab
+obj.camera.toneMapping.desc: Bildet riesige Helligkeitsunterschiede auf sRGB ab
 obj.camera.lut: Look Up Table
 obj.camera.lut.desc: Wie UE4, für universelle Kontrolle über Farben, via Photoshop or Gimp
 obj.camera.resetTransform: Setze Transformation zurück

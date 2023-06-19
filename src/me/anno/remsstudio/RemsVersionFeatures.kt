@@ -13,14 +13,9 @@ class RemsVersionFeatures(oldVersion: Int) : VersionFeatures(oldVersion) {
 
     constructor(config: StringMap) : this(config["version", -1])
 
-    fun addInstance(config: StringMap, name: String, value: Transform) {
+    private fun addInstance(config: StringMap, name: String, value: Transform) {
         val list = config["createNewInstancesList"] as? StringMap ?: return
         list[name, value]
-    }
-
-    fun removeInstance(config: StringMap, name: String) {
-        val list = config["createNewInstancesList"] as? StringMap ?: return
-        list.remove(name)
     }
 
     override fun addNewPackages(config: StringMap) {

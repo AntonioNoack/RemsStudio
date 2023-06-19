@@ -58,11 +58,14 @@ class SceneTab(var file: FileReference?, var scene: Transform, history: History?
 
     var hasChanged = false
         set(value) {
-            val baseName = shortName
-            val newText = if (value) "$baseName*" else baseName
-            text = newText
-            tooltip = longName
-            field = value
+            if (field != value) {
+                val baseName = shortName
+                val newText = if (value) "$baseName*" else baseName
+                // RuntimeException("[SceneTab] $text -> $newText").printStackTrace()
+                text = newText
+                tooltip = longName
+                field = value
+            }
         }
 
     init {

@@ -63,8 +63,8 @@ class NumberInputComponentV2(
         val driver = driver
         if (driver != null) {
             val driverName = driver.getDisplayName()
-            if (text != driverName) {
-                setText(text, true)
+            if (lastValue != driverName) {
+                setText(lastValue, true)
             }
         }
         super.onDraw(x0, y0, x1, y1)
@@ -78,15 +78,17 @@ class NumberInputComponentV2(
                     owningProperty.drivers[indexInProperty] = driver
                     if (driver != null) Selection.selectProperty(listOf(driver))
                     else {
-                        text = when (val numberInput = numberInput) {
-                            is IntInput -> numberInput.stringify(numberInput.lastValue)
-                            is FloatInput -> numberInput.stringify(numberInput.lastValue)
-                            else -> throw RuntimeException()
-                        }
+                        setValue(
+                            when (val numberInput = numberInput) {
+                                is IntInput -> numberInput.stringify(numberInput.lastValue)
+                                is FloatInput -> numberInput.stringify(numberInput.lastValue)
+                                else -> throw RuntimeException()
+                            }, true // todo notify?
+                        )
                     }
                 }
             }
-        } else super.onMouseClicked(x, y, button, long)
+        } else super.onMouseClicked(x, y, button, false)
     }
 
     override fun onEmpty(x: Float, y: Float) {

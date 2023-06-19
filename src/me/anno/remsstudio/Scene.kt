@@ -532,7 +532,7 @@ object Scene {
          * draw the selection ring for selected objects
          * draw it after everything else and without depth
          * */
-        for (selectedTransform in selectedTransforms ?: return) {
+        for (selectedTransform in selectedTransforms) {
             if (!isFinalRendering && !isFakeColorRendering && selectedTransform != camera) { // seeing the own camera is irritating xD
                 val stack = stack
                 renderDefault {

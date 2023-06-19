@@ -136,12 +136,14 @@ class TextParticles : ParticleSystem() {
 
     override fun readObject(name: String, value: ISaveable?) {
         when (name) {
-            "text",
-            "relativeLineSpacing", "outlineColor0",
-            "outlineColor1", "outlineColor2",
-            "outlineWidths", "outlineSmoothness",
+            "text", "textAlignment",
+            "blockAlignmentX", "blockAlignmentY",
+            "shadowOffset", "shadowColor", "shadowSmoothness",
+            "relativeLineSpacing",
+            "outlineColor0", "outlineColor1", "outlineColor2",
+            "outlineWidths", "outlineDepth", "outlineSmoothness",
             "startCursor", "endCursor",
-            "textAlignment", "blockAlignmentX", "blockAlignmentY" ->
+            "attractorBaseColor" ->
                 text.readObject(name, value)
             else -> super.readObject(name, value)
         }
@@ -158,7 +160,7 @@ class TextParticles : ParticleSystem() {
 
     override fun readBoolean(name: String, value: Boolean) {
         when (name) {
-            "isItalic", "isBold", "roundSDFCorners" ->
+            "isItalic", "isBold", "roundSDFCorners", "smallCaps" ->
                 text.readBoolean(name, value)
             else -> super.readBoolean(name, value)
         }
@@ -173,7 +175,7 @@ class TextParticles : ParticleSystem() {
 
     override fun readFloat(name: String, value: Float) {
         when (name) {
-            "lineBreakWidth", "relativeTabSize" ->
+            "relativeTabSize", "relativeCharSpacing", "lineBreakWidth" ->
                 text.readFloat(name, value)
             else -> super.readFloat(name, value)
         }
