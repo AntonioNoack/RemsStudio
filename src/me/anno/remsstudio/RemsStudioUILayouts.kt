@@ -33,9 +33,11 @@ import me.anno.studio.StudioBase.Companion.instance
 import me.anno.ui.Panel
 import me.anno.ui.base.SpacerPanel
 import me.anno.ui.base.groups.PanelListY
-import me.anno.ui.base.menu.Menu.ask
+import me.anno.ui.base.menu.Menu.askName
 import me.anno.ui.base.menu.Menu.msg
+import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.Menu.openMenuByPanels
+import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.custom.CustomContainer
 import me.anno.ui.custom.CustomList
 import me.anno.ui.debug.ConsoleOutputPanel.Companion.createConsoleWithStats
@@ -43,6 +45,7 @@ import me.anno.ui.editor.OptionBar
 import me.anno.ui.editor.PropertyInspector
 import me.anno.ui.editor.WelcomeUI
 import me.anno.ui.editor.config.ConfigPanel
+import me.anno.ui.editor.files.toAllowedFilename
 import me.anno.ui.style.Style
 import me.anno.ui.utils.WindowStack.Companion.createReloadWindow
 import me.anno.utils.files.OpenInBrowser.openInBrowser
@@ -66,6 +69,7 @@ object RemsStudioUILayouts {
 
         val configTitle = Dict["Config", "ui.top.config"]
         val projectTitle = Dict["Project", "ui.top.project"]
+        val windowTitle = Dict["Window", "ui.top.window"]
         val selectTitle = Dict["Select", "ui.top.select"]
         val debugTitle = Dict["Debug", "ui.top.debug"]
         val renderTitle = Dict["Render", "ui.top.render"]
@@ -76,7 +80,6 @@ object RemsStudioUILayouts {
         }
 
         // todo complete translation
-        // todo option to save/load/restore layout
         options.addAction(configTitle, Dict["Settings", "ui.top.config.settings"]) {
             val panel = ConfigPanel(DefaultConfig, false, style)
             val window = createReloadWindow(panel, transparent = false, fullscreen = true) { createEditorUI(welcomeUI) }
@@ -121,15 +124,6 @@ object RemsStudioUILayouts {
             openMenuByPanels(windowStack, name, listOf(openRecentProject, createNewProject))
         }
 
-        options.addAction(projectTitle, Dict["Reset UI", "ui.top.resetUI"]) {
-            ask(windowStack, NameDesc("Are you sure?", "", "")) {
-                project?.apply {
-                    resetUIToDefault()
-                    createEditorUI(welcomeUI, false)
-                }
-            }
-        }
-
         options.addAction(selectTitle, "Inspector Camera") { selectTransform(nullCamera) }
         options.addAction(selectTitle, "Root") { selectTransform(root) }
         options.addAction(selectTitle, "First Camera") {
@@ -157,6 +151,56 @@ object RemsStudioUILayouts {
         ) { overrideAudio(InvalidRef, true, callback) }
         options.addAction(renderTitle, Dict["Audio Only", "ui.top.audioOnly"]) { renderAudio(true, callback) }
 
+
+        // options to save/load/restore layout
+        // todo option to delete layout?
+        options.addAction(windowTitle, Dict["Reset Layout", "ui.top.resetUILayout"]) {
+            val project = project
+            if (project != null) {
+                project.resetUIToDefault()
+                createEditorUI(welcomeUI, false)
+            }
+        }
+        options.addAction(windowTitle, Dict["Load Layout", "ui.top.loadUILayout"]) {
+            val project = project
+            if (project != null) {
+                val list = Project.getUIFiles()
+                if (list.isNotEmpty()) {
+                    openMenu(windowStack, list.map { layoutFile ->
+                        var name = layoutFile.name
+                        if (name.endsWith(".layout.json"))
+                            name = name.substring(0, name.length - ".layout.json".length)
+                        MenuOption(NameDesc(name)) {
+                            val loadedUI = project.loadUILayout(layoutFile)
+                            if (loadedUI != null) {
+                                project.mainUI = loadedUI
+                                createEditorUI(welcomeUI, false)
+                            } else msg(windowStack, NameDesc("File couldn't be loaded"))
+                        }
+                    })
+                } else msg(windowStack, NameDesc("No saved layouts were found"))
+            } else msg(windowStack, NameDesc("Project is null?"))
+        }
+        options.addAction(windowTitle, Dict["Save Layout", "ui.top.saveUILayout"]) {
+            askName(windowStack, NameDesc("Layout Name"), "ui", NameDesc("Save"), {
+                // todo ask-for-file-name-menu
+                val trimmed = it.trim()
+                if (trimmed.toAllowedFilename() == trimmed) {
+                    if (Project.getUILayoutFile(trimmed).exists) {
+                        0xffff00
+                    } else 0x00ff00
+                } else 0xff0000
+            }, {
+                val name = it.toAllowedFilename()
+                if (name != null) {
+                    val project = project
+                    if (project != null) project.saveUILayout(name)
+                    else msg(windowStack, NameDesc("Project is null?"))
+                } else msg(windowStack, NameDesc("Filename is invalid"))
+            })
+        }
+
+
         options.addAction(helpTitle, "Tutorials") {
             URL("https://remsstudio.phychi.com/?s=learn").openInBrowser()
         }
@@ -176,7 +220,7 @@ object RemsStudioUILayouts {
         ui += SpacerPanel(0, 1, style)
 
         val project = project!!
-        if (loadUI) project.loadUI()
+        if (loadUI) project.loadInitialUI()
 
         ui += project.mainUI
         ui += SpacerPanel(0, 1, style)

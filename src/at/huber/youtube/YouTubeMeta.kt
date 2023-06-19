@@ -101,12 +101,12 @@ class YouTubeMeta(youtubeLink: String) : ICacheData {
         private val patSigEncUrl = Pattern.compile("url=(.+?)(\\u0026|$)")
         private val patSignature = Pattern.compile("s=(.+?)(\\u0026|$)")
         private val patVariableFunction =
-            Pattern.compile("([{; =])([a-zA-Z$][a-zA-Z0-9$]{0,2})\\.([a-zA-Z$][a-zA-Z0-9$]{0,2})\\(")
-        private val patFunction = Pattern.compile("([{; =])([a-zA-Z\$_][a-zA-Z0-9$]{0,2})\\(")
+            Pattern.compile("([{; =])([a-zA-Z$][a-zA-Z\\d$]{0,2})\\.([a-zA-Z$][a-zA-Z\\d$]{0,2})\\(")
+        private val patFunction = Pattern.compile("([{; =])([a-zA-Z\$_][a-zA-Z\\d$]{0,2})\\(")
         private val patDecryptionJsFile = Pattern.compile("\\\\/s\\\\/player\\\\/([^\"]+?)\\.js")
         private val patDecryptionJsFileWithoutSlash = Pattern.compile("/s/player/([^\"]+?).js")
         private val patSignatureDecFunction =
-            Pattern.compile("(?:\\b|[^a-zA-Z0-9$])([a-zA-Z0-9$]{1,4})\\s*=\\s*function\\(\\s*a\\s*\\)\\s*\\{\\s*a\\s*=\\s*a\\.split\\(\\s*\"\"\\s*\\)")
+            Pattern.compile("(?:\\b|[^a-zA-Z\\d$])([a-zA-Z\\d$]{1,4})\\s*=\\s*function\\(\\s*a\\s*\\)\\s*\\{\\s*a\\s*=\\s*a\\.split\\(\\s*\"\"\\s*\\)")
 
         private val LOGGER = LogManager.getLogger(YouTubeMeta::class.java)
 
@@ -463,7 +463,7 @@ class YouTubeMeta(youtubeLink: String) : ICacheData {
                 if (formats is List<*>) {
                     decodeFormats(formats, sources, encodedSources)
                 } else LOGGER.warn("Missing formats")
-                val adaptiveFormats = streamingData.get("adaptiveFormats")
+                val adaptiveFormats = streamingData["adaptiveFormats"]
                 if (adaptiveFormats is List<*>) {
                     decodeFormats(adaptiveFormats, sources, encodedSources)
                 } else LOGGER.warn("Missing adaptive formats")

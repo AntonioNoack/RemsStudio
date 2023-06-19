@@ -43,7 +43,7 @@ import kotlin.math.roundToInt
 class Project(var name: String, val file: FileReference) : Saveable() {
 
     val configFile = getReference(file, "config.json")
-    val uiFile = getReference(file, "ui.json")
+    val uiFile get() = getUILayoutFile("ui")
     val tabsFile = getReference(file, "tabs.json")
 
     val config: StringMap
@@ -69,7 +69,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
         mainUI = createDefaultMainUI(style)
     }
 
-    fun loadUI() {
+    fun loadInitialUI() {
 
         fun tabsDefault() {
             val ref = getReference(scenes, "Root.json")
@@ -132,11 +132,9 @@ class Project(var name: String, val file: FileReference) : Saveable() {
 
         // main ui
         try {
-            if (uiFile.exists) {
-                val loadedUIData = loadUI2()
-                if (loadedUIData != null) {
-                    mainUI = loadedUIData
-                } else resetUIToDefault()
+            val loadedUIData = loadUILayout()
+            if (loadedUIData != null) {
+                mainUI = loadedUIData
             } else resetUIToDefault()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -154,13 +152,23 @@ class Project(var name: String, val file: FileReference) : Saveable() {
         TextWriter.save(data, tabsFile, workspace)
     }
 
-    fun loadUI2(): Panel? {
-        return uiFile.inputStreamSync().use { fis ->
+    fun loadUILayout(name: String = uiFile.nameWithoutExtension): Panel? {
+        return loadUILayout(getUILayoutFile(name))
+    }
+
+    fun loadUILayout(file: FileReference): Panel? {
+        println("Trying to load layout from $file")
+        if (!file.exists || file.isDirectory) {
+            LOGGER.warn("$file doesn't exist")
+            return null
+        }
+        return file.inputStreamSync().use { fis ->
             val library = StudioUITypeLibrary()
             val types = library.types
             val notFound = HashSet<String>()
             val style = style
             fun load(arr: List<*>?): Panel? {
+                println("Loading $arr")
                 arr ?: return null
                 return try {
                     val type = arr[0] as? String ?: return null
@@ -201,8 +209,8 @@ class Project(var name: String, val file: FileReference) : Saveable() {
         }
     }
 
-    fun saveUI() {
-        uiFile.outputStream().use { fos ->
+    fun saveUILayout(name: String = uiFile.nameWithoutExtension) {
+        getUILayoutFile(name).outputStream().use { fos ->
             val writer = JsonWriter(fos)
             val cdc = mainUI as CustomList
             fun write(c: Panel, w: Float) {
@@ -283,7 +291,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
     fun save() {
         saveConfig()
         SceneTabs.currentTab?.save {}
-        saveUI()
+        saveUILayout()
     }
 
     fun createNullCamera(camera: Camera?): Camera {
@@ -301,6 +309,16 @@ class Project(var name: String, val file: FileReference) : Saveable() {
         private val LOGGER = LogManager.getLogger(Project::class)
         val MotionBlurType = Type.INT_PLUS.withDefaultValue(8)
         val ShutterPercentageType = Type.FLOAT_PLUS.withDefaultValue(1f)
+
+         fun getUILayoutFile(name: String): FileReference {
+            return ConfigBasics.getConfigFile("$name.layout.json")
+        }
+
+        fun getUIFiles(): List<FileReference> {
+            return (ConfigBasics.configFolder.listChildren() ?: emptyList())
+                .filter { it.name.endsWith(".layout.json") }
+        }
+
     }
 
 }
