@@ -8,6 +8,7 @@ import me.anno.audio.openal.SoundBuffer
 import me.anno.audio.streams.AudioStreamRaw.Companion.averageSamples
 import me.anno.audio.streams.AudioStreamRaw.Companion.ffmpegSliceSampleDuration
 import me.anno.audio.streams.StereoShortStream
+import me.anno.cache.CacheData
 import me.anno.cache.instances.AudioCache
 import me.anno.cache.keys.AudioSliceKey
 import me.anno.io.files.FileReference
@@ -58,6 +59,7 @@ class AudioStreamRaw2(
 
     private var lastSliceIndex = Long.MAX_VALUE
     private var lastSoundBuffer: SoundBuffer? = null
+    private var lastChannels: Int = 0
 
     private fun getAmplitudeSync(index0: Long, shortPair: ShortPair): ShortPair {
 
@@ -79,19 +81,31 @@ class AudioStreamRaw2(
             val sliceTime = sliceIndex * ffmpegSliceSampleDuration
             val soundBuffer = AudioCache.getEntry(key, timeout, false) {
                 val sequence = getAudioSequence(file, sliceTime, ffmpegSliceSampleDuration, ffmpegSampleRate)
-                waitUntilDefined(true) { sequence.soundBuffer }
-            } as SoundBuffer
-            lastSoundBuffer = soundBuffer
+                val buffer = waitUntilDefined(true) { sequence.soundBuffer }
+                CacheData(buffer to sequence.channels)
+            } as CacheData<*>
+            val sv = soundBuffer.value as Pair<*, *>
+            val sb = sv.first as SoundBuffer
+            lastSoundBuffer = sb
             lastSliceIndex = sliceIndex
-            soundBuffer
+            lastChannels = sv.second as Int
+            sb
         }
 
         val data = soundBuffer.data!!
         val localIndex = (index % ffmpegSliceSampleCount).toInt()
-        val arrayIndex0 = localIndex * 2 // for stereo
+        val arrayIndex0 = localIndex * lastChannels // for stereo
 
-        return shortPair.set(data[arrayIndex0], data[arrayIndex0 + 1])
-
+        return when {
+            lastChannels >= 2 && arrayIndex0 + 1 < data.limit() -> {
+                shortPair.set(data[arrayIndex0], data[arrayIndex0 + 1])
+            }
+            lastChannels == 1 && arrayIndex0 < data.limit() -> {
+                val v = data[arrayIndex0]
+                shortPair.set(v, v)
+            }
+            else -> shortPair.set(0, 0)
+        }
     }
 
     private val v0 = Vector3f()

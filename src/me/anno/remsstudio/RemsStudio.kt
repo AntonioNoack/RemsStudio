@@ -111,9 +111,9 @@ import me.anno.utils.OS
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
-object RemsStudio : StudioBase(true, "Rem's Studio", 10118) {
+object RemsStudio : StudioBase("Rem's Studio", 10118, true) {
 
-    val defaultWindowStack get() = GFX.someWindow.windowStack
+    val defaultWindowStack get() = GFX.someWindow!!.windowStack
     var hideUnusedProperties = false
 
     // private val LOGGER = LogManager.getLogger(RemsStudio::class)
@@ -212,7 +212,7 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10118) {
         val project = Project(name.trim(), folder)
         RemsStudio.project = project
         project.open()
-        GFX.someWindow.title = "Rem's Studio: ${project.name}"
+        GFX.someWindow?.title = "Rem's Studio: ${project.name}"
         return project
     }
 
@@ -256,8 +256,8 @@ object RemsStudio : StudioBase(true, "Rem's Studio", 10118) {
     val targetDuration get(): Double = project?.targetDuration ?: Double.POSITIVE_INFINITY
     val targetSampleRate get(): Int = project?.targetSampleRate ?: 48000
     val targetFPS get(): Double = project?.targetFPS ?: 60.0
-    val targetWidth get(): Int = project?.targetWidth ?: GFX.someWindow.width
-    val targetHeight get(): Int = project?.targetHeight ?: GFX.someWindow.height
+    val targetWidth get(): Int = project?.targetWidth ?: GFX.someWindow!!.width
+    val targetHeight get(): Int = project?.targetHeight ?: GFX.someWindow!!.height
     val targetOutputFile get(): FileReference = project!!.targetOutputFile
     val motionBlurSteps get(): AnimatedProperty<Int> = project!!.motionBlurSteps
     val shutterPercentage get() = project!!.shutterPercentage

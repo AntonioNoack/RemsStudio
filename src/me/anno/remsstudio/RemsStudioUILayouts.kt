@@ -73,6 +73,7 @@ object RemsStudioUILayouts {
         val selectTitle = Dict["Select", "ui.top.select"]
         val debugTitle = Dict["Debug", "ui.top.debug"]
         val renderTitle = Dict["Render", "ui.top.render"]
+        val toolsTitle = Dict["Tools", "ui.top.tools"]
         val helpTitle = Dict["Help", "ui.top.help"]
 
         options.addMajor(Dict["Add", "ui.top.add"]) {
@@ -102,34 +103,38 @@ object RemsStudioUILayouts {
             ConfigBasics.configFolder.openInExplorer()
         }
 
-        val menuStyle = style.getChild("menu")
 
-        options.addAction(
-            projectTitle,
-            Dict["Change Language", ""]
-        ) {
+        /**
+         * Project options
+         * */
+        options.addAction(projectTitle, Dict["Change Language", ""]) {
             val panel = ProjectSettings.createSpellcheckingPanel(style)
             openMenuByPanels(windowStack, NameDesc("Change Project Language"), listOf(panel))
         }
-
         options.addAction(projectTitle, Dict["Save", "ui.top.project.save"]) {
             instance?.save()
             LOGGER.info("Saved the project")
         }
-
         options.addAction(projectTitle, Dict["Load", "ui.top.project.load"]) {
             val name = NameDesc("Load Project", "", "ui.loadProject")
+            val menuStyle = style.getChild("menu")
             val openRecentProject = welcomeUI.createRecentProjectsUI(RemsStudio, menuStyle, getRecentProjects())
             val createNewProject = welcomeUI.createNewProjectUI(RemsStudio, menuStyle)
             openMenuByPanels(windowStack, name, listOf(openRecentProject, createNewProject))
         }
 
+        /**
+         * Selecting things
+         * */
         options.addAction(selectTitle, "Inspector Camera") { selectTransform(nullCamera) }
         options.addAction(selectTitle, "Root") { selectTransform(root) }
         options.addAction(selectTitle, "First Camera") {
             selectTransform(root.listOfAll.firstInstanceOrNull<Camera>())
         }
 
+        /**
+         * Debugging
+         * */
         options.addAction(debugTitle, "Reload Cache (Ctrl+F5)") { RemsStudio.clearAll() }
         options.addAction(debugTitle, "Clear Cache") { ConfigBasics.cacheFolder.deleteRecursively() }
         options.addAction(debugTitle, "Reload Plugins") { ExtensionLoader.reloadPlugins() }
@@ -139,7 +144,10 @@ object RemsStudioUILayouts {
 
         // todo shortcuts, which can be set for all actions??...
 
-        val callback = { GFX.someWindow.requestAttentionMaybe() }
+        /**
+         * Rendering
+         * */
+        val callback: () -> Unit = { GFX.someWindow?.requestAttentionMaybe() }
         options.addAction(renderTitle, Dict["Settings", "ui.top.render.settings"]) { selectTransform(RenderSettings) }
         options.addAction(renderTitle, Dict["Set%", "ui.top.render.topPercent"]) { renderSetPercent(true, callback) }
         options.addAction(renderTitle, Dict["Full", "ui.top.render.full"]) { renderPart(1, true, callback) }
@@ -151,7 +159,9 @@ object RemsStudioUILayouts {
         ) { overrideAudio(InvalidRef, true, callback) }
         options.addAction(renderTitle, Dict["Audio Only", "ui.top.audioOnly"]) { renderAudio(true, callback) }
 
-
+        /**
+         * Window (Layout)
+         * */
         // options to save/load/restore layout
         // todo option to delete layout?
         options.addAction(windowTitle, Dict["Reset Layout", "ui.top.resetUILayout"]) {
@@ -200,7 +210,16 @@ object RemsStudioUILayouts {
             })
         }
 
+        /**
+         * Tools
+         * */
+        options.addAction(toolsTitle, "Downloader") {
+            DownloadUI.openUI(style, windowStack)
+        }
 
+        /**
+         * Help
+         * */
         options.addAction(helpTitle, "Tutorials") {
             URL("https://remsstudio.phychi.com/?s=learn").openInBrowser()
         }

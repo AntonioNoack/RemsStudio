@@ -2,7 +2,6 @@ package me.anno.remsstudio.objects
 
 import me.anno.animation.LoopingState
 import me.anno.audio.openal.AudioTasks
-import me.anno.cache.instances.VideoCache
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
@@ -10,7 +9,6 @@ import me.anno.io.files.InvalidRef
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.audio.AudioFileStreamOpenAL2
 import me.anno.remsstudio.audio.effects.SoundPipeline
-import me.anno.remsstudio.yt.YTCache
 import me.anno.studio.Inspectable
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -18,9 +16,7 @@ import me.anno.ui.style.Style
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
 import me.anno.utils.structures.ValueWithDefaultFunc
-import me.anno.video.ffmpeg.FFMPEGMetadata
 import me.anno.video.ffmpeg.FFMPEGMetadata.Companion.getMeta
-import me.anno.video.formats.gpu.GPUFrame
 import org.joml.Matrix4fArrayList
 import org.joml.Vector4f
 
