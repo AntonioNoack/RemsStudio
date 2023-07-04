@@ -1,9 +1,6 @@
-@file:Suppress("MemberVisibilityCanBePrivate")
-
 package me.anno.remsstudio.ui.scene
 
 import me.anno.Engine.deltaTime
-import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.addGPUTask
 import me.anno.gpu.GFXState.renderDefault
@@ -43,6 +40,7 @@ import me.anno.remsstudio.ui.editor.ISceneView
 import me.anno.remsstudio.ui.editor.SimplePanel
 import me.anno.studio.StudioBase.Companion.dragged
 import me.anno.studio.StudioBase.Companion.shiftSlowdown
+import me.anno.ui.Panel
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelList
 import me.anno.ui.custom.CustomContainer
@@ -75,13 +73,8 @@ import kotlin.math.tan
 // then say the number + change axis
 // then press enter to apply the change
 
+@Suppress("MemberVisibilityCanBePrivate")
 open class StudioSceneView(style: Style) : PanelList(null, style.getChild("sceneView")), ISceneView {
-
-    constructor(base: StudioSceneView) : this(DefaultConfig.style) {
-        camera = base.camera
-        isLocked2D = base.isLocked2D
-        mode = base.mode
-    }
 
     companion object {
         private val LOGGER = LogManager.getLogger(StudioSceneView::class)
@@ -97,7 +90,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
     override fun isOpaqueAt(x: Int, y: Int): Boolean = true
 
     override val usesFPBuffers get() = camera.toneMapping != ToneMappers.RAW8
-    override var isLocked2D = camera.rotationYXZ.isDefaultValue()
+    final override var isLocked2D = camera.rotationYXZ.isDefaultValue()
 
     val controls = ArrayList<SimplePanel>()
 
@@ -110,7 +103,9 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         invalidateDrawing()
     }
 
-    // we need the depth for post processing effects like dof
+    // we need the depth for post-processing effects like dof
+
+    final override val children: ArrayList<Panel> get() = super.children
 
     init {
         val is2DPanel = TextButton(
@@ -591,8 +586,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         }
         // move the camera
         val window = window!!
-        val size = 20f * shiftSlowdown * (if (selectedTransforms.all { it is Camera }) -1f else 1f) /
-                max(window.width, window.height)
+        val size = 20f * shiftSlowdown / max(window.width, window.height)
         val dx0 = dx * size
         val dy0 = dy * size
         val scaleFactor = 10f
@@ -690,14 +684,6 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         return true
     }
 
-    fun goFullscreen() {
-        // don't open, if it's already fullscreen
-        if (windowStack.peek()?.panel !is StudioSceneView) {
-            val view = StudioSceneView(this)
-            windowStack.push(view)
-        }
-    }
-
     fun resolveClick(x: Float, y: Float, onClick: (Transform?) -> Unit) {
         val w = stableSize.stableWidth
         val h = stableSize.stableHeight
@@ -741,7 +727,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             var isProcessed = false
             val xi = x.toInt()
             val yi = y.toInt()
-            controls.forEach {
+            for (it in controls) {
                 if (it.contains(xi, yi)) {
                     it.drawable.onMouseClicked(x, y, button, long)
                     isProcessed = true
@@ -749,21 +735,25 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             }
 
             if (!isProcessed && wasInFocus) {
-                resolveClick(x, y) {
-                    selectTransform(it)
+                resolveClick(x, y) { tr ->
+                    if (isShiftDown || isControlDown) {
+                        // todo if(isShiftDown) select all in-between...
+                        if (tr != null) {
+                            val newList = if (tr in selectedTransforms) {
+                                selectedTransforms.filter { it != tr }
+                            } else {
+                                selectedTransforms + tr
+                            }
+                            select(newList, null)
+                        }
+                    } else {
+                        selectTransform(tr)
+                    }
                     invalidateDrawing()
                 }
             }
         }
     }
-
-    // sadly doesn't work well; glfw/windows cursor is only changed when moved
-    /*override fun getCursor() = when(mode){
-        TransformMode.MOVE -> Cursor.drag
-        TransformMode.SCALE -> if(Input.isShiftDown) Cursor.vResize else Cursor.hResize
-        TransformMode.ROTATE -> Cursor.crossHair
-        else -> null
-    }*/
 
     override fun onPaste(x: Float, y: Float, data: String, type: String) {
         when (type) {
@@ -825,7 +815,8 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                 val newOrbitDistance = radius * factor
                 if (isLocked2D) {
                     // zoom in on point in 2D using mouse position
-                    val fov = (factor - 1f) * radius * tan(camera.fovYDegrees[cameraTime].toRadians() * 0.5f) * 2f / height
+                    val fov =
+                        (factor - 1f) * radius * tan(camera.fovYDegrees[cameraTime].toRadians() * 0.5f) * 2f / height
                     val dx2 = +(this.x - x + this.width * 0.5f) * fov
                     val dy2 = -(this.y - y + this.height * 0.5f) * fov
                     val oldPos = camera.position[cameraTime]

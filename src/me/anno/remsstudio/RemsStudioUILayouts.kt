@@ -9,7 +9,6 @@ import me.anno.io.files.InvalidRef
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio.defaultWindowStack
-import me.anno.remsstudio.RemsStudio.nullCamera
 import me.anno.remsstudio.RemsStudio.project
 import me.anno.remsstudio.RemsStudio.root
 import me.anno.remsstudio.RemsStudio.versionName
@@ -19,7 +18,6 @@ import me.anno.remsstudio.Rendering.renderPart
 import me.anno.remsstudio.Rendering.renderSetPercent
 import me.anno.remsstudio.Selection.selectTransform
 import me.anno.remsstudio.Selection.selectedTransforms
-import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.ui.StudioFileExplorer
 import me.anno.remsstudio.ui.StudioTreeView
 import me.anno.remsstudio.ui.StudioTreeView.Companion.openAddMenu
@@ -49,7 +47,6 @@ import me.anno.ui.editor.files.toAllowedFilename
 import me.anno.ui.style.Style
 import me.anno.ui.utils.WindowStack.Companion.createReloadWindow
 import me.anno.utils.files.OpenInBrowser.openInBrowser
-import me.anno.utils.structures.lists.Lists.firstInstanceOrNull
 import org.apache.logging.log4j.LogManager
 import java.net.URL
 
@@ -70,7 +67,6 @@ object RemsStudioUILayouts {
         val configTitle = Dict["Config", "ui.top.config"]
         val projectTitle = Dict["Project", "ui.top.project"]
         val windowTitle = Dict["Window", "ui.top.window"]
-        val selectTitle = Dict["Select", "ui.top.select"]
         val debugTitle = Dict["Debug", "ui.top.debug"]
         val renderTitle = Dict["Render", "ui.top.render"]
         val toolsTitle = Dict["Tools", "ui.top.tools"]
@@ -121,15 +117,6 @@ object RemsStudioUILayouts {
             val openRecentProject = welcomeUI.createRecentProjectsUI(RemsStudio, menuStyle, getRecentProjects())
             val createNewProject = welcomeUI.createNewProjectUI(RemsStudio, menuStyle)
             openMenuByPanels(windowStack, name, listOf(openRecentProject, createNewProject))
-        }
-
-        /**
-         * Selecting things
-         * */
-        options.addAction(selectTitle, "Inspector Camera") { selectTransform(nullCamera) }
-        options.addAction(selectTitle, "Root") { selectTransform(root) }
-        options.addAction(selectTitle, "First Camera") {
-            selectTransform(root.listOfAll.firstInstanceOrNull<Camera>())
         }
 
         /**

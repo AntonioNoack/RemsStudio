@@ -45,14 +45,11 @@ import me.anno.utils.OS
 // todo bugs:
 //  - camera cannot be clicked
 //  - sometimes delete-key isn't registered as such
-//  - multiselect is broken: calls click -> checks focus -> calls select -> removes others?
 //  - Bokeh blur is broken
 
 // todo isolate and remove certain frequencies from audio
 // todo visualize audio frequency, always!!!, from 25Hz to 48kHz
 // inspiration: https://www.youtube.com/watch?v=RA5UiLYWdbM
-
-// todo use YouTube videos as a video source?
 
 // todo scripting?...
 // todo gizmos
@@ -103,9 +100,6 @@ import me.anno.utils.OS
 
 // to do Mod with "hacked"-text effect for text: swizzle characters and introduce others?
 
-// todo bug: cutting (control+x) only cuts one
-
-// todo bug: shift clicking names toggles things in tree view... why ever
 // todo bug: shift should select from-to, not two element
 // todo bug?: controls should select things one by one
 
