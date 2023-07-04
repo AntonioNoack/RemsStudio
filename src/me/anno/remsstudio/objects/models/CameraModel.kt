@@ -33,7 +33,8 @@ object CameraModel {
         // todo render the intersections instead
         shader.use()
         shader.m4x4("transform", stack)
-        GFX.shaderColor(shader, "color", color)
+        shader.v4f("color", color)
+        GFX.shaderColor(shader, "tint", -1)
         cameraModel.draw(shader)
 
         stack.scale(near)

@@ -43,9 +43,7 @@ import me.anno.ui.style.Style
 import me.anno.utils.OS
 
 // todo bugs:
-//  - camera cannot be clicked
 //  - sometimes delete-key isn't registered as such
-//  - Bokeh blur is broken
 
 // todo isolate and remove certain frequencies from audio
 // todo visualize audio frequency, always!!!, from 25Hz to 48kHz

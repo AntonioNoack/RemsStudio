@@ -310,9 +310,17 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             Scene.draw(camera, root, dx, dy, width, height, editorTime, false, Renderer.depthRenderer, this)
         }
 
-        // println("click: [${idBuffer.joinToString()}], [${depthBuffer.joinToString()}]")
-        val bestResult = Screenshots.getClosestId(diameter, idBuffer, depthBuffer)
+        /*LOGGER.debug(
+            "ResolveClick: " +
+                    "[${idBuffer.joinToString { it.toUInt().toString(16) }}], " +
+                    "[${depthBuffer.joinToString()}]"
+        )
+        LOGGER.debug("Available IDs: ${
+            root.listOfAll.toList()
+                .joinToString { it.clickId.toUInt().toString(16) }
+        }")*/
 
+        val bestResult = Screenshots.getClosestId(diameter, idBuffer, depthBuffer)
         // find the transform with the id to select it
         if (bestResult > 0) {
 
@@ -746,9 +754,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                             }
                             select(newList, null)
                         }
-                    } else {
-                        selectTransform(tr)
-                    }
+                    } else selectTransform(tr)
                     invalidateDrawing()
                 }
             }
