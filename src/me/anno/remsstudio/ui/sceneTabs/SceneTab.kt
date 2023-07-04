@@ -165,7 +165,7 @@ class SceneTab(var file: FileReference?, var scene: Transform, history: History?
     }
 
     override fun onMouseUp(x: Float, y: Float, button: MouseButton) {
-        ActionManager.executeGlobally(GFX.someWindow, 0f, 0f, false, listOf("DragEnd"))
+        ActionManager.executeGlobally(GFX.someWindow!!, 0f, 0f, false, listOf("DragEnd"))
     }
 
     override fun onPaste(x: Float, y: Float, data: String, type: String) {

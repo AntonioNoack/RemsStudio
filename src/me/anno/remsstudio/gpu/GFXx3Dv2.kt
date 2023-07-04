@@ -107,7 +107,7 @@ object GFXx3Dv2 {
         val shader = ShaderLib.shader3DRGBA.value
         shader.use()
         GFXx2Dv2.defineAdvancedGraphicalFeatures(shader, video, time)
-        shader3DUniforms(shader, stack, texture.w, texture.h, color, tiling, filtering, uvProjection)
+        shader3DUniforms(shader, stack, texture.width, texture.height, color, tiling, filtering, uvProjection)
         texture.bind(0, filtering, clamping)
         uvProjection.getBuffer().draw(shader)
         GFX.check()
@@ -138,7 +138,7 @@ object GFXx3Dv2 {
         val shader = shader0.value
         shader.use()
         GFXx2Dv2.defineAdvancedGraphicalFeatures(shader, video, time)
-        shader3DUniforms(shader, stack, v0.w, v0.h, color, tiling, filtering, uvProjection)
+        shader3DUniforms(shader, stack, v0.width, v0.height, color, tiling, filtering, uvProjection)
         v0.bindUVCorrection(shader)
         uvProjection.getBuffer().draw(shader)
         GFX.check()
@@ -155,7 +155,7 @@ object GFXx3Dv2 {
         val shader = shader0.value
         shader.use()
         GFXx2Dv2.defineAdvancedGraphicalFeatures(shader, video, time)
-        shader3DUniforms(shader, stack, texture.w, texture.h, color, tiling, filtering, uvProjection)
+        shader3DUniforms(shader, stack, texture.width, texture.height, color, tiling, filtering, uvProjection)
         texture.bind(0, filtering, clamping)
         texture.bindUVCorrection(shader)
         uvProjection.getBuffer().draw(shader)
@@ -172,7 +172,7 @@ object GFXx3Dv2 {
         val shader = ShaderLib.shader3DPolygon.value
         shader.use()
         polygon.uploadAttractors(shader, time)
-        shader3DUniforms(shader, stack, texture.w, texture.h, color, null, filtering, null)
+        shader3DUniforms(shader, stack, texture.width, texture.height, color, null, filtering, null)
         shader.v1f("inset", inset)
         texture.bind(0, filtering, clamping)
         buffer.draw(shader)

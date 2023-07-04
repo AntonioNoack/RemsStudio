@@ -53,7 +53,7 @@ class FloatInputV2(
 
     override fun onEmpty(x: Float, y: Float) {
         val newValue = getValue(owningProperty.defaultValue ?: type.defaultValue)
-        if (newValue != lastValue) {
+        if (newValue != value) {
             setValue(newValue, true)
         }
     }

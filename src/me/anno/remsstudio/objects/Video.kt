@@ -308,8 +308,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 val frame = ImageGPUCache[meta.getImage(localTime), 5L, true]
                 if (frame == null || !frame.isCreated) onMissingImageOrFrame((localTime * 1000).toInt())
                 else {
-                    lastW = frame.w
-                    lastH = frame.h
+                    lastW = frame.width
+                    lastH = frame.height
                     draw3DVideo(
                         this, time,
                         stack, frame, color, this@Video.filtering.value, this@Video.clampMode.value,
@@ -368,8 +368,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 )
 
                 if (frame != null && frame.isCreated) {
-                    lastW = frame.w
-                    lastH = frame.h
+                    lastW = frame.width
+                    lastH = frame.height
                     return frame
                 }
             }
@@ -551,8 +551,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 if (texture == null || !texture.isCreated) onMissingImageOrFrame(0)
                 else {
                     texture.rotation?.apply(stack)
-                    lastW = texture.w
-                    lastH = texture.h
+                    lastW = texture.width
+                    lastH = texture.height
                     draw3DVideo(
                         this, time, stack, texture, color,
                         this.filtering.value, this.clampMode.value, tiling, uvProjection.value
@@ -822,8 +822,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         infoGroup += img(UpdatingTextPanel(250, style) {
             val meta = lastMeta ?: imSeqExampleMeta
             val frame = getImage() as? Texture2D
-            val w = max(meta?.videoWidth ?: 0, frame?.w ?: 0)
-            val h = max(meta?.videoHeight ?: 0, frame?.h ?: 0)
+            val w = max(meta?.videoWidth ?: 0, frame?.width ?: 0)
+            val h = max(meta?.videoHeight ?: 0, frame?.height ?: 0)
             "Resolution: $w x $h"
         })
         infoGroup += vid(UpdatingTextPanel(250, style) { "Frame Rate: ${lastMeta?.videoFPS?.f2()} frames/s" })

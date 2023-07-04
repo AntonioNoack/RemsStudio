@@ -49,13 +49,13 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
     // todo select multiple elements to move them around together
     // todo they shouldn't be parent and children, because that would have awkward results...
 
-    val height = style.getSize("fontSize", 15) * 3
+    val height1 = style.getSize("fontSize", 15) * 3
 
     override fun getTooltipPanel(x: Float, y: Float): Panel? {
         val video = getTransformAt(x, y) as? Video
         return if (video != null) {
-            val data = VideoCache.getEntry(Triple(video, height, video.file), 1000, false) {
-                CacheData(VideoPreviewPanel(video, height * 2, style) {
+            val data = VideoCache.getEntry(Triple(video, height1, video.file), 1000, false) {
+                CacheData(VideoPreviewPanel(video, height1 * 2, style) {
                     video.getLocalTimeFromRoot(getTimeAt(it), false)
                 })
             } as CacheData<*>
@@ -153,7 +153,7 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
 
         this.solution?.apply {
             this.y0 = y
-            this.y1 = y + h
+            this.y1 = y + height
             draw(selectedTransforms, draggedTransform)
         }
 
@@ -222,7 +222,7 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
                 val color = tr.lastLocalColor
                 val alpha = color.w * alphaMultiplier
                 if (alpha >= minAlpha && tr.isVisible(tr.lastLocalTime)) {
-                    if (yInt - (this.y + 3 + ctr * 3) in 0..h - 10) {
+                    if (yInt - (this.y + 3 + ctr * 3) in 0..height - 10) {
                         bestTransform = tr
                     }
                     ctr++
@@ -280,7 +280,7 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
                 if (draggedKeyframes.isNotEmpty()) {
                     val dilation = transform.listOfInheritance
                         .fold(1.0) { t0, tx -> t0 * tx.timeDilation.value }
-                    val dt = shiftSlowdown * dilation * dx * dtHalfLength * 2 / w
+                    val dt = shiftSlowdown * dilation * dx * dtHalfLength * 2 / width
                     if (dt != 0.0) {
                         RemsStudio.incrementalChange("Move Keyframes") {
                             for (kf in draggedKeyframes) {
@@ -298,16 +298,16 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
                         if (isControlDown) {
                             // todo scale around the time=0 point?
                             // todo first find this point...
-                            val factor = clamp(1f - shiftSlowdown * dx / w, 0.01f, 100f)
+                            val factor = clamp(1f - shiftSlowdown * dx / width, 0.01f, 100f)
                             transform.timeDilation.value *= factor
                         } else {
                             // todo use parent dilation?...
-                            val dt = shiftSlowdown * dx * dtHalfLength * 2 / w
+                            val dt = shiftSlowdown * dx * dtHalfLength * 2 / width
                             transform.timeOffset.value += dt
                         }
                     }
                 }
-                var sumDY = (y - Input.mouseDownY) / height
+                var sumDY = (y - Input.mouseDownY) / height1
                 if (sumDY < 0) sumDY += 0.5f
                 else sumDY -= 0.5f
                 if (sumDY.isFinite()) {
@@ -403,7 +403,7 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
     override fun calculateSize(w: Int, h: Int) {
         super.calculateSize(w, h)
         minW = w
-        minH = height
+        minH = height1
     }
 
 }

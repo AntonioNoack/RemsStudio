@@ -200,7 +200,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
 
     fun updateStableSize() {
         stableSize.updateSize(
-            w - 2 * borderThickness, h - 2 * borderThickness,
+            width - 2 * borderThickness, height - 2 * borderThickness,
             if (camera.onlyShowTarget) RemsStudio.targetWidth else -1, RemsStudio.targetHeight
         )
     }
@@ -255,17 +255,18 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         val dy = stableSize.dy + bt
 
         val white = -1
-        drawBorder(x, y, w, h, white, bth)
-        drawBorder(x + bth, y + bth, w - bt, h - bt, black, bth)
+        drawBorder(x, y, width, height, white, bth)
+        drawBorder(x + bth, y + bth, width - bt, height - bt, black, bth)
         // filled with scene background color anyway
         // drawRect(x + bt, y + bt, w - 2 * bt, h - 2 * bt, deepDark)
 
         val x00 = x + dx
         val y00 = y + dy
-        val wx = min(stableSize.stableWidth, GFX.someWindow.width - x00)
-        val wy = min(stableSize.stableHeight, GFX.someWindow.height - y00)
-        val rw = min(wx, w - 2 * bt)
-        val rh = min(wy, h - 2 * bt)
+        val window = window ?: GFX.someWindow!!.windowStack.first()
+        val wx = min(stableSize.stableWidth, window.width - x00)
+        val wy = min(stableSize.stableHeight, window.height - y00)
+        val rw = min(wx, width - 2 * bt)
+        val rh = min(wy, height - 2 * bt)
         if (rw > 0 && rh > 0) {
             Scene.draw(
                 camera, RemsStudio.root,
@@ -278,7 +279,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         GFX.clip2(x0, y0, x1, y1) {
             renderDefault {
                 for (control in controls) {
-                    control.draw(x, y, w, h, x0, y0, x1, y1)
+                    control.draw(x, y, width, height, x0, y0, x1, y1)
                 }
             }
             drawChildren(x0, y0, x1, y1)
@@ -391,7 +392,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         if (!mayControlCamera) return
 
         // todo rotate/move our camera or the selected object?
-        val size = -20f * shiftSlowdown / GFX.someWindow.height
+        val size = -20f * shiftSlowdown / window!!.height
         when (touches.size) {
             2 -> {
                 val first = touches[0]!!
@@ -489,7 +490,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         val targetZonUI = Vector3f(v0.x, v0.y, v0.z)
         val targetZ = -targetZonUI.z
         val shiftSlowdown = shiftSlowdown
-        val speed = shiftSlowdown * 2 * targetZ / h * pow(0.02f, camera.orthographicness[cameraTime])
+        val speed = shiftSlowdown * 2 * targetZ / height * pow(0.02f, camera.orthographicness[cameraTime])
         val dx = dx0 * speed
         val dy = dy0 * speed
         val pos1v = camera2target.transform(
@@ -518,7 +519,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
 
             }
             SceneDragMode.SCALE -> {
-                val speed2 = 1f / h
+                val speed2 = 1f / height
                 val oldScale = selected.scale[localTime]
                 val localDelta = target2camera.transformDirection(
                     if (isControlDown) Vector3f(dx0, dy0, 0f)
@@ -539,15 +540,15 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             }
             SceneDragMode.ROTATE -> {
                 // todo transform rotation??? quaternions...
-                val centerX = x + w / 2
-                val centerY = y + h / 2
+                val centerX = x + width / 2
+                val centerY = y + height / 2
                 val window = window!!
                 val mdx = (window.mouseX - centerX).toDouble()
                 val mdy = (window.mouseY - centerY).toDouble()
                 val oldDegree = toDegrees(atan2(mdy - dy0, mdx - dx0)).toFloat()
                 val newDegree = toDegrees(atan2(mdy, mdx)).toFloat()
                 val deltaDegree = newDegree - oldDegree
-                val speed2 = 20f / h
+                val speed2 = 20f / height
                 val oldRotation = selected.rotationYXZ[localTime]
                 val localDelta =
                     if (isControlDown) Vector3f(dx0 * speed2, -dy0 * speed2, 0f)
@@ -564,7 +565,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
 
     override fun onMouseMoved(x: Float, y: Float, dx: Float, dy: Float) {
         // fov is relative to height -> modified to depend on height
-        val size = 20f * shiftSlowdown / GFX.someWindow.height
+        val size = 20f * shiftSlowdown / window!!.height
         val dx0 = dx * size
         val dy0 = dy * size
         // move stuff, if mouse is down and no touch is down
@@ -589,10 +590,9 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             return
         }
         // move the camera
-        val size = 20f * shiftSlowdown * (if (selectedTransforms.all { it is Camera }) -1f else 1f) / max(
-            GFX.someWindow.width,
-            GFX.someWindow.height
-        )
+        val window = window!!
+        val size = 20f * shiftSlowdown * (if (selectedTransforms.all { it is Camera }) -1f else 1f) /
+                max(window.width, window.height)
         val dx0 = dx * size
         val dy0 = dy * size
         val scaleFactor = 10f
@@ -825,9 +825,9 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                 val newOrbitDistance = radius * factor
                 if (isLocked2D) {
                     // zoom in on point in 2D using mouse position
-                    val fov = (factor - 1f) * radius * tan(camera.fovYDegrees[cameraTime].toRadians() * 0.5f) * 2f / h
-                    val dx2 = +(this.x - x + this.w * 0.5f) * fov
-                    val dy2 = -(this.y - y + this.h * 0.5f) * fov
+                    val fov = (factor - 1f) * radius * tan(camera.fovYDegrees[cameraTime].toRadians() * 0.5f) * 2f / height
+                    val dx2 = +(this.x - x + this.width * 0.5f) * fov
+                    val dy2 = -(this.y - y + this.height * 0.5f) * fov
                     val oldPos = camera.position[cameraTime]
                     oldPos.add(dx2, dy2, 0f)
                     camera.putValue(camera.position, oldPos, false)

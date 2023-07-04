@@ -30,7 +30,7 @@ object GFXxSVGv2 {
     ): Shader {
         val shader = ShaderLib.shader3DSVG.value
         shader.use()
-        GFXx3D.shader3DUniforms(shader, stack, texture.w, texture.h, color, null, filtering, null)
+        GFXx3D.shader3DUniforms(shader, stack, texture.width, texture.height, color, null, filtering, null)
         texture.bind(0, filtering, clamping)
         if (tiling == null) {
             GFXx2Dv2.defineAdvancedGraphicalFeatures(shader, video, time)

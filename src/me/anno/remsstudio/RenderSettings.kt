@@ -166,7 +166,7 @@ object RenderSettings : Transform() {
         }
         list += fileInput
 
-        val callback = { GFX.someWindow.requestAttentionMaybe() }
+        val callback: () -> Unit = { GFX.someWindow?.requestAttentionMaybe() }
 
         list += TextButton("Render at 100%", false, style)
             .addLeftClickListener { renderPart(1, true, callback) }

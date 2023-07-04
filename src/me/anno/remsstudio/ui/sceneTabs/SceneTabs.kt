@@ -53,7 +53,7 @@ object SceneTabs : ScrollPanelX(DefaultConfig.style) {
                 val tab = dragged!!.getOriginal() as SceneTab
                 if (!tab.contains(x, y)) {
                     val oldIndex = tab.indexInParent
-                    val newIndex = panelChildren.map { it.x + it.w / 2 }.count { it < x }
+                    val newIndex = panelChildren.map { it.x + it.width / 2 }.count { it < x }
                     // LOGGER.info("$oldIndex -> $newIndex, $x ${children2.map { it.x + it.w/2 }}")
                     if (oldIndex < newIndex) {
                         panelChildren.add(newIndex, tab)

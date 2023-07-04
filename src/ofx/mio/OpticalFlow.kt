@@ -18,8 +18,8 @@ object OpticalFlow {
 
     fun run(lambda: Float, blurAmount: Float, displacement: Float, t0: Texture2D, t1: Texture2D): Framebuffer {
 
-        val w = t0.w
-        val h = t0.h
+        val w = t0.width
+        val h = t0.height
 
         val flowT = FBStack["flow", w, h, 4, false, 1, false]
 

@@ -190,7 +190,7 @@ object Scene {
         nearest: GPUFiltering,
         samples: Int?
     ): Framebuffer {
-        val next = FBStack[name, previous.w, previous.h, 4, usesFPBuffers, samples ?: previous.samples, true]
+        val next = FBStack[name, previous.width, previous.height, 4, usesFPBuffers, samples ?: previous.samples, true]
         previous.bindTextures(offset, nearest, Clamping.CLAMP)
         return next
     }
@@ -262,6 +262,7 @@ object Scene {
         // (for low-performance devices)
         var needsTemporaryBuffer = !isFakeColorRendering
         if (needsTemporaryBuffer) {
+            val window = GFX.someWindow!!
             needsTemporaryBuffer = // issues are resolved: clipping was missing maybe...
                 flipY ||
                         samples > 1 ||
@@ -270,7 +271,7 @@ object Scene {
                         chromaticAberration > 0f ||
                         toneMapping != ToneMappers.RAW8 ||
                         needsCG || needsBloom ||
-                        w > GFX.someWindow.width || h > GFX.someWindow.height
+                        w > window.width || h > window.height
         }
 
         var buffer: IFramebuffer =

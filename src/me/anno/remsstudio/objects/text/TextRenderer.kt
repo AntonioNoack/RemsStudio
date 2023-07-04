@@ -278,8 +278,8 @@ object TextRenderer {
                 val baseScale =
                     TextMesh.DEFAULT_LINE_HEIGHT / sdfResolution / (exampleLayout.ascent + exampleLayout.descent)
 
-                val scaleX = 0.5f * texture.w * baseScale
-                val scaleY = 0.5f * texture.h * baseScale
+                val scaleX = 0.5f * texture.width * baseScale
+                val scaleY = 0.5f * texture.height * baseScale
                 val scale = scale0
 
                 val sdfOffset = sdf.offset

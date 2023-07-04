@@ -9,6 +9,7 @@ import me.anno.audio.streams.AudioStreamRaw.Companion.averageSamples
 import me.anno.audio.streams.AudioStreamRaw.Companion.ffmpegSliceSampleDuration
 import me.anno.audio.streams.StereoShortStream
 import me.anno.cache.CacheData
+import me.anno.cache.CacheSection
 import me.anno.cache.instances.AudioCache
 import me.anno.cache.keys.AudioSliceKey
 import me.anno.io.files.FileReference
@@ -39,6 +40,7 @@ class AudioStreamRaw2(
     // should be as short as possible for fast calculation
     // should be at least as long as the ffmpeg response time (0.3s for the start of a FHD video)
     companion object {
+        val AudioCache2 = CacheSection("Audio2")
         val minPerceptibleAmplitude = 1f / 32500f
     }
 
@@ -79,7 +81,7 @@ class AudioStreamRaw2(
             val key = AudioSliceKey(file, sliceIndex)
             val timeout = (ffmpegSliceSampleDuration * 2 * 1000).toLong()
             val sliceTime = sliceIndex * ffmpegSliceSampleDuration
-            val soundBuffer = AudioCache.getEntry(key, timeout, false) {
+            val soundBuffer = AudioCache2.getEntry(key, timeout, false) {
                 val sequence = getAudioSequence(file, sliceTime, ffmpegSliceSampleDuration, ffmpegSampleRate)
                 val buffer = waitUntilDefined(true) { sequence.soundBuffer }
                 CacheData(buffer to sequence.channels)

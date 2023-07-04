@@ -61,9 +61,9 @@ class PatternRecorderCore(val tp: TextInput) : Panel(style) {
         backgroundColor = black
         super.onDraw(x0, y0, x1, y1)
         // draw record button
-        val s = min(w, h)
-        val xc = x + w / 2
-        val yc = y + h / 2
+        val s = min(width, height)
+        val xc = x + width / 2
+        val yc = y + height / 2
         val r = s * 0.5f
         val q = r * 0.8f
         val mainColor = if (isRecording) 0xff0000 or black else -1

@@ -116,7 +116,7 @@ object Rendering {
             if (audioSources.isEmpty()) targetOutputFile else tmpFile
         )
 
-        val progress = GFX.someWindow.addProgressBar(
+        val progress = GFX.someWindow?.addProgressBar(
             "Rendering", "Frames",
             totalFrameCount.toDouble()
         )
@@ -129,7 +129,7 @@ object Rendering {
             // todo sometimes the "pipe fails", and that is reported as a green bar -> needs to be red (cancelled)
             //  this happens after something has been cancelled :/ -> FFMPEG not closed down?
             isRendering = false
-            progress.finish()
+            progress?.finish()
             callback()
         }
 
@@ -200,7 +200,7 @@ object Rendering {
                 // we need to ask
                 else -> {
                     // todo ask which video is the right one
-                    val windowStack = GFX.someWindow.windowStack
+                    val windowStack = GFX.someWindow!!.windowStack
                     openMenu(windowStack, NameDesc(
                         "Select the target video",
                         "Where the video part is defined; will also decide the length",
@@ -228,11 +228,11 @@ object Rendering {
             // if empty, skip?
             LOGGER.info("Found ${audioSources.size} audio sources")
 
-            val progress = GFX.someWindow.addProgressBar("Audio Override", "Samples", duration * sampleRate)
+            val progress = GFX.someWindow?.addProgressBar("Audio Override", "Samples", duration * sampleRate)
             AudioCreatorV2(scene, findCamera(scene), audioSources, duration, sampleRate, progress).apply {
                 onFinished = {
                     isRendering = false
-                    progress.finish()
+                    progress?.finish()
                     callback()
                 }
                 thread(name = "Rendering::renderAudio()") {
@@ -265,11 +265,11 @@ object Rendering {
 
         // todo if is empty, send a warning instead of doing something
 
-        val progress = GFX.someWindow.addProgressBar("Audio Export", "Samples", duration * sampleRate)
+        val progress = GFX.someWindow?.addProgressBar("Audio Export", "Samples", duration * sampleRate)
         AudioCreatorV2(scene, findCamera(scene), audioSources, duration, sampleRate, progress).apply {
             onFinished = {
                 isRendering = false
-                progress.finish()
+                progress?.finish()
                 callback()
             }
             thread(name = "Rendering::renderAudio()") {
@@ -280,7 +280,7 @@ object Rendering {
     }
 
     private fun onAlreadyRendering() {
-        val windowStack = GFX.someWindow.windowStack
+        val windowStack = GFX.someWindow?.windowStack ?: return
         msg(
             windowStack, NameDesc(
                 "Rendering already in progress!",
@@ -291,7 +291,7 @@ object Rendering {
     }
 
     private fun askOverridingIsAllowed(targetOutputFile: FileReference, callback: () -> Unit) {
-        val windowStack = GFX.someWindow.windowStack
+        val windowStack = GFX.someWindow!!.windowStack
         ask(windowStack, NameDesc("Override %1?").with("%1", targetOutputFile.name), callback)
     }
 

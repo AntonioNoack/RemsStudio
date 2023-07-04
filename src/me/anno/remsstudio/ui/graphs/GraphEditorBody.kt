@@ -72,8 +72,8 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
 
     fun normValue01(value: Float) = 0.5 - (value - centralValue) / dvHalfHeight * 0.5
 
-    fun getValueAt(my: Float) = centralValue - dvHalfHeight * normAxis11(my, y, h)
-    fun getYAt(value: Float) = y + h * normValue01(value)
+    fun getValueAt(my: Float) = centralValue - dvHalfHeight * normAxis11(my, y, height)
+    fun getYAt(value: Float) = y + height * normValue01(value)
 
     override fun calculateSize(w: Int, h: Int) {
         super.calculateSize(w, h)
@@ -112,7 +112,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
 
         val deltaValue = 2 * dvHalfHeight
 
-        val textLines = clamp(h * 0.7f / fontHeight, 2f, 5f)
+        val textLines = clamp(height * 0.7f / fontHeight, 2f, 5f)
         val valueStep = getValueStep((deltaValue / textLines).toFloat())
 
         val minStepIndex = (minValue / valueStep).toInt() - 1
@@ -131,7 +131,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
 
             if (y + yOffset >= y0 && y - yOffset < y1) {
                 if (y in y0 until y1) {
-                    drawRect(x + width + 2, y, w - width - 2, 1, fontColor and 0x3fffffff)
+                    drawRect(x + width + 2, y, this.width - width - 2, 1, fontColor and 0x3fffffff)
                 }
                 DrawTexts.drawSimpleTextCharByChar(
                     x + 2, y - yOffset, 0,
@@ -285,7 +285,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                             val endY = getYAt(getFloat(endValue, i, 0f)).toFloat()
                             drawSmoothLine(
                                 x0.toFloat(), startY, endX, endY,
-                                this.x, this.y, this.w, this.h, valueColors[i], 0.5f
+                                this.x, this.y, this.width, this.height, valueColors[i], 0.5f
                             )
                         }
                     }
@@ -300,7 +300,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                 val y = getYAt(getFloat(value, i, 0f)).toFloat()
                 drawSmoothLine(
                     x0.toFloat(), y, x1.toFloat(), y,
-                    this.x, this.y, this.w, this.h,
+                    this.x, this.y, this.width, this.height,
                     valueColors[i],
                     0.5f
                 )
@@ -363,7 +363,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                             val startY = getYAt(getFloat(startValue, i, 0f)).toFloat()
                             drawSmoothLine(
                                 startX, startY, x1.toFloat(), endY,
-                                this.x, this.y, this.w, this.h, valueColors[i], 0.5f
+                                this.x, this.y, this.width, this.height, valueColors[i], 0.5f
                             )
                         }
                     }
@@ -440,7 +440,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                 if (xHere > lastX && xHere >= x0 && lastX < x1) {
                     drawSmoothLine(
                         lastX.toFloat(), lastY, xHere.toFloat(), yHere,
-                        this.x, this.y, this.w, this.h, valueColors[i], 0.5f
+                        this.x, this.y, this.width, this.height, valueColors[i], 0.5f
                     )
                 }
                 lastX = xHere
@@ -598,7 +598,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
     }
 
     fun moveUp(sign: Float) {
-        val delta = sign * dvHalfHeight * movementSpeed / h
+        val delta = sign * dvHalfHeight * movementSpeed / height
         centralValue += delta
         clampTime()
     }
@@ -677,8 +677,8 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                     editorTime = getTimeAt(x)
                 } else {
                     // move left/right/up/down
-                    centralTime -= dx * dtHalfLength / (w / 2)
-                    centralValue += dy * dvHalfHeight / (h / 2)
+                    centralTime -= dx * dtHalfLength / (width / 2f)
+                    centralValue += dy * dvHalfHeight / (height / 2f)
                     clampTime()
                     clampValues()
                 }

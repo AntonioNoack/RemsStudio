@@ -63,8 +63,8 @@ class NumberInputComponentV2(
         val driver = driver
         if (driver != null) {
             val driverName = driver.getDisplayName()
-            if (lastValue != driverName) {
-                setText(lastValue, true)
+            if (value != driverName) {
+                setText(value, true)
             }
         }
         super.onDraw(x0, y0, x1, y1)
@@ -80,8 +80,8 @@ class NumberInputComponentV2(
                     else {
                         setValue(
                             when (val numberInput = numberInput) {
-                                is IntInput -> numberInput.stringify(numberInput.lastValue)
-                                is FloatInput -> numberInput.stringify(numberInput.lastValue)
+                                is IntInput -> numberInput.stringify(numberInput.value)
+                                is FloatInput -> numberInput.stringify(numberInput.value)
                                 else -> throw RuntimeException()
                             }, true // todo notify?
                         )

@@ -27,8 +27,8 @@ class SimplePanel(
 
     init {
         drawable.backgroundColor = 0
-        drawable.w = sizeX
-        drawable.h = sizeY
+        drawable.width = sizeX
+        drawable.height = sizeY
         drawable.minW = sizeX
         drawable.minH = sizeY
     }

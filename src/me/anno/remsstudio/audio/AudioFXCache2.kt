@@ -11,6 +11,7 @@ import me.anno.cache.ICacheData
 import me.anno.gpu.GFX
 import me.anno.io.files.FileReference
 import me.anno.maths.Maths.clamp
+import me.anno.maths.Maths.max
 import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.SoundEffect
 import me.anno.remsstudio.audio.effects.SoundEffect.Companion.copy
@@ -25,6 +26,7 @@ import me.anno.video.ffmpeg.FFMPEGMetadata
 import java.util.concurrent.Semaphore
 import kotlin.math.ceil
 import kotlin.math.floor
+import kotlin.math.min
 import kotlin.math.roundToLong
 
 object AudioFXCache2 : CacheSection("AudioFX-RS") {
@@ -374,8 +376,8 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
                 val bufferSizeM1 = bufferSize - 1
                 for (split in 0 until splits) {
 
-                    var min = +1e5f
-                    var max = -1e5f
+                    var minV = +1e5f
+                    var maxV = -1e5f
 
                     val deltaIndex = index1 - index0
                     val index0i = index0 + deltaIndex * split / splits
@@ -395,15 +397,15 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
                         val v0 = buffer.first[localIndex]
                         val v1 = buffer.second[localIndex]
 
-                        min = StrictMath.min(min, v0)
-                        min = StrictMath.min(min, v1)
-                        max = StrictMath.max(max, v0)
-                        max = StrictMath.max(max, v1)
+                        minV = min(minV, v0)
+                        minV = min(minV, v1)
+                        maxV = max(maxV, v0)
+                        maxV = max(maxV, v1)
 
                     }
 
-                    val minInt = floor(min).toInt()
-                    val maxInt = ceil(max).toInt()
+                    val minInt = floor(minV).toInt()
+                    val maxInt = ceil(maxV).toInt()
                     values[split * 2 + 0] = clamp(minInt, -32768, 32767).toShort()
                     values[split * 2 + 1] = clamp(maxInt, -32768, 32767).toShort()
 

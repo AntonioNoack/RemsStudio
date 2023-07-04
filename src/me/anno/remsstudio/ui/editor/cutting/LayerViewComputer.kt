@@ -41,7 +41,7 @@ class LayerViewComputer(private val view: LayerView) {
             val stepSize = 1
 
             val leftTime = view.getTimeAt(x0.toFloat())
-            val dt = TimelinePanel.dtHalfLength * 2.0 / view.w
+            val dt = TimelinePanel.dtHalfLength * 2.0 / view.width
             val white = white4
 
             val size = transforms.size

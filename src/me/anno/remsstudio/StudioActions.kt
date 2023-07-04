@@ -22,7 +22,8 @@ object StudioActions {
     fun register() {
 
         fun setEditorTimeDilation(dilation: Double): Boolean {
-            return if (dilation == RemsStudio.editorTimeDilation || GFX.someWindow.windowStack.inFocus0?.isKeyInput() == true) false
+            return if (dilation == RemsStudio.editorTimeDilation ||
+                GFX.someWindow?.windowStack?.inFocus0?.isKeyInput() == true) false
             else {
                 RemsStudio.editorTimeDilation = dilation
                 true
@@ -35,7 +36,7 @@ object StudioActions {
             "PlaySlow" to { setEditorTimeDilation(0.2) },
             "PlayReversed" to { setEditorTimeDilation(-1.0) },
             "PlayReversedSlow" to { setEditorTimeDilation(-0.2) },
-            "ToggleFullscreen" to { GFX.someWindow.toggleFullscreen(); true },
+            "ToggleFullscreen" to { GFX.someWindow?.toggleFullscreen(); true },
             "PrintLayout" to { printLayout();true },
             "NextFrame" to {
                 RemsStudio.editorTime = (round(RemsStudio.editorTime * RemsStudio.targetFPS) + 1) / RemsStudio.targetFPS
@@ -71,7 +72,7 @@ object StudioActions {
 
                     val type = dragged.getContentType()
                     val data = dragged.getContent()
-                    val window = GFX.someWindow
+                    val window = GFX.someWindow!!
 
                     when (type) {
                         "File" -> {
@@ -131,21 +132,21 @@ object StudioActions {
                 true
             },
             "Paste" to {
-                Input.paste(GFX.someWindow)
+                Input.paste(GFX.someWindow!!)
                 true
             },
             "Copy" to {
-                Input.copy(GFX.someWindow)
+                Input.copy(GFX.someWindow!!)
                 true
             },
             "Duplicate" to {
-                val window = GFX.someWindow
+                val window = GFX.someWindow!!
                 Input.copy(window)
                 Input.paste(window)
                 true
             },
             "Cut" to {
-                val window = GFX.someWindow
+                val window = GFX.someWindow!!
                 Input.copy(window)
                 Input.empty(window)
                 true
@@ -159,7 +160,7 @@ object StudioActions {
                 true
             },
             "SelectAll" to {
-                val ws = GFX.someWindow.windowStack
+                val ws = GFX.someWindow!!.windowStack
                 val inFocus0 = ws.inFocus0
                 inFocus0?.onSelectAll(ws.mouseX, ws.mouseY)
                 true

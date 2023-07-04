@@ -41,7 +41,7 @@ object MenuUtils {
         val panel = object : FloatInput(style) {
             // not fired...
             override fun onEnterKey(x: Float, y: Float) {
-                callback(this.lastValue)
+                callback(value)
                 Menu.close(this)
             }
         }
@@ -49,14 +49,14 @@ object MenuUtils {
         panel.inputPanel.placeholder = title.name
         panel.inputPanel.lineLimit = 1
         panel.inputPanel.setEnterListener {
-            callback(panel.lastValue)
+            callback(panel.value)
             Menu.close(panel)
         }
         panel.setTooltip(title.desc)
         val submit = TextButton(actionName.name, false, style)
             .setTooltip(actionName.desc)
             .addLeftClickListener {
-                callback(panel.lastValue)
+                callback(panel.value)
                 Menu.close(panel)
             }
 

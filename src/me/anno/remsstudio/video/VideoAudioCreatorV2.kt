@@ -20,14 +20,14 @@ fun videoAudioCreatorV2(
     motionBlurSteps: AnimatedProperty<Int>,
     shutterPercentage: AnimatedProperty<Float>,
     output: FileReference,
-    progress: ProgressBar
+    progress: ProgressBar?
 ) = VideoAudioCreator(
     videoCreator,
     VideoBackgroundTaskV2(videoCreator, scene, camera, motionBlurSteps, shutterPercentage, progress),
     object : AudioCreatorV2(scene, camera, audioSources, durationSeconds, sampleRate, progress) {
         override fun hasStreams(): Boolean {// will be starting
             val answer = super.hasStreams()
-            if (answer && !progress.isCancelled) {// this is hacky :/
+            if (answer && progress != null && !progress.isCancelled) {// this is hacky :/
                 progress.progress = 0.0
                 progress.total = durationSeconds * sampleRate
             }

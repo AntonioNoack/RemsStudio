@@ -3,7 +3,6 @@ package me.anno.remsstudio.ui.scene
 import me.anno.Engine.gameTime
 import me.anno.Engine.rawDeltaTime
 import me.anno.config.DefaultStyle.deepDark
-import me.anno.gpu.GFX
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.shader.Renderer
 import me.anno.maths.Maths.clamp01
@@ -90,24 +89,25 @@ class ScenePreview(style: Style) : PanelList(null, style.getChild("sceneView")),
 
         updatePosition()
 
-        drawRect(x, y, w, h, deepDark)
+        drawRect(x, y, width, height, deepDark)
 
-        w = min(w, GFX.someWindow.width - x)
-        h = min(h, GFX.someWindow.height - y)
+        val window = window!!
+        width = min(width, window.width - x)
+        height = min(height, window.height - y)
 
         var dx = 0
         var dy = 0
-        var rw = w
-        var rh = h
+        var rw = width
+        var rh = height
 
         val camera = camera
         if (camera.onlyShowTarget) {
-            if (w * targetHeight > targetWidth * h) {
-                rw = h * targetWidth / targetHeight
-                dx = (w - rw) / 2
+            if (width * targetHeight > targetWidth * height) {
+                rw = height * targetWidth / targetHeight
+                dx = (width - rw) / 2
             } else {
-                rh = w * targetHeight / targetWidth
-                dy = (h - rh) / 2
+                rh = width * targetHeight / targetWidth
+                dy = (height - rh) / 2
             }
         }
 
@@ -132,8 +132,8 @@ class ScenePreview(style: Style) : PanelList(null, style.getChild("sceneView")),
         }
 
         // prevent us drawing over the size of the frame
-        goodW = min(goodW, GFX.someWindow.width - (x + dx))
-        goodH = min(goodH, GFX.someWindow.height - (y + dy))
+        goodW = min(goodW, window.width - (x + dx))
+        goodH = min(goodH, window.height - (y + dy))
 
         drawRect(x + dx, y + dy, rw, rh, black)
         Scene.draw(

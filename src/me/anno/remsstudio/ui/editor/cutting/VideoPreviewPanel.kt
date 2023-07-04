@@ -9,11 +9,11 @@ import org.joml.Vector4f
 // todo why is this flickering, when moving the mouse???...
 class VideoPreviewPanel(
     val video: Video,
-    val height: Int, style: Style,
+    val height1: Int, style: Style,
     val getTime: (x: Float) -> Double
 ) : Panel(style) {
 
-    val width = height * video.lastW / video.lastH
+    val width1 = height1 * video.lastW / video.lastH
 
     init {
         backgroundColor = 0xff777777.toInt()
@@ -22,15 +22,15 @@ class VideoPreviewPanel(
     override val onMovementHideTooltip get() = false
 
     override fun calculateSize(w: Int, h: Int) {
-        minW = width
-        minH = height
+        minW = width1
+        minH = height1
     }
 
     override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
         val meta = video.meta ?: return
         val window = window!!
         val time = getTime(window.mouseX)
-        val frame = video.getFrameAtLocalTime(time, width, meta)
+        val frame = video.getFrameAtLocalTime(time, width1, meta)
         if (frame != null) {
             DrawGradients.drawRectGradient(
                 x0, y0, x1 - x0, y1 - y0, color, color, frame,

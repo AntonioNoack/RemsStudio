@@ -66,7 +66,7 @@ open class TimelinePanel(style: Style) : Panel(style) {
         GFX.loadTexturesSync.push(true)
         val text = getTimeString(editorTime, 0.0)
         val color = mixARGB(fontColor, backgroundColor, 0.8f)
-        drawSimpleTextCharByChar(x + w / 2, y + h / 2, 0, text, color, backgroundColor, AxisAlignment.CENTER)
+        drawSimpleTextCharByChar(x + width / 2, y + height / 2, 0, text, color, backgroundColor, AxisAlignment.CENTER)
         GFX.loadTexturesSync.pop()
     }
 
@@ -131,9 +131,9 @@ open class TimelinePanel(style: Style) : Panel(style) {
             // centralTime = max(centralTime, dtHalfLength)
         }
 
-        val movementSpeed get() = 0.05f * sqrt(GFX.someWindow.width * GFX.someWindow.height.toFloat())
+        val movementSpeed get() = 0.05f * sqrt(GFX.someWindow!!.width * GFX.someWindow!!.height.toFloat())
 
-        val propertyDt get() = 10f * dtHalfLength / GFX.someWindow.width
+        val propertyDt get() = 10f * dtHalfLength / GFX.someWindow!!.width
 
         fun moveRight(sign: Float) {
             val delta = sign * dtHalfLength * 0.05f
@@ -149,7 +149,7 @@ open class TimelinePanel(style: Style) : Panel(style) {
 
 
         fun get0XString(time: Int) = if (time < 10) "0$time" else "$time"
-        fun get00XString(time: Int) = if (time < 100) "00$time" else if (time < 10) "0$time" else "$time"
+        fun get00XString(time: Int) = if (time < 10) "0$time" else if (time < 100) "00$time" else "$time"
 
         fun getTimeString(time: Double, step: Double): String {
             val key = TimestampKey(time, step)
@@ -181,16 +181,16 @@ open class TimelinePanel(style: Style) : Panel(style) {
     fun normTime01(time: Float) = (time - centralTime) / dtHalfLength * 0.5f + 0.5f
     fun normAxis11(lx: Float, x0: Int, size: Int) = (lx - x0) / size * 2f - 1f
 
-    fun getTimeAt(mx: Float) = centralTime + dtHalfLength * normAxis11(mx, x, w)
-    fun getXAt(time: Double) = x + w * normTime01(time)
-    fun getXAt(time: Float) = x + w * normTime01(time)
+    fun getTimeAt(mx: Float) = centralTime + dtHalfLength * normAxis11(mx, x, width)
+    fun getXAt(time: Double) = x + width * normTime01(time)
+    fun getXAt(time: Float) = x + width * normTime01(time)
 
     fun drawTimeAxis(x0: Int, y0: Int, x1: Int, y1: Int, drawText: Boolean) {
 
         val y02 = if (drawText) y0 else y0 - (2 + font.sizeInt)
 
         // make the step amount dependent on width and font size
-        val deltaFrame = 500 * dtHalfLength * font.size / w
+        val deltaFrame = 500 * dtHalfLength * font.size / width
 
         val timeStep = getTimeStep(deltaFrame * 0.2)
 
@@ -330,7 +330,7 @@ open class TimelinePanel(style: Style) : Panel(style) {
                 editorTime = getTimeAt(x)
             } else {
                 // move left/right
-                val dt = dx * dtHalfLength / (w / 2)
+                val dt = dx * dtHalfLength / (width / 2f)
                 centralTime -= dt
                 clampTime()
             }
@@ -342,10 +342,10 @@ open class TimelinePanel(style: Style) : Panel(style) {
         val scale = pow(1.05f, dx)
         // set the center to the cursor
         // works great :D
-        val normalizedX = (x - w / 2) / (w / 2)
+        val normalizedX = (x - width / 2f) / (width / 2f)
         centralTime += normalizedX * dtHalfLength * (1f - scale)
         dtHalfLength *= scale
-        centralTime += dtHalfLength * 20f * dy / w
+        centralTime += dtHalfLength * 20f * dy / width
 
         clampTime()
 
