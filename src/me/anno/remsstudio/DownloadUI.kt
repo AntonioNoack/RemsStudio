@@ -335,8 +335,9 @@ object DownloadUI {
                 srcURL = getReference("https://${srcURL.absolutePath}")
             }
 
+            val customFormat = videoFormatUI.value !in defaultFormats || audioFormatUI.value !in defaultFormats
             var dstFile = dstPanel.value
-            if (dstFile.lcExtension.isEmpty()) {
+            if (customFormat && dstFile.lcExtension.isEmpty()) {
                 val ext = if (videoFormatUI.value == discardFormat) "mp3"
                 else outputFormats[videoFormatUI.value.desc] ?: "mp4"
                 dstFile = dstFile.getSibling("${dstFile.name}.$ext")
@@ -369,7 +370,7 @@ object DownloadUI {
                         },
                         // choose output format by chosen video format
                         "--merge-output-format", outputFormats[videoFormatUI.value.desc] ?: "mp4"
-                    ), videoFormatUI.value !in defaultFormats || audioFormatUI.value !in defaultFormats
+                    ), customFormat
                 )
                 // link ffmpeg for the program, it needs it for some file types like streams
                 .add("--ffmpeg-location").add(ffmpegPath.absolutePath)

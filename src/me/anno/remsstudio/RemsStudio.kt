@@ -103,7 +103,7 @@ import me.anno.utils.OS
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
-object RemsStudio : StudioBase("Rem's Studio", 10118, true) {
+object RemsStudio : StudioBase("Rem's Studio", 10200, true) {
 
     val defaultWindowStack get() = GFX.someWindow!!.windowStack
     var hideUnusedProperties = false
