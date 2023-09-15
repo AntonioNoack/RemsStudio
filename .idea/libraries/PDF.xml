@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="PDF">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../VideoStudio/out/artifacts/PDF/PDF.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../RemsEngine/out/artifacts/PDF/PDF.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

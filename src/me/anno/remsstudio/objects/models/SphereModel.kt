@@ -22,6 +22,7 @@ object SphereModel {
         val vertexCount = triangleCount * 3
 
         val buffer = StaticBuffer(
+            "SphereModel/1",
             attributes,
             vertexCount
         )
@@ -89,6 +90,7 @@ object SphereModel {
         val vertexCount = triangleCount * 3 * 2
 
         val buffer = StaticBuffer(
+            "Sphere.LineModel",
             attributes,
             vertexCount
         )

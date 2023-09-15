@@ -32,6 +32,7 @@ object ArrowModel {
         val vertexCount = triangleCount * 3
 
         val buffer = StaticBuffer(
+            "ArrowModel",
             attributes,
             vertexCount
         )
@@ -71,6 +72,7 @@ object ArrowModel {
         val vertexCount = 2 * 7
 
         val buffer = StaticBuffer(
+            "Arrow.LineModel",
             attributes,
             vertexCount
         )

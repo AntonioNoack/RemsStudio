@@ -1,7 +1,7 @@
 package me.anno.remsstudio.ui.graphs
 
 import me.anno.animation.Interpolation
-import me.anno.input.MouseButton
+import me.anno.input.Key
 import me.anno.remsstudio.Selection.selectedProperties
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelList
@@ -21,7 +21,7 @@ class GraphEditor(style: Style) : PanelListY(style) {
         val cc = controls.child as PanelList
         for (type in Interpolation.values()) {
             cc += object : TextButton(type.symbol, true, style) {
-                override fun onMouseDown(x: Float, y: Float, button: MouseButton) {
+                override fun onMouseDown(x: Float, y: Float, button: Key) {
                     println("textButton.onMouseDown")
                 }
 

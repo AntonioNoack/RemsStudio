@@ -10,7 +10,7 @@ import me.anno.remsstudio.objects.attractors.EffectMorphing
 import me.anno.remsstudio.objects.effects.MaskLayer
 import me.anno.remsstudio.objects.geometric.Circle
 import me.anno.remsstudio.objects.geometric.Polygon
-import me.anno.remsstudio.objects.meshes.MeshTransform
+import me.anno.remsstudio.objects.MeshTransform
 import me.anno.remsstudio.objects.particles.ParticleSystem
 import me.anno.remsstudio.objects.particles.TextParticles
 import me.anno.remsstudio.objects.text.Text

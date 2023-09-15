@@ -1,7 +1,7 @@
 package me.anno.remsstudio.ui.input
 
 import me.anno.animation.Type
-import me.anno.input.MouseButton
+import me.anno.input.Key
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.ui.input.components.NumberInputComponentV2
 import me.anno.ui.input.FloatInput
@@ -35,8 +35,8 @@ class FloatInputV2(
         }
     }
 
-    override fun onMouseClicked(x: Float, y: Float, button: MouseButton, long: Boolean) {
-        if (!button.isLeft || long) {
+    override fun onMouseClicked(x: Float, y: Float, button: Key, long: Boolean) {
+        if (button != Key.BUTTON_LEFT || long) {
             inputPanel.onMouseClicked(x, y, button, long)
         } else super.onMouseClicked(x, y, button, false)
     }

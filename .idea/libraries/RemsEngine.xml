@@ -1,12 +1,11 @@
 <component name="libraryTable">
   <library name="RemsEngine">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../VideoStudio/out/artifacts/Universal/VideoStudio.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../RemsEngine/out/artifacts/Universal/RemsEngine.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="file://$PROJECT_DIR$/../VideoStudio/src" />
-      <root url="file://$PROJECT_DIR$/../VideoStudio/src" />
+      <root url="file://$PROJECT_DIR$/../RemsEngine/src" />
     </SOURCES>
   </library>
 </component>

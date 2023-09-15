@@ -229,7 +229,7 @@ object Scene {
         stack.identity()
 
         val mayUseMSAA = mayUseMSAA
-        val samples = if (mayUseMSAA && !isFakeColorRendering) 8 else 1
+        val samples = if (mayUseMSAA && !isFakeColorRendering) RemsStudio.targetSamples else 1
 
         GFX.check()
 
@@ -276,7 +276,7 @@ object Scene {
 
         var buffer: IFramebuffer =
             if (needsTemporaryBuffer) FBStack["Scene-Main", w, h, 4, usesFPBuffers, samples, camera.useDepth]
-            else GFXState.currentBuffer as Framebuffer? ?: NullFramebuffer
+            else GFXState.currentBuffer
 
         val x = if (needsTemporaryBuffer) 0 else x0
         val y = if (needsTemporaryBuffer) 0 else y0

@@ -2,7 +2,6 @@ package me.anno.remsstudio.lite
 
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.effects.MaskLayer
-import me.anno.utils.types.Quaternions.toEulerAnglesDegrees
 import org.joml.*
 
 // todo Rem's Studio Lite: don't output images, just execute chained ffmpeg commands

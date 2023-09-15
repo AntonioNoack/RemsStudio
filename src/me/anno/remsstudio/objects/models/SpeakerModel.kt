@@ -17,6 +17,7 @@ object SpeakerModel {
 
     private const val speakerEdges = 64
     val speakerModel = StaticBuffer(
+        "SpeakerModel",
         listOf(
             Attribute("coords", 3),
             Attribute("attr1", 2)

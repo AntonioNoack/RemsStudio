@@ -426,7 +426,7 @@ object DownloadUI {
     @JvmStatic
     fun main(args: Array<String>) {
         GFXBase.disableRenderDoc()
-        TestStudio.testUI2 { createUI(DefaultConfig.style) }
+        TestStudio.testUI2("DownloadTest") { createUI(DefaultConfig.style) }
     }
 
 }

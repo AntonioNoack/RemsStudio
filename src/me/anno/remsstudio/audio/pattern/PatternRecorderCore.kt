@@ -6,9 +6,8 @@ import me.anno.gpu.drawing.DrawTexts.drawSimpleTextCharByChar
 import me.anno.gpu.drawing.GFXx2D.drawCircle
 import me.anno.image.ImageWriter
 import me.anno.input.Input
-import me.anno.input.MouseButton
+import me.anno.input.Key
 import me.anno.language.translation.NameDesc
-import me.anno.maths.Maths.max
 import me.anno.maths.Maths.mix
 import me.anno.maths.Maths.mixARGB
 import me.anno.maths.Maths.pow
@@ -19,13 +18,10 @@ import me.anno.ui.base.constraints.AxisAlignment
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
-import me.anno.ui.debug.TestStudio.Companion.testUI
 import me.anno.ui.input.TextInput
 import me.anno.utils.Color.black
 import me.anno.utils.types.Booleans.toInt
 import org.joml.Vector2f
-import org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER
-import org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -96,8 +92,8 @@ class PatternRecorderCore(val tp: TextInput) : Panel(style) {
         )
     }
 
-    override fun onMouseDown(x: Float, y: Float, button: MouseButton) {
-        if (button.isLeft) callAction()
+    override fun onMouseDown(x: Float, y: Float, button: Key) {
+        if (button == Key.BUTTON_LEFT) callAction()
         else super.onMouseDown(x, y, button)
     }
 
@@ -121,8 +117,8 @@ class PatternRecorderCore(val tp: TextInput) : Panel(style) {
         changeListener?.invoke(times.toDoubleArray())
     }
 
-    override fun onKeyDown(x: Float, y: Float, key: Int) {
-        if (isRecording && key != GLFW_KEY_ESCAPE && key != GLFW_KEY_ENTER && !Input.isShiftDown && !Input.isControlDown) {
+    override fun onKeyDown(x: Float, y: Float, key: Key) {
+        if (isRecording && key != Key.KEY_ESCAPE && key != Key.KEY_ENTER && !Input.isShiftDown && !Input.isControlDown) {
             times.add(RemsStudio.editorTime)
             onTimesChange()
             ensurePlaying()

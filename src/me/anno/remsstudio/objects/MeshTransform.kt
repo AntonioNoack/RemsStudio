@@ -1,32 +1,27 @@
-package me.anno.remsstudio.objects.meshes
+package me.anno.remsstudio.objects
 
 import me.anno.animation.Type
-import me.anno.cache.instances.OldMeshCache
 import me.anno.config.DefaultConfig
 import me.anno.ecs.Entity
 import me.anno.ecs.components.anim.AnimRenderer
-import me.anno.ecs.components.anim.BoneByBoneAnimation
-import me.anno.ecs.components.anim.ImportedAnimation
-import me.anno.ecs.components.anim.Skeleton
-import me.anno.ecs.components.mesh.Material
-import me.anno.ecs.components.mesh.Mesh
-import me.anno.ecs.components.mesh.MeshComponent
-import me.anno.gpu.GFX.isFinalRendering
+import me.anno.ecs.components.anim.Animation
+import me.anno.ecs.components.anim.AnimationCache
+import me.anno.ecs.components.anim.SkeletonCache
+import me.anno.ecs.prefab.PrefabCache
+import me.anno.gpu.GFX
+import me.anno.gpu.drawing.GFXx3D
+import me.anno.gpu.shader.ShaderLib
 import me.anno.io.ISaveable
-import me.anno.io.ISaveable.Companion.registerCustomClass
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
-import me.anno.maths.Maths.pow
+import me.anno.maths.Maths
+import me.anno.mesh.MeshUtils
 import me.anno.mesh.assimp.AnimGameItem
-import me.anno.mesh.assimp.AnimatedMeshesLoader
-import me.anno.mesh.vox.VOXReader
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.remsstudio.objects.GFXTransform
-import me.anno.remsstudio.objects.Transform
 import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.base.groups.PanelListY
@@ -36,9 +31,7 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.EnumInput
 import me.anno.ui.style.Style
 import me.anno.utils.files.LocalFile.toGlobalFile
-import me.anno.video.MissingFrameException
-import org.joml.Matrix4fArrayList
-import org.joml.Vector4f
+import org.joml.*
 
 class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(parent) {
 
@@ -50,71 +43,6 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
 
     // todo info field with the amount of vertices, triangles, and such :)
 
-    companion object {
-
-        init {
-            registerCustomClass(Mesh())
-            registerCustomClass(Entity())
-            registerCustomClass(MeshComponent())
-            registerCustomClass(AnimRenderer())
-            registerCustomClass(Skeleton())
-            registerCustomClass(Material())
-            registerCustomClass(ImportedAnimation())
-            registerCustomClass(BoneByBoneAnimation())
-        }
-
-        fun loadModel(
-            file: FileReference,
-            key: String,
-            instance: Transform?,
-            load: (MeshData) -> Unit,
-            getData: (MeshData) -> Any?
-        ): MeshData? {
-            val meshData1 = OldMeshCache.getEntry(file, key, 1000, true) { _, _ ->
-                val meshData = MeshData()
-                try {
-                    load(meshData)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    meshData.lastWarning = e.message ?: e.javaClass.name
-                }
-                meshData
-            } as? MeshData
-            if (isFinalRendering && meshData1 == null) throw MissingFrameException(file)
-            val renderData = if (meshData1 != null) getData(meshData1) else null
-            instance?.lastWarning = if (renderData == null) meshData1?.lastWarning ?: "Loading" else null
-            return if (renderData == null) null else meshData1
-        }
-
-        fun loadVOX(file: FileReference, instance: Transform?): MeshData? {
-            return loadModel(file, "vox", instance, {
-                val reader = VOXReader().read(file.inputStreamSync())
-                val entity = reader.toEntityPrefab(listOf(file)).createInstance() as Entity
-                // alternatively for testing:
-                // reader.toEntityPrefab().createInstance()
-                // works :)
-                it.assimpModel = AnimGameItem(entity)
-            }, { it.assimpModel })
-        }
-
-        fun loadAssimpAnimated(file: FileReference, instance: Transform?): MeshData? {
-            return loadModel(file, "Assimp", instance, { meshData ->
-                val reader = AnimatedMeshesLoader
-                val meshes = reader.read(file, file.getParent() ?: InvalidRef)
-                meshData.assimpModel = meshes
-            }) { it.assimpModel }
-        }
-
-        /*fun loadAssimpStatic(file: FileReference, instance: Transform?): MeshData? {
-            return loadModel(file, "Assimp-Static", instance, { meshData ->
-                val reader = StaticMeshesLoader()
-                val meshes = reader.load(file)
-                meshData.assimpModel = meshes
-            }) { it.assimpModel }
-        }*/
-
-    }
-
     val animation = AnimatedProperty.string()
 
     var centerMesh = true
@@ -124,66 +52,114 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
 
     constructor() : this(InvalidRef, null)
 
-    var lastFile: FileReference? = null
-    var extension = ""
     var powerOf10Correction = 0
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
-
         val file = file
-        if (file.hasValidName() && file.exists) {
-
-            if (file !== lastFile) {
-                extension = file.lcExtension
-                lastFile = file
-            }
-
-            // todo decide on file magic instead
-            val data = when (extension) {
-                "vox" -> {
-                    // vox is not supported by assimp -> custom loader
-                    loadVOX(file, this)
-                }
-                else -> {
-                    // load the 3D model
-                    loadAssimpAnimated(file, this)
-                }
-            }
-
-            drawAssimp(data, stack, time, color)
-            lastModel = data?.assimpModel
-
+        val data = PrefabCache[file]?.getSampleInstance()
+        if (data is Entity) {
+            lastWarning = null
+            lastModel = draw(data, stack, time, color)
         } else {
-            lastWarning = "Missing file"
+            lastWarning = if (file.exists) data?.className ?: "Model loading?" else "File missing"
             super.onDraw(stack, time, color)
         }
-
     }
 
-    fun drawAssimp(data: MeshData?, stack: Matrix4fArrayList, time: Double, color: Vector4f) {
-        if (data?.assimpModel != null) {
-            stack.next {
+    private fun draw(data: Entity, stack: Matrix4fArrayList, time: Double, color: Vector4f): AnimGameItem {
+        return stack.next {
 
-                if (powerOf10Correction != 0)
-                    stack.scale(pow(10f, powerOf10Correction.toFloat()))
+            if (powerOf10Correction != 0)
+                stack.scale(Maths.pow(10f, powerOf10Correction.toFloat()))
 
-                // todo option to center the mesh
-                // todo option to normalize its size
-                // (see thumbnail generator)
+            // todo option to center the mesh
+            // todo option to normalize its size
+            // (see thumbnail generator)
 
-                when {
-                    isFinalRendering -> data.drawAssimp2(
-                        false, this, stack, time, color,
-                        animation[time], true, centerMesh, normalizeScale, false
-                    )
-                    else -> data.drawAssimp2(
-                        false, this, stack, time, color,
-                        animation[time], true, centerMesh, normalizeScale, true
-                    )
+            val drawSkeletons = GFX.isFinalRendering
+            draw(
+                data, stack, time, color, animation[time],
+                centerMesh, normalizeScale, drawSkeletons
+            )
+        }
+    }
+
+    private fun findAnimations(entity: Entity): HashMap<String, Animation> {
+        val result = HashMap<String, Animation>()
+        entity.forAll {
+            if (it is AnimRenderer) {
+                val skeleton = SkeletonCache[it.skeleton]
+                if (skeleton != null) {
+                    for ((name, anim) in skeleton.animations) {
+                        result[name] = AnimationCache[anim] ?: continue
+                    }
                 }
-
             }
-        } else super.onDraw(stack, time, color)
+        }
+        return result
+    }
+
+    private fun draw(
+        entity: Entity,
+        cameraMatrix: Matrix4fArrayList,
+        time: Double,
+        color: Vector4f,
+        animationName: String,
+        centerMesh: Boolean,
+        normalizeScale: Boolean,
+        drawSkeletons: Boolean
+    ): AnimGameItem {
+
+        val baseShader = ShaderLib.shaderAssimp
+        val shader = baseShader.value
+        shader.use()
+        GFXx3D.shader3DUniforms(shader, cameraMatrix, color)
+        uploadAttractors(shader, time)
+
+        val model0 = AnimGameItem(entity, findAnimations(entity))
+        val animation = model0.animations[animationName]
+        val skinningMatrices = if (animation != null) {
+            model0.uploadJointMatrices(shader, animation, time)
+        } else null
+        shader.v1b("hasAnimation", skinningMatrices != null)
+
+        val localTransform = Matrix4x3fArrayList()
+
+        if (normalizeScale) {
+            val scale = AnimGameItem.getScaleFromAABB(model0.staticAABB.value)
+            localTransform.scale(scale)
+        }
+
+        if (centerMesh) {
+            MeshUtils.centerMesh(this, cameraMatrix, localTransform, model0)
+        }
+
+        GFXx3D.transformUniform(shader, cameraMatrix)
+
+        val cameraXPreGlobal = Matrix4f()
+        cameraXPreGlobal.set(cameraMatrix)
+            .mul(localTransform)
+
+        val localTransform0 = Matrix4x3f(localTransform)
+        val useMaterials = true
+        model0.drawHierarchy(
+            shader,
+            cameraMatrix,
+            cameraXPreGlobal,
+            localTransform,
+            localTransform0,
+            skinningMatrices,
+            color,
+            model0.hierarchy,
+            useMaterials,
+            drawSkeletons
+        )
+
+        // todo line mode: draw every mesh as lines
+        // todo draw non-indexed as lines: use an index buffer
+        // todo draw indexed as lines: use a geometry shader, which converts 3 vertices into 3 lines
+        return model0
+
     }
 
     var lastModel: AnimGameItem? = null
@@ -222,7 +198,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             map.getOrPut(lastModel) {
                 val model = lastModel
                 val animations = model?.animations
-                if (animations != null && animations.isNotEmpty()) {
+                if (!animations.isNullOrEmpty()) {
                     var currentValue = animation[lastLocalTime]
                     val noAnimName = "No animation"
                     if (currentValue !in animations.keys) {
@@ -291,8 +267,8 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
 
     // was Mesh before
     // mmh, but the game engine is kinda more important...
-    // and the mesh support was very limited before anyways -> we shouldn't worry too much,
-    // because we don't have users at the moment anyways
+    // and the mesh support was very limited before anyway -> we shouldn't worry too much,
+    // because we don't have users at the moment anyway
     override val className get() = "MeshTransform"
 
     override val defaultDisplayName get() = Dict["Mesh", "obj.mesh"]

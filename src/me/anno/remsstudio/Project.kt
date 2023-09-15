@@ -2,6 +2,7 @@ package me.anno.remsstudio
 
 import me.anno.animation.Type
 import me.anno.config.DefaultConfig.style
+import me.anno.gpu.GFX
 import me.anno.io.Saveable
 import me.anno.io.config.ConfigBasics
 import me.anno.io.files.FileReference
@@ -32,11 +33,11 @@ import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.Panel
 import me.anno.ui.custom.CustomContainer
 import me.anno.ui.custom.CustomList
-import me.anno.utils.bugs.SumOf
 import me.anno.utils.types.Casting.castToFloat
 import me.anno.video.ffmpeg.FFMPEGEncodingBalance
 import me.anno.video.ffmpeg.FFMPEGEncodingType
 import org.apache.logging.log4j.LogManager
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 // todo option to reset the timeline
@@ -164,11 +165,10 @@ class Project(var name: String, val file: FileReference) : Saveable() {
         }
         return file.inputStreamSync().use { fis ->
             val library = StudioUITypeLibrary()
-            val types = library.types
             val notFound = HashSet<String>()
             val style = style
             fun load(arr: List<*>?): Panel? {
-                println("Loading $arr")
+                // println("Loading $arr")
                 arr ?: return null
                 return try {
                     val type = arr[0] as? String ?: return null
@@ -179,7 +179,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
                         "FileExplorer" -> StudioFileExplorer(project?.scenes, style)
                         "CuttingView", "LayerViewContainer" -> LayerViewContainer(style)
                         "SceneView", "StudioSceneView" -> StudioSceneView(style)
-                        else -> types[type]?.constructor?.invoke()
+                        else -> library.getType(type)?.constructor?.invoke()
                     }
                     if (obj == null) {
                         notFound += type
@@ -220,7 +220,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
                         writer.open(true)
                         writer.write(if (c.isY) "CustomListY" else "CustomListX")
                         writer.write((w * 1000f).roundToInt())
-                        val weightSum = SumOf.sumOf(c.children) { it.weight }
+                        val weightSum = c.children.sumOf { it.weight.toDouble() }.toFloat()
                         for (chi in c.children) {
                             write(chi, chi.weight / weightSum)
                         }
@@ -252,6 +252,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
     var targetFPS = config["target.fps", 30.0]
     var targetOutputFile = config["target.output", getReference(file, "output.mp4")]
     var targetVideoQuality = config["target.quality", 23]
+    var targetSamples = config["target.samples", min(8, GFX.maxSamples)]
     var motionBlurSteps = config.getAnimated<Int>("target.motionBlur.steps", MotionBlurType)
     var shutterPercentage = config.getAnimated<Float>("target.motionBlur.shutterPercentage", ShutterPercentageType)
     var nullCamera = createNullCamera(config["camera.null"] as? Camera)
@@ -276,6 +277,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
         config["target.motionBlur.steps"] = motionBlurSteps
         config["target.motionBlur.shutterPercentage"] = shutterPercentage
         config["target.sampleRate"] = targetSampleRate
+        config["target.samples"] = targetSamples
         config["target.output"] = targetOutputFile.toString()
         config["recent.files"] = SceneTabs.sceneTabs
             .filter { it.file != null }

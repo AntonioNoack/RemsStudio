@@ -283,10 +283,6 @@ object TextRenderer {
                 val scale = scale0
 
                 val sdfOffset = sdf.offset
-                val offset = Vector2f(
-                    (lineDeltaX + xOffset) * scaleX,
-                    lineDeltaY * scaleY
-                ).add(sdfOffset)
 
                 /**
                  * character- and alignment offset
@@ -301,7 +297,7 @@ object TextRenderer {
                 val sdfX = sdfOffset.x * scaleX
                 val sdfY = sdfOffset.y * scaleY
 
-                offset.set(charAlignOffsetX + sdfX, charAlignOffsetY + sdfY)
+                val offset = Vector2f(charAlignOffsetX + sdfX, charAlignOffsetY + sdfY)
                 scale.set(scaleX, scaleY)
 
                 if (firstTimeDrawing) {

@@ -4,6 +4,7 @@ import me.anno.Engine.deltaTime
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.addGPUTask
 import me.anno.gpu.GFXState.renderDefault
+import me.anno.gpu.drawing.DrawRectangles
 import me.anno.gpu.drawing.DrawRectangles.drawBorder
 import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.framebuffer.Screenshots
@@ -14,7 +15,7 @@ import me.anno.gpu.shader.Renderer.Companion.colorSqRenderer
 import me.anno.input.Input
 import me.anno.input.Input.isControlDown
 import me.anno.input.Input.isShiftDown
-import me.anno.input.MouseButton
+import me.anno.input.Key
 import me.anno.input.Touch.Companion.touches
 import me.anno.io.files.FileReference
 import me.anno.maths.Maths.clamp
@@ -250,10 +251,12 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         val dy = stableSize.dy + bt
 
         val white = -1
+        val b = DrawRectangles.startBatch()
         drawBorder(x, y, width, height, white, bth)
         drawBorder(x + bth, y + bth, width - bt, height - bt, black, bth)
         // filled with scene background color anyway
         // drawRect(x + bt, y + bt, w - 2 * bt, h - 2 * bt, deepDark)
+        DrawRectangles.finishBatch(b)
 
         val x00 = x + dx
         val y00 = y + dy
@@ -705,10 +708,10 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         }
     }
 
-    override fun onDoubleClick(x: Float, y: Float, button: MouseButton) {
+    override fun onDoubleClick(x: Float, y: Float, button: Key) {
         onInteraction()
         invalidateDrawing()
-        if (button.isLeft) {
+        if (button == Key.BUTTON_LEFT) {
             val xi = x.toInt()
             val yi = y.toInt()
             for (it in controls) {
@@ -727,7 +730,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         }
     }
 
-    override fun onMouseClicked(x: Float, y: Float, button: MouseButton, long: Boolean) {
+    override fun onMouseClicked(x: Float, y: Float, button: Key, long: Boolean) {
         onInteraction()
         invalidateDrawing()
         if ((parent as? CustomContainer)?.clicked(x, y) != true) {

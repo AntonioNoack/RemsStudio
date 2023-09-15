@@ -52,6 +52,7 @@ object CameraModel {
     }
 
     private val cameraModel: StaticBuffer = StaticBuffer(
+        "CameraModel",
         listOf(
             Attribute("coords", 3)
         ), 2 * 8

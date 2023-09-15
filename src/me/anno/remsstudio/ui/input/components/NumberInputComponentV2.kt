@@ -1,7 +1,7 @@
 package me.anno.remsstudio.ui.input.components
 
 import me.anno.input.Input
-import me.anno.input.MouseButton
+import me.anno.input.Key
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
@@ -32,14 +32,14 @@ class NumberInputComponentV2(
     val driver get() = owningProperty.drivers.getOrNull(indexInProperty)
     val hasDriver get() = driver != null
 
-    override fun onMouseDown(x: Float, y: Float, button: MouseButton) {
+    override fun onMouseDown(x: Float, y: Float, button: Key) {
         if (!hasDriver) {
             super.onMouseDown(x, y, button)
             numberInput.onMouseDown(x, y, button)
         }
     }
 
-    override fun onMouseUp(x: Float, y: Float, button: MouseButton) {
+    override fun onMouseUp(x: Float, y: Float, button: Key) {
         if (!hasDriver) numberInput.onMouseUp(x, y, button)
     }
 
@@ -70,8 +70,8 @@ class NumberInputComponentV2(
         super.onDraw(x0, y0, x1, y1)
     }
 
-    override fun onMouseClicked(x: Float, y: Float, button: MouseButton, long: Boolean) {
-        if (!button.isLeft || long) {
+    override fun onMouseClicked(x: Float, y: Float, button: Key, long: Boolean) {
+        if (button != Key.BUTTON_LEFT || long) {
             val oldDriver = owningProperty.drivers[indexInProperty]
             AnimationDriver.openDriverSelectionMenu(windowStack, oldDriver) { driver ->
                 RemsStudio.largeChange("Changed driver to ${driver?.className}") {

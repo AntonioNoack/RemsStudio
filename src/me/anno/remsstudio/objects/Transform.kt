@@ -48,7 +48,6 @@ import me.anno.utils.structures.ValueWithDefaultFunc
 import me.anno.utils.types.Casting.castToDouble
 import me.anno.utils.types.Casting.castToDouble2
 import me.anno.utils.types.Floats.toRadians
-import me.anno.utils.types.Matrices.skew
 import me.anno.utils.types.Strings.isBlank2
 import me.anno.video.MissingFrameException
 import org.apache.logging.log4j.LogManager

@@ -5,11 +5,12 @@ import me.anno.config.DefaultStyle
 import me.anno.fonts.FontManager
 import me.anno.fonts.keys.TextCacheKey
 import me.anno.gpu.GFX
+import me.anno.gpu.drawing.DrawRectangles
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.drawing.DrawTexts.drawSimpleTextCharByChar
 import me.anno.gpu.drawing.GFXx2D.flatColor
 import me.anno.input.Input
-import me.anno.input.MouseButton
+import me.anno.input.Key
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.fract
@@ -177,13 +178,11 @@ open class TimelinePanel(style: Style) : Panel(style) {
         }
     }
 
-    fun normTime01(time: Double) = (time - centralTime) / dtHalfLength * 0.5f + 0.5f
-    fun normTime01(time: Float) = (time - centralTime) / dtHalfLength * 0.5f + 0.5f
+    fun normTime01(time: Double) = (time - centralTime) / dtHalfLength * 0.5 + 0.5
     fun normAxis11(lx: Float, x0: Int, size: Int) = (lx - x0) / size * 2f - 1f
 
     fun getTimeAt(mx: Float) = centralTime + dtHalfLength * normAxis11(mx, x, width)
     fun getXAt(time: Double) = x + width * normTime01(time)
-    fun getXAt(time: Float) = x + width * normTime01(time)
 
     fun drawTimeAxis(x0: Int, y0: Int, x1: Int, y1: Int, drawText: Boolean) {
 
@@ -198,6 +197,8 @@ open class TimelinePanel(style: Style) : Panel(style) {
         val fineLineColor = fontColor and 0x1fffffff
         val veryFineLineColor = fontColor and 0x10ffffff
 
+        val batch = DrawRectangles.startBatch()
+
         // very fine lines, 20x as many
         drawTimeAxis(timeStep * 0.05, x0, y02, x1, y1, veryFineLineColor, false)
 
@@ -209,6 +210,8 @@ open class TimelinePanel(style: Style) : Panel(style) {
 
         drawLine(targetDuration, y02, y1, endColor)
         drawLine(editorTime, y02, y1, accentColor)
+
+        DrawRectangles.finishBatch(batch)
 
     }
 
@@ -241,12 +244,11 @@ open class TimelinePanel(style: Style) : Panel(style) {
         // probably because of program switching
         // 8% more are gained by assigning the color only once
         if (lineH > 0) {
-            flatColor(lineColor)
             for (stepIndex in maxStepIndex downTo minStepIndex) {
                 val time = stepIndex * timeStep
                 val x = getXAt(time).roundToInt()
                 if (x > x0 + 1 && x + 2 < x1) {
-                    drawRect(x, lineY, 1, lineH)
+                    drawRect(x, lineY, 1, lineH, lineColor)
                 }
             }
         }
@@ -282,10 +284,10 @@ open class TimelinePanel(style: Style) : Panel(style) {
         return timeFractions.minByOrNull { abs(it - time) }!!.toDouble()
     }
 
-    override fun onMouseClicked(x: Float, y: Float, button: MouseButton, long: Boolean) {
+    override fun onMouseClicked(x: Float, y: Float, button: Key, long: Boolean) {
         when {
             isCross(x, y) -> super.onMouseClicked(x, y, button, long)
-            button.isLeft -> jumpToX(x)
+            button == Key.BUTTON_LEFT -> jumpToX(x)
             else -> {
                 val options = listOf(
                     MenuOption(
@@ -324,7 +326,7 @@ open class TimelinePanel(style: Style) : Panel(style) {
     }
 
     override fun onMouseMoved(x: Float, y: Float, dx: Float, dy: Float) {
-        if (0 in Input.mouseKeysDown) {
+        if (Key.BUTTON_LEFT in Input.mouseKeysDown) {
             if ((Input.isShiftDown || Input.isControlDown) && isPaused) {
                 // scrubbing
                 editorTime = getTimeAt(x)

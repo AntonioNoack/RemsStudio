@@ -23,6 +23,7 @@ import me.anno.ui.base.menu.Menu.ask
 import me.anno.ui.base.menu.Menu.msg
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
+import me.anno.ui.base.progress.ProgressBar
 import me.anno.utils.types.Strings.defaultImportType
 import me.anno.utils.types.Strings.getImportType
 import me.anno.video.VideoCreator
@@ -99,6 +100,7 @@ object Rendering {
         val fps = RemsStudio.targetFPS
         val totalFrameCount = max(1, (fps * duration).toLong() + 1)
         val sampleRate = max(1, RemsStudio.targetSampleRate)
+        val samples = RemsStudio.targetSamples
         val project = project
 
         val scene = root.clone()
@@ -117,11 +119,18 @@ object Rendering {
         )
 
         val progress = GFX.someWindow?.addProgressBar(
-            "Rendering", "Frames",
-            totalFrameCount.toDouble()
+            object: ProgressBar("Rendering", "Frames",
+                totalFrameCount.toDouble()){
+                override fun formatText(): String {
+                    val progress = progress.toInt()
+                    val total = total.toInt()
+                    return "$progress / $total $unit"
+                }
+            }
         )
+
         val videoAudioCreator = videoAudioCreatorV2(
-            videoCreator, scene, findCamera(scene), duration, sampleRate, audioSources,
+            videoCreator, samples, scene, findCamera(scene), duration, sampleRate, audioSources,
             motionBlurSteps, shutterPercentage, targetOutputFile, progress
         )
 

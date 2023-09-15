@@ -195,7 +195,7 @@ class LayerStripeSolution(
                     val timeStartIndex = floor(tStart / dt).toLong()
                     val timeEndIndex = ceil(getTimeAt(ix1) / dt).toLong()
 
-                    DrawRectangles.startBatch()
+                    val b = DrawRectangles.startBatch()
                     for (timeIndex in timeStartIndex until timeEndIndex) {
 
                         val t0 = timeIndex * dt
@@ -233,7 +233,7 @@ class LayerStripeSolution(
                             }
                         }
                     }
-                    DrawRectangles.finishBatch()
+                    DrawRectangles.finishBatch(b)
                 }
 
                 val hasError = tr?.lastWarning != null

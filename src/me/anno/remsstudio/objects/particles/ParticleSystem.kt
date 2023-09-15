@@ -4,6 +4,7 @@ import me.anno.Engine.gameTime
 import me.anno.animation.Type
 import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX.isFinalRendering
+import me.anno.input.Key
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.InvalidRef
@@ -30,7 +31,6 @@ import me.anno.ui.editor.files.FileExplorerEntry.Companion.drawLoadingCircle
 import me.anno.ui.editor.stacked.Option
 import me.anno.ui.input.BooleanInput
 import me.anno.ui.style.Style
-import me.anno.utils.bugs.SumOf
 import me.anno.utils.hpc.HeavyProcessing.processBalanced
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
@@ -270,7 +270,9 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
             dist.distribution.draw(stack, color)
         }
 
-        sumWeight = SumOf.sumOf(children.filterNot { it is ForceField }) { it.weight }// .sumOf { it.weight }
+        sumWeight = children
+            .filterNot { it is ForceField }
+            .sumOf { it.weight.toDouble() }.toFloat()
         if (needsChildren() && (time < 0f || children.isEmpty() || sumWeight <= 0.0)) return
 
         if (step(time)) {
@@ -326,7 +328,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
                 }
             })
             group.addOnClickListener { _, _, button, long ->
-                if (button.isRight || long) {
+                if (button == Key.BUTTON_RIGHT || long) {
                     // show all options for different distributions
                     openMenu(
                         list.windowStack,

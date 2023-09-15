@@ -3,7 +3,7 @@ package me.anno.remsstudio.ui.sceneTabs
 import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX
 import me.anno.input.ActionManager
-import me.anno.input.MouseButton
+import me.anno.input.Key
 import me.anno.io.files.FileReference
 import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.text.TextReader
@@ -164,7 +164,7 @@ class SceneTab(var file: FileReference?, var scene: Transform, history: History?
         return true
     }
 
-    override fun onMouseUp(x: Float, y: Float, button: MouseButton) {
+    override fun onMouseUp(x: Float, y: Float, button: Key) {
         ActionManager.executeGlobally(GFX.someWindow!!, 0f, 0f, false, listOf("DragEnd"))
     }
 

@@ -10,7 +10,7 @@ import me.anno.gpu.texture.TextureLib.colorShowTexture
 import me.anno.input.Input.isControlDown
 import me.anno.input.Input.isShiftDown
 import me.anno.input.Input.mouseKeysDown
-import me.anno.input.MouseButton
+import me.anno.input.Key
 import me.anno.io.files.InvalidRef
 import me.anno.io.text.TextReader
 import me.anno.io.text.TextWriter
@@ -539,7 +539,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
 
     // todo if there are multiples selected, allow them to be moved (?)
 
-    override fun onMouseDown(x: Float, y: Float, button: MouseButton) {
+    override fun onMouseDown(x: Float, y: Float, button: Key) {
         // find the dragged element
         if (!isHovered) {
             super.onMouseDown(x, y, button)
@@ -552,7 +552,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             draggedChannel = -1
         } else {
             draggedKeyframe = null
-            if (button.isLeft) {
+            if (button == Key.BUTTON_LEFT) {
                 isSelecting = isShiftDown
                 if (!isSelecting) {
                     selectedKeyframes.clear()
@@ -574,7 +574,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
 
     // todo always show the other properties, too???
     // todo maybe add a list of all animated properties?
-    override fun onMouseUp(x: Float, y: Float, button: MouseButton) {
+    override fun onMouseUp(x: Float, y: Float, button: Key) {
         draggedKeyframe = null
         if (isSelecting) {
             // add all keyframes in that area
@@ -661,7 +661,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                 } else {
                     val timeHere = global2Kf(time)
                     val deltaTime = timeHere - draggedKeyframe.time
-                    selectedKeyframes.forEach { keyframe ->
+                    for (keyframe in selectedKeyframes) {
                         keyframe.time += deltaTime // global -> local
                     }
                     editorTime = time
@@ -671,7 +671,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             }
             invalidateDrawing()
         } else {
-            if (0 in mouseKeysDown) {
+            if (Key.BUTTON_LEFT in mouseKeysDown) {
                 if ((isShiftDown || isControlDown) && isPaused) {
                     // scrubbing
                     editorTime = getTimeAt(x)
@@ -687,7 +687,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         }
     }
 
-    override fun onDoubleClick(x: Float, y: Float, button: MouseButton) {
+    override fun onDoubleClick(x: Float, y: Float, button: Key) {
         val selectedProperty = selectedProperties?.firstOrNull()
         if (selectedProperty != null) {
             val time = global2Kf(getTimeAt(x))
@@ -767,9 +767,9 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         invalidateDrawing()
     }
 
-    override fun onMouseClicked(x: Float, y: Float, button: MouseButton, long: Boolean) {
+    override fun onMouseClicked(x: Float, y: Float, button: Key, long: Boolean) {
         when {
-            button.isRight -> {
+            button == Key.BUTTON_RIGHT -> {
                 if (selectedKeyframes.isEmpty()) {
                     super.onMouseClicked(x, y, button, long)
                 } else {

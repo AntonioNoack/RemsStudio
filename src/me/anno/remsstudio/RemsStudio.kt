@@ -1,6 +1,7 @@
 package me.anno.remsstudio
 
 import me.anno.Build
+import me.anno.Engine
 import me.anno.Engine.deltaTime
 import me.anno.Engine.gameTime
 import me.anno.audio.openal.ALBase
@@ -44,6 +45,7 @@ import me.anno.utils.OS
 
 // todo bugs:
 //  - sometimes delete-key isn't registered as such
+
 
 // todo isolate and remove certain frequencies from audio
 // todo visualize audio frequency, always!!!, from 25Hz to 48kHz
@@ -138,7 +140,6 @@ object RemsStudio : StudioBase("Rem's Studio", 10200, true) {
     }
 
     override fun loadConfig() {
-        PrefabCache.disablePrefabs = true
         RemsRegistry.init()
         RemsConfig.init()
     }
@@ -252,6 +253,7 @@ object RemsStudio : StudioBase("Rem's Studio", 10200, true) {
     val targetHeight get(): Int = project?.targetHeight ?: GFX.someWindow!!.height
     val targetOutputFile get(): FileReference = project!!.targetOutputFile
     val motionBlurSteps get(): AnimatedProperty<Int> = project!!.motionBlurSteps
+    val targetSamples get(): Int = project?.targetSamples ?: 1
     val shutterPercentage get() = project!!.shutterPercentage
     val history get() = currentTab?.history
     val nullCamera get() = project?.nullCamera

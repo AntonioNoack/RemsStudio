@@ -23,6 +23,7 @@ object SphereAxesModel {
         val vertexCount = sideCount * 9 * 2
 
         val buffer = StaticBuffer(
+            "SphereAxes",
             attributes,
             vertexCount
         )

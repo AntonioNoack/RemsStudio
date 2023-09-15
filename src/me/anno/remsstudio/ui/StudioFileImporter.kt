@@ -8,7 +8,7 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.Transform.Companion.toTransform
 import me.anno.remsstudio.objects.Video
 import me.anno.remsstudio.objects.documents.PDFDocument
-import me.anno.remsstudio.objects.meshes.MeshTransform
+import me.anno.remsstudio.objects.MeshTransform
 import me.anno.gpu.drawing.UVProjection
 import me.anno.remsstudio.objects.text.Text
 import me.anno.studio.StudioBase.Companion.addEvent

@@ -18,6 +18,7 @@ import me.anno.remsstudio.Rendering.renderFrame
 import me.anno.remsstudio.Rendering.renderPart
 import me.anno.remsstudio.Rendering.renderSetPercent
 import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.ui.scene.StudioSceneView
 import me.anno.studio.Inspectable
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
@@ -105,8 +106,7 @@ object RenderSettings : Transform() {
         // todo why is the field not showing up?
         val mbs = vi(
             "Motion-Blur-Steps", "0,1 = no motion blur, e.g. 16 = decent motion blur, sub-frames per frame",
-            project.motionBlurSteps,
-            style
+            project.motionBlurSteps, style
         ) as IntInput
         val mbsListener = mbs.changeListener
         mbs.setChangeListener {
@@ -114,6 +114,35 @@ object RenderSettings : Transform() {
             save()
         }
         list += mbs
+
+        val samples = EnumInput(
+            NameDesc(
+                "GPU Samples",
+                "Smoothes edges. 1 = default. Support depends on GPU.", ""
+            ),
+            NameDesc("MSAA ${project.targetSamples}x"),
+            listOf(1, 2, 4, 8, 16, 32, 64, 128).map {
+                NameDesc(
+                    if (it == 1) "No MSAA"
+                    else if (it <= GFX.maxSamples) "MSAA ${it}x"
+                    else "MSAA ${it}x (unsupported)"
+                )
+            }, style
+        )
+        samples.setChangeListener { _, index, _ ->
+            project.targetSamples = 1 shl index
+            // invalidate rendering as a preview
+            // currently, this value affects editor rendering, too for wysiwyg
+            for (window in GFX.windows) {
+                for (window1 in window.windowStack) {
+                    window1.panel.forAllVisiblePanels {
+                        if (it is StudioSceneView) it.invalidateDrawing()
+                    }
+                }
+            }
+            save()
+        }
+        list += samples
 
         val shp = vi(
             "Shutter-Percentage", "[Motion Blur] 1 = full frame is used; 0.1 = only 1/10th of a frame time is used",

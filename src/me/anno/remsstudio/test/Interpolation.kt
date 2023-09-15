@@ -1,13 +1,12 @@
 package me.anno.remsstudio.test
 
-import me.anno.remsstudio.animation.Keyframe
 import me.anno.io.ISaveable.Companion.registerCustomClass
 import me.anno.io.files.InvalidRef
 import me.anno.io.text.TextReader
 import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.animation.Keyframe
 import me.anno.remsstudio.objects.text.Text
 import me.anno.utils.LOGGER
-import me.anno.utils.types.Vectors.print
 import org.joml.Vector4f
 
 fun main() {

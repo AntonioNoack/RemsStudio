@@ -10,7 +10,7 @@ import me.anno.input.Input.isControlDown
 import me.anno.input.Input.keysDown
 import me.anno.input.Input.mouseKeysDown
 import me.anno.input.Input.needsLayoutUpdate
-import me.anno.input.MouseButton
+import me.anno.input.Key
 import me.anno.io.files.FileReference
 import me.anno.io.text.TextReader
 import me.anno.language.translation.NameDesc
@@ -237,8 +237,8 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
     // done move start/end times
     // done highlight the hovered panel?
 
-    override fun onMouseDown(x: Float, y: Float, button: MouseButton) {
-        if (button.isLeft) {
+    override fun onMouseDown(x: Float, y: Float, button: Key) {
+        if (button == Key.BUTTON_LEFT) {
             var draggedTransform = getTransformAt(x, y)
             this.draggedTransform = draggedTransform
             if (draggedTransform != null) {
@@ -322,14 +322,14 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
         } else super.onMouseMoved(x, y, dx, dy)
     }
 
-    override fun onMouseUp(x: Float, y: Float, button: MouseButton) {
+    override fun onMouseUp(x: Float, y: Float, button: Key) {
         draggedTransform = null
         draggedKeyframes = null
     }
 
-    override fun onMouseClicked(x: Float, y: Float, button: MouseButton, long: Boolean) {
-        when {
-            button.isRight -> {
+    override fun onMouseClicked(x: Float, y: Float, button: Key, long: Boolean) {
+        when (button) {
+            Key.BUTTON_RIGHT -> {
                 val transform = getTransformAt(x, y)
                 if (transform != null) {
                     val localTime = transform.lastLocalTime

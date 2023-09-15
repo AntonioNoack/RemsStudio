@@ -1,9 +1,9 @@
 package me.anno.remsstudio.gpu
 
+import me.anno.ecs.components.mesh.Mesh
 import me.anno.gpu.GFX
 import me.anno.gpu.GFXState
 import me.anno.gpu.buffer.SimpleBuffer
-import me.anno.gpu.buffer.SimpleBuffer.Companion.circleBuffer
 import me.anno.gpu.buffer.StaticBuffer
 import me.anno.gpu.drawing.GFXx3D
 import me.anno.gpu.drawing.GFXx3D.circleParams
@@ -258,6 +258,38 @@ object GFXx3Dv2 {
         GFX.check()
     }
 
+    private val circleData = Mesh().apply {
+
+        val slices = 128
+        val positions = FloatArray((slices + 1) * 3 * 2)
+        val indices = IntArray(slices * 6)
+
+        for (i in 0..slices) {
+
+            val angle = i.toFloat() / slices
+
+            val i6 = i * 6
+            positions[i6 + 0] = angle
+            positions[i6 + 1] = 0f
+            positions[i6 + 3] = angle
+            positions[i6 + 4] = 1f
+
+            if (i < slices) {
+                val i2 = i * 2
+                indices[i6 + 0] = i2 + 0
+                indices[i6 + 1] = i2 + 1
+                indices[i6 + 2] = i2 + 2
+                indices[i6 + 3] = i2 + 2
+                indices[i6 + 4] = i2 + 1
+                indices[i6 + 5] = i2 + 3
+            }
+        }
+
+        this.positions = positions
+        this.indices = indices
+
+    }
+
     fun draw3DCircle(
         that: GFXTransform, time: Double,
         stack: Matrix4fArrayList,
@@ -271,7 +303,7 @@ object GFXx3Dv2 {
         GFXx2Dv2.defineAdvancedGraphicalFeatures(shader, that, time)
         shader3DUniforms(shader, stack, 1, 1, color, null, Filtering.NEAREST, null)
         circleParams(innerRadius, startDegrees, endDegrees, shader)
-        circleBuffer.draw(shader)
+        circleData.draw(shader, 0)
         GFX.check()
     }
 
