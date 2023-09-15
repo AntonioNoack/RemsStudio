@@ -237,12 +237,6 @@ object RemsStudioUILayouts {
         ui += SpacerPanel(0, 1, style)
         ui += createConsoleWithStats(true, style)
 
-        ui.add(SpyPanel {
-            if (Input.isKeyDown(Key.KEY_LEFT_ALT)) {
-
-            }
-        })
-
         windowStack.clear()
         windowStack.push(ui)
 

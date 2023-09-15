@@ -1,23 +1,26 @@
 package me.anno.remsstudio.objects
 
-import me.anno.animation.Type
 import me.anno.config.DefaultConfig
 import me.anno.ecs.Entity
-import me.anno.ecs.components.anim.AnimRenderer
-import me.anno.ecs.components.anim.Animation
-import me.anno.ecs.components.anim.AnimationCache
-import me.anno.ecs.components.anim.SkeletonCache
+import me.anno.ecs.components.anim.*
+import me.anno.ecs.components.mesh.MaterialCache
+import me.anno.ecs.components.mesh.Mesh
+import me.anno.ecs.components.mesh.MeshComponentBase
 import me.anno.ecs.prefab.PrefabCache
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.GFXx3D
+import me.anno.gpu.shader.Shader
 import me.anno.gpu.shader.ShaderLib
+import me.anno.gpu.texture.ITexture2D
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
+import me.anno.io.files.thumbs.ThumbsExt
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
-import me.anno.maths.Maths
+import me.anno.maths.Maths.fract
+import me.anno.mesh.MeshData
 import me.anno.mesh.MeshUtils
 import me.anno.mesh.assimp.AnimGameItem
 import me.anno.remsstudio.RemsStudio
@@ -31,6 +34,7 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.EnumInput
 import me.anno.ui.style.Style
 import me.anno.utils.files.LocalFile.toGlobalFile
+import me.anno.utils.pooling.JomlPools
 import org.joml.*
 
 class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(parent) {
@@ -43,6 +47,8 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
 
     // todo info field with the amount of vertices, triangles, and such :)
 
+    // todo it looks like some animations get forgotten, only first is shown
+
     val animation = AnimatedProperty.string()
 
     var centerMesh = true
@@ -51,8 +57,6 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
     // for the start it is nice to be able to import meshes like a torus into the engine :)
 
     constructor() : this(InvalidRef, null)
-
-    var powerOf10Correction = 0
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val file = file
@@ -63,24 +67,6 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         } else {
             lastWarning = if (file.exists) data?.className ?: "Model loading?" else "File missing"
             super.onDraw(stack, time, color)
-        }
-    }
-
-    private fun draw(data: Entity, stack: Matrix4fArrayList, time: Double, color: Vector4f): AnimGameItem {
-        return stack.next {
-
-            if (powerOf10Correction != 0)
-                stack.scale(Maths.pow(10f, powerOf10Correction.toFloat()))
-
-            // todo option to center the mesh
-            // todo option to normalize its size
-            // (see thumbnail generator)
-
-            val drawSkeletons = GFX.isFinalRendering
-            draw(
-                data, stack, time, color, animation[time],
-                centerMesh, normalizeScale, drawSkeletons
-            )
         }
     }
 
@@ -99,17 +85,11 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         return result
     }
 
-    private fun draw(
-        entity: Entity,
-        cameraMatrix: Matrix4fArrayList,
-        time: Double,
-        color: Vector4f,
-        animationName: String,
-        centerMesh: Boolean,
-        normalizeScale: Boolean,
-        drawSkeletons: Boolean
-    ): AnimGameItem {
+    private fun draw(entity: Entity, cameraMatrix: Matrix4fArrayList, time: Double, color: Vector4f): AnimGameItem {
 
+        val animationName = animation[time]
+
+        val drawSkeletons = !GFX.isFinalRendering
         val baseShader = ShaderLib.shaderAssimp
         val shader = baseShader.value
         shader.use()
@@ -118,10 +98,34 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
 
         val model0 = AnimGameItem(entity, findAnimations(entity))
         val animation = model0.animations[animationName]
-        val skinningMatrices = if (animation != null) {
-            model0.uploadJointMatrices(shader, animation, time)
-        } else null
-        shader.v1b("hasAnimation", skinningMatrices != null)
+        var animTexture: ITexture2D? = null
+        if (animation != null) {
+            if (AnimTexture.useAnimTextures) {
+
+                val skeleton = SkeletonCache[animation.skeleton]
+                val animTexture1 = if (skeleton != null) AnimationCache[skeleton] else null
+                val frameIndex = fract(time.toFloat() / animation.duration) * animation.numFrames
+                val internalIndex = animTexture1?.getIndex(animation, frameIndex)
+
+                val animTexture2 = animTexture1?.texture
+                if (skeleton == null) {
+                    lastWarning = "Skeleton is invalid"
+                    shader.v1b("hasAnimation", false)
+                } else if (animTexture2 == null) {
+                    lastWarning = "AnimTexture is invalid"
+                    shader.v1b("hasAnimation", false)
+                } else {
+                    shader.v4f("animWeights", 1f, 0f, 0f, 0f)
+                    shader.v4f("animIndices", internalIndex!!, 0f, 0f, 0f)
+                    animTexture2.bindTrulyNearest(shader, "animTexture")
+                    animTexture = animTexture2
+                    shader.v1b("hasAnimation", true)
+                }
+            } else {
+                val skinningMatrices = model0.uploadJointMatrices(shader, animation, time)
+                shader.v1b("hasAnimation", skinningMatrices != null)
+            }
+        }
 
         val localTransform = Matrix4x3fArrayList()
 
@@ -141,18 +145,16 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             .mul(localTransform)
 
         val localTransform0 = Matrix4x3f(localTransform)
-        val useMaterials = true
-        model0.drawHierarchy(
+        drawHierarchy(
             shader,
             cameraMatrix,
             cameraXPreGlobal,
             localTransform,
             localTransform0,
-            skinningMatrices,
             color,
             model0.hierarchy,
-            useMaterials,
-            drawSkeletons
+            drawSkeletons,
+            animTexture
         )
 
         // todo line mode: draw every mesh as lines
@@ -161,6 +163,96 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         return model0
 
     }
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun drawHierarchy(
+        shader: Shader,
+        cameraMatrix: Matrix4f,
+        cameraXPreGlobal: Matrix4f,
+        localTransform: Matrix4x3fArrayList,
+        localTransform0: Matrix4x3f,
+        color: Vector4f,
+        entity: Entity,
+        drawSkeletons: Boolean,
+        animTexture: ITexture2D?
+    ) {
+
+        localTransform.pushMatrix()
+
+        val transform = entity.transform
+        val local = transform.localTransform
+
+        // this moves the engine parts correctly, but ruins the rotation of the ghost
+        // and scales it totally incorrectly
+        localTransform.mul(
+            Matrix4x3f(
+                local.m00.toFloat(), local.m01.toFloat(), local.m02.toFloat(),
+                local.m10.toFloat(), local.m11.toFloat(), local.m12.toFloat(),
+                local.m20.toFloat(), local.m21.toFloat(), local.m22.toFloat(),
+                local.m30.toFloat(), local.m31.toFloat(), local.m32.toFloat(),
+            )
+        )
+
+        if (entity.hasComponent(MeshComponentBase::class)) {
+
+            shader.use()
+            shader.m4x3("localTransform", localTransform)
+
+            if (shader["invLocalTransform"] >= 0) {
+                val tmp = JomlPools.mat4x3f.borrow()
+                tmp.set(localTransform).invert()
+                shader.m4x3("invLocalTransform", tmp)
+            }
+
+            shader.v1f("worldScale", 1f) // correct?
+            GFX.shaderColor(shader, "tint", -1)
+
+
+            entity.anyComponent(MeshComponentBase::class) { comp ->
+                val mesh = comp.getMesh()
+                if (mesh?.positions != null) {
+                    mesh.checkCompleteness()
+                    mesh.ensureBuffer()
+                    val materialOverrides = comp.materials
+                    val materials = mesh.materials
+                    // LOGGER.info("drawing mesh with material $materialOverrides x $materials")
+                    for (index in 0 until mesh.numMaterials) {
+                        val m0 = materialOverrides.getOrNull(index)?.nullIfUndefined()
+                        val m1 = m0 ?: materials.getOrNull(index)
+                        val material = MaterialCache[m1, Mesh.defaultMaterial]
+                        shader.v1i("hasVertexColors", if (material.enableVertexColors) mesh.hasVertexColors else 0)
+                        material.bind(shader)
+                        animTexture?.bindTrulyNearest(shader, "animTexture")
+                        mesh.draw(shader, index)
+                    }
+                } else MeshData.warnMissingMesh(comp, mesh)
+                false
+            }
+        }
+
+        ThumbsExt.finishLines(cameraXPreGlobal)
+
+        // todo implement
+        /*if (drawSkeletons) {
+            val animMeshRenderer = entity.getComponent(AnimRenderer::class, false)
+            if (animMeshRenderer != null) {
+                val skinningMatrices = uploadJointMatrices(shader, animation, time)
+                SkeletonCache[animMeshRenderer.skeleton]
+                    ?.draw(shader, localTransform, skinningMatrices)
+            }
+        }*/
+
+        val children = entity.children
+        for (i in children.indices) {
+            drawHierarchy(
+                shader, cameraMatrix, cameraXPreGlobal, localTransform, localTransform0,
+                color, children[i], drawSkeletons, animTexture
+            )
+        }
+
+        localTransform.popMatrix()
+    }
+
 
     var lastModel: AnimGameItem? = null
 
@@ -175,11 +267,6 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         val c = inspected.filterIsInstance<MeshTransform>()
 
         list += vi(inspected, "File", "", null, file, style) { for (x in c) x.file = it }
-        list += vi(
-            inspected, "Scale Correction, 10^N",
-            "Often file formats are incorrect in size by a factor of 100. Use +/- 2 to correct this issue easily",
-            Type.INT, powerOf10Correction, style
-        ) { for (x in c) x.powerOf10Correction = it }
 
         list += vi(
             inspected, "Normalize Scale", "A quicker fix than manually finding the correct scale",
@@ -223,7 +310,6 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
     override fun save(writer: BaseWriter) {
         super.save(writer)
         writer.writeFile("file", file)
-        writer.writeInt("powerOf10", powerOf10Correction)
         writer.writeObject(this, "animation", animation)
         writer.writeBoolean("normalizeScale", normalizeScale, true)
         writer.writeBoolean("centerMesh", centerMesh, true)
@@ -255,13 +341,6 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         when (name) {
             "file" -> file = value
             else -> super.readFile(name, value)
-        }
-    }
-
-    override fun readInt(name: String, value: Int) {
-        when (name) {
-            "powerOf10" -> powerOf10Correction = value
-            else -> super.readInt(name, value)
         }
     }
 
