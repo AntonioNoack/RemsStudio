@@ -1,6 +1,9 @@
 package me.anno.remsstudio.objects.distributions
 
-import org.joml.*
+import org.joml.Matrix4fArrayList
+import org.joml.Vector2f
+import org.joml.Vector3f
+import org.joml.Vector4f
 
 class SphereVolumeDistribution(center: Vector4f, size: Vector4f, rotation: Vector4f = Vector4f()) :
     CenterSizeDistribution(
@@ -15,6 +18,10 @@ class SphereVolumeDistribution(center: Vector4f, size: Vector4f, rotation: Vecto
     constructor(center: Vector2f, size: Vector2f) : this(Vector4f(center, 0f, 0f), Vector4f(size, 0f, 0f))
     constructor(center: Float, size: Float) : this(Vector3f(center), size)
 
+    override fun nextV1(): Float {
+        return transform(random.nextFloat() * 2f - 1f)
+    }
+
     override fun nextV2(): Vector2f {
         var x: Float
         var y: Float
@@ -22,7 +29,7 @@ class SphereVolumeDistribution(center: Vector4f, size: Vector4f, rotation: Vecto
             x = random.nextFloat() * 2f - 1f
             y = random.nextFloat() * 2f - 1f
         } while (x * x + y * y > 1f)
-        return Vector2f(x, y).transform()
+        return transform(Vector2f(x, y))
     }
 
     override fun nextV3(): Vector3f {
@@ -34,7 +41,21 @@ class SphereVolumeDistribution(center: Vector4f, size: Vector4f, rotation: Vecto
             y = random.nextFloat() * 2f - 1f
             z = random.nextFloat() * 2f - 1f
         } while (x * x + y * y + z * z > 1f)
-        return Vector3f(x, y, z).transform()
+        return transform(Vector3f(x, y, z))
+    }
+
+    override fun nextV4(): Vector4f {
+        var x: Float
+        var y: Float
+        var z: Float
+        var w: Float
+        do {
+            x = random.nextFloat() * 2f - 1f
+            y = random.nextFloat() * 2f - 1f
+            z = random.nextFloat() * 2f - 1f
+            w = random.nextFloat() * 2f - 1f
+        } while (x * x + y * y + z * z + w * w > 1f)
+        return transform(Vector4f(x, y, z, w))
     }
 
     override fun drawTransformed(stack: Matrix4fArrayList, color: Vector4f) {

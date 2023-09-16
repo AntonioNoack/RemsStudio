@@ -72,6 +72,7 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
     val forcedMeta get() = getMeta(file, false)!!
 
     fun getMeta(src: FileReference, async: Boolean): PDFCache.AtomicCountedDocument? {
+        if (!src.exists) return null
         return PDFCache.getDocumentRef(src, src.inputStreamSync(), true, async)
     }
 

@@ -27,7 +27,7 @@ class CuboidHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4
 
     override fun nextV1(): Float {
         val x = random.nextFloat()
-        return (if (x > 0.5f) 1f else -1f).transform()
+        return transform(if (x > 0.5f) 1f else -1f)
     }
 
     override fun nextV2(): Vector2f {
@@ -43,9 +43,7 @@ class CuboidHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4
         }
         if (x.isNaN()) x = 0f
         if (y.isNaN()) y = 0f
-        return Vector2f(
-            x, y
-        ).transform()
+        return transform(Vector2f(x, y))
     }
 
     override fun nextV3(): Vector3f {
@@ -76,9 +74,7 @@ class CuboidHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4
         if (x.isNaN()) x = 0f
         if (y.isNaN()) y = 0f
         if (z.isNaN()) z = 0f
-        return Vector3f(
-            x, y, z
-        ).transform()
+        return transform(Vector3f(x, y, z))
     }
 
     override fun nextV4(): Vector4f {
@@ -121,9 +117,7 @@ class CuboidHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4
         if (y.isNaN()) y = 0f
         if (z.isNaN()) z = 0f
         if (w.isNaN()) w = 0f
-        return Vector4f(
-            x, y, z, w
-        ).transform()
+        return transform(Vector4f(x, y, z, w))
     }
 
     override fun drawTransformed(stack: Matrix4fArrayList, color: Vector4f) {

@@ -23,27 +23,33 @@ class CuboidDistribution(center: Vector4f, size: Vector4f, rotation: Vector4f = 
     constructor(center: Vector3f, size: Vector3f) : this(Vector4f(center, 0f), Vector4f(size, 0f))
 
     override fun nextV2(): Vector2f {
-        return Vector2f(
-            random.nextFloat() * 2f,
-            random.nextFloat() * 2f
-        ).sub(1f, 1f).transform()
+        return transform(
+            Vector2f(
+                random.nextFloat() * 2f - 1f,
+                random.nextFloat() * 2f - 1f
+            )
+        )
     }
 
     override fun nextV3(): Vector3f {
-        return Vector3f(
-            random.nextFloat() * 2f,
-            random.nextFloat() * 2f,
-            random.nextFloat() * 2f
-        ).sub(1f, 1f, 1f).transform()
+        return transform(
+            Vector3f(
+                random.nextFloat() * 2f - 1f,
+                random.nextFloat() * 2f - 1f,
+                random.nextFloat() * 2f - 1f
+            )
+        )
     }
 
     override fun nextV4(): Vector4f {
-        return Vector4f(
-            random.nextFloat() * 2f,
-            random.nextFloat() * 2f,
-            random.nextFloat() * 2f,
-            random.nextFloat() * 2f
-        ).sub(1f, 1f, 1f, 1f).transform()
+        return transform(
+            Vector4f(
+                random.nextFloat() * 2f - 1f,
+                random.nextFloat() * 2f - 1f,
+                random.nextFloat() * 2f - 1f,
+                random.nextFloat() * 2f - 1f
+            )
+        )
     }
 
     override fun drawTransformed(stack: Matrix4fArrayList, color: Vector4f) {

@@ -8,8 +8,6 @@ import me.anno.gpu.GFX
 import me.anno.gpu.drawing.DrawRectangles
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.drawing.DrawTexts.drawSimpleTextCharByChar
-import me.anno.gpu.drawing.GFXx2D.flatColor
-import me.anno.input.Input
 import me.anno.input.Key
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
@@ -19,13 +17,14 @@ import me.anno.maths.Maths.mixARGB
 import me.anno.maths.Maths.pow
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.editorTime
-import me.anno.remsstudio.RemsStudio.isPaused
 import me.anno.remsstudio.RemsStudio.project
 import me.anno.remsstudio.RemsStudio.targetDuration
 import me.anno.remsstudio.RemsStudio.targetFPS
 import me.anno.remsstudio.RemsStudio.updateAudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.ui.graphs.GraphEditorBody.Companion.shouldMove
+import me.anno.remsstudio.ui.graphs.GraphEditorBody.Companion.shouldScrub
 import me.anno.ui.Panel
 import me.anno.ui.base.constraints.AxisAlignment
 import me.anno.ui.base.menu.Menu.openMenu
@@ -326,17 +325,16 @@ open class TimelinePanel(style: Style) : Panel(style) {
     }
 
     override fun onMouseMoved(x: Float, y: Float, dx: Float, dy: Float) {
-        if (Key.BUTTON_LEFT in Input.mouseKeysDown) {
-            if ((Input.isShiftDown || Input.isControlDown) && isPaused) {
-                // scrubbing
-                editorTime = getTimeAt(x)
-            } else {
-                // move left/right
-                val dt = dx * dtHalfLength / (width / 2f)
-                centralTime -= dt
-                clampTime()
-            }
+        if (shouldScrub()) {
+            // scrubbing
+            editorTime = getTimeAt(x)
+        } else if (shouldMove()) {
+            // move left/right
+            val dt = dx * dtHalfLength / (width / 2f)
+            centralTime -= dt
+            clampTime()
         }
+        invalidateDrawing()
     }
 
     override fun onMouseWheel(x: Float, y: Float, dx: Float, dy: Float, byMouse: Boolean) {

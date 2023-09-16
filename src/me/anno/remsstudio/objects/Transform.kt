@@ -440,21 +440,16 @@ open class Transform() : Saveable(),
      * stack with camera already included
      * */
     fun draw(stack: Matrix4fArrayList, parentTime: Double, parentColor: Vector4f) {
-
         val time = getLocalTime(parentTime)
         val color = getLocalColor(parentColor, time, tmp0)
-
         draw(stack, time, parentColor, color)
-
     }
 
     fun draw(stack: Matrix4fArrayList, time: Double, parentColor: Vector4f, color: Vector4f) {
-
         if (color.w > minAlpha && visibility.isVisible) {
             applyTransformLT(stack, time)
             drawDirectly(stack, time, parentColor, color)
         }
-
     }
 
     fun drawDirectly(stack: Matrix4fArrayList, time: Double, parentColor: Vector4f, color: Vector4f) {

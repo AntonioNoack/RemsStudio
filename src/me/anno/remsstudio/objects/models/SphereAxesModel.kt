@@ -4,6 +4,7 @@ import me.anno.gpu.buffer.Attribute
 import me.anno.gpu.buffer.StaticBuffer
 import me.anno.maths.Maths.pow
 import org.joml.Vector3f
+import org.lwjgl.opengl.GL11C.GL_LINES
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -27,6 +28,7 @@ object SphereAxesModel {
             attributes,
             vertexCount
         )
+        buffer.drawMode = GL_LINES
 
         fun addAxis(func: (x: Float, y: Float) -> Vector3f) {
             val zero = func(1f, 0f)
@@ -48,23 +50,14 @@ object SphereAxesModel {
         addAxis { x, y -> Vector3f(x, 0f, y) }
 
         // xy yz zx
-        addAxis { x, y -> Vector3f(x, y*s, +y*s) }
-        addAxis { x, y -> Vector3f(x, y*s, -y*s) }
-        addAxis { x, y -> Vector3f(y*s, x, +y*s) }
-        addAxis { x, y -> Vector3f(y*s, x, -y*s) }
-        addAxis { x, y -> Vector3f(y*s, +y*s, x) }
-        addAxis { x, y -> Vector3f(y*s, -y*s, x) }
+        addAxis { x, y -> Vector3f(x, y * s, +y * s) }
+        addAxis { x, y -> Vector3f(x, y * s, -y * s) }
+        addAxis { x, y -> Vector3f(y * s, x, +y * s) }
+        addAxis { x, y -> Vector3f(y * s, x, -y * s) }
+        addAxis { x, y -> Vector3f(y * s, +y * s, x) }
+        addAxis { x, y -> Vector3f(y * s, -y * s, x) }
 
         return buffer
 
     }
-
-    fun destroy(){
-        sphereAxesModels.forEach {
-            if(it.isInitialized()){
-                it.value.destroy()
-            }
-        }
-    }
-
 }

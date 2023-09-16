@@ -158,7 +158,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
     }
 
     fun loadUILayout(file: FileReference): Panel? {
-        println("Trying to load layout from $file")
+        LOGGER.debug("Trying to load layout from {}", file)
         if (!file.exists || file.isDirectory) {
             LOGGER.warn("$file doesn't exist")
             return null
@@ -308,7 +308,9 @@ class Project(var name: String, val file: FileReference) : Saveable() {
     }
 
     companion object {
+
         private val LOGGER = LogManager.getLogger(Project::class)
+
         val MotionBlurType = Type.INT_PLUS.withDefaultValue(8)
         val ShutterPercentageType = Type.FLOAT_PLUS.withDefaultValue(1f)
 

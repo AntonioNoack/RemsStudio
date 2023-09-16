@@ -3,13 +3,11 @@ package me.anno.remsstudio
 import me.anno.config.DefaultConfig
 import me.anno.extensions.ExtensionLoader
 import me.anno.gpu.GFX
-import me.anno.input.Input
 import me.anno.input.Key
 import me.anno.io.config.ConfigBasics
 import me.anno.io.files.InvalidRef
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
-import me.anno.maths.Maths.hasFlag
 import me.anno.remsstudio.RemsStudio.defaultWindowStack
 import me.anno.remsstudio.RemsStudio.project
 import me.anno.remsstudio.RemsStudio.root
@@ -32,7 +30,6 @@ import me.anno.studio.Projects.getRecentProjects
 import me.anno.studio.StudioBase.Companion.instance
 import me.anno.ui.Panel
 import me.anno.ui.base.SpacerPanel
-import me.anno.ui.base.SpyPanel
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.menu.Menu.askName
 import me.anno.ui.base.menu.Menu.msg
@@ -118,9 +115,8 @@ object RemsStudioUILayouts {
         }
         options.addAction(projectTitle, Dict["Load", "ui.top.project.load"]) {
             val name = NameDesc("Load Project", "", "ui.loadProject")
-            val menuStyle = style.getChild("menu")
-            val openRecentProject = welcomeUI.createRecentProjectsUI(RemsStudio, menuStyle, getRecentProjects())
-            val createNewProject = welcomeUI.createNewProjectUI(RemsStudio, menuStyle)
+            val openRecentProject = welcomeUI.createRecentProjectsUI(RemsStudio, style, getRecentProjects())
+            val createNewProject = welcomeUI.createNewProjectUI(RemsStudio, style)
             openMenuByPanels(windowStack, name, listOf(openRecentProject, createNewProject))
         }
 

@@ -19,31 +19,39 @@ class GaussianDistribution(center: Vector4f, size: Vector4f, rotation: Vector4f 
     constructor(center: Vector3f, stdDeviation: Vector3f) : this(Vector4f(center, 0f), Vector4f(stdDeviation, 0f))
 
     override fun nextV1(): Float {
-        return (random.nextGaussian().toFloat() * gaussianScale).transform()
+        return transform(
+            random.nextGaussian().toFloat() * gaussianScale
+        )
     }
 
     override fun nextV2(): Vector2f {
-        return Vector2f(
-            random.nextGaussian().toFloat(),
-            random.nextGaussian().toFloat()
-        ).mul(gaussianScale).transform()
+        return transform(
+            Vector2f(
+                random.nextGaussian().toFloat(),
+                random.nextGaussian().toFloat()
+            ).mul(gaussianScale)
+        )
     }
 
     override fun nextV3(): Vector3f {
-        return Vector3f(
-            random.nextGaussian().toFloat(),
-            random.nextGaussian().toFloat(),
-            random.nextGaussian().toFloat()
-        ).mul(gaussianScale).transform()
+        return transform(
+            Vector3f(
+                random.nextGaussian().toFloat(),
+                random.nextGaussian().toFloat(),
+                random.nextGaussian().toFloat()
+            ).mul(gaussianScale)
+        )
     }
 
     override fun nextV4(): Vector4f {
-        return Vector4f(
-            random.nextGaussian().toFloat(),
-            random.nextGaussian().toFloat(),
-            random.nextGaussian().toFloat(),
-            random.nextGaussian().toFloat()
-        ).mul(gaussianScale).transform()
+        return transform(
+            Vector4f(
+                random.nextGaussian().toFloat(),
+                random.nextGaussian().toFloat(),
+                random.nextGaussian().toFloat(),
+                random.nextGaussian().toFloat()
+            ).mul(gaussianScale)
+        )
     }
 
     override fun drawTransformed(stack: Matrix4fArrayList, color: Vector4f) {

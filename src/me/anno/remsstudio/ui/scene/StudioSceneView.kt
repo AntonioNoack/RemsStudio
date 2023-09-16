@@ -1,6 +1,7 @@
 package me.anno.remsstudio.ui.scene
 
 import me.anno.Engine.deltaTime
+import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.addGPUTask
 import me.anno.gpu.GFXState.renderDefault
@@ -55,7 +56,6 @@ import org.apache.logging.log4j.LogManager
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
-import org.joml.Vector4f
 import java.lang.Math.toDegrees
 import kotlin.math.atan2
 import kotlin.math.max
@@ -432,7 +432,10 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     val old = camera.rotationYXZ[time]
                     val rotationSpeed = -10f
                     if (!isLocked2D) {
-                        camera.rotationYXZ.addKeyframe(time, old + Vector3f(dy * rotationSpeed, dx * rotationSpeed, 0f))
+                        // todo test this
+                        val newRotation = Vector3f(dy * rotationSpeed, dx * rotationSpeed, 0f).add(old)
+                        newRotation.x = clamp(newRotation.x, -90f, +90f)
+                        camera.rotationYXZ.addKeyframe(time, newRotation)
                     } else {
                         // move camera? completely ignore, what is selected
                     }
@@ -440,6 +443,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     invalidateDrawing()
                 }
             }
+
             3 -> {
                 // very slow..., but we can move around with a single finger, so it shouldn't matter...
                 // move the camera around
@@ -479,30 +483,23 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         global2normUI.clear()
         camera.applyTransform(cameraTime, camera2global, global2normUI)
 
-        // val inverse = Matrix4f(global2normUI).invert()
-
-        val global2target = global2target.set(target2global).invert()
+        val global2target = target2global.invert(global2target)
 
         // transforms: global to local
         // ->
         // camera local to global, then global to local
         //      obj   cam
         // v' = G2L * L2G * v
-        val camera2target = camera2target.set(camera2global).mul(global2target)
-        val target2camera = target2camera.set(camera2target).invert()
+        val camera2target = camera2global.mul(global2target, camera2target)
+        val target2camera = camera2target.invert(target2camera)
 
         // where the object is on screen
-        val v0 = target2camera.transform(Vector4f(0f, 0f, 0f, 1f))
-        val targetZonUI = Vector3f(v0.x, v0.y, v0.z)
-        val targetZ = -targetZonUI.z
+        val targetZOnUI = target2camera.getTranslation(Vector3f())
+        val targetZ = -targetZOnUI.z
         val shiftSlowdown = shiftSlowdown
         val speed = shiftSlowdown * 2 * targetZ / height * pow(0.02f, camera.orthographicness[cameraTime])
         val dx = dx0 * speed
         val dy = dy0 * speed
-        val pos1v = camera2target.transform(
-            Vector4f(targetZonUI.x + dx, targetZonUI.y - dy, targetZonUI.z, 1f)
-        )
-        val pos1 = Vector3f(pos1v.x, pos1v.y, pos1v.z)
 
         val delta0 = dx0 - dy0
         val delta = dx - dy
@@ -514,16 +511,20 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                 // depends on FOV, camera and object transform
 
                 val oldPosition = selected.position[localTime]
-                val localDelta = if (isControlDown)
-                    camera2target.transformDirection(Vector3f(0f, 0f, -delta)) * (targetZ / 6)
-                else pos1
+                val localDelta = if (isControlDown) Vector3f(0f, 0f, -delta * targetZ / 6f)
+                else Vector3f(dx, -dy, 0f)
+
+                camera2target.transformDirection(localDelta)
+
                 invalidateDrawing()
+                val newPosition = Vector3f(oldPosition).add(localDelta)
                 RemsStudio.incrementalChange("Move Object") {
-                    selected.position.addKeyframe(localTime, oldPosition.add(localDelta))
+                    selected.position.addKeyframe(localTime, newPosition)
                     invalidateUI(false)
                 }
 
             }
+
             SceneDragMode.SCALE -> {
                 val speed2 = 1f / height
                 val oldScale = selected.scale[localTime]
@@ -544,6 +545,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     invalidateUI(false)
                 }
             }
+
             SceneDragMode.ROTATE -> {
                 // todo transform rotation??? quaternions...
                 val centerX = x + width / 2
@@ -597,17 +599,18 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         }
         // move the camera
         val window = window!!
-        val size = 20f * shiftSlowdown / max(window.width, window.height)
-        val dx0 = dx * size
-        val dy0 = dy * size
-        val scaleFactor = 10f
+        val turnSpeed = DefaultConfig["ui.editor.turnSpeed", -400f] * shiftSlowdown / max(window.width, window.height)
+        val dx0 = dx * turnSpeed
+        val dy0 = dy * turnSpeed
         val camera = camera
         val cameraTime = cameraTime
         val oldRotation = camera.rotationYXZ[cameraTime]
         // if(camera.orthographicness[cameraTime] > 0.5f) scaleFactor = -scaleFactor
         invalidateDrawing()
         RemsStudio.incrementalChange("Turn Camera") {
-            camera.putValue(camera.rotationYXZ, oldRotation.add(dy0 * scaleFactor, dx0 * scaleFactor, 0f), false)
+            val newRotation = Vector3f(oldRotation).add(dy0, dx0, 0f)
+            newRotation.x = clamp(newRotation.x, -90f, 90f)
+            camera.putValue(camera.rotationYXZ, newRotation, false)
             invalidateUI(false)
         }
     }
@@ -634,14 +637,17 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                 mode = SceneDragMode.MOVE
                 invalidateDrawing()
             }
+
             "SetMode(SCALE)" -> {
                 mode = SceneDragMode.SCALE
                 invalidateDrawing()
             }
+
             "SetMode(ROTATE)" -> {
                 mode = SceneDragMode.ROTATE
                 invalidateDrawing()
             }
+
             "Cam0", "ResetCamera" -> {
                 val firstCamera = firstCamera
                 if (firstCamera == null) {
@@ -655,6 +661,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                 }
                 invalidateDrawing()
             }
+
             "Cam5" -> {// switch between orthographic and perspective
                 camera.putValue(camera.orthographicness, 1f - camera.orthographicness[cameraTime], true)
             }
@@ -669,6 +676,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     Vector3f(0f, -15f, 0f)
                 }
             )
+
             "Cam6" -> rotateCamera(
                 if (isShiftDown) {// right
                     Vector3f(0f, 0f, +15f)
@@ -676,6 +684,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     Vector3f(0f, +15f, 0f)
                 }
             )
+
             "Cam8" -> rotateCamera(Vector3f(-15f, 0f, 0f)) // up
             "Cam2" -> rotateCamera(Vector3f(+15f, 0f, 0f)) // down
             "Cam9" -> rotateCamera(Vector3f(0f, 180f, 0f)) // look at back; rotate by 90 degrees on y axis

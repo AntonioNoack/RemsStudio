@@ -19,7 +19,6 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.studio.CommandLines.parseDouble
 import me.anno.studio.CommandLines.parseFloat
 import me.anno.studio.CommandLines.parseInt
-import me.anno.studio.StudioBase
 import me.anno.studio.StudioBase.Companion.workEventTasks
 import me.anno.utils.Sleep.sleepABit
 import me.anno.utils.types.Strings.getImportType
@@ -72,12 +71,22 @@ object RemsCLI {
             return printHelp(options)
         }
 
-        val sceneSource = if (line.hasOption("input")) {
-            readText(line.getOptionValue("input"))
+        val sceneSourceFile = if (line.hasOption("input")) {
+            getReference(line.getOptionValue("input"))
         } else return error("Input needs to be defined")
 
-        // todo find project above scene source
-        val project0 = getReference(sceneSource).getParent() ?: InvalidRef
+        // find project above scene source
+        var project0 = getReference(sceneSourceFile).getParent() ?: InvalidRef
+        var project1 = project0
+        while (true) {
+            project1 = project1.getParent() ?: break
+            if (project1.getChild("config.json").exists &&
+                project1.getChild("tabs.json").exists
+            ) {
+                project0 = project1
+                break
+            }
+        }
 
         val yes = line.hasOption("yes") || line.hasOption("force")
         val no = line.hasOption("no")
@@ -86,7 +95,7 @@ object RemsCLI {
         init()
 
         val scene = try {
-            TextReader.readFirstOrNull<Transform>(sceneSource, project0, true)
+            TextReader.readFirstOrNull<Transform>(sceneSourceFile, project0, true)
                 ?: return error("Could not find scene")
         } catch (e: RuntimeException) {
             e.printStackTrace()
@@ -189,8 +198,7 @@ object RemsCLI {
         }
 
         LOGGER.info("Done")
-
-        StudioBase.shallStop = true
+        Engine.requestShutdown()
 
     }
 

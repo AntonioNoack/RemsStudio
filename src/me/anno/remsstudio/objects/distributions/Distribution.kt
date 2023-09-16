@@ -77,7 +77,7 @@ abstract class Distribution(val displayName: String, val description: String) :
         Grid.drawBuffer(
             stack,
             if (alpha == 1f) color
-            else color.mulAlpha(alpha),
+            else color.mulAlpha(alpha, Vector4f()),
             sphereAxesModels[sphereSubDivision].value
         )
     }

@@ -21,12 +21,13 @@ abstract class CenterSizeDistribution(
         center, scale, rotation
     )
 
-    fun Float.transform() = this * scale.x + center.x
-    fun Vector2f.transform(): Vector2f = rotate(this.mul(Vector2f(scale.x, scale.y))).add(center.x, center.y)
-    fun Vector3f.transform(): Vector3f =
-        rotate(this.mul(Vector3f(scale.x, scale.y, scale.z))).add(center.x, center.y, center.z)
-
-    fun Vector4f.transform(): Vector4f = rotate(this.mul(scale)).add(center)
+    fun transform(v: Float) =
+        v * scale.x + center.x
+    fun transform(v: Vector2f): Vector2f =
+        rotate(v.mul(Vector2f(scale.x, scale.y))).add(center.x, center.y)
+    fun transform(v: Vector3f): Vector3f =
+        rotate(v.mul(Vector3f(scale.x, scale.y, scale.z))).add(center.x, center.y, center.z)
+    fun transform(v: Vector4f): Vector4f = rotate(v.mul(scale)).add(center)
 
     fun rotate(vector: Vector2f): Vector2f {
         val angleDegrees = rotation.x + rotation.y + rotation.z
@@ -68,7 +69,7 @@ abstract class CenterSizeDistribution(
     abstract fun drawTransformed(stack: Matrix4fArrayList, color: Vector4f)
 
     override fun nextV1(): Float {
-        return (random.nextFloat() - 0.5f).transform()
+        return transform(random.nextFloat() - 0.5f)
     }
 
     override fun listProperties(): List<InspectableVector> {

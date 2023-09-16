@@ -77,7 +77,7 @@ object Selection {
         }
 
         if (same(transforms, selectedTransforms) && same(properties0, selectedProperties)) return
-        val newName = if (properties0 == null || properties0.isEmpty() || properties0[0] == null) null
+        val newName = if (properties0.isNullOrEmpty() || properties0[0] == null) null
         else PropertyFinder.getName(transforms[0], properties0[0]!!)
         val propName = newName ?: selectedPropName
 
@@ -115,6 +115,7 @@ object Selection {
                 selectedProperties = properties
                 selectedTransforms = transforms
             }
+            invalidateUI(true)
         }
     }
 
@@ -152,7 +153,6 @@ object Selection {
             }
 
             invalidateUI(true)
-
             needsUpdate = false
 
         }

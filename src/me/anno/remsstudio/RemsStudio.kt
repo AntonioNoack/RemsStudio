@@ -46,10 +46,14 @@ import me.anno.utils.OS
 // todo bugs:
 //  - sometimes delete-key isn't registered as such
 
+// todo check all features for the next release
+
 
 // todo isolate and remove certain frequencies from audio
 // todo visualize audio frequency, always!!!, from 25Hz to 48kHz
 // inspiration: https://www.youtube.com/watch?v=RA5UiLYWdbM
+
+// todo show loudness of audio based on perceived amplitude, instead of real amplitude
 
 // todo scripting?...
 // todo gizmos
@@ -341,7 +345,10 @@ object RemsStudio : StudioBase("Rem's Studio", 10200, true) {
     @JvmStatic
     fun main(args: Array<String>) {
 
-        // todo integration-test scene with ALL rendering/playback features
+        // to do integration-test scene with ALL rendering/playback features
+        // -> Example Project
+        // todo publish that project, and write an article for it
+        // todo publish example projects for all wiki pages?
 
         Build.isDebug = false
         Build.isShipped = true

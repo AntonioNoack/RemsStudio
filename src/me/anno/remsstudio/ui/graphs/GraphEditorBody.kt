@@ -290,6 +290,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                         }
                     }
                 }
+
                 else -> {
                     // ...
                 }
@@ -368,6 +369,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                         }
                     }
                 }
+
                 else -> {
                     // ...
                 }
@@ -629,6 +631,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                     }
                 }
             }
+
             else -> return super.onGotAction(x, y, dx, dy, action, isContinuous)
         }
         return true
@@ -652,6 +655,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                             is Vector2f, is Vector3f, is Vector4f,
                             is Vector2d, is Vector3d, is Vector4d,
                             is Quaternionf, is Quaterniond -> true
+
                             else -> false
                         }
                     ) {
@@ -671,19 +675,17 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             }
             invalidateDrawing()
         } else {
-            if (Key.BUTTON_LEFT in mouseKeysDown) {
-                if ((isShiftDown || isControlDown) && isPaused) {
-                    // scrubbing
-                    editorTime = getTimeAt(x)
-                } else {
-                    // move left/right/up/down
-                    centralTime -= dx * dtHalfLength / (width / 2f)
-                    centralValue += dy * dvHalfHeight / (height / 2f)
-                    clampTime()
-                    clampValues()
-                }
-                invalidateDrawing()
+            if (shouldScrub()) {
+                // scrubbing
+                editorTime = getTimeAt(x)
+            } else if (shouldMove()) {
+                // move left/right/up/down
+                centralTime -= dx * dtHalfLength / (width / 2f)
+                centralValue += dy * dvHalfHeight / (height / 2f)
+                clampTime()
+                clampValues()
             }
+            invalidateDrawing()
         }
     }
 
@@ -768,8 +770,8 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
     }
 
     override fun onMouseClicked(x: Float, y: Float, button: Key, long: Boolean) {
-        when {
-            button == Key.BUTTON_RIGHT -> {
+        when (button) {
+            Key.BUTTON_RIGHT -> {
                 if (selectedKeyframes.isEmpty()) {
                     super.onMouseClicked(x, y, button, long)
                 } else {
@@ -785,6 +787,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                         })
                 }
             }
+
             else -> super.onMouseClicked(x, y, button, long)
         }
     }
@@ -798,6 +801,15 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             2f, 5f, 10f, 15f, 30f, 45f,
             90f, 120f, 180f, 360f, 720f
         )
+
+        fun shouldScrub(): Boolean {
+            return (Key.BUTTON_LEFT in mouseKeysDown || Key.BUTTON_RIGHT in mouseKeysDown) &&
+                    ((isShiftDown || isControlDown) == (Key.BUTTON_LEFT in mouseKeysDown)) && isPaused
+        }
+
+        fun shouldMove(): Boolean {
+            return (Key.BUTTON_LEFT in mouseKeysDown || Key.BUTTON_RIGHT in mouseKeysDown) && !shouldScrub()
+        }
     }
 
 }

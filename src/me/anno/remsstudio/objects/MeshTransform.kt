@@ -3,15 +3,20 @@ package me.anno.remsstudio.objects
 import me.anno.config.DefaultConfig
 import me.anno.ecs.Entity
 import me.anno.ecs.components.anim.*
+import me.anno.ecs.components.anim.BoneData.uploadJointMatrices
 import me.anno.ecs.components.mesh.MaterialCache
 import me.anno.ecs.components.mesh.Mesh
 import me.anno.ecs.components.mesh.MeshComponentBase
 import me.anno.ecs.prefab.PrefabCache
+import me.anno.engine.ui.render.ECSShaderLib
+import me.anno.engine.ui.render.Renderers.previewRenderer
 import me.anno.gpu.GFX
+import me.anno.gpu.GFXState
 import me.anno.gpu.drawing.GFXx3D
+import me.anno.gpu.shader.Renderer
 import me.anno.gpu.shader.Shader
-import me.anno.gpu.shader.ShaderLib
 import me.anno.gpu.texture.ITexture2D
+import me.anno.gpu.texture.TextureLib.whiteTexture
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
@@ -22,7 +27,7 @@ import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.fract
 import me.anno.mesh.MeshData
 import me.anno.mesh.MeshUtils
-import me.anno.mesh.assimp.AnimGameItem
+import me.anno.mesh.MeshUtils.getScaleFromAABB
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.studio.Inspectable
@@ -53,6 +58,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
 
     var centerMesh = true
     var normalizeScale = true
+    var lastAnimations: Map<String, Animation>? = null
 
     // for the start it is nice to be able to import meshes like a torus into the engine :)
 
@@ -62,8 +68,19 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         val file = file
         val data = PrefabCache[file]?.getSampleInstance()
         if (data is Entity) {
-            lastWarning = null
-            lastModel = draw(data, stack, time, color)
+            if (GFXState.currentRenderer != Renderer.idRenderer && GFXState.currentRenderer != Renderer.randomIdRenderer) {
+                GFXState.useFrame(previewRenderer) {
+                    GFXState.animated.use(true) {
+                        lastWarning = null
+                        lastAnimations = draw(data, stack, time, color)
+                    }
+                }
+            } else {
+                GFXState.animated.use(true) {
+                    lastWarning = null
+                    lastAnimations = draw(data, stack, time, color)
+                }
+            }
         } else {
             lastWarning = if (file.exists) data?.className ?: "Model loading?" else "File missing"
             super.onDraw(stack, time, color)
@@ -85,19 +102,24 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         return result
     }
 
-    private fun draw(entity: Entity, cameraMatrix: Matrix4fArrayList, time: Double, color: Vector4f): AnimGameItem {
+    private fun draw(
+        entity: Entity,
+        cameraMatrix: Matrix4fArrayList,
+        time: Double,
+        color: Vector4f
+    ): Map<String, Animation> {
 
         val animationName = animation[time]
 
         val drawSkeletons = !GFX.isFinalRendering
-        val baseShader = ShaderLib.shaderAssimp
-        val shader = baseShader.value
+        val shader = ECSShaderLib.pbrModelShader.value
         shader.use()
+        whiteTexture.bindTrulyNearest(shader, "reflectionPlane")
         GFXx3D.shader3DUniforms(shader, cameraMatrix, color)
         uploadAttractors(shader, time)
 
-        val model0 = AnimGameItem(entity, findAnimations(entity))
-        val animation = model0.animations[animationName]
+        val animations = findAnimations(entity)
+        val animation = animations[animationName]
         var animTexture: ITexture2D? = null
         if (animation != null) {
             if (AnimTexture.useAnimTextures) {
@@ -122,7 +144,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                     shader.v1b("hasAnimation", true)
                 }
             } else {
-                val skinningMatrices = model0.uploadJointMatrices(shader, animation, time)
+                val skinningMatrices = uploadJointMatrices(shader, animation, time)
                 shader.v1b("hasAnimation", skinningMatrices != null)
             }
         }
@@ -130,12 +152,14 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         val localTransform = Matrix4x3fArrayList()
 
         if (normalizeScale) {
-            val scale = AnimGameItem.getScaleFromAABB(model0.staticAABB.value)
+            entity.validateAABBs()
+            val scale = getScaleFromAABB(entity.aabb)
             localTransform.scale(scale)
         }
 
         if (centerMesh) {
-            MeshUtils.centerMesh(this, cameraMatrix, localTransform, model0)
+            entity.validateAABBs()
+            MeshUtils.centerStackFromAABB(localTransform, entity.aabb)
         }
 
         GFXx3D.transformUniform(shader, cameraMatrix)
@@ -152,15 +176,13 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             localTransform,
             localTransform0,
             color,
-            model0.hierarchy,
+            entity,
             drawSkeletons,
             animTexture
         )
 
         // todo line mode: draw every mesh as lines
-        // todo draw non-indexed as lines: use an index buffer
-        // todo draw indexed as lines: use a geometry shader, which converts 3 vertices into 3 lines
-        return model0
+        return animations
 
     }
 
@@ -205,8 +227,8 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             }
 
             shader.v1f("worldScale", 1f) // correct?
-            GFX.shaderColor(shader, "tint", -1)
-
+            // todo tint is not working (needed for blending in for example)
+            GFX.shaderColor(shader, "tint", color)
 
             entity.anyComponent(MeshComponentBase::class) { comp ->
                 val mesh = comp.getMesh()
@@ -215,7 +237,6 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                     mesh.ensureBuffer()
                     val materialOverrides = comp.materials
                     val materials = mesh.materials
-                    // LOGGER.info("drawing mesh with material $materialOverrides x $materials")
                     for (index in 0 until mesh.numMaterials) {
                         val m0 = materialOverrides.getOrNull(index)?.nullIfUndefined()
                         val m1 = m0 ?: materials.getOrNull(index)
@@ -254,8 +275,6 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
     }
 
 
-    var lastModel: AnimGameItem? = null
-
     override fun createInspector(
         inspected: List<Inspectable>,
         list: PanelListY,
@@ -280,11 +299,10 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         // the list of available animations depends on the model
         // but still, it's like an enum: only a certain set of animations is available
         // and the user wouldn't know perfectly which
-        val map = HashMap<AnimGameItem?, Panel>()
+        val map = HashMap<Map<String, Animation>?, Panel>()
         list += UpdatingContainer(100, {
-            map.getOrPut(lastModel) {
-                val model = lastModel
-                val animations = model?.animations
+            val animations = lastAnimations
+            map.getOrPut(animations) {
                 if (!animations.isNullOrEmpty()) {
                     var currentValue = animation[lastLocalTime]
                     val noAnimName = "No animation"

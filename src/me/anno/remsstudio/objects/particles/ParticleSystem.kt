@@ -292,7 +292,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
         val fadeIn = fadeIn[time].toDouble()
         val fadeOut = fadeOut[time].toDouble()
         val simulationStep = simulationStep
-        particles.forEach { p ->
+        for (p in particles) {
             p.draw(stack, time, color, simulationStep, fadeIn, fadeOut)
         }
     }
@@ -370,9 +370,17 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
 
         val general = getGroup("Particle System", "", "particles")
 
-        general += vis(inspected,c, "Spawn Rate", "How many particles are spawned per second", "", c.map { it.spawnRate }, style)
+        general += vis(
+            inspected,
+            c,
+            "Spawn Rate",
+            "How many particles are spawned per second",
+            "",
+            c.map { it.spawnRate },
+            style
+        )
         general += vi(
-            inspected,"Simulation Step",
+            inspected, "Simulation Step",
             "Larger values are faster, while smaller values are more accurate for forces",
             Type.DOUBLE, simulationStep, style
         ) {
@@ -387,7 +395,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
             .setChangeListener { for (x in c) x.showChildren = it }
             .setIsSelectedListener { show(inspected.filterIsInstance<Transform>(), null) }
 
-        general += vi(inspected,"Seed", "The seed for all randomness", null, seed, style) {
+        general += vi(inspected, "Seed", "The seed for all randomness", null, seed, style) {
             for (x in c) x.seed = it
             clearCache()
         }
@@ -497,7 +505,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
                 { CuboidDistribution() },
                 { CuboidHullDistribution() },
                 { SphereVolumeDistribution() },
-                { SphereHullDistribution() }
+                { SphereHullDistribution() },
             )
         }
     }

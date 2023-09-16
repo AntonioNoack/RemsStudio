@@ -1,6 +1,6 @@
 package me.anno.remsstudio.objects.geometric
 
-import me.anno.cache.instances.OldMeshCache
+import me.anno.cache.CacheSection
 import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX
 import me.anno.gpu.buffer.Attribute
@@ -190,6 +190,8 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
 
     companion object {
 
+        val PolygonCache = CacheSection("PolygonCache")
+
         val sqrt2 = sqrt(2f)
         val meshTimeout = 1000L
         private const val minEdges = 3
@@ -198,7 +200,7 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
         fun getBuffer(n: Int, hasDepth: Boolean): StaticBuffer {
             if (n < minEdges) return getBuffer(minEdges, hasDepth)
             if (n > maxEdges) return getBuffer(maxEdges, hasDepth)
-            return OldMeshCache.getEntry(
+            return PolygonCache.getEntry(
                 n * 2 + (if (hasDepth) 1 else 0),
                 meshTimeout, false
             ) {

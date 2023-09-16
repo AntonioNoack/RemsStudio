@@ -6,7 +6,7 @@ import me.anno.audio.openal.AudioManager
 import me.anno.audio.openal.AudioTasks
 import me.anno.cache.data.ImageData.Companion.imageTimeout
 import me.anno.cache.data.VideoData.Companion.framesPerContainer
-import me.anno.cache.instances.OldMeshCache
+import me.anno.cache.instances.SVGMeshCache
 import me.anno.cache.instances.VideoCache.getVideoFrame
 import me.anno.cache.instances.VideoCache.getVideoFrameWithoutGenerator
 import me.anno.config.DefaultConfig
@@ -141,7 +141,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
 
     var lastFile: FileReference? = null
     var lastMeta: FFMPEGMetadata? = null
-    var lastDuration = 10.0
+    var lastDuration = Double.POSITIVE_INFINITY
 
     var imageSequenceMeta: ImageSequenceMeta? = null
     val imSeqExampleMeta get() = imageSequenceMeta?.matches?.firstOrNull()?.first?.run { getMeta(this, true) }
@@ -195,6 +195,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
             when (type) {
                 VideoType.IMAGE_SEQUENCE -> imageSequenceMeta?.duration
                 VideoType.IMAGE -> Double.POSITIVE_INFINITY
+                VideoType.UNKNOWN -> Double.POSITIVE_INFINITY
                 else -> meta?.duration
             } ?: Double.POSITIVE_INFINITY
         }
@@ -297,7 +298,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
 
             val isLooping = isLooping.value
             val duration = meta.duration
-            println("drawing image sequence, setting duration to $duration")
+            LOGGER.debug("drawing image sequence, setting duration to $duration")
             lastDuration = duration
 
             if (time >= 0.0 && (isLooping != LoopingState.PLAY_ONCE || time <= duration)) {
@@ -509,7 +510,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         val ext = file.extension
         return when {
             ext.equals("svg", true) ->
-                OldMeshCache.getSVG(file, imageTimeout, true)
+                SVGMeshCache[file, imageTimeout, true]
             ext.equals("webp", true) || ext.equals("dds", true) ->
                 // calculate required scale? no, without animation, we don't need to scale it down ;)
                 getVideoFrame(file, 1, 0, 1, 1.0, imageTimeout, true)
@@ -520,10 +521,10 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
 
     private fun drawImage(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val file = file
-        val ext = file.extension
+        val ext = file.lcExtension
         when {
-            ext.equals("svg", true) -> {
-                val bufferData = OldMeshCache.getSVG(file, imageTimeout, true)
+            ext == "svg" -> {
+                val bufferData = SVGMeshCache[file, imageTimeout, true]
                 if (bufferData == null) onMissingImageOrFrame(0)
                 else {
                     GFXxSVGv2.draw3DSVG(

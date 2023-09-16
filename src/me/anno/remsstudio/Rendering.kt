@@ -124,7 +124,7 @@ object Rendering {
                 override fun formatText(): String {
                     val progress = progress.toInt()
                     val total = total.toInt()
-                    return "$progress / $total $unit"
+                    return "$name: $progress / $total $unit"
                 }
             }
         )
@@ -237,7 +237,11 @@ object Rendering {
             // if empty, skip?
             LOGGER.info("Found ${audioSources.size} audio sources")
 
-            val progress = GFX.someWindow?.addProgressBar("Audio Override", "Samples", duration * sampleRate)
+            val progress = GFX.someWindow?.addProgressBar(object: ProgressBar("Audio Override", "Samples", duration * sampleRate){
+                override fun formatText(): String {
+                    return "$name: ${progress.toLong()} / ${total.toLong()} $unit"
+                }
+            })
             AudioCreatorV2(scene, findCamera(scene), audioSources, duration, sampleRate, progress).apply {
                 onFinished = {
                     isRendering = false
@@ -274,7 +278,11 @@ object Rendering {
 
         // todo if is empty, send a warning instead of doing something
 
-        val progress = GFX.someWindow?.addProgressBar("Audio Export", "Samples", duration * sampleRate)
+        val progress = GFX.someWindow?.addProgressBar(object: ProgressBar("Audio Export", "Samples", duration * sampleRate){
+            override fun formatText(): String {
+                return "$name: ${progress.toLong()} / ${total.toLong()} $unit"
+            }
+        })
         AudioCreatorV2(scene, findCamera(scene), audioSources, duration, sampleRate, progress).apply {
             onFinished = {
                 isRendering = false
@@ -282,7 +290,7 @@ object Rendering {
                 callback()
             }
             thread(name = "Rendering::renderAudio()") {
-                createOrAppendAudio(targetOutputFile, null, false)
+                createOrAppendAudio(targetOutputFile, InvalidRef, false)
             }
         }
 
