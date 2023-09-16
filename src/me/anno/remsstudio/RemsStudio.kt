@@ -45,6 +45,7 @@ import me.anno.utils.OS
 
 // todo bugs:
 //  - sometimes delete-key isn't registered as such
+//  - new files, like with 0 bytes, cannot be right clicked in file explorer
 
 // todo check all features for the next release
 
@@ -109,7 +110,7 @@ import me.anno.utils.OS
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
-object RemsStudio : StudioBase("Rem's Studio", 10200, true) {
+object RemsStudio : StudioBase("Rem's Studio", 10201, true) {
 
     val defaultWindowStack get() = GFX.someWindow!!.windowStack
     var hideUnusedProperties = false
