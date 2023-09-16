@@ -42,6 +42,7 @@ import me.anno.ui.editor.WelcomeUI
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.style.Style
 import me.anno.utils.OS
+import kotlin.math.min
 
 // todo bugs:
 //  - sometimes delete-key isn't registered as such
@@ -258,7 +259,7 @@ object RemsStudio : StudioBase("Rem's Studio", 10201, true) {
     val targetHeight get(): Int = project?.targetHeight ?: GFX.someWindow!!.height
     val targetOutputFile get(): FileReference = project!!.targetOutputFile
     val motionBlurSteps get(): AnimatedProperty<Int> = project!!.motionBlurSteps
-    val targetSamples get(): Int = project?.targetSamples ?: 1
+    val targetSamples get(): Int = project?.targetSamples ?: min(GFX.maxSamples, 8)
     val shutterPercentage get() = project!!.shutterPercentage
     val history get() = currentTab?.history
     val nullCamera get() = project?.nullCamera

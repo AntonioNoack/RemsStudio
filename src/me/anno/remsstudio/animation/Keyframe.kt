@@ -64,7 +64,7 @@ class Keyframe<V>(var time: Double, var value: V, var interpolation: Interpolati
     @Suppress("useless_cast")
     fun setValue(index: Int, v: Float, type: Type) {
         @Suppress("unchecked_cast")
-        value = type.clamp(
+        val tmp: Any= type.clamp(
             when (val value = value) {
                 is Int -> v.toInt()
                 is Long -> v.toLong()
@@ -93,8 +93,9 @@ class Keyframe<V>(var time: Double, var value: V, var interpolation: Interpolati
                 }
                 is String -> v as Any
                 else -> throw RuntimeException("todo implement Keyframe.getValue(index) for $value")
-            } as V
+            }
         )
+        value = tmp as V
     }
 
     companion object {
