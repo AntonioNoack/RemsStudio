@@ -8,7 +8,7 @@ import me.anno.remsstudio.objects.inspectable.InspectableVector
 import me.anno.remsstudio.objects.models.SphereAxesModel.sphereAxesModels
 import me.anno.ui.base.groups.PanelList
 import me.anno.ui.editor.sceneView.Grid
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector3f

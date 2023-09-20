@@ -10,7 +10,7 @@ import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.TextInput
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import me.anno.utils.structures.lists.CountingList
 import kotlin.math.PI
 import kotlin.math.sin

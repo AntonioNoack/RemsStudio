@@ -29,7 +29,7 @@ import me.anno.ui.input.EnumInput
 import me.anno.ui.input.FileInput
 import me.anno.ui.input.FloatInput
 import me.anno.ui.input.IntInput
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import me.anno.utils.Color.black
 import me.anno.utils.process.DelayedTask
 import me.anno.video.ffmpeg.FFMPEGEncodingBalance

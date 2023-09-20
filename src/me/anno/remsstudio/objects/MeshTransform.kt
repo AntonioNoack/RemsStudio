@@ -37,7 +37,7 @@ import me.anno.ui.base.groups.UpdatingContainer
 import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.EnumInput
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.pooling.JomlPools
 import org.joml.*
@@ -147,6 +147,8 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                 val skinningMatrices = uploadJointMatrices(shader, animation, time)
                 shader.v1b("hasAnimation", skinningMatrices != null)
             }
+        } else {
+            shader.v1b("hasAnimation", false)
         }
 
         val localTransform = Matrix4x3fArrayList()
@@ -162,19 +164,10 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             MeshUtils.centerStackFromAABB(localTransform, entity.aabb)
         }
 
-        GFXx3D.transformUniform(shader, cameraMatrix)
-
-        val cameraXPreGlobal = Matrix4f()
-        cameraXPreGlobal.set(cameraMatrix)
-            .mul(localTransform)
-
-        val localTransform0 = Matrix4x3f(localTransform)
         drawHierarchy(
             shader,
             cameraMatrix,
-            cameraXPreGlobal,
             localTransform,
-            localTransform0,
             color,
             entity,
             drawSkeletons,
@@ -189,10 +182,8 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
     @Suppress("MemberVisibilityCanBePrivate")
     fun drawHierarchy(
         shader: Shader,
-        cameraMatrix: Matrix4f,
-        cameraXPreGlobal: Matrix4f,
+        cameraTransform: Matrix4f,
         localTransform: Matrix4x3fArrayList,
-        localTransform0: Matrix4x3f,
         color: Vector4f,
         entity: Entity,
         drawSkeletons: Boolean,
@@ -218,6 +209,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         if (entity.hasComponent(MeshComponentBase::class)) {
 
             shader.use()
+            shader.m4x4("transform", cameraTransform)
             shader.m4x3("localTransform", localTransform)
 
             if (shader["invLocalTransform"] >= 0) {
@@ -251,8 +243,6 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             }
         }
 
-        ThumbsExt.finishLines(cameraXPreGlobal)
-
         // todo implement
         /*if (drawSkeletons) {
             val animMeshRenderer = entity.getComponent(AnimRenderer::class, false)
@@ -266,7 +256,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         val children = entity.children
         for (i in children.indices) {
             drawHierarchy(
-                shader, cameraMatrix, cameraXPreGlobal, localTransform, localTransform0,
+                shader, cameraTransform, localTransform,
                 color, children[i], drawSkeletons, animTexture
             )
         }

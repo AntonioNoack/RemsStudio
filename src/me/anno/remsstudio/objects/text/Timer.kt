@@ -8,7 +8,7 @@ import me.anno.studio.Inspectable
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.TextInputML
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import org.joml.Matrix4fArrayList
 import org.joml.Vector4f
 import java.net.URL

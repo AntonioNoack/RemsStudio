@@ -8,7 +8,7 @@ import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.FloatInput
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 
 class RhythmDriver : AnimationDriver() {
 

@@ -1,7 +1,6 @@
 package me.anno.remsstudio
 
 import me.anno.Build
-import me.anno.Engine
 import me.anno.Engine.deltaTime
 import me.anno.Engine.gameTime
 import me.anno.audio.openal.ALBase
@@ -10,7 +9,6 @@ import me.anno.audio.openal.AudioTasks
 import me.anno.cache.instances.PDFPlugin
 import me.anno.config.DefaultConfig
 import me.anno.config.DefaultStyle.baseTheme
-import me.anno.ecs.prefab.PrefabCache
 import me.anno.extensions.ExtensionLoader
 import me.anno.gpu.GFX
 import me.anno.gpu.OSWindow
@@ -40,7 +38,7 @@ import me.anno.ui.base.groups.PanelStack
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.WelcomeUI
 import me.anno.ui.editor.files.FileContentImporter
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import me.anno.utils.OS
 import kotlin.math.min
 
@@ -48,8 +46,8 @@ import kotlin.math.min
 //  - sometimes delete-key isn't registered as such
 //  - new files, like with 0 bytes, cannot be right clicked in file explorer
 
-// todo check all features for the next release
-
+// todo use reflectionMap for mesh rendering where available
+//       - option to bake it around the mesh?
 
 // todo isolate and remove certain frequencies from audio
 // todo visualize audio frequency, always!!!, from 25Hz to 48kHz

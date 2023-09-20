@@ -7,7 +7,7 @@ import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelList
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.scrolling.ScrollPanelX
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 
 class GraphEditor(style: Style) : PanelListY(style) {
 

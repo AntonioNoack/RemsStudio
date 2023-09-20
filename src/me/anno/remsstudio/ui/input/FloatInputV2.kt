@@ -5,7 +5,7 @@ import me.anno.input.Key
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.ui.input.components.NumberInputComponentV2
 import me.anno.ui.input.FloatInput
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import me.anno.utils.types.AnyToDouble
 import me.anno.utils.types.AnyToFloat
 import org.joml.*

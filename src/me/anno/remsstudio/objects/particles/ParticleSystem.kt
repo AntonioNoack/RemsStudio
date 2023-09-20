@@ -30,7 +30,7 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.files.FileExplorerEntry.Companion.drawLoadingCircle
 import me.anno.ui.editor.stacked.Option
 import me.anno.ui.input.BooleanInput
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import me.anno.utils.hpc.HeavyProcessing.processBalanced
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe

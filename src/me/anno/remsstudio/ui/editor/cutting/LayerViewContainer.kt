@@ -5,7 +5,7 @@ import me.anno.ui.base.components.Padding
 import me.anno.ui.base.constraints.AxisAlignment
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.scrolling.ScrollPanelY
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 
 class LayerViewContainer(style: Style) : ScrollPanelY(Padding(0), AxisAlignment.MIN, style) {
 

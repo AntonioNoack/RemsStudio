@@ -39,7 +39,7 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.stacked.Option
 import me.anno.ui.input.TextInput
 import me.anno.ui.input.TextInputML
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import me.anno.utils.Color.mulARGB
 import me.anno.utils.structures.Hierarchical
 import me.anno.utils.structures.ValueWithDefault

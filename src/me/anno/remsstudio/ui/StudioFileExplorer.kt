@@ -6,7 +6,7 @@ import me.anno.remsstudio.ui.sceneTabs.SceneTabs
 import me.anno.ui.editor.files.FileExplorer
 import me.anno.ui.editor.files.FileExplorerOption
 import me.anno.ui.editor.files.toAllowedFilename
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import me.anno.utils.files.Files
 
 class StudioFileExplorer(file: FileReference?, style: Style) : FileExplorer(file, style) {

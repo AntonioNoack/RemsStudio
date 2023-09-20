@@ -48,7 +48,7 @@ import me.anno.ui.base.groups.PanelList
 import me.anno.ui.custom.CustomContainer
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.files.FileContentImporter
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import me.anno.utils.Color.black
 import me.anno.utils.types.Booleans.toInt
 import me.anno.utils.types.Floats.toRadians
@@ -134,11 +134,9 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             controls += SimplePanel(
                 object : TextButton(mode.displayName, true, style) {
                     override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
-                        draw(x0, y0, x1, y1, isHovered, mouseDown || mode == this@StudioSceneView.mode)
+                        draw(x0, y0, x1, y1, isHovered, isPressed || mode == this@StudioSceneView.mode)
                     }
-                }.apply {
-                    setTooltip(mode.description)
-                },
+                }.setTooltip(mode.description),
                 true, true,
                 pad * 2 + iconSize * (i + 1), pad,
                 iconSize

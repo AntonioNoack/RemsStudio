@@ -14,7 +14,7 @@ import me.anno.remsstudio.ui.input.IntInputV2
 import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.input.*
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import me.anno.utils.Color.toHexColor
 import me.anno.utils.Color.toVecRGBA
 import me.anno.utils.structures.ValueWithDefault

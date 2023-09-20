@@ -8,7 +8,7 @@ import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListX
 import me.anno.ui.base.menu.Menu
 import me.anno.ui.input.FloatInput
-import me.anno.ui.utils.WindowStack
+import me.anno.ui.WindowStack
 import kotlin.concurrent.thread
 
 object MenuUtils {

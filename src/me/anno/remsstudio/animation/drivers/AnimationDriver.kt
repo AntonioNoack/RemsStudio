@@ -18,8 +18,8 @@ import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.style.Style
-import me.anno.ui.utils.WindowStack
+import me.anno.ui.Style
+import me.anno.ui.WindowStack
 import org.joml.Vector2d
 import org.joml.Vector3d
 import org.joml.Vector4d

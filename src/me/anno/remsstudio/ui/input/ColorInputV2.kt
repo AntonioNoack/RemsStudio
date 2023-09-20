@@ -4,7 +4,7 @@ import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.ui.input.ColorInput
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import org.joml.Vector4f
 
 class ColorInputV2(

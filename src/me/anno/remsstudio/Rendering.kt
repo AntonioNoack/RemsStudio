@@ -121,7 +121,7 @@ object Rendering {
         val progress = GFX.someWindow?.addProgressBar(
             object: ProgressBar("Rendering", "Frames",
                 totalFrameCount.toDouble()){
-                override fun formatText(): String {
+                override fun formatProgress(): String {
                     val progress = progress.toInt()
                     val total = total.toInt()
                     return "$name: $progress / $total $unit"
@@ -238,7 +238,7 @@ object Rendering {
             LOGGER.info("Found ${audioSources.size} audio sources")
 
             val progress = GFX.someWindow?.addProgressBar(object: ProgressBar("Audio Override", "Samples", duration * sampleRate){
-                override fun formatText(): String {
+                override fun formatProgress(): String {
                     return "$name: ${progress.toLong()} / ${total.toLong()} $unit"
                 }
             })
@@ -279,7 +279,7 @@ object Rendering {
         // todo if is empty, send a warning instead of doing something
 
         val progress = GFX.someWindow?.addProgressBar(object: ProgressBar("Audio Export", "Samples", duration * sampleRate){
-            override fun formatText(): String {
+            override fun formatProgress(): String {
                 return "$name: ${progress.toLong()} / ${total.toLong()} $unit"
             }
         })

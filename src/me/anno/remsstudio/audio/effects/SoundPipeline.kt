@@ -16,7 +16,7 @@ import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.stacked.Option
 import me.anno.ui.editor.stacked.StackPanel
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import org.jtransforms.fft.FloatFFT_1D
 
 class SoundPipeline() : Saveable(), Inspectable {

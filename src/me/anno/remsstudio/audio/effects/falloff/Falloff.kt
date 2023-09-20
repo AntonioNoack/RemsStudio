@@ -12,7 +12,7 @@ import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import org.joml.Vector3f
 
 abstract class Falloff : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {

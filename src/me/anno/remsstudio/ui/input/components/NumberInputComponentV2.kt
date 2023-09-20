@@ -10,7 +10,7 @@ import me.anno.ui.input.FloatInput
 import me.anno.ui.input.IntInput
 import me.anno.ui.input.NumberInput
 import me.anno.ui.input.components.NumberInputComponent
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import me.anno.utils.types.AnyToDouble
 
 class NumberInputComponentV2(

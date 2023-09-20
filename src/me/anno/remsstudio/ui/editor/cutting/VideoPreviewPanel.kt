@@ -3,7 +3,7 @@ package me.anno.remsstudio.ui.editor.cutting
 import me.anno.gpu.drawing.DrawGradients
 import me.anno.remsstudio.objects.Video
 import me.anno.ui.Panel
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import org.joml.Vector4f
 
 // todo why is this flickering, when moving the mouse???...

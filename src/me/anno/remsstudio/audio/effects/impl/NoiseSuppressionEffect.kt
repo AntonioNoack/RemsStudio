@@ -17,7 +17,7 @@ import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.FloatInput
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import me.anno.utils.LOGGER
 import me.anno.video.ffmpeg.FFMPEGStream.Companion.getAudioSequence
 import kotlin.concurrent.thread

@@ -14,7 +14,7 @@ import me.anno.remsstudio.RemsStudio.hoveredPanel
 import me.anno.remsstudio.objects.modes.TransformVisibility
 import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.studio.StudioBase
-import me.anno.ui.utils.WindowStack.Companion.printLayout
+import me.anno.ui.WindowStack.Companion.printLayout
 import kotlin.math.round
 
 object StudioActions {

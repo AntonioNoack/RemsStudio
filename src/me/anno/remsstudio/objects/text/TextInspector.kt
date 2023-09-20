@@ -11,7 +11,7 @@ import me.anno.ui.editor.FontListMenu.createFontInput
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.color.spaces.HSLuv
 import me.anno.ui.input.BooleanInput
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import org.joml.Vector3f
 import org.joml.Vector4f
 

@@ -5,7 +5,7 @@ import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 
 object ColorGrading {
 

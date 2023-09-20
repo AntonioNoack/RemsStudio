@@ -35,7 +35,7 @@ import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.dragging.Draggable
 import me.anno.ui.editor.files.FileContentImporter
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import me.anno.utils.Color.white4
 import me.anno.utils.hpc.ProcessingQueue
 import kotlin.math.abs

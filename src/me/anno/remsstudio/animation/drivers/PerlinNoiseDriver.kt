@@ -10,7 +10,7 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import kotlin.math.min
 
 class PerlinNoiseDriver : AnimationDriver() {

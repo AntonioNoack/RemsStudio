@@ -30,7 +30,7 @@ import me.anno.ui.base.constraints.AxisAlignment
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.custom.CustomContainer.Companion.isCross
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import me.anno.utils.Color.black
 import me.anno.utils.Color.mulAlpha
 import me.anno.utils.structures.tuples.Quad

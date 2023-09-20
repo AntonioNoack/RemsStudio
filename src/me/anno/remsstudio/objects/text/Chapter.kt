@@ -10,7 +10,7 @@ import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.base.text.UpdatingTextPanel
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import kotlin.math.max
 import kotlin.math.roundToInt
 

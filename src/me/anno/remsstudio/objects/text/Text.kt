@@ -27,7 +27,7 @@ import me.anno.ui.base.constraints.AxisAlignment
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import me.anno.utils.strings.StringHelper.smallCaps
 import me.anno.utils.structures.tuples.Quad
 import org.joml.Matrix4fArrayList

@@ -8,7 +8,7 @@ import me.anno.parser.SimpleExpressionParser.preparse
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.TextInputML
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import me.anno.utils.structures.lists.CountingList
 
 class FunctionDriver : AnimationDriver() {

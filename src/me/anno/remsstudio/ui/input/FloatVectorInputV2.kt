@@ -8,7 +8,7 @@ import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.studio.StudioBase
 import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.input.FloatVectorInput
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import org.joml.*
 
 class FloatVectorInputV2(

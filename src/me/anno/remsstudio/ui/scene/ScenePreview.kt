@@ -18,7 +18,7 @@ import me.anno.remsstudio.Scene
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.ui.editor.ISceneView
 import me.anno.ui.base.groups.PanelList
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import me.anno.utils.Color.black
 import me.anno.utils.types.Floats.toDegrees
 import org.joml.Vector3f

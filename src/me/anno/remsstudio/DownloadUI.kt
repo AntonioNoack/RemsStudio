@@ -24,8 +24,8 @@ import me.anno.ui.editor.files.toAllowedFilename
 import me.anno.ui.input.EnumInput
 import me.anno.ui.input.FileInput
 import me.anno.ui.input.URLInput
-import me.anno.ui.style.Style
-import me.anno.ui.utils.WindowStack
+import me.anno.ui.Style
+import me.anno.ui.WindowStack
 import me.anno.utils.Color.black
 import me.anno.utils.Color.withAlpha
 import me.anno.utils.OS

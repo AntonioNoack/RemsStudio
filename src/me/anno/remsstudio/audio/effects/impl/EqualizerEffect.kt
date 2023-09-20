@@ -11,7 +11,7 @@ import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.style.Style
+import me.anno.ui.Style
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.mix
 import me.anno.maths.Maths.pow
