@@ -1,18 +1,20 @@
 package me.anno.remsstudio.ui.scene
 
-import me.anno.Engine.deltaTime
+import me.anno.Time.deltaTime
 import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.addGPUTask
 import me.anno.gpu.GFXState.renderDefault
 import me.anno.gpu.drawing.DrawRectangles
 import me.anno.gpu.drawing.DrawRectangles.drawBorder
+import me.anno.gpu.framebuffer.DepthBufferType
 import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.framebuffer.Screenshots
 import me.anno.gpu.framebuffer.StableWindowSize
 import me.anno.gpu.shader.Renderer
 import me.anno.gpu.shader.Renderer.Companion.colorRenderer
 import me.anno.gpu.shader.Renderer.Companion.colorSqRenderer
+import me.anno.gpu.texture.Texture2D.Companion.switchRGB2BGR
 import me.anno.input.Input
 import me.anno.input.Input.isControlDown
 import me.anno.input.Input.isShiftDown
@@ -43,12 +45,12 @@ import me.anno.remsstudio.ui.editor.SimplePanel
 import me.anno.studio.StudioBase.Companion.dragged
 import me.anno.studio.StudioBase.Companion.shiftSlowdown
 import me.anno.ui.Panel
+import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelList
 import me.anno.ui.custom.CustomContainer
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.files.FileContentImporter
-import me.anno.ui.Style
 import me.anno.utils.Color.black
 import me.anno.utils.types.Booleans.toInt
 import me.anno.utils.types.Floats.toRadians
@@ -288,7 +290,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         val camera = camera
         GFX.check()
 
-        val buffer = FBStack["resolveClick", width, height, 4, true, 1, true]
+        val buffer = FBStack["resolveClick", width, height, 4, true, 1, DepthBufferType.INTERNAL]
 
         val diameter = 5
 
@@ -311,7 +313,9 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             Scene.draw(camera, root, dx, dy, width, height, editorTime, false, Renderer.depthRenderer, this)
         }
 
-        /*LOGGER.debug(
+        switchRGB2BGR(idBuffer)
+
+        LOGGER.debug(
             "ResolveClick: " +
                     "[${idBuffer.joinToString { it.toUInt().toString(16) }}], " +
                     "[${depthBuffer.joinToString()}]"
@@ -319,7 +323,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         LOGGER.debug("Available IDs: ${
             root.listOfAll.toList()
                 .joinToString { it.clickId.toUInt().toString(16) }
-        }")*/
+        }")
 
         val bestResult = Screenshots.getClosestId(diameter, idBuffer, depthBuffer)
         // find the transform with the id to select it
@@ -344,7 +348,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
 
     fun parseKeyInput() {
         if (!mayControlCamera) return
-        moveCamera(clamp(deltaTime, 0f, 0.1f))
+        moveCamera(clamp(deltaTime.toFloat(), 0f, 0.1f))
     }
 
     fun moveCamera(dx: Float, dy: Float, dz: Float) {

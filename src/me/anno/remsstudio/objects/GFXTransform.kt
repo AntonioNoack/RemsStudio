@@ -63,10 +63,8 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
     }
 
     fun uploadAttractors(shader: Shader, time: Double) {
-
         uploadUVAttractors(shader, time)
         uploadColorAttractors(shader, time)
-
     }
 
     fun uploadUVAttractors(shader: Shader, time: Double) {

@@ -14,16 +14,16 @@ import me.anno.gpu.GFXState.renderPurely
 import me.anno.gpu.GFXState.useFrame
 import me.anno.gpu.blending.BlendMode
 import me.anno.gpu.drawing.DrawRectangles.drawRect
+import me.anno.gpu.framebuffer.DepthBufferType
 import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.framebuffer.Framebuffer
 import me.anno.gpu.framebuffer.IFramebuffer
-import me.anno.gpu.framebuffer.NullFramebuffer
 import me.anno.gpu.shader.BaseShader
 import me.anno.gpu.shader.GLSLType
 import me.anno.gpu.shader.Renderer
 import me.anno.gpu.shader.Shader
 import me.anno.gpu.shader.ShaderFuncLib.acesToneMapping
-import me.anno.gpu.shader.ShaderFuncLib.noiseFunc
+import me.anno.gpu.shader.ShaderFuncLib.randomGLSL
 import me.anno.gpu.shader.ShaderFuncLib.reinhardToneMapping
 import me.anno.gpu.shader.ShaderFuncLib.uchimuraToneMapping
 import me.anno.gpu.shader.ShaderLib.ascColorDecisionList
@@ -104,7 +104,7 @@ object Scene {
                 Variable(GLSLType.V3F, "finalColor", VariableMode.OUT),
                 Variable(GLSLType.V1F, "finalAlpha", VariableMode.OUT)
             ), "" +
-                    noiseFunc +
+                    randomGLSL +
                     reinhardToneMapping +
                     acesToneMapping +
                     uchimuraToneMapping +
@@ -161,7 +161,7 @@ object Scene {
             "lut", simplestVertexShader, uvList, "" +
                     "uniform sampler2D tex;\n" +
                     "uniform sampler3D lut;\n" +
-                    noiseFunc +
+                    randomGLSL +
                     "void main(){" +
                     "   vec4 c0 = texture(tex, uv);\n" +
                     "   vec3 color = clamp(c0.rgb, 0.0, 1.0);\n" +
@@ -189,8 +189,9 @@ object Scene {
         offset: Int,
         nearest: GPUFiltering,
         samples: Int?
-    ): Framebuffer {
-        val next = FBStack[name, previous.width, previous.height, 4, usesFPBuffers, samples ?: previous.samples, true]
+    ): IFramebuffer {
+        val next = FBStack[name, previous.width, previous.height, 4, usesFPBuffers, samples
+            ?: previous.samples, DepthBufferType.INTERNAL]
         previous.bindTextures(offset, nearest, Clamping.CLAMP)
         return next
     }
@@ -200,8 +201,9 @@ object Scene {
     var lGCTInverted = Matrix4f()
     var usesFPBuffers = false
 
-    val mayUseMSAA get() = if (isFinalRendering) DefaultConfig["rendering.useMSAA", true]
-    else DefaultConfig["ui.editor.useMSAA", gfxSettings.data["ui.editor.useMSAA", true]]
+    val mayUseMSAA
+        get() = if (isFinalRendering) DefaultConfig["rendering.useMSAA", true]
+        else DefaultConfig["ui.editor.useMSAA", gfxSettings.data["ui.editor.useMSAA", true]]
 
     // rendering must be done in sync with the rendering thread (OpenGL limitation) anyways, so one object is enough
     val stack = Matrix4fArrayList()
@@ -275,7 +277,8 @@ object Scene {
         }
 
         var buffer: IFramebuffer =
-            if (needsTemporaryBuffer) FBStack["Scene-Main", w, h, 4, usesFPBuffers, samples, camera.useDepth]
+            if (needsTemporaryBuffer) FBStack["Scene-Main", w, h, 4, usesFPBuffers, samples,
+                if (camera.useDepth) DepthBufferType.INTERNAL else DepthBufferType.NONE]
             else GFXState.currentBuffer
 
         val x = if (needsTemporaryBuffer) 0 else x0

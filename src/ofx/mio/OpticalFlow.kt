@@ -2,13 +2,13 @@ package ofx.mio
 
 import me.anno.gpu.GFX.flat01
 import me.anno.gpu.GFXState.useFrame
-import me.anno.gpu.shader.ShaderLib.createShader
-import me.anno.gpu.shader.ShaderLib.simplestVertexShader
+import me.anno.gpu.framebuffer.DepthBufferType
 import me.anno.gpu.framebuffer.FBStack
-import me.anno.gpu.framebuffer.Frame
-import me.anno.gpu.framebuffer.Framebuffer
+import me.anno.gpu.framebuffer.IFramebuffer
 import me.anno.gpu.shader.GLSLType
 import me.anno.gpu.shader.Renderer
+import me.anno.gpu.shader.ShaderLib.createShader
+import me.anno.gpu.shader.ShaderLib.simplestVertexShader
 import me.anno.gpu.shader.builder.Variable
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.GPUFiltering
@@ -16,12 +16,12 @@ import me.anno.gpu.texture.Texture2D
 
 object OpticalFlow {
 
-    fun run(lambda: Float, blurAmount: Float, displacement: Float, t0: Texture2D, t1: Texture2D): Framebuffer {
+    fun run(lambda: Float, blurAmount: Float, displacement: Float, t0: Texture2D, t1: Texture2D): IFramebuffer {
 
         val w = t0.width
         val h = t0.height
 
-        val flowT = FBStack["flow", w, h, 4, false, 1, false]
+        val flowT = FBStack["flow", w, h, 4, false, 1, DepthBufferType.NONE]
 
         // flow process
 
@@ -44,21 +44,21 @@ object OpticalFlow {
         blur.v1f("sigma", blurAmount * 0.5f)
         blur.v2f("texOffset", 2f, 2f)
 
-        val blurH = FBStack["blurH", w, h, 4, false, 1, false]
+        val blurH = FBStack["blurH", w, h, 4, false, 1, DepthBufferType.NONE]
         useFrame(blurH, Renderer.colorRenderer) {
             flowT.bindTexture0(0, GPUFiltering.TRULY_NEAREST, Clamping.CLAMP)
             blur.v1f("horizontalPass", 1f)
             flat01.draw(blur)
         }
 
-        val blurV = FBStack["blurV", w, h, 4, false, 1, false]
+        val blurV = FBStack["blurV", w, h, 4, false, 1, DepthBufferType.NONE]
         useFrame(blurV, Renderer.colorRenderer) {
             blurH.bindTexture0(0, GPUFiltering.LINEAR, Clamping.CLAMP)
             blur.v1f("horizontalPass", 0f)
             flat01.draw(blur)
         }
 
-        val result = FBStack["reposition", w, h, 4, false, 1, false]
+        val result = FBStack["reposition", w, h, 4, false, 1, DepthBufferType.NONE]
         useFrame(result, Renderer.colorRenderer) {
 
             // reposition

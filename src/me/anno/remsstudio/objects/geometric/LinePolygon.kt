@@ -7,7 +7,6 @@ import me.anno.gpu.drawing.UVProjection
 import me.anno.gpu.shader.BaseShader
 import me.anno.gpu.shader.GLSLType
 import me.anno.gpu.shader.Shader
-import me.anno.gpu.shader.ShaderFuncLib.noiseFunc
 import me.anno.gpu.shader.ShaderLib
 import me.anno.gpu.shader.ShaderLib.y3D
 import me.anno.gpu.shader.builder.Variable
@@ -23,10 +22,10 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.attractors.EffectColoring
 import me.anno.remsstudio.objects.attractors.EffectMorphing
 import me.anno.studio.Inspectable
+import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
@@ -114,6 +113,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
         // todo coloring and morphing needs to be applied to the children
+        // todo line isn't clickable???
 
         val points = children.filter { it !is EffectMorphing && it !is EffectColoring }
         if (points.isEmpty()) {
@@ -271,6 +271,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
         shader.v3f("pos3", b1)
         shader.v4f("col0", c0)
         shader.v4f("col1", c1)
+        shader.v4f("gfxId", clickId)
         UVProjection.Planar.getBuffer().draw(shader)
         GFX.check()
     }
@@ -306,7 +307,6 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
                         "}", y3D + Variable(GLSLType.V4F, "colX"), listOf(), "" +
                         ShaderLib.getTextureLib +
                         ShaderLib.getColorForceFieldLib +
-                        noiseFunc +
                         "void main(){\n" +
                         "   vec4 color = colX;\n" +
                         "   if(${ShaderLib.hasForceFieldColor}) color *= getForceFieldColor(finalPosition);\n" +

@@ -220,7 +220,8 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
 
             shader.v1f("worldScale", 1f) // correct?
             // todo tint is not working (needed for blending in for example)
-            GFX.shaderColor(shader, "tint", color)
+            shader.v4f("tint", color)
+            shader.v4f("gfxId", clickId)
 
             entity.anyComponent(MeshComponentBase::class) { comp ->
                 val mesh = comp.getMesh()

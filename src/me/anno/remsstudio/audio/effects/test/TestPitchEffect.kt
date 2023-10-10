@@ -1,8 +1,9 @@
 package me.anno.remsstudio.audio.effects.test
 
-import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.Engine
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.length
+import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.utils.OS
 import org.jtransforms.fft.FloatFFT_1D
 import java.awt.image.BufferedImage
@@ -47,8 +48,8 @@ class TestPitchEffect(
         val timeIntegral = FloatArray(blockSize)
         timeIntegral[0] = pitch[timeX0]
 
-        for(i in 1 until blockSize){
-            timeIntegral[i] = timeIntegral[i-1] + pitch[timeX0 + i * dtPerBuffer / blockSize]
+        for (i in 1 until blockSize) {
+            timeIntegral[i] = timeIntegral[i - 1] + pitch[timeX0 + i * dtPerBuffer / blockSize]
         }
 
         for (frequency in 1 until blockSize / 2) {
@@ -76,6 +77,10 @@ class TestPitchEffect(
 
         @JvmStatic
         fun main(args: Array<String>) {
+
+            Engine.registerForShutdown {
+                pl.edu.icm.jlargearrays.ConcurrencyUtils.shutdownThreadPoolAndAwaitTermination()
+            }
 
             val blockSize = 256
             val pitch = AnimatedProperty.float(0.7f)

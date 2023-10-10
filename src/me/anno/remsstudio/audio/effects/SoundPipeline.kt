@@ -1,5 +1,6 @@
 package me.anno.remsstudio.audio.effects
 
+import me.anno.Engine
 import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
@@ -12,11 +13,11 @@ import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
 import me.anno.studio.Inspectable
 import me.anno.ui.Panel
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.stacked.Option
 import me.anno.ui.editor.stacked.StackPanel
-import me.anno.ui.Style
 import org.jtransforms.fft.FloatFFT_1D
 
 class SoundPipeline() : Saveable(), Inspectable {
@@ -117,6 +118,7 @@ class SoundPipeline() : Saveable(), Inspectable {
                     effects.add(value)
                 }
             }
+
             else -> super.readObject(name, value)
         }
     }
@@ -138,6 +140,12 @@ class SoundPipeline() : Saveable(), Inspectable {
     }
 
     companion object {
+
+        init {
+            Engine.registerForShutdown {
+                pl.edu.icm.jlargearrays.ConcurrencyUtils.shutdownThreadPoolAndAwaitTermination()
+            }
+        }
 
         fun changeDomain(
             src: Domain,

@@ -37,7 +37,7 @@ object RemsConfig {
             this["rendering.resolutions.default", "1920x1080"]
             this["rendering.resolutions.defaultValues", "1920x1080,1920x1200,720x480,2560x1440,3840x2160"]
             this["rendering.resolutions.sort", 1] // 1 = ascending order, -1 = descending order, 0 = don't sort
-            this["rendering.frameRates", "24,30,60,90,120,144,240,300,360"]
+            this["rendering.frameRates", "24,30,48,60,90,120,144,240,300,360"]
 
             this["rendering.useMSAA", true] // should not be deactivated, unless... idk...
             this["ui.editor.useMSAA", true] // can be deactivated for really weak GPUs

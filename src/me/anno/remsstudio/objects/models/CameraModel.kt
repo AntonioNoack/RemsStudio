@@ -1,9 +1,8 @@
 package me.anno.remsstudio.objects.models
 
-import me.anno.gpu.GFX
-import me.anno.gpu.shader.ShaderLib
 import me.anno.gpu.buffer.Attribute
 import me.anno.gpu.buffer.StaticBuffer
+import me.anno.gpu.shader.ShaderLib
 import me.anno.remsstudio.RemsStudio
 import me.anno.utils.types.Floats.toRadians
 import org.joml.Matrix4fArrayList
@@ -34,7 +33,7 @@ object CameraModel {
         shader.use()
         shader.m4x4("transform", stack)
         shader.v4f("color", color)
-        GFX.shaderColor(shader, "tint", -1)
+        shader.v4f("tint", -1)
         cameraModel.draw(shader)
 
         stack.scale(near)
@@ -47,7 +46,7 @@ object CameraModel {
 
     }
 
-    fun destroy(){
+    fun destroy() {
         cameraModel.destroy()
     }
 

@@ -29,11 +29,11 @@ import me.anno.remsstudio.animation.Keyframe
 import me.anno.remsstudio.ui.MenuUtils.askNumber
 import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.studio.StudioBase.Companion.workspace
+import me.anno.ui.Style
 import me.anno.ui.base.constraints.AxisAlignment
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.editor.sceneView.Grid.drawSmoothLine
-import me.anno.ui.Style
 import me.anno.utils.Color.black
 import me.anno.utils.Color.mulAlpha
 import me.anno.utils.Color.toARGB
@@ -541,10 +541,10 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
 
     // todo if there are multiples selected, allow them to be moved (?)
 
-    override fun onMouseDown(x: Float, y: Float, button: Key) {
+    override fun onKeyDown(x: Float, y: Float, key: Key) {
         // find the dragged element
-        if (!isHovered) {
-            super.onMouseDown(x, y, button)
+        if (!isHovered || (key != Key.BUTTON_LEFT && key != Key.BUTTON_RIGHT)) {
+            super.onKeyDown(x, y, key)
             return
         }
         invalidateDrawing()
@@ -554,7 +554,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             draggedChannel = -1
         } else {
             draggedKeyframe = null
-            if (button == Key.BUTTON_LEFT) {
+            if (key == Key.BUTTON_LEFT) {
                 isSelecting = isShiftDown
                 if (!isSelecting) {
                     selectedKeyframes.clear()
@@ -576,14 +576,16 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
 
     // todo always show the other properties, too???
     // todo maybe add a list of all animated properties?
-    override fun onMouseUp(x: Float, y: Float, button: Key) {
-        draggedKeyframe = null
-        if (isSelecting) {
-            // add all keyframes in that area
-            selectedKeyframes += getAllKeyframes(select0.x, x, select0.y, y)
-            isSelecting = false
-        }
-        invalidateDrawing()
+    override fun onKeyUp(x: Float, y: Float, key: Key) {
+        if (key == Key.BUTTON_LEFT || key == Key.BUTTON_RIGHT) {
+            draggedKeyframe = null
+            if (isSelecting) {
+                // add all keyframes in that area
+                selectedKeyframes += getAllKeyframes(select0.x, x, select0.y, y)
+                isSelecting = false
+            }
+            invalidateDrawing()
+        } else super.onKeyUp(x, y, key)
     }
 
     override fun onDeleteKey(x: Float, y: Float) {

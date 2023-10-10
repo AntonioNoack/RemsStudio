@@ -1,8 +1,8 @@
 package me.anno.remsstudio
 
 import me.anno.Build
-import me.anno.Engine.deltaTime
-import me.anno.Engine.gameTime
+import me.anno.Time.deltaTime
+import me.anno.Time.gameTime
 import me.anno.audio.openal.ALBase
 import me.anno.audio.openal.AudioManager
 import me.anno.audio.openal.AudioTasks

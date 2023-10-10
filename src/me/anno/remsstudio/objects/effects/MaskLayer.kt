@@ -5,13 +5,16 @@ import me.anno.gpu.GFX
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.GFXState.renderDefault
 import me.anno.gpu.GFXState.useFrame
+import me.anno.gpu.framebuffer.DepthBufferType
 import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.framebuffer.Framebuffer
+import me.anno.gpu.framebuffer.IFramebuffer
 import me.anno.gpu.shader.Renderer
 import me.anno.gpu.shader.effects.BokehBlur
 import me.anno.gpu.shader.effects.GaussianBlur
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.GPUFiltering
+import me.anno.gpu.texture.Texture2D
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.Scene
@@ -45,8 +48,8 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
     // seems better, because it should not influence the alpha values
     override fun getStartTime(): Double = Double.NEGATIVE_INFINITY
 
-    lateinit var mask: Framebuffer
-    lateinit var masked: Framebuffer
+    lateinit var mask: IFramebuffer
+    lateinit var masked: IFramebuffer
 
     var useExperimentalMSAA = false
 
@@ -97,8 +100,8 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
 
                 val w = GFX.viewportWidth
                 val h = GFX.viewportHeight
-                mask = FBStack["mask", w, h, 4, true, samples, true]
-                masked = FBStack["masked", w, h, 4, true, samples, true]
+                mask = FBStack["mask", w, h, 4, true, samples, DepthBufferType.INTERNAL]
+                masked = FBStack["masked", w, h, 4, true, samples, DepthBufferType.INTERNAL]
 
                 renderDefault {
 
@@ -253,11 +256,12 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
             }
             MaskType.BOKEH_BLUR -> {
 
-                val temp = FBStack["mask-bokeh", w, h, 4, true, 1, false]
+                val temp = FBStack["mask-bokeh", w, h, 4, true, 1, DepthBufferType.NONE]
 
                 val src0 = masked
-                src0.bindTexture0(0, src0.textures[0].filtering, src0.textures[0].clamping!!)
-                val srcBuffer = src0.ssBuffer ?: src0
+                val src0Tex = src0.getTexture0() as Texture2D
+                src0.bindTexture0(0, src0Tex.filtering, src0Tex.clamping!!)
+                val srcBuffer = (src0 as Framebuffer).ssBuffer ?: src0
                 BokehBlur.draw(srcBuffer.textures[0], temp, pixelSize, Scene.usesFPBuffers)
 
                 temp.bindTexture0(2, GPUFiltering.TRULY_NEAREST, Clamping.CLAMP)

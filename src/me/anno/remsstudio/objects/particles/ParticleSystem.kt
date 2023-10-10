@@ -1,6 +1,8 @@
 package me.anno.remsstudio.objects.particles
 
-import me.anno.Engine.gameTime
+import me.anno.Time
+import me.anno.Time.gameTime
+import me.anno.Time.gameTimeN
 import me.anno.animation.Type
 import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX.isFinalRendering
@@ -219,7 +221,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
 
     fun clearCache(state: Any? = getSystemState()) {
         lastState = state
-        lastCheckup = gameTime
+        lastCheckup = Time.nanoTime
         particles.clear()
         aliveParticles.clear()
         random = Random(seed)
@@ -231,7 +233,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
     var timeoutMultiplier = 1
 
     private fun checkNeedsUpdate() {
-        val time = gameTime
+        val time = Time.nanoTime
         if (abs(time - lastCheckup) > 33_000_000 * timeoutMultiplier) {// 30 fps
             // how fast is this method?
             // would be binary writing and reading faster?
@@ -279,7 +281,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
             drawParticles(stack, time, color)
         } else {
             if (isFinalRendering) throw MissingFrameException(name)
-            drawLoadingCircle(stack, (gameTime * 1e-9f) % 1f)
+            drawLoadingCircle(stack, (Time.nanoTime * 1e-9f) % 1f)
             drawParticles(stack, time, color)
         }
 
@@ -327,7 +329,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
                     if (needsUpdate) invalidateUI(true)
                 }
             })
-            group.addOnClickListener { _, _, button, long ->
+            group.addOnClickListener { _, _, _, button, long ->
                 if (button == Key.BUTTON_RIGHT || long) {
                     // show all options for different distributions
                     openMenu(

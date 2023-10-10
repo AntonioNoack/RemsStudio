@@ -5,6 +5,7 @@ import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.GFXState.useFrame
 import me.anno.gpu.drawing.UVProjection
+import me.anno.gpu.framebuffer.DepthBufferType
 import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.shader.Renderer
 import me.anno.gpu.texture.Clamping
@@ -81,13 +82,13 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
             val rx = resolution.x.roundToInt()
             val ry = resolution.y.roundToInt()
             if (rx > 0 && ry > 0 && rx * ry < 16e6) {
-                val fb = FBStack["SoftLink", rx, ry, 4, false, 1, true]
+                val fb = FBStack["SoftLink", rx, ry, 4, false, 1, DepthBufferType.INTERNAL]
                 useFrame(fb) {
                     fb.clearColor(0, true)
                     drawSceneWithPostProcessing(time)
                 }
                 draw3DVideo(
-                    this, time, stack, fb.textures[0], color, filtering.value, clampMode.value,
+                    this, time, stack, fb.getTexture0(), color, filtering.value, clampMode.value,
                     tiling[time], uvProjection.value
                 )
             }

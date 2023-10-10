@@ -10,6 +10,7 @@ object GFXx2Dv2 {
 
     fun defineAdvancedGraphicalFeatures(shader: Shader, transform: Transform?, time: Double) {
         (transform as? GFXTransform)?.uploadAttractors(shader, time) ?: GFXx3D.uploadAttractors0(shader)
+        shader.v4f("gfxId", transform?.clickId ?: -1)
         GFXx3Dv2.colorGradingUniforms(transform as? Video, time, shader)
     }
 

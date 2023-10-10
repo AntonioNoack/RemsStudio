@@ -12,14 +12,12 @@ import me.anno.gpu.drawing.GFXx3D.shader3DText
 import me.anno.gpu.drawing.UVProjection
 import me.anno.gpu.shader.Shader
 import me.anno.gpu.shader.ShaderLib
-import me.anno.gpu.texture.Clamping
-import me.anno.gpu.texture.Filtering
-import me.anno.gpu.texture.GPUFiltering
-import me.anno.gpu.texture.Texture2D
+import me.anno.gpu.texture.*
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Video
 import me.anno.remsstudio.objects.geometric.Polygon
+import me.anno.utils.Color.white4
 import me.anno.video.formats.gpu.GPUFrame
 import ofx.mio.OpticalFlow
 import org.joml.Matrix4fArrayList
@@ -73,7 +71,7 @@ object GFXx3Dv2 {
         uvProjection: UVProjection?
     ) {
         shader3DUniforms(shader, stack, w, h, tiling, filtering, uvProjection)
-        GFX.shaderColor(shader, "tint", color)
+        shader.v4f("tint", color ?: white4)
     }
 
     fun shader3DUniforms(
@@ -83,7 +81,7 @@ object GFXx3Dv2 {
         uvProjection: UVProjection?
     ) {
         shader3DUniforms(shader, stack, w, h, tiling, filtering, uvProjection)
-        GFX.shaderColor(shader, "tint", color)
+        shader.v4f("tint", color)
     }
 
     fun draw3DText(
@@ -101,7 +99,7 @@ object GFXx3Dv2 {
 
     fun draw3DVideo(
         video: GFXTransform, time: Double,
-        stack: Matrix4fArrayList, texture: Texture2D, color: Vector4f,
+        stack: Matrix4fArrayList, texture: ITexture2D, color: Vector4f,
         filtering: Filtering, clamping: Clamping, tiling: Vector4f?, uvProjection: UVProjection
     ) {
         val shader = ShaderLib.shader3DRGBA.value
@@ -171,6 +169,7 @@ object GFXx3Dv2 {
     ) {
         val shader = ShaderLib.shader3DPolygon.value
         shader.use()
+        shader.v4f("gfxId", polygon.clickId)
         polygon.uploadAttractors(shader, time)
         shader3DUniforms(shader, stack, texture.width, texture.height, color, null, filtering, null)
         shader.v1f("inset", inset)
@@ -205,7 +204,7 @@ object GFXx3Dv2 {
 
         GFXx2Dv2.defineAdvancedGraphicalFeatures(shader, that, time)
 
-        GFX.shaderColor(shader, "tint", color)
+        shader.v4f("tint", color)
 
         val cc = min(colorCount, ShaderLib.maxOutlineColors)
 

@@ -159,13 +159,15 @@ class SceneTab(var file: FileReference?, var scene: Transform, history: History?
                     )
                 }
             }
+
             else -> return super.onGotAction(x, y, dx, dy, action, isContinuous)
         }
         return true
     }
 
-    override fun onMouseUp(x: Float, y: Float, button: Key) {
-        ActionManager.executeGlobally(GFX.someWindow!!, 0f, 0f, false, listOf("DragEnd"))
+    override fun onKeyUp(x: Float, y: Float, key: Key) {
+        if (key == Key.BUTTON_LEFT) ActionManager.executeGlobally(GFX.someWindow!!, 0f, 0f, false, listOf("DragEnd"))
+        else super.onKeyUp(x, y, key)
     }
 
     override fun onPaste(x: Float, y: Float, data: String, type: String) {

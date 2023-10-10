@@ -1,7 +1,7 @@
 package me.anno.remsstudio.ui.scene
 
-import me.anno.Engine.gameTime
-import me.anno.Engine.rawDeltaTime
+import me.anno.Time.deltaTime
+import me.anno.Time.gameTime
 import me.anno.config.DefaultStyle.deepDark
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.shader.Renderer
@@ -17,8 +17,8 @@ import me.anno.remsstudio.RemsStudio.targetWidth
 import me.anno.remsstudio.Scene
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.ui.editor.ISceneView
-import me.anno.ui.base.groups.PanelList
 import me.anno.ui.Style
+import me.anno.ui.base.groups.PanelList
 import me.anno.utils.Color.black
 import me.anno.utils.types.Floats.toDegrees
 import org.joml.Vector3f
@@ -69,7 +69,7 @@ class ScenePreview(style: Style) : PanelList(null, style.getChild("sceneView")),
             target.z = random.nextGaussian().toFloat() + 3f
         }
         // go towards that target
-        val deltaTime = rawDeltaTime
+        val deltaTime = deltaTime.toFloat()
         val relativeMovement = clamp01(movementSpeed * deltaTime / (distance + 0.2f))
         val diff = pos - (target * 0.5f)
         val r0 = camera.rotationYXZ[0.0]

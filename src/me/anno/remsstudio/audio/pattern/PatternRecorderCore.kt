@@ -1,6 +1,7 @@
 package me.anno.remsstudio.audio.pattern
 
 import me.anno.Engine
+import me.anno.Time
 import me.anno.config.DefaultConfig.style
 import me.anno.gpu.drawing.DrawTexts.drawSimpleTextCharByChar
 import me.anno.gpu.drawing.GFXx2D.drawCircle
@@ -42,7 +43,7 @@ class PatternRecorderCore(val tp: TextInput) : Panel(style) {
 
     override fun onUpdate() {
         super.onUpdate()
-        level *= pow(0.1f, Engine.deltaTime)
+        level *= pow(0.1f, Time.deltaTime.toFloat())
         if (level > 0.01f) invalidateDrawing()
     }
 
@@ -92,11 +93,6 @@ class PatternRecorderCore(val tp: TextInput) : Panel(style) {
         )
     }
 
-    override fun onMouseDown(x: Float, y: Float, button: Key) {
-        if (button == Key.BUTTON_LEFT) callAction()
-        else super.onMouseDown(x, y, button)
-    }
-
     override fun onEnterKey(x: Float, y: Float) {
         callAction()
     }
@@ -118,7 +114,8 @@ class PatternRecorderCore(val tp: TextInput) : Panel(style) {
     }
 
     override fun onKeyDown(x: Float, y: Float, key: Key) {
-        if (isRecording && key != Key.KEY_ESCAPE && key != Key.KEY_ENTER && !Input.isShiftDown && !Input.isControlDown) {
+        if (key == Key.BUTTON_LEFT) callAction()
+        else if (isRecording && key != Key.KEY_ESCAPE && key != Key.KEY_ENTER && !Input.isShiftDown && !Input.isControlDown) {
             times.add(RemsStudio.editorTime)
             onTimesChange()
             ensurePlaying()
@@ -183,7 +180,7 @@ class PatternRecorderCore(val tp: TextInput) : Panel(style) {
             var idx = rhythm.binarySearch(t, 0, s)
             if (idx < 0) idx = -2 - idx
             else idx--
-            if(idx < 0) return timestamps[0] - rhythm[0] + t
+            if (idx < 0) return timestamps[0] - rhythm[0] + t
             val sm1 = s - 1
             if (idx >= sm1) return timestamps[sm1] - rhythm[sm1] + t
             val t0 = rhythm[idx]

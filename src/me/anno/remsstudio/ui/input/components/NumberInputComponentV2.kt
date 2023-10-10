@@ -32,15 +32,19 @@ class NumberInputComponentV2(
     val driver get() = owningProperty.drivers.getOrNull(indexInProperty)
     val hasDriver get() = driver != null
 
-    override fun onMouseDown(x: Float, y: Float, button: Key) {
-        if (!hasDriver) {
-            super.onMouseDown(x, y, button)
-            numberInput.onMouseDown(x, y, button)
-        }
+    override fun onKeyDown(x: Float, y: Float, key: Key) {
+        if (key == Key.BUTTON_LEFT) {
+            if (!hasDriver) {
+                super.onKeyDown(x, y, key)
+                numberInput.onKeyDown(x, y, key)
+            }
+        } else super.onKeyDown(x, y, key)
     }
 
-    override fun onMouseUp(x: Float, y: Float, button: Key) {
-        if (!hasDriver) numberInput.onMouseUp(x, y, button)
+    override fun onKeyUp(x: Float, y: Float, key: Key) {
+        if (key == Key.BUTTON_LEFT) {
+            if (!hasDriver) numberInput.onKeyUp(x, y, key)
+        } else super.onKeyUp(x, y, key)
     }
 
     override fun onMouseMoved(x: Float, y: Float, dx: Float, dy: Float) {

@@ -1,6 +1,6 @@
 package me.anno.remsstudio.ui.editor.cutting
 
-import me.anno.Engine.gameTime
+import me.anno.Time.gameTime
 import me.anno.cache.CacheData
 import me.anno.cache.instances.VideoCache
 import me.anno.gpu.GFX
@@ -31,11 +31,11 @@ import me.anno.studio.StudioBase
 import me.anno.studio.StudioBase.Companion.shiftSlowdown
 import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.Panel
+import me.anno.ui.Style
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.dragging.Draggable
 import me.anno.ui.editor.files.FileContentImporter
-import me.anno.ui.Style
 import me.anno.utils.Color.white4
 import me.anno.utils.hpc.ProcessingQueue
 import kotlin.math.abs
@@ -237,8 +237,8 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
     // done move start/end times
     // done highlight the hovered panel?
 
-    override fun onMouseDown(x: Float, y: Float, button: Key) {
-        if (button == Key.BUTTON_LEFT) {
+    override fun onKeyDown(x: Float, y: Float, key: Key) {
+        if (key == Key.BUTTON_LEFT) {
             var draggedTransform = getTransformAt(x, y)
             this.draggedTransform = draggedTransform
             if (draggedTransform != null) {
@@ -261,7 +261,7 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
                     draggedKeyframes = hoveredKeyframes
                 }
             }
-        }
+        } else super.onKeyDown(x, y, key)
     }
 
     override fun onDeleteKey(x: Float, y: Float) {
@@ -322,9 +322,11 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
         } else super.onMouseMoved(x, y, dx, dy)
     }
 
-    override fun onMouseUp(x: Float, y: Float, button: Key) {
-        draggedTransform = null
-        draggedKeyframes = null
+    override fun onKeyUp(x: Float, y: Float, key: Key) {
+        if (key == Key.BUTTON_LEFT || key == Key.BUTTON_RIGHT) {
+            draggedTransform = null
+            draggedKeyframes = null
+        } else super.onKeyUp(x, y, key)
     }
 
     override fun onMouseClicked(x: Float, y: Float, button: Key, long: Boolean) {
@@ -349,6 +351,7 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
                     openMenu(windowStack, options)
                 } else super.onMouseClicked(x, y, button, long)
             }
+
             else -> super.onMouseClicked(x, y, button, long)
         }
     }

@@ -19,15 +19,14 @@ import me.anno.remsstudio.objects.Rectangle
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.Transform.Companion.toTransform
 import me.anno.remsstudio.objects.effects.MaskLayer
+import me.anno.ui.Style
 import me.anno.ui.base.Font
 import me.anno.ui.base.menu.Menu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.treeView.TreeView
-import me.anno.ui.Style
 import me.anno.utils.Color.black
 import me.anno.utils.Color.toARGB
-import me.anno.utils.structures.lists.UpdatingList
 import me.anno.utils.types.Strings.joinChars
 import org.apache.logging.log4j.LogManager
 import org.joml.Vector3f
@@ -36,14 +35,17 @@ import java.util.*
 import kotlin.streams.toList
 
 class StudioTreeView(style: Style) :
-    TreeView<Transform>(
-        UpdatingList {
-            val nc = nullCamera
-            if (nc == null) listOf(RemsStudio.root)
-            else listOf(nc, RemsStudio.root)
-        },
-        StudioFileImporter, true, style
-    ) {
+    TreeView<Transform>(StudioFileImporter, true, style) {
+
+    override fun listSources(): List<Transform> {
+        val nc = nullCamera
+        return if (nc == null) listOf(RemsStudio.root)
+        else listOf(nc, RemsStudio.root)
+    }
+
+    override fun removeRoot(root: Transform) {
+        LOGGER.debug("Removing root is not supported")
+    }
 
     override fun getDragType(element: Transform) = "Transform"
     override fun stringifyForCopy(element: Transform) = TextWriter.toText(element, InvalidRef)
