@@ -10,13 +10,6 @@ class GaussianDistribution(center: Vector4f, size: Vector4f, rotation: Vector4f 
 ) {
 
     constructor() : this(Vector4f(), Vector4f())
-    constructor(center: Float, stdDeviation: Float) : this(Vector4f(center), Vector4f(stdDeviation))
-    constructor(center: Vector2f, stdDeviation: Vector2f) : this(
-        Vector4f(center, 0f, 0f),
-        Vector4f(stdDeviation, 0f, 0f)
-    )
-
-    constructor(center: Vector3f, stdDeviation: Vector3f) : this(Vector4f(center, 0f), Vector4f(stdDeviation, 0f))
 
     override fun nextV1(): Float {
         return transform(

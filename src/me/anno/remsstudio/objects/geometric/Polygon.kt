@@ -2,9 +2,8 @@ package me.anno.remsstudio.objects.geometric
 
 import me.anno.cache.CacheSection
 import me.anno.config.DefaultConfig
+import me.anno.ecs.components.mesh.Mesh
 import me.anno.gpu.GFX
-import me.anno.gpu.buffer.Attribute
-import me.anno.gpu.buffer.StaticBuffer
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.Filtering
 import me.anno.gpu.texture.TextureLib.whiteTexture
@@ -20,9 +19,9 @@ import me.anno.remsstudio.gpu.GFXx3Dv2.draw3DPolygon
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.studio.Inspectable
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.types.Floats.toRadians
 import me.anno.video.MissingFrameException
@@ -197,23 +196,21 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
         private const val minEdges = 3
         private val maxEdges by lazy { DefaultConfig["objects.polygon.maxEdges", 1000] }
 
-        fun getBuffer(n: Int, hasDepth: Boolean): StaticBuffer {
+        fun getBuffer(n: Int, hasDepth: Boolean): Mesh {
             if (n < minEdges) return getBuffer(minEdges, hasDepth)
             if (n > maxEdges) return getBuffer(maxEdges, hasDepth)
             return PolygonCache.getEntry(
                 n * 2 + (if (hasDepth) 1 else 0),
                 meshTimeout, false
-            ) {
-                createBuffer(n, hasDepth)
-            } as StaticBuffer
+            ) { createBuffer(n, hasDepth) } as Mesh
         }
 
-        private fun createBuffer(n: Int, hasDepth: Boolean): StaticBuffer {
+        private fun createBuffer(n: Int, hasDepth: Boolean): Mesh {
 
             val frontCount = n * 3
             val sideCount = n * 6
             val vertexCount = if (hasDepth) frontCount * 2 + sideCount else frontCount
-            val buffer = StaticBuffer("Polygon[$n]/$hasDepth", listOf(Attribute("coords", 3), Attribute("attr1", 2)), vertexCount)
+
             val angles = FloatArray(n + 1) { i -> (i * Math.PI * 2.0 / n).toFloat() }
             val sin = angles.map { +sin(it) }
             val cos = angles.map { -cos(it) }
@@ -229,29 +226,29 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
 
             outline.add(outline.first())
 
+            val positions = FloatArray(vertexCount * 3)
+            val uvs = FloatArray(vertexCount * 2)
+            var i = 0
+            var j = 0
             fun putCenter(depth: Float) {
-                buffer.put(0f)
-                buffer.put(0f)
-                buffer.put(depth)
-                buffer.put(0f)
-                buffer.put(0f)
+                i += 2
+                positions[i++] = depth
+                j += 2
             }
 
             fun put(out: Vector4f, depth: Float) {
-                buffer.put(out.x)
-                buffer.put(out.y)
-                buffer.put(depth)
-                buffer.put(out.z)
-                buffer.put(out.w)
+                positions[i++] = out.x
+                positions[i++] = out.y
+                positions[i++] = depth
+                uvs[j++] = out.z
+                uvs[j++] = out.w
             }
 
             fun putFront(depth: Float) {
-                for (i in 0 until n) {
-
+                for (k in 0 until n) {
                     putCenter(depth)
-                    put(outline[i], depth)
-                    put(outline[i + 1], depth)
-
+                    put(outline[k], depth)
+                    put(outline[k + 1], depth)
                 }
             }
 
@@ -263,21 +260,24 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
             }
 
             if (hasDepth) {
-                for (i in 0 until n) {
+                for (k in 0 until n) {
 
                     // 012
-                    put(outline[i], d1)
-                    put(outline[i + 1], d1)
-                    put(outline[i + 1], d2)
+                    put(outline[k], d1)
+                    put(outline[k + 1], d1)
+                    put(outline[k + 1], d2)
 
                     // 023
-                    put(outline[i], d1)
-                    put(outline[i + 1], d2)
-                    put(outline[i], d2)
+                    put(outline[k], d1)
+                    put(outline[k + 1], d2)
+                    put(outline[k], d2)
 
                 }
             }
 
+            val buffer = Mesh()
+            buffer.positions = positions
+            buffer.uvs = uvs
             return buffer
         }
     }

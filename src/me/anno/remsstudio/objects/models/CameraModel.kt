@@ -1,7 +1,6 @@
 package me.anno.remsstudio.objects.models
 
-import me.anno.gpu.buffer.Attribute
-import me.anno.gpu.buffer.StaticBuffer
+import me.anno.ecs.components.mesh.Mesh
 import me.anno.gpu.shader.ShaderLib
 import me.anno.remsstudio.RemsStudio
 import me.anno.utils.types.Floats.toRadians
@@ -34,28 +33,22 @@ object CameraModel {
         shader.m4x4("transform", stack)
         shader.v4f("color", color)
         shader.v4f("tint", -1)
-        cameraModel.draw(shader)
+        cameraModel.draw(shader, 0)
 
         stack.scale(near)
         shader.m4x4("transform", stack)
-        cameraModel.draw(shader)
+        cameraModel.draw(shader, 0)
 
         stack.scale(far / near)
         shader.m4x4("transform", stack)
-        cameraModel.draw(shader)
+        cameraModel.draw(shader, 0)
 
     }
 
-    fun destroy() {
-        cameraModel.destroy()
-    }
+    private val cameraModel = Mesh().apply {
 
-    private val cameraModel: StaticBuffer = StaticBuffer(
-        "CameraModel",
-        listOf(
-            Attribute("coords", 3)
-        ), 2 * 8
-    ).apply {
+        val vertexCount = 16
+        val positions = FloatArray(vertexCount * 3)
 
         // points
         val zero = Vector3f()
@@ -63,6 +56,13 @@ object CameraModel {
         val p01 = Vector3f(-1f, +1f, -1f)
         val p10 = Vector3f(+1f, -1f, -1f)
         val p11 = Vector3f(+1f, +1f, -1f)
+
+        var i = 0
+        fun put(v: Vector3f) {
+            positions[i++] = v.x
+            positions[i++] = v.y
+            positions[i++] = v.z
+        }
 
         // lines to frame
         put(zero)
@@ -90,6 +90,7 @@ object CameraModel {
         put(p10)
         put(p00)
 
+        this.positions = positions
         drawMode = GL11C.GL_LINES
     }
 

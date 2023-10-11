@@ -23,10 +23,13 @@ abstract class CenterSizeDistribution(
 
     fun transform(v: Float) =
         v * scale.x + center.x
+
     fun transform(v: Vector2f): Vector2f =
         rotate(v.mul(Vector2f(scale.x, scale.y))).add(center.x, center.y)
+
     fun transform(v: Vector3f): Vector3f =
         rotate(v.mul(Vector3f(scale.x, scale.y, scale.z))).add(center.x, center.y, center.z)
+
     fun transform(v: Vector4f): Vector4f = rotate(v.mul(scale)).add(center)
 
     fun rotate(vector: Vector2f): Vector2f {

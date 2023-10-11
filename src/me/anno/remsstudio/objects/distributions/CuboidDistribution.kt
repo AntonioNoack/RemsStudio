@@ -1,6 +1,6 @@
 package me.anno.remsstudio.objects.distributions
 
-import me.anno.ecs.components.mesh.shapes.CubemapModel.cubemapLineModel
+import me.anno.ecs.components.mesh.shapes.CubemapModel
 import me.anno.ui.editor.sceneView.Grid
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
@@ -15,12 +15,6 @@ class CuboidDistribution(center: Vector4f, size: Vector4f, rotation: Vector4f = 
 
     constructor() : this(0f, 1f)
     constructor(center: Float, size: Float) : this(Vector4f(center), Vector4f(size))
-    constructor(center: Vector2f, size: Vector2f) : this(
-        Vector4f(center.x, center.y, center.x, center.y),
-        Vector4f(size.x, size.y, size.x, size.y)
-    )
-
-    constructor(center: Vector3f, size: Vector3f) : this(Vector4f(center, 0f), Vector4f(size, 0f))
 
     override fun nextV2(): Vector2f {
         return transform(
@@ -54,7 +48,7 @@ class CuboidDistribution(center: Vector4f, size: Vector4f, rotation: Vector4f = 
 
     override fun drawTransformed(stack: Matrix4fArrayList, color: Vector4f) {
         // draw cube out of lines
-        Grid.drawBuffer(stack, color, cubemapLineModel)
+        Grid.drawLineMesh(stack, color, CubemapModel)
     }
 
     override val className get() = "CuboidDistribution"

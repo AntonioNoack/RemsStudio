@@ -69,7 +69,7 @@ class TornadoField : ForceField(
                     stack.translate(pos)
                     stack.scale(visualForceScale * force)
                     stack.rotateY(-angle - 1.57f)
-                    Grid.drawBuffer(stack, Vector4f(1f), arrowLineModel)
+                    Grid.drawLineMesh(stack, Vector4f(1f), arrowLineModel)
                 }
             }
         }

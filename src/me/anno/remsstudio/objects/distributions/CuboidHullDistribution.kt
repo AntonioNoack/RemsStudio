@@ -1,6 +1,6 @@
 package me.anno.remsstudio.objects.distributions
 
-import me.anno.ecs.components.mesh.shapes.CubemapModel.cubemapLineModel
+import me.anno.ecs.components.mesh.shapes.CubemapModel
 import me.anno.maths.Maths.max
 import me.anno.ui.editor.sceneView.Grid
 import org.joml.Matrix4fArrayList
@@ -18,12 +18,6 @@ class CuboidHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4
 
     constructor() : this(0f, 1f)
     constructor(center: Float, size: Float) : this(Vector4f(center), Vector4f(size))
-    constructor(center: Vector2f, size: Vector2f) : this(
-        Vector4f(center.x, center.y, center.x, center.y),
-        Vector4f(size.x, size.y, size.x, size.y)
-    )
-
-    constructor(center: Vector3f, size: Vector3f) : this(Vector4f(center, 0f), Vector4f(size, 0f))
 
     override fun nextV1(): Float {
         val x = random.nextFloat()
@@ -60,11 +54,13 @@ class CuboidHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4
                 y *= maxScale / scale.y
                 z *= maxScale / scale.z
             }
+
             ay -> {
                 y = if (y > 0f) +1f else -1f
                 x *= maxScale / scale.x
                 z *= maxScale / scale.z
             }
+
             else -> {
                 z = if (z > 0f) +1f else -1f
                 x *= maxScale / scale.x
@@ -94,18 +90,21 @@ class CuboidHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4
                 z *= maxScale / scale.z
                 w *= maxScale / scale.w
             }
+
             ay -> {
                 y = if (y > 0f) +1f else -1f
                 x *= maxScale / scale.x
                 z *= maxScale / scale.z
                 w *= maxScale / scale.w
             }
+
             az -> {
                 z = if (z > 0f) +1f else -1f
                 x *= maxScale / scale.x
                 y *= maxScale / scale.y
                 w *= maxScale / scale.w
             }
+
             else -> {
                 w = if (w > 0f) +1f else -1f
                 x *= maxScale / scale.x
@@ -122,7 +121,7 @@ class CuboidHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4
 
     override fun drawTransformed(stack: Matrix4fArrayList, color: Vector4f) {
         // draw cube out of lines
-        Grid.drawBuffer(stack, color, cubemapLineModel)
+        Grid.drawLineMesh(stack, color, CubemapModel)
     }
 
     override val className get() = "CuboidHullDistribution"

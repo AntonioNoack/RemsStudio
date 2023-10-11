@@ -2,7 +2,10 @@ package me.anno.remsstudio.objects.distributions
 
 import me.anno.remsstudio.objects.inspectable.InspectableVector
 import me.anno.ui.editor.sceneView.Grid
-import org.joml.*
+import org.joml.Matrix4fArrayList
+import org.joml.Vector2f
+import org.joml.Vector3f
+import org.joml.Vector4f
 
 class ConstantDistribution(val center: Vector4f) : Distribution(
     "Constant",
@@ -11,8 +14,6 @@ class ConstantDistribution(val center: Vector4f) : Distribution(
 
     constructor() : this(0f)
     constructor(center: Float) : this(Vector4f(center))
-    constructor(center: Vector2f) : this(Vector4f(center.x, center.y, center.x, center.y))
-    constructor(center: Vector3f) : this(Vector4f(center, 0f))
 
     override fun nextV1(): Float = center.x
 

@@ -6,9 +6,9 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.inspectable.InspectableAttribute
 import me.anno.remsstudio.objects.inspectable.InspectableVector
 import me.anno.remsstudio.objects.models.SphereAxesModel.sphereAxesModels
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelList
 import me.anno.ui.editor.sceneView.Grid
-import me.anno.ui.Style
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector3f
@@ -74,7 +74,7 @@ abstract class Distribution(val displayName: String, val description: String) :
     abstract fun onDraw(stack: Matrix4fArrayList, color: Vector4f)
 
     fun drawSphere(stack: Matrix4fArrayList, color: Vector4f, alpha: Float = 1f) {
-        Grid.drawBuffer(
+        Grid.drawLineMesh(
             stack,
             if (alpha == 1f) color
             else color.mulAlpha(alpha, Vector4f()),

@@ -1,13 +1,10 @@
 package me.anno.remsstudio.objects.models
 
-import me.anno.gpu.buffer.Attribute
-import me.anno.gpu.buffer.StaticBuffer
+import me.anno.ecs.components.mesh.Mesh
 import org.joml.Vector2f
+import org.lwjgl.opengl.GL11C.GL_LINES
 
 object ArrowModel {
-
-    val arrowModel by lazy { createModel() }
-    val arrowLineModel by lazy { createLineModel() }
 
     private const val smallHeight = 0.25f
     private val leftTop = Vector2f(-1f, smallHeight)
@@ -22,66 +19,55 @@ object ArrowModel {
     private val arrowBottom = Vector2f(center, -arrow)
     private val front = Vector2f(+1f, 0f)
 
-    private fun createModel(): StaticBuffer {
+    val arrowModel = createModel()
+    val arrowLineModel = createLineModel()
 
-        val attributes = listOf(
-            Attribute("coords", 3)
-        )
+    private fun createModel(): Mesh {
 
         val triangleCount = 6
         val vertexCount = triangleCount * 3
+        val positions = FloatArray(vertexCount * 3)
 
-        val buffer = StaticBuffer(
-            "ArrowModel",
-            attributes,
-            vertexCount
-        )
+        var i = 0
+        fun add(a: Vector2f) {
+            positions[i++] = a.x
+            positions[i++] = a.y
+            positions[i++] = 0f
+        }
 
         fun addTriangle(a: Vector2f, b: Vector2f, c: Vector2f) {
-
             // from both sides
-            buffer.put(a)
-            buffer.put(0f)
-            buffer.put(b)
-            buffer.put(0f)
-            buffer.put(c)
-            buffer.put(0f)
-            buffer.put(a)
-            buffer.put(0f)
-            buffer.put(c)
-            buffer.put(0f)
-            buffer.put(b)
-            buffer.put(0f)
-
+            add(a)
+            add(b)
+            add(c)
+            add(a)
+            add(c)
+            add(b)
         }
 
         addTriangle(leftTop, centerBottom, centerTop)
         addTriangle(leftBottom, leftTop, centerBottom)
         addTriangle(arrowTop, arrowBottom, front)
 
+        val buffer = Mesh()
+        buffer.positions = positions
         return buffer
-
     }
 
-    private fun createLineModel(): StaticBuffer {
-
-        val attributes = listOf(
-            Attribute("coords", 3)
-        )
+    private fun createLineModel(): Mesh {
 
         val vertexCount = 2 * 7
+        val positions = FloatArray(vertexCount * 3)
 
-        val buffer = StaticBuffer(
-            "Arrow.LineModel",
-            attributes,
-            vertexCount
-        )
 
+        var i = 0
         fun addLine(a: Vector2f, b: Vector2f) {
-            buffer.put(a)
-            buffer.put(0f)
-            buffer.put(b)
-            buffer.put(0f)
+            positions[i++] = a.x
+            positions[i++] = a.y
+            positions[i++] = 0f
+            positions[i++] = b.x
+            positions[i++] = b.y
+            positions[i++] = 0f
         }
 
         addLine(leftBottom, leftTop)
@@ -92,13 +78,11 @@ object ArrowModel {
         addLine(arrowBottom, centerBottom)
         addLine(centerBottom, leftBottom)
 
+        val buffer = Mesh()
+        buffer.positions = positions
+        buffer.drawMode = GL_LINES
         return buffer
 
-    }
-
-    fun destroy() {
-        arrowLineModel.destroy()
-        arrowModel.destroy()
     }
 
 }

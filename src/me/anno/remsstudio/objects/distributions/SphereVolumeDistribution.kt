@@ -13,9 +13,7 @@ class SphereVolumeDistribution(center: Vector4f, size: Vector4f, rotation: Vecto
     ) {
 
     constructor() : this(0f, 1f)
-    constructor(center: Vector2f, size: Float) : this(Vector4f(center, 0f, 0f), Vector4f(size))
     constructor(center: Vector3f, size: Float) : this(Vector4f(center, 0f), Vector4f(size))
-    constructor(center: Vector2f, size: Vector2f) : this(Vector4f(center, 0f, 0f), Vector4f(size, 0f, 0f))
     constructor(center: Float, size: Float) : this(Vector3f(center), size)
 
     override fun nextV1(): Float {

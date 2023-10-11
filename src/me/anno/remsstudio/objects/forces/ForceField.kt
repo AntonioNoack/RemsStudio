@@ -98,7 +98,7 @@ abstract class ForceField(val displayName: String, val descriptionI: String) : T
                 stack.next {
                     stack.translate(position)
                     applyTransform(particle, index0, indexF)
-                    Grid.drawBuffer(
+                    Grid.drawLineMesh(
                         stack, Vector4f(color.x, color.y, color.z, color.w * opacity),
                         ArrowModel.arrowLineModel
                     )

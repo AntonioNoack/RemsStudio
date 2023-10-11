@@ -8,8 +8,8 @@ import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.inspectable.InspectableVector
 import me.anno.studio.Inspectable
-import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.Style
+import me.anno.ui.base.groups.PanelListY
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
 import org.joml.Vector2f
@@ -34,17 +34,8 @@ class AnimatedDistribution(
     constructor(type: Type, defaultValue: Any) : this(ConstantDistribution(), listOf(type), listOf(defaultValue))
     constructor(type: Type, defaultValues: List<Any>) : this(ConstantDistribution(), listOf(type), defaultValues)
 
-    constructor(distribution: Distribution, type: Type, defaultValue: Any) : this(
-        distribution,
-        listOf(type),
-        listOf(defaultValue)
-    )
-
-    constructor(distribution: Distribution, type: Type, defaultValues: List<Any>) : this(
-        distribution,
-        listOf(type),
-        defaultValues
-    )
+    constructor(distribution: Distribution, type: Type, defaultValues: List<Any>) :
+            this(distribution, listOf(type), defaultValues)
 
     val channels = ArrayList<AnimatedProperty<*>>()
     lateinit var properties: List<InspectableVector>

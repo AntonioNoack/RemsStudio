@@ -4,7 +4,6 @@ import me.anno.ecs.components.mesh.Mesh
 import me.anno.gpu.GFX
 import me.anno.gpu.GFXState
 import me.anno.gpu.buffer.SimpleBuffer
-import me.anno.gpu.buffer.StaticBuffer
 import me.anno.gpu.drawing.GFXx3D
 import me.anno.gpu.drawing.GFXx3D.circleParams
 import me.anno.gpu.drawing.GFXx3D.shader3DCircle
@@ -29,11 +28,11 @@ import kotlin.math.min
 object GFXx3Dv2 {
 
     fun getScale(w: Int, h: Int): Float = getScale(w.toFloat(), h.toFloat())
-    fun getScale(w: Float, h: Float): Float {
+    private fun getScale(w: Float, h: Float): Float {
         return if (w * RemsStudio.targetHeight > h * RemsStudio.targetWidth) RemsStudio.targetWidth / (w * RemsStudio.targetHeight) else 1f / h
     }
 
-    fun shader3DUniforms(
+    private fun shader3DUniforms(
         shader: Shader, stack: Matrix4fArrayList,
         w: Int, h: Int,
         tiling: Vector4f?, filtering: Filtering,
@@ -64,7 +63,7 @@ object GFXx3Dv2 {
 
     }
 
-    fun shader3DUniforms(
+    private fun shader3DUniforms(
         shader: Shader, stack: Matrix4fArrayList,
         w: Int, h: Int, color: Vector4f?,
         tiling: Vector4f?, filtering: Filtering,
@@ -74,26 +73,16 @@ object GFXx3Dv2 {
         shader.v4f("tint", color ?: white4)
     }
 
-    fun shader3DUniforms(
-        shader: Shader, stack: Matrix4fArrayList,
-        w: Int, h: Int, color: Int,
-        tiling: Vector4f?, filtering: Filtering,
-        uvProjection: UVProjection?
-    ) {
-        shader3DUniforms(shader, stack, w, h, tiling, filtering, uvProjection)
-        shader.v4f("tint", color)
-    }
-
     fun draw3DText(
         that: GFXTransform, time: Double, offset: Vector3f,
-        stack: Matrix4fArrayList, buffer: StaticBuffer, color: Vector4f
+        stack: Matrix4fArrayList, mesh: Mesh, color: Vector4f
     ) {
         val shader = shader3DText.value
         shader.use()
         GFXx3D.shader3DUniforms(shader, stack, color)
         shader.v3f("offset", offset)
         GFXTransform.uploadAttractors(that, shader, time)
-        buffer.draw(shader)
+        mesh.draw(shader, 0)
         GFX.check()
     }
 
@@ -107,7 +96,7 @@ object GFXx3Dv2 {
         GFXx2Dv2.defineAdvancedGraphicalFeatures(shader, video, time)
         shader3DUniforms(shader, stack, texture.width, texture.height, color, tiling, filtering, uvProjection)
         texture.bind(0, filtering, clamping)
-        uvProjection.getBuffer().draw(shader)
+        uvProjection.getMesh().draw(shader, 0)
         GFX.check()
     }
 
@@ -138,7 +127,7 @@ object GFXx3Dv2 {
         GFXx2Dv2.defineAdvancedGraphicalFeatures(shader, video, time)
         shader3DUniforms(shader, stack, v0.width, v0.height, color, tiling, filtering, uvProjection)
         v0.bindUVCorrection(shader)
-        uvProjection.getBuffer().draw(shader)
+        uvProjection.getMesh().draw(shader, 0)
         GFX.check()
 
     }
@@ -156,13 +145,13 @@ object GFXx3Dv2 {
         shader3DUniforms(shader, stack, texture.width, texture.height, color, tiling, filtering, uvProjection)
         texture.bind(0, filtering, clamping)
         texture.bindUVCorrection(shader)
-        uvProjection.getBuffer().draw(shader)
+        uvProjection.getMesh().draw(shader, 0)
         GFX.check()
     }
 
     fun draw3DPolygon(
         polygon: Polygon, time: Double,
-        stack: Matrix4fArrayList, buffer: StaticBuffer,
+        stack: Matrix4fArrayList, buffer: Mesh,
         texture: Texture2D, color: Vector4f,
         inset: Float,
         filtering: Filtering, clamping: Clamping
@@ -174,7 +163,7 @@ object GFXx3Dv2 {
         shader3DUniforms(shader, stack, texture.width, texture.height, color, null, filtering, null)
         shader.v1f("inset", inset)
         texture.bind(0, filtering, clamping)
-        buffer.draw(shader)
+        buffer.draw(shader, 0)
         GFX.check()
     }
 
@@ -253,7 +242,7 @@ object GFXx3Dv2 {
         texture.bind(0, GPUFiltering.LINEAR, Clamping.CLAMP)
         // if we have a force field applied, subdivide the geometry
         val buffer = if (hasUVAttractors) SimpleBuffer.flat01CubeX10 else SimpleBuffer.flat01Cube
-        buffer.draw(shader)
+        buffer.draw(shader, 0)
         GFX.check()
     }
 

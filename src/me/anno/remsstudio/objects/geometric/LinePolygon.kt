@@ -272,7 +272,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
         shader.v4f("col0", c0)
         shader.v4f("col1", c1)
         shader.v4f("gfxId", clickId)
-        UVProjection.Planar.getBuffer().draw(shader)
+        UVProjection.Planar.getMesh().draw(shader, 0)
         GFX.check()
     }
 
@@ -287,7 +287,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
                 // todo uniforms + attributes to variables
                 "linePolygon", listOf(
                     Variable(GLSLType.V3F, "coords", VariableMode.ATTR),
-                    Variable(GLSLType.V2F, "attr1", VariableMode.ATTR),
+                    Variable(GLSLType.V2F, "uvs", VariableMode.ATTR),
                     Variable(GLSLType.M4x4, "transform"),
                     Variable(GLSLType.V4F, "tiling"),
                     Variable(GLSLType.V3F, "pos0"), Variable(GLSLType.V3F, "pos1"),
@@ -301,7 +301,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
                         "   gl_Position = transform * vec4(localPosition, 1.0);\n" +
                         ShaderLib.flatNormal +
                         ShaderLib.positionPostProcessing +
-                        "   uv = attr1;\n" +
+                        "   uv = uvs;\n" +
                         "   uvw = coords;\n" +
                         "   colX = mix(col0, col1, att.y);\n" +
                         "}", y3D + Variable(GLSLType.V4F, "colX"), listOf(), "" +
