@@ -14,6 +14,7 @@ import me.anno.gpu.shader.ShaderLib
 import me.anno.gpu.texture.*
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.objects.GFXTransform
+import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.Video
 import me.anno.remsstudio.objects.geometric.Polygon
 import me.anno.utils.Color.white4
@@ -26,6 +27,13 @@ import org.joml.Vector4f
 import kotlin.math.min
 
 object GFXx3Dv2 {
+
+    fun defineAdvancedGraphicalFeatures(shader: Shader, transform: Transform?, time: Double) {
+        (transform as? GFXTransform)?.uploadAttractors(shader, time) ?: GFXx3D.uploadAttractors0(shader)
+        shader.v4f("gfxId", transform?.clickId ?: -1)
+        colorGradingUniforms(transform as? Video, time, shader)
+    }
+
 
     fun getScale(w: Int, h: Int): Float = getScale(w.toFloat(), h.toFloat())
     private fun getScale(w: Float, h: Float): Float {
@@ -93,10 +101,10 @@ object GFXx3Dv2 {
     ) {
         val shader = ShaderLib.shader3DRGBA.value
         shader.use()
-        GFXx2Dv2.defineAdvancedGraphicalFeatures(shader, video, time)
+        defineAdvancedGraphicalFeatures(shader, video, time)
         shader3DUniforms(shader, stack, texture.width, texture.height, color, tiling, filtering, uvProjection)
         texture.bind(0, filtering, clamping)
-        uvProjection.getMesh().draw(shader, 0)
+        uvProjection.mesh.draw(shader, 0)
         GFX.check()
     }
 
@@ -124,10 +132,10 @@ object GFXx3Dv2 {
         val shader0 = v0.get3DShader()
         val shader = shader0.value
         shader.use()
-        GFXx2Dv2.defineAdvancedGraphicalFeatures(shader, video, time)
+        defineAdvancedGraphicalFeatures(shader, video, time)
         shader3DUniforms(shader, stack, v0.width, v0.height, color, tiling, filtering, uvProjection)
         v0.bindUVCorrection(shader)
-        uvProjection.getMesh().draw(shader, 0)
+        uvProjection.mesh.draw(shader, 0)
         GFX.check()
 
     }
@@ -141,11 +149,11 @@ object GFXx3Dv2 {
         val shader0 = texture.get3DShader()
         val shader = shader0.value
         shader.use()
-        GFXx2Dv2.defineAdvancedGraphicalFeatures(shader, video, time)
+        defineAdvancedGraphicalFeatures(shader, video, time)
         shader3DUniforms(shader, stack, texture.width, texture.height, color, tiling, filtering, uvProjection)
         texture.bind(0, filtering, clamping)
         texture.bindUVCorrection(shader)
-        uvProjection.getMesh().draw(shader, 0)
+        uvProjection.mesh.draw(shader, 0)
         GFX.check()
     }
 
@@ -191,7 +199,7 @@ object GFXx3Dv2 {
         val shader = ShaderLib.shaderSDFText.value
         shader.use()
 
-        GFXx2Dv2.defineAdvancedGraphicalFeatures(shader, that, time)
+        defineAdvancedGraphicalFeatures(shader, that, time)
 
         shader.v4f("tint", color)
 
@@ -241,7 +249,7 @@ object GFXx3Dv2 {
         shader.v2f("scale", scale)
         texture.bind(0, GPUFiltering.LINEAR, Clamping.CLAMP)
         // if we have a force field applied, subdivide the geometry
-        val buffer = if (hasUVAttractors) SimpleBuffer.flat01CubeX10 else SimpleBuffer.flat01Cube
+        val buffer = if (hasUVAttractors) SimpleBuffer.flat01CubeX10 else SimpleBuffer.flat01Mesh
         buffer.draw(shader, 0)
         GFX.check()
     }
@@ -288,7 +296,7 @@ object GFXx3Dv2 {
     ) {
         val shader = shader3DCircle.value
         shader.use()
-        GFXx2Dv2.defineAdvancedGraphicalFeatures(shader, that, time)
+        defineAdvancedGraphicalFeatures(shader, that, time)
         shader3DUniforms(shader, stack, 1, 1, color, null, Filtering.NEAREST, null)
         circleParams(innerRadius, startDegrees, endDegrees, shader)
         circleData.draw(shader, 0)

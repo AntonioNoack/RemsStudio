@@ -4,6 +4,7 @@ import me.anno.Engine
 import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX
 import me.anno.gpu.GFXBase
+import me.anno.image.ImageGPUCache
 import me.anno.installer.Installer
 import me.anno.io.Streams.readText
 import me.anno.io.files.FileReference
@@ -13,6 +14,9 @@ import me.anno.io.json.JsonReader
 import me.anno.language.translation.NameDesc
 import me.anno.studio.StudioBase
 import me.anno.ui.Panel
+import me.anno.ui.Style
+import me.anno.ui.WindowStack
+import me.anno.ui.base.ImagePanel
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.constraints.AxisAlignment
 import me.anno.ui.base.groups.PanelListY
@@ -24,8 +28,6 @@ import me.anno.ui.editor.files.toAllowedFilename
 import me.anno.ui.input.EnumInput
 import me.anno.ui.input.FileInput
 import me.anno.ui.input.URLInput
-import me.anno.ui.Style
-import me.anno.ui.WindowStack
 import me.anno.utils.Color.black
 import me.anno.utils.Color.withAlpha
 import me.anno.utils.OS
@@ -49,69 +51,104 @@ object DownloadUI {
 
     private val dstFile = OS.downloads.getChild("lib/yt-dlp")
     private val tmpZip = dstFile.getChild("tmp.zip")
-    private var executable = dstFile.getChild("yt_dlp/__main__.py")
+    private val executable = dstFile.getChild("yt_dlp/__main__.py")
+    private val version = dstFile.getChild("yt_dlp/version.py")
 
-    private fun ensureInstall(style: Style): List<Panel> {
-        // add install check
-        val checkedFile = dstFile.getChild("yt_dlp/__main__.py")
-        return if (!checkedFile.exists) {
-            val height = TextPanel(style).textSize.toInt() + 8
-            val progress = ProgressBarPanel("Installing", "Steps", 2.0, height, style)
-
-            dstFile.tryMkdirs()
-            // download zip
-            Installer.download("yt-dlp.zip", tmpZip) {
-                progress.progress = 1.0
-                progress.progressBar.name = "Unpacking"
-
-                // unpack zip
-                tmpZip.inputStream { it, exc ->
-                    if (it != null) {
-
-                        val zip = ZipArchiveInputStream(it)
-                        while (true) {
-
-                            val entry = zip.nextZipEntry ?: break
-                            val name = entry.name
-
-                            // check name for being malicious
-                            if (".." in name || name.trim() != name ||
-                                name.any {
-                                    it !in 'A'..'Z' && it !in 'a'..'z' &&
-                                            it !in '0'..'9' && it !in "._-/"
-                                }
-                            ) {
-                                zip.close()
-                                throw IOException("Illegal file name: $name")
-                            }
-
-                            if (entry.size > 1e6) {
-                                throw IOException("File suspiciously large: $name, ${entry.size.formatFileSize()}")
-                            }
-
-                            val dstChild = dstFile.getChild(name)
-                            if (entry.isDirectory) {
-                                dstChild.tryMkdirs()
-                            } else {
-                                dstChild.writeBytes(zip.readBytes())
-                            }
-                        }
-                        zip.close()
-
-                        // delete zip
-                        tmpZip.delete()
-
-                        progress.progressBar.finish(true)
-                        progress.progressBar.name = "Finished"
-                        thread {
-                            Thread.sleep(1000)
-                            progress.isVisible = false
-                        }
-                    } else exc?.printStackTrace()
+    private fun findInstalledVersion(): String? {
+        try {
+            if (!executable.exists) return null
+            for (line in version.readLinesSync(256)) {
+                if ('\'' in line && "__version__" in line) {
+                    return line.split('\'')[1]
                 }
             }
-            listOf(progress)
-        } else emptyList() // done
+        } catch (ignored: IOException) {
+        }
+        return null
+    }
+
+    private fun findNewestVersion(callback: (String?) -> Unit) {
+        try {
+            getReference("https://remsstudio.phychi.com/version2.php?prefix=yt-dlp/yt-dlp-&suffix=.zip")
+                .readText { data, e ->
+                    e?.printStackTrace()
+                    val version = if (data != null) {
+                        JsonReader(data).readObject()["version"]?.toString()
+                    } else null
+                    callback(version)
+                }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            callback(null)
+        }
+    }
+
+    private fun executeInstall(progress: ProgressBarPanel, version: String) {
+        dstFile.deleteRecursively()
+        dstFile.tryMkdirs()
+        // download zip
+        Installer.download("yt-dlp/yt-dlp-$version.zip", tmpZip) {
+            progress.progress = 1.0
+            progress.progressBar.name = "Unpacking"
+
+            // unpack zip
+            tmpZip.inputStream { it, exc ->
+                if (it != null) {
+
+                    val zip = ZipArchiveInputStream(it)
+                    while (true) {
+
+                        val entry = zip.nextZipEntry ?: break
+                        val name = entry.name
+
+                        // check name for being malicious
+                        if (".." in name || name.trim() != name ||
+                            name.any {
+                                it !in 'A'..'Z' && it !in 'a'..'z' &&
+                                        it !in '0'..'9' && it !in "._-/"
+                            }
+                        ) {
+                            zip.close()
+                            throw IOException("Illegal file name: $name")
+                        }
+
+                        if (entry.size > 1e6) {
+                            throw IOException("File suspiciously large: $name, ${entry.size.formatFileSize()}")
+                        }
+
+                        val dstChild = dstFile.getChild(name)
+                        if (entry.isDirectory) {
+                            dstChild.tryMkdirs()
+                        } else {
+                            dstChild.writeBytes(zip.readBytes())
+                        }
+                    }
+                    zip.close()
+
+                    // delete zip
+                    tmpZip.delete()
+
+                    progress.progressBar.finish(true)
+                    progress.progressBar.name = "Finished"
+                    thread {
+                        Thread.sleep(1000)
+                        progress.isVisible = false
+                    }
+                } else exc?.printStackTrace()
+            }
+        }
+    }
+
+    private fun ensureInstall(style: Style): List<Panel> {
+        val height = TextPanel(style).textSize.toInt() + 8
+        val progress = ProgressBarPanel("Installing", "Steps", 2.0, height, style)
+        findNewestVersion { newVersion ->
+            val installedVersion = findInstalledVersion()
+            if (newVersion != null && (installedVersion == null || newVersion > installedVersion)) {
+                executeInstall(progress, newVersion)
+            } else progress.isVisible = false
+        }
+        return listOf(progress)
     }
 
     private fun createUI(style: Style): List<Panel> {
@@ -137,26 +174,22 @@ object DownloadUI {
         val infoPanel = TextPanel("", style)
         infoPanel.isVisible = false
 
-        /*var thumbnailSource: FileReference = InvalidRef
+        var thumbnailSource: FileReference = InvalidRef
+        val thumbnailHeight = 240
         val thumbnailPanel = object : ImagePanel(style) {
+            override val className: String get() = "ThumbnailPanel"
             override fun getTexture() = ImageGPUCache[thumbnailSource, false]
+            override fun getTooltipText(x: Float, y: Float) = thumbnailSource.toString()
+            override fun onCopyRequested(x: Float, y: Float) = thumbnailSource
             override fun calculateSize(w: Int, h: Int) {
-                val texture = getTexture()
-                if (texture != null) {
-                    val size = min(min(w, h), 700) / 3
-                    val maxSize = max(texture.w, texture.h)
-                    minW = size * texture.w / maxSize
-                    minH = size * texture.h / maxSize
-                } else {
-                    minW = 1
-                    minH = 1
-                }
-                this.w = minW
-                this.h = minH
+                super.calculateSize(w, h)
+                val tex = getTexture()
+                minW = if (tex == null) 1 else thumbnailHeight * tex.width / tex.height
+                minH = if (tex == null) 1 else thumbnailHeight
             }
         }
         thumbnailPanel.flipY = true
-        thumbnailPanel.stretchMode = ImagePanel.StretchModes.PADDING*/
+        thumbnailPanel.stretchMode = ImagePanel.StretchModes.PADDING
 
         val bestFormat = NameDesc("Best", "best", "")
         val discardFormat = NameDesc("Discard", "", "")
@@ -179,6 +212,7 @@ object DownloadUI {
 
             val iteration = ++iter
             infoPanel.isVisible = false
+            thumbnailSource = InvalidRef
 
             // todo for livestreams on YouTube use --live-from-start
             // show media information
@@ -238,10 +272,11 @@ object DownloadUI {
                     }
 
                     val data = JsonReader(txt).readObject()
-                    /*val thumbnail = data["thumbnail"]?.toString()
+                    val thumbnail = data["thumbnail"]?.toString()
                     if (thumbnail != null &&
                         (thumbnail.startsWith("https://") || thumbnail.startsWith("http://"))
-                    ) thumbnailSource = getReference(thumbnail)*/
+                    ) thumbnailSource = getReference(thumbnail)
+
                     val dstName = (data["title"] ?: data["id"] ?: data["filesize"])?.toString()?.toAllowedFilename()
                     if (dstName != null) {
                         dstPanel.setValue((dstPanel.value.getParent() ?: dstFolder).getChild(dstName), true)
@@ -308,17 +343,18 @@ object DownloadUI {
             }
         }
         loadMetadata(srcInput.value)
-        srcInput.setChangeListener { loadMetadata(it) }
+        srcInput.setChangeListener(::loadMetadata)
 
         ui.add(srcInput)
         ui.add(stateUI)
         ui.add(infoPanel)
-        // ui.add(thumbnailPanel)
+        ui.add(thumbnailPanel)
         ui.add(videoFormatUI)
         ui.add(audioFormatUI)
         ui.add(dstPanel)
+
         val button = TextButton("Start Download", false, style)
-        // todo why is this not working?
+        // todo why is this alignment not working?
         button.alignmentX = AxisAlignment.FILL
         button.weight = 1f
         button.addLeftClickListener {

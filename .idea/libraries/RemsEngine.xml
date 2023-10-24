@@ -6,8 +6,6 @@
     <JAVADOC />
     <SOURCES>
       <root url="file://$PROJECT_DIR$/../RemsEngine/src" />
-      <root url="file://$PROJECT_DIR$/../RemsEngine/src" />
-      <root url="file://$PROJECT_DIR$/../RemsEngine/src" />
     </SOURCES>
   </library>
 </component>

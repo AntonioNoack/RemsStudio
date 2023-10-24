@@ -131,12 +131,7 @@ object Selection {
     }
 
     fun update() {
-        if (!needsUpdate) {
-
-            // nothing to do
-
-        } else {
-
+        if (needsUpdate) {
             // re-find the selected transform and property...
             selectedTransforms = getTransformsFromId()
             val selectedTransforms = selectedTransforms
@@ -151,10 +146,8 @@ object Selection {
                 selectedProperties = null
                 selectedInspectables = selectedTransforms
             }
-
             invalidateUI(true)
             needsUpdate = false
-
         }
     }
 
