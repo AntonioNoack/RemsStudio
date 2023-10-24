@@ -86,12 +86,18 @@ object DownloadUI {
     }
 
     private fun executeInstall(progress: ProgressBarPanel, version: String) {
-        dstFile.deleteRecursively()
-        dstFile.tryMkdirs()
+
         // download zip
         Installer.download("yt-dlp/yt-dlp-$version.zip", tmpZip) {
             progress.progress = 1.0
             progress.progressBar.name = "Unpacking"
+
+            dstFile.tryMkdirs()
+            for (child in dstFile.listChildren() ?: emptyList()) {
+                if (child != tmpZip) { // zip has to be kept ofc
+                    child.deleteRecursively()
+                }
+            }
 
             // unpack zip
             tmpZip.inputStream { it, exc ->
