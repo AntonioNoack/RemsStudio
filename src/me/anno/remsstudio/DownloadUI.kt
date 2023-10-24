@@ -54,6 +54,8 @@ object DownloadUI {
     private val executable = dstFile.getChild("yt_dlp/__main__.py")
     private val version = dstFile.getChild("yt_dlp/version.py")
 
+    private var invalidateStatus: () -> Unit = {}
+
     private fun findInstalledVersion(): String? {
         try {
             if (!executable.exists) return null
@@ -130,10 +132,13 @@ object DownloadUI {
 
                     progress.progressBar.finish(true)
                     progress.progressBar.name = "Finished"
+                    invalidateStatus()
+
                     thread {
                         Thread.sleep(1000)
                         progress.isVisible = false
                     }
+
                 } else exc?.printStackTrace()
             }
         }
@@ -208,6 +213,7 @@ object DownloadUI {
         val tc = stateUI.textColor
 
         var iter = 0
+
         fun loadMetadata(file: FileReference) {
 
             val iteration = ++iter
@@ -220,7 +226,6 @@ object DownloadUI {
             // -j for metadata :3
 
             if (!executable.exists) {
-                // todo when download of library is finished, update this
                 stateUI.text = "Executable Missing/Downloading"
                 stateUI.textColor = 0xffff00 or black
                 return
@@ -342,6 +347,11 @@ object DownloadUI {
                 }
             }
         }
+        invalidateStatus = {
+            executable.invalidate()
+            loadMetadata(InvalidRef)
+        }
+
         loadMetadata(srcInput.value)
         srcInput.setChangeListener(::loadMetadata)
 
