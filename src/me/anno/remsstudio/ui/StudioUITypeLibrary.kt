@@ -26,8 +26,9 @@ class StudioUITypeLibrary : UITypeLibrary(typeList) {
 
         val createTransform = FileExplorerOption(
             NameDesc("Create Component", "Create a new folder component", "ui.newComponent")
-        ) { p, folder ->
-            askName(
+        ) { p, folders ->
+            val folder = folders.firstOrNull()
+            if (folder != null) askName(
                 p.windowStack,
                 NameDesc("Name", "", "ui.newComponent.askName"),
                 "",

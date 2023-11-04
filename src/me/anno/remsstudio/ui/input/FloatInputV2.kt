@@ -64,4 +64,7 @@ class FloatInputV2(
         return clone
     }
 
+    override val className: String
+        get() = "FloatInputV2"
+
 }

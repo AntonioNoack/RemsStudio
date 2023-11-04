@@ -5,11 +5,10 @@ import me.anno.gpu.GFXState.useFrame
 import me.anno.gpu.framebuffer.DepthBufferType
 import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.framebuffer.IFramebuffer
-import me.anno.gpu.shader.GLSLType
 import me.anno.gpu.shader.Renderer
+import me.anno.gpu.shader.ShaderLib.coordsUVVertexShader
 import me.anno.gpu.shader.ShaderLib.createShader
-import me.anno.gpu.shader.ShaderLib.simplestVertexShader
-import me.anno.gpu.shader.builder.Variable
+import me.anno.gpu.shader.ShaderLib.uvList
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.GPUFiltering
 import me.anno.gpu.texture.Texture2D
@@ -78,8 +77,7 @@ object OpticalFlow {
 
     val flowShader = lazy {
         createShader(
-            "flow", simplestVertexShader,
-            listOf(Variable(GLSLType.V2F, "uv")), "" +
+            "flow", coordsUVVertexShader, uvList, "" +
                     "uniform sampler2D tex0, tex1;\n" +
                     "uniform vec2 scale, offset;\n" +
                     "uniform float lambda;\n" +
@@ -121,8 +119,7 @@ object OpticalFlow {
 
     val blurShader = lazy {
         createShader(
-            "blur", "" + simplestVertexShader,
-            listOf(Variable(GLSLType.V2F, "uv")), "" +
+            "blur", coordsUVVertexShader, uvList, "" +
                     "uniform sampler2D tex;\n" +
                     "uniform vec2 texOffset;\n" +
                     "\n" +
@@ -182,8 +179,7 @@ object OpticalFlow {
 
     val repositionShader = lazy {
         createShader(
-            "reposition", "" +
-                    simplestVertexShader, listOf(Variable(GLSLType.V2F, "uv")), "" +
+            "reposition", coordsUVVertexShader, uvList, "" +
                     "uniform vec2 amt;\n" +
                     "uniform sampler2D tex0, tex1;\n" +
                     "vec2 get2DOff(sampler2D tex, vec2 coord) {\n" +

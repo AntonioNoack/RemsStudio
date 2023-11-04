@@ -4,7 +4,7 @@ import me.anno.animation.LoopingState
 import me.anno.animation.Type
 import me.anno.audio.openal.AudioManager
 import me.anno.audio.openal.AudioTasks
-import me.anno.cache.data.ImageData.Companion.imageTimeout
+import me.anno.cache.data.ImageToTexture.Companion.imageTimeout
 import me.anno.cache.data.VideoData.Companion.framesPerContainer
 import me.anno.cache.instances.SVGMeshCache
 import me.anno.cache.instances.VideoCache.getVideoFrame

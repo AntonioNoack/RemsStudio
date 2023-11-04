@@ -217,20 +217,20 @@ class Project(var name: String, val file: FileReference) : Saveable() {
                 when (c) {
                     is CustomContainer -> write(c.child, w)
                     is CustomList -> {
-                        writer.open(true)
+                        writer.beginArray()
                         writer.write(if (c.isY) "CustomListY" else "CustomListX")
                         writer.write((w * 1000f).roundToInt())
                         val weightSum = c.children.sumOf { it.weight.toDouble() }.toFloat()
                         for (chi in c.children) {
                             write(chi, chi.weight / weightSum)
                         }
-                        writer.close(true)
+                        writer.endArray()
                     }
                     else -> {
-                        writer.open(true)
+                        writer.beginArray()
                         writer.write(c.className)
                         writer.write((w * 1000f).roundToInt())
-                        writer.close(true)
+                        writer.endArray()
                     }
                 }
             }

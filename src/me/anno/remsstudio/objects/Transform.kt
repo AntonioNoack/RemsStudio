@@ -748,7 +748,6 @@ open class Transform() : Saveable(),
      * title, tool tip text, type, start value
      * callback is used to adjust the value
      * */
-    @Suppress("UNCHECKED_CAST") // all casts are checked in all known use-cases ;)
     fun <V> vi(
         inspected: List<Inspectable>,
         title: String, ttt: String,
@@ -894,11 +893,6 @@ open class Transform() : Saveable(),
             // draw a small symbol to indicate pivot
             if (!isFinalRendering) {
                 stack.pushMatrix()
-                /*val w = GFX.windowWidth
-                val h = GFX.windowHeight
-                stack.m00(scale*h/w);stack.m01(0f);stack.m02(0f)
-                stack.m10(0f);stack.m11(scale);stack.m12(0f)
-                stack.m20(0f);stack.m21(0f);stack.m22(scale)*/
                 stack.scale(scale)
                 draw3DCircle(stack, inner, 0f, 360f, color)
                 stack.popMatrix()

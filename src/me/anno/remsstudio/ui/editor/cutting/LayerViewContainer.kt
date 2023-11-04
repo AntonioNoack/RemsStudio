@@ -7,7 +7,7 @@ import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.scrolling.ScrollPanelY
 import me.anno.ui.Style
 
-class LayerViewContainer(style: Style) : ScrollPanelY(Padding(0), AxisAlignment.MIN, style) {
+class LayerViewContainer(style: Style) : ScrollPanelY(Padding(0), style) {
 
     // todo this could be more beautiful, maybe automatically managed or sth like that...
     private val addLayerButton = TextButton("+", true, style)

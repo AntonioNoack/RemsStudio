@@ -109,7 +109,7 @@ import kotlin.math.min
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
-object RemsStudio : StudioBase("Rem's Studio", 10202, true) {
+object RemsStudio : StudioBase("Rem's Studio", 10203, true) {
 
     val defaultWindowStack get() = GFX.someWindow!!.windowStack
     var hideUnusedProperties = false

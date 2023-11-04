@@ -4,6 +4,7 @@ import me.anno.config.DefaultConfig
 import me.anno.ecs.Entity
 import me.anno.ecs.components.anim.*
 import me.anno.ecs.components.anim.BoneData.uploadJointMatrices
+import me.anno.ecs.components.mesh.Material
 import me.anno.ecs.components.mesh.MaterialCache
 import me.anno.ecs.components.mesh.Mesh
 import me.anno.ecs.components.mesh.MeshComponentBase
@@ -233,7 +234,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                     for (index in 0 until mesh.numMaterials) {
                         val m0 = materialOverrides.getOrNull(index)?.nullIfUndefined()
                         val m1 = m0 ?: materials.getOrNull(index)
-                        val material = MaterialCache[m1, Mesh.defaultMaterial]
+                        val material = MaterialCache[m1, Material.defaultMaterial]
                         shader.v1i("hasVertexColors", if (material.enableVertexColors) mesh.hasVertexColors else 0)
                         material.bind(shader)
                         animTexture?.bindTrulyNearest(shader, "animTexture")

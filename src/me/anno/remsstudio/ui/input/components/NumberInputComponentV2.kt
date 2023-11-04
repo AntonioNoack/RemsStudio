@@ -1,16 +1,15 @@
 package me.anno.remsstudio.ui.input.components
 
-import me.anno.input.Input
 import me.anno.input.Key
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.animation.drivers.AnimationDriver
+import me.anno.ui.Style
 import me.anno.ui.input.FloatInput
 import me.anno.ui.input.IntInput
 import me.anno.ui.input.NumberInput
 import me.anno.ui.input.components.NumberInputComponent
-import me.anno.ui.Style
 import me.anno.utils.types.AnyToDouble
 
 class NumberInputComponentV2(
@@ -49,7 +48,7 @@ class NumberInputComponentV2(
 
     override fun onMouseMoved(x: Float, y: Float, dx: Float, dy: Float) {
         if (!hasDriver) numberInput.onMouseMoved(x, y, dx, dy)
-        isDragging = !Input.isControlDown && Input.isLeftDown
+        super.onMouseMoved(x, y, dx, dy)
     }
 
     override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {

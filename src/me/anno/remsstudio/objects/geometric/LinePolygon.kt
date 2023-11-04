@@ -272,7 +272,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
         shader.v4f("col0", c0)
         shader.v4f("col1", c1)
         shader.v4f("gfxId", clickId)
-        UVProjection.Planar.getMesh().draw(shader, 0)
+        UVProjection.Planar.mesh.draw(shader, 0)
         GFX.check()
     }
 

@@ -262,7 +262,7 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
                 val src0Tex = src0.getTexture0() as Texture2D
                 src0.bindTexture0(0, src0Tex.filtering, src0Tex.clamping!!)
                 val srcBuffer = (src0 as Framebuffer).ssBuffer ?: src0
-                BokehBlur.draw(srcBuffer.textures[0], temp, pixelSize, Scene.usesFPBuffers)
+                BokehBlur.draw(srcBuffer.textures!![0], temp, pixelSize, Scene.usesFPBuffers)
 
                 temp.bindTexture0(2, GPUFiltering.TRULY_NEAREST, Clamping.CLAMP)
                 masked.bindTexture0(1, GPUFiltering.TRULY_NEAREST, Clamping.CLAMP)

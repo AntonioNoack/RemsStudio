@@ -47,6 +47,8 @@ import kotlin.math.round
  * */
 object DownloadUI {
 
+    // todo check for Python to be installed; if not, lead user to download page/tutorial for Python
+
     private val LOGGER = LogManager.getLogger(DownloadUI::class)
 
     private val dstFile = OS.downloads.getChild("lib/yt-dlp")
@@ -199,7 +201,7 @@ object DownloadUI {
                 minH = if (tex == null) 1 else thumbnailHeight
             }
         }
-        thumbnailPanel.flipY = true
+        thumbnailPanel.flipY = false
         thumbnailPanel.stretchMode = ImagePanel.StretchModes.PADDING
 
         val bestFormat = NameDesc("Best", "best", "")

@@ -1,14 +1,15 @@
 package me.anno.remsstudio.ui.input
 
 import me.anno.animation.Type
+import me.anno.input.Key
 import me.anno.io.text.TextReader
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.studio.StudioBase
 import me.anno.studio.StudioBase.Companion.workspace
-import me.anno.ui.input.FloatVectorInput
 import me.anno.ui.Style
+import me.anno.ui.input.FloatVectorInput
 import org.joml.*
 
 class FloatVectorInputV2(
@@ -111,5 +112,15 @@ class FloatVectorInputV2(
         copyInto(clone)
         return clone
     }
+
+    override fun onKeyTyped(x: Float, y: Float, key: Key) {
+        if (key == Key.KEY_ENTER || key == Key.KEY_KP_ENTER) return
+        super.onKeyTyped(x, y, key)
+    }
+
+    override fun onEnterKey(x: Float, y: Float) {}
+
+    override val className: String
+        get() = "FloatVectorInputV2"
 
 }

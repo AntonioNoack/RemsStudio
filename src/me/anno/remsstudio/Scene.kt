@@ -28,8 +28,8 @@ import me.anno.gpu.shader.ShaderFuncLib.reinhardToneMapping
 import me.anno.gpu.shader.ShaderFuncLib.uchimuraToneMapping
 import me.anno.gpu.shader.ShaderLib.ascColorDecisionList
 import me.anno.gpu.shader.ShaderLib.brightness
+import me.anno.gpu.shader.ShaderLib.coordsUVVertexShader
 import me.anno.gpu.shader.ShaderLib.createShader
-import me.anno.gpu.shader.ShaderLib.simplestVertexShader
 import me.anno.gpu.shader.ShaderLib.uvList
 import me.anno.gpu.shader.builder.Variable
 import me.anno.gpu.shader.builder.VariableMode
@@ -158,7 +158,7 @@ object Scene {
         )
 
         lutShader = createShader(
-            "lut", simplestVertexShader, uvList, "" +
+            "lut", coordsUVVertexShader, uvList, "" +
                     "uniform sampler2D tex;\n" +
                     "uniform sampler3D lut;\n" +
                     randomGLSL +
@@ -170,7 +170,7 @@ object Scene {
         )
 
         addBloomShader = createShader(
-            "addBloom", simplestVertexShader, uvList, "" +
+            "addBloom", coordsUVVertexShader, uvList, "" +
                     "uniform sampler2D original, blurred;\n" +
                     "uniform float intensity;\n" +
                     "void main(){" +
