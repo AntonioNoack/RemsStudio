@@ -11,9 +11,9 @@ import me.anno.gpu.framebuffer.DepthBufferType
 import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.framebuffer.Screenshots
 import me.anno.gpu.framebuffer.StableWindowSize
-import me.anno.gpu.shader.Renderer
-import me.anno.gpu.shader.Renderer.Companion.colorRenderer
-import me.anno.gpu.shader.Renderer.Companion.colorSqRenderer
+import me.anno.gpu.shader.renderer.Renderer
+import me.anno.gpu.shader.renderer.Renderer.Companion.colorRenderer
+import me.anno.gpu.shader.renderer.Renderer.Companion.colorSqRenderer
 import me.anno.gpu.texture.Texture2D.Companion.switchRGB2BGR
 import me.anno.input.Input
 import me.anno.input.Input.isControlDown

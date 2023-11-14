@@ -23,7 +23,7 @@ import me.anno.remsstudio.objects.Camera
 import me.anno.utils.Sleep.acquire
 import me.anno.utils.hpc.ProcessingQueue
 import me.anno.video.AudioCreator.Companion.playbackSampleRate
-import me.anno.video.ffmpeg.FFMPEGMetadata
+import me.anno.video.ffmpeg.MediaMetadata
 import java.util.concurrent.Semaphore
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -206,7 +206,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
     )
 
     fun getRawData(
-        meta: FFMPEGMetadata,
+        meta: MediaMetadata,
         source: Audio?,
         destination: Camera?,
         key: PipelineKey
@@ -239,7 +239,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
     }
 
     fun getBuffer0(
-        meta: FFMPEGMetadata,
+        meta: MediaMetadata,
         source: Audio?,
         destination: Camera?,
         pipelineKey: PipelineKey,
@@ -253,7 +253,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
     }
 
     fun getBuffer0(
-        meta: FFMPEGMetadata,
+        meta: MediaMetadata,
         pipelineKey: PipelineKey,
         async: Boolean
     ): AudioData? = getBuffer0(meta, null, null, pipelineKey, async)

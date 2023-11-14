@@ -11,7 +11,7 @@ import me.anno.remsstudio.objects.documents.PDFDocument
 import me.anno.remsstudio.objects.MeshTransform
 import me.anno.gpu.drawing.UVProjection
 import me.anno.remsstudio.objects.text.Text
-import me.anno.studio.StudioBase.Companion.addEvent
+import me.anno.studio.Events.addEvent
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.defaultWindowStack
 import me.anno.remsstudio.Selection.selectTransform

@@ -2,13 +2,13 @@ package me.anno.remsstudio.ui
 
 import me.anno.config.DefaultConfig
 import me.anno.language.translation.NameDesc
-import me.anno.studio.StudioBase.Companion.addEvent
+import me.anno.studio.Events.addEvent
 import me.anno.ui.Window
+import me.anno.ui.WindowStack
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListX
 import me.anno.ui.base.menu.Menu
 import me.anno.ui.input.FloatInput
-import me.anno.ui.WindowStack
 import kotlin.concurrent.thread
 
 object MenuUtils {

@@ -1,6 +1,6 @@
 package me.anno.remsstudio.video
 
-import me.anno.gpu.shader.Renderer
+import me.anno.gpu.shader.renderer.Renderer
 import me.anno.remsstudio.Scene
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Camera

@@ -2,20 +2,19 @@ package me.anno.remsstudio.objects
 
 import me.anno.animation.Type
 import me.anno.config.DefaultConfig
-import me.anno.gpu.GFX
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.GFXState
 import me.anno.gpu.blending.BlendMode
 import me.anno.gpu.drawing.GFXx3D.draw3DCircle
-import me.anno.gpu.shader.Renderer
+import me.anno.gpu.shader.renderer.Renderer
 import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.base.InvalidFormatException
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
-import me.anno.io.text.TextReader
-import me.anno.io.text.TextWriter
+import me.anno.io.json.saveable.JsonStringReader
+import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.language.translation.Dict
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.max
@@ -673,7 +672,7 @@ open class Transform() : Saveable(),
     fun clone() = clone(InvalidRef)
     open fun clone(workspace: FileReference): Transform {
         val asString = try {
-            TextWriter.toText(this, workspace)
+            JsonStringWriter.toText(this, workspace)
         } catch (e: Exception) {
             e.printStackTrace()
             ""
@@ -902,7 +901,7 @@ open class Transform() : Saveable(),
         val nextClickId = AtomicInteger()
 
         fun String.toTransform() = try {
-            TextReader.readFirstOrNull<Transform>(this, workspace, true)
+            JsonStringReader.readFirstOrNull<Transform>(this, workspace, true)
         } catch (e: InvalidFormatException) {
             null
         }

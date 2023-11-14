@@ -16,7 +16,7 @@ import me.anno.ui.Style
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
 import me.anno.utils.structures.ValueWithDefaultFunc
-import me.anno.video.ffmpeg.FFMPEGMetadata.Companion.getMeta
+import me.anno.video.ffmpeg.MediaMetadata.Companion.getMeta
 import org.joml.Matrix4fArrayList
 import org.joml.Vector4f
 

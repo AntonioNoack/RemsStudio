@@ -13,7 +13,7 @@ import me.anno.ui.base.groups.PanelList
 import me.anno.ui.base.scrolling.ScrollPanelX
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.remsstudio.ui.scene.SceneTabData
-import me.anno.studio.StudioBase.Companion.addEvent
+import me.anno.studio.Events.addEvent
 import me.anno.utils.structures.lists.Lists.getOrPrevious
 import org.apache.logging.log4j.LogManager
 

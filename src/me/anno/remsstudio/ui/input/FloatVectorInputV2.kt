@@ -2,14 +2,14 @@ package me.anno.remsstudio.ui.input
 
 import me.anno.animation.Type
 import me.anno.input.Key
-import me.anno.io.text.TextReader
+import me.anno.io.json.saveable.JsonStringReader
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.studio.StudioBase
 import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.Style
 import me.anno.ui.input.FloatVectorInput
+import org.apache.logging.log4j.LogManager
 import org.joml.*
 
 class FloatVectorInputV2(
@@ -22,6 +22,10 @@ class FloatVectorInputV2(
     title, visibilityKey, type, style,
     { FloatInputV2(style, "", visibilityKey, type, owningProperty) }
 ) {
+
+    companion object {
+        private val LOGGER = LogManager.getLogger(FloatVectorInputV2::class)
+    }
 
     constructor(title: String, property: AnimatedProperty<*>, time: Double, style: Style) :
             this(title, title, property.type, property, style) {
@@ -84,7 +88,7 @@ class FloatVectorInputV2(
     private fun pasteAnimated(data: String): Unit? {
         return try {
             val editorTime = RemsStudio.editorTime
-            val animProperty = TextReader.read(data, workspace, true)
+            val animProperty = JsonStringReader.read(data, workspace, true)
                 .firstOrNull() as? AnimatedProperty<*>
             if (animProperty != null) {
                 owningProperty.copyFrom(animProperty)
@@ -93,7 +97,7 @@ class FloatVectorInputV2(
                     is Vector3f -> setValue(value, true)
                     is Vector4f -> setValue(value, true)
                     is Quaternionf -> setValue(value, true)
-                    else -> StudioBase.warn("Unknown pasted data type $value")
+                    else -> LOGGER.warn("Unknown pasted data type $value")
                 }
             }
             Unit

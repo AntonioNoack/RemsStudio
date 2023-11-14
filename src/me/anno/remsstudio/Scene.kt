@@ -20,7 +20,7 @@ import me.anno.gpu.framebuffer.Framebuffer
 import me.anno.gpu.framebuffer.IFramebuffer
 import me.anno.gpu.shader.BaseShader
 import me.anno.gpu.shader.GLSLType
-import me.anno.gpu.shader.Renderer
+import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.shader.Shader
 import me.anno.gpu.shader.ShaderFuncLib.acesToneMapping
 import me.anno.gpu.shader.ShaderFuncLib.randomGLSL

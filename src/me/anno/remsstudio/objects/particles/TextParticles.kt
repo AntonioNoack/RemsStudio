@@ -10,12 +10,12 @@ import me.anno.fonts.mesh.TextMeshGroup
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.InvalidRef
-import me.anno.io.text.TextWriter
+import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.remsstudio.objects.text.Text
 import me.anno.studio.Inspectable
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
 import me.anno.utils.types.Strings.joinChars
 import org.joml.Vector3f
 import kotlin.streams.toList
@@ -132,7 +132,7 @@ class TextParticles : ParticleSystem() {
         text.saveWithoutSuper(writer)
     }
 
-    override fun getSystemState() = super.getSystemState() to TextWriter.toText(text, InvalidRef)
+    override fun getSystemState() = super.getSystemState() to JsonStringWriter.toText(text, InvalidRef)
 
     override fun readObject(name: String, value: ISaveable?) {
         when (name) {
@@ -145,6 +145,7 @@ class TextParticles : ParticleSystem() {
             "startCursor", "endCursor",
             "attractorBaseColor" ->
                 text.readObject(name, value)
+
             else -> super.readObject(name, value)
         }
     }
@@ -154,6 +155,7 @@ class TextParticles : ParticleSystem() {
             "textAlignment", "blockAlignmentX", "blockAlignmentY",
             "renderingMode" ->
                 text.readInt(name, value)
+
             else -> super.readInt(name, value)
         }
     }
@@ -162,6 +164,7 @@ class TextParticles : ParticleSystem() {
         when (name) {
             "isItalic", "isBold", "roundSDFCorners", "smallCaps" ->
                 text.readBoolean(name, value)
+
             else -> super.readBoolean(name, value)
         }
     }
@@ -177,6 +180,7 @@ class TextParticles : ParticleSystem() {
         when (name) {
             "relativeTabSize", "relativeCharSpacing", "lineBreakWidth" ->
                 text.readFloat(name, value)
+
             else -> super.readFloat(name, value)
         }
     }

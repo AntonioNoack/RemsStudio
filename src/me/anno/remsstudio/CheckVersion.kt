@@ -4,7 +4,7 @@ import me.anno.installer.Installer
 import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio.defaultWindowStack
-import me.anno.studio.StudioBase.Companion.addEvent
+import me.anno.studio.Events.addEvent
 import me.anno.ui.base.menu.Menu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.utils.OS

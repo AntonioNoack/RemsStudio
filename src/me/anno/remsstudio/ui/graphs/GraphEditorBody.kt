@@ -12,8 +12,8 @@ import me.anno.input.Input.isShiftDown
 import me.anno.input.Input.mouseKeysDown
 import me.anno.input.Key
 import me.anno.io.files.InvalidRef
-import me.anno.io.text.TextReader
-import me.anno.io.text.TextWriter
+import me.anno.io.json.saveable.JsonStringReader
+import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.length
@@ -717,7 +717,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             val selectedProperty = selectedProperties?.firstOrNull()
             val target = selectedProperty ?: return super.onPaste(x, y, data, type)
             val targetType = target.type
-            val parsedKeyframes = TextReader.read(data, workspace, true).filterIsInstance<Keyframe<*>>()
+            val parsedKeyframes = JsonStringReader.read(data, workspace, true).filterIsInstance<Keyframe<*>>()
             if (parsedKeyframes.isNotEmpty()) {
                 RemsStudio.largeChange("Pasted Keyframes") {
                     parsedKeyframes.forEach { sth ->
@@ -740,7 +740,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         // copy keyframes
         // left anker or center? left for now
         val time0 = selectedKeyframes.minByOrNull { it.time }?.time ?: 0.0
-        return TextWriter.toText(
+        return JsonStringWriter.toText(
             selectedKeyframes
                 .map { Keyframe(it.time - time0, it.value) }
                 .toList(),

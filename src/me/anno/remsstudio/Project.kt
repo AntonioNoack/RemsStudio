@@ -7,10 +7,10 @@ import me.anno.io.Saveable
 import me.anno.io.config.ConfigBasics
 import me.anno.io.files.FileReference
 import me.anno.io.files.FileReference.Companion.getReference
-import me.anno.io.json.JsonReader
-import me.anno.io.json.JsonWriter
-import me.anno.io.text.TextReader
-import me.anno.io.text.TextWriter
+import me.anno.io.json.generic.JsonReader
+import me.anno.io.json.generic.JsonWriter
+import me.anno.io.json.saveable.JsonStringReader
+import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.io.utils.StringMap
 import me.anno.language.Language
 import me.anno.remsstudio.RemsStudio.editorTime
@@ -28,7 +28,7 @@ import me.anno.remsstudio.ui.scene.StudioSceneView
 import me.anno.remsstudio.ui.sceneTabs.SceneTab
 import me.anno.remsstudio.ui.sceneTabs.SceneTabs
 import me.anno.remsstudio.utils.Utils.getAnimated
-import me.anno.studio.StudioBase.Companion.addEvent
+import me.anno.studio.Events.addEvent
 import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.Panel
 import me.anno.ui.custom.CustomContainer
@@ -76,7 +76,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
             val ref = getReference(scenes, "Root.json")
             val tab0 = if (ref.exists) {
                 try {
-                    val data = TextReader.read(ref.inputStreamSync(), workspace, true)
+                    val data = JsonStringReader.read(ref.inputStreamSync(), workspace, true)
                     val trans = data.filterIsInstance<Transform>().firstOrNull()
                     val history = data.filterIsInstance<History>().firstOrNull()
                     if (trans != null) Pair(trans, history ?: History()) else null
@@ -105,7 +105,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
         // tabs
         try {
             if (tabsFile.exists) {
-                val loadedUIData = TextReader
+                val loadedUIData = JsonStringReader
                     .read(tabsFile, workspace, true)
                 val sceneTabs = loadedUIData
                     .filterIsInstance<SceneTabData>()
@@ -150,7 +150,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
 
     fun saveTabs() {
         val data = SceneTabs.sceneTabs.map { SceneTabData(it) }
-        TextWriter.save(data, tabsFile, workspace)
+        JsonStringWriter.save(data, tabsFile, workspace)
     }
 
     fun loadUILayout(name: String = uiFile.nameWithoutExtension): Panel? {

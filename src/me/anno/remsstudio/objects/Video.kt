@@ -71,8 +71,8 @@ import me.anno.video.BlankFrameDetector
 import me.anno.video.ImageSequenceMeta
 import me.anno.video.ImageSequenceMeta.Companion.imageSequenceIdentifier
 import me.anno.video.MissingFrameException
-import me.anno.video.ffmpeg.FFMPEGMetadata
-import me.anno.video.ffmpeg.FFMPEGMetadata.Companion.getMeta
+import me.anno.video.ffmpeg.MediaMetadata
+import me.anno.video.ffmpeg.MediaMetadata.Companion.getMeta
 import me.anno.video.ffmpeg.IsFFMPEGOnly.isFFMPEGOnlyExtension
 import me.anno.video.formats.gpu.GPUFrame
 import org.apache.logging.log4j.LogManager
@@ -140,7 +140,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
     val videoScale = ValueWithDefaultFunc { DefaultConfig["default.video.scale", 1] }
 
     var lastFile: FileReference? = null
-    var lastMeta: FFMPEGMetadata? = null
+    var lastMeta: MediaMetadata? = null
     var lastDuration = Double.POSITIVE_INFINITY
 
     var imageSequenceMeta: ImageSequenceMeta? = null
@@ -339,7 +339,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         // LOGGER.info("missing frame")
     }
 
-    fun getFrameAtLocalTime(time: Double, width: Int, meta: FFMPEGMetadata): GPUFrame? {
+    fun getFrameAtLocalTime(time: Double, width: Int, meta: MediaMetadata): GPUFrame? {
 
         // only load a single frame at a time?? idk...
 
@@ -383,7 +383,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
     private var lastFrame: GPUFrame? = null
 
     private fun drawVideo(
-        meta: FFMPEGMetadata, stack: Matrix4fArrayList, time: Double, color: Vector4f,
+        meta: MediaMetadata, stack: Matrix4fArrayList, time: Double, color: Vector4f,
         getFrame: (zoomLevel: Int, frameIndex0: Int, videoFPS: Double) -> GPUFrame?
     ) {
 
@@ -477,7 +477,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         }
     }
 
-    fun getFrame(zoomLevel: Int, meta: FFMPEGMetadata, frameIndex: Int, videoFPS: Double): GPUFrame? {
+    fun getFrame(zoomLevel: Int, meta: MediaMetadata, frameIndex: Int, videoFPS: Double): GPUFrame? {
 
         val scale = max(1, zoomLevel)
         val bufferSize = framesPerContainer
@@ -939,7 +939,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                             component = audio2.component
                         }
                     } else AudioTasks.addTask("stop", 1) { stopPlayback() }
-                } else StudioBase.warn("Separated playback is only available with paused editor")
+                } else LOGGER.warn("Separated playback is only available with paused editor")
             }
             .setTooltip("Listen to the audio separated from the rest"))
 

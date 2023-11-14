@@ -1,8 +1,8 @@
 package me.anno.remsstudio.objects.models
 
 import me.anno.ecs.components.mesh.Mesh
+import me.anno.gpu.buffer.DrawMode
 import org.joml.Vector2f
-import org.lwjgl.opengl.GL11C.GL_LINES
 
 object ArrowModel {
 
@@ -80,7 +80,7 @@ object ArrowModel {
 
         val buffer = Mesh()
         buffer.positions = positions
-        buffer.drawMode = GL_LINES
+        buffer.drawMode = DrawMode.LINES
         return buffer
 
     }

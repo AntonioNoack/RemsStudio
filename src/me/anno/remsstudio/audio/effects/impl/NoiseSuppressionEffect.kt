@@ -12,7 +12,7 @@ import me.anno.remsstudio.audio.effects.SoundEffect
 import me.anno.remsstudio.audio.effects.Time
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
-import me.anno.studio.StudioBase.Companion.addEvent
+import me.anno.studio.Events.addEvent
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory

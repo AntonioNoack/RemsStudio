@@ -14,7 +14,7 @@ import me.anno.engine.ui.render.Renderers.previewRenderer
 import me.anno.gpu.GFX
 import me.anno.gpu.GFXState
 import me.anno.gpu.drawing.GFXx3D
-import me.anno.gpu.shader.Renderer
+import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.shader.Shader
 import me.anno.gpu.texture.ITexture2D
 import me.anno.gpu.texture.TextureLib.whiteTexture
@@ -91,7 +91,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
     private fun findAnimations(entity: Entity): HashMap<String, Animation> {
         val result = HashMap<String, Animation>()
         entity.forAll {
-            if (it is AnimRenderer) {
+            if (it is AnimMeshComponent) {
                 val skeleton = SkeletonCache[it.skeleton]
                 if (skeleton != null) {
                     for ((name, anim) in skeleton.animations) {

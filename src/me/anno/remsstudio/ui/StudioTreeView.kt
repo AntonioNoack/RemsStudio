@@ -4,7 +4,7 @@ import me.anno.config.DefaultConfig
 import me.anno.config.DefaultConfig.style
 import me.anno.gpu.drawing.DrawTexts.getTextSizeX
 import me.anno.io.files.InvalidRef
-import me.anno.io.text.TextWriter
+import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.io.utils.StringMap
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
@@ -48,7 +48,7 @@ class StudioTreeView(style: Style) :
     }
 
     override fun getDragType(element: Transform) = "Transform"
-    override fun stringifyForCopy(element: Transform) = TextWriter.toText(element, InvalidRef)
+    override fun stringifyForCopy(element: Transform) = JsonStringWriter.toText(element, InvalidRef)
     override fun getSymbol(element: Transform) = element.symbol
     override fun isCollapsed(element: Transform) = element.isCollapsed
     override fun getName(element: Transform) = element.name.ifBlank { element.defaultDisplayName }

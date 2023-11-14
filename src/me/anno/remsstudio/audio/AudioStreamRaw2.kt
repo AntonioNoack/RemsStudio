@@ -18,7 +18,7 @@ import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Transform
 import me.anno.utils.Sleep.waitUntilDefined
 import me.anno.utils.structures.tuples.ShortPair
-import me.anno.video.ffmpeg.FFMPEGMetadata
+import me.anno.video.ffmpeg.MediaMetadata
 import me.anno.video.ffmpeg.FFMPEGStream.Companion.getAudioSequence
 import org.joml.Vector3f
 import kotlin.math.abs
@@ -28,7 +28,7 @@ import kotlin.math.min
 class AudioStreamRaw2(
     val file: FileReference,
     val repeat: LoopingState,
-    val meta: FFMPEGMetadata,
+    val meta: MediaMetadata,
     val is3D: Boolean,
     val source: Audio?,
     val destination: Transform?

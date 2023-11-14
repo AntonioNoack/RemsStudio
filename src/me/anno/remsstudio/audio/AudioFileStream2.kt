@@ -7,8 +7,8 @@ import me.anno.remsstudio.audio.AudioFXCache2.convert
 import me.anno.remsstudio.audio.effects.Time
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
-import me.anno.video.ffmpeg.FFMPEGMetadata
-import me.anno.video.ffmpeg.FFMPEGMetadata.Companion.getMeta
+import me.anno.video.ffmpeg.MediaMetadata
+import me.anno.video.ffmpeg.MediaMetadata.Companion.getMeta
 
 // only play once, then destroy; it makes things easier
 // (on user input and when finally rendering only)
@@ -32,7 +32,7 @@ open class AudioFileStream2(
     file: FileReference,
     repeat: LoopingState,
     startIndex: Long,
-    meta: FFMPEGMetadata,
+    meta: MediaMetadata,
     val source: Audio,
     val destination: Camera,
     speed: Double,

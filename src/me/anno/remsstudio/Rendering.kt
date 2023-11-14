@@ -30,7 +30,7 @@ import me.anno.video.VideoCreator
 import me.anno.video.VideoCreator.Companion.defaultQuality
 import me.anno.video.ffmpeg.FFMPEGEncodingBalance
 import me.anno.video.ffmpeg.FFMPEGEncodingType
-import me.anno.video.ffmpeg.FFMPEGMetadata.Companion.getMeta
+import me.anno.video.ffmpeg.MediaMetadata.Companion.getMeta
 import org.apache.logging.log4j.LogManager
 import kotlin.concurrent.thread
 import kotlin.math.max

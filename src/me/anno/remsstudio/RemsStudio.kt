@@ -30,19 +30,21 @@ import me.anno.remsstudio.objects.text.Text
 import me.anno.remsstudio.ui.StudioFileImporter
 import me.anno.remsstudio.ui.scene.ScenePreview
 import me.anno.remsstudio.ui.sceneTabs.SceneTabs.currentTab
+import me.anno.studio.Events.addEvent
 import me.anno.studio.GFXSettings
 import me.anno.studio.StudioBase
 import me.anno.ui.Panel
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListX
 import me.anno.ui.base.groups.PanelStack
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.WelcomeUI
 import me.anno.ui.editor.files.FileContentImporter
-import me.anno.ui.Style
 import me.anno.utils.OS
 import kotlin.math.min
 
 // todo bugs:
+//  - my sample HDR file isn't showing anymore? :(
 //  - sometimes delete-key isn't registered as such
 //  - new files, like with 0 bytes, cannot be right clicked in file explorer
 

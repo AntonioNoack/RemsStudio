@@ -1,8 +1,8 @@
 package me.anno.remsstudio.test
 
 import me.anno.io.files.InvalidRef
-import me.anno.io.text.TextReader
-import me.anno.io.text.TextWriter
+import me.anno.io.json.saveable.JsonStringReader
+import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.remsstudio.objects.Transform
 import me.anno.utils.Clock.Companion.measure
 
@@ -18,7 +18,7 @@ fun test() {
     val genName = { Math.random().toString() }
     // val readerFile = File.createTempFile("RemsStudio", ".tmp")
     val readerText = measure("Reader-create") {
-        TextWriter(InvalidRef).apply {
+       JsonStringWriter(InvalidRef).apply {
             writeStringArray("strings", (0 until lines).map { genName() }.toTypedArray())
         }.toString()
     }
@@ -31,7 +31,7 @@ fun test() {
         TextReader(readerFile.readText()).readProperty(Transform())
     }*/
     measure("Reader-raw") {//   415 ms for 1M
-        TextReader(readerText, InvalidRef).readProperty(Transform())
+        JsonStringReader(readerText, InvalidRef).readProperty(Transform())
     }
     /*measure("Native-1") {// 119 ms for 1M
         nativeFile.readLines()

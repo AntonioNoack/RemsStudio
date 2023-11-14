@@ -4,7 +4,7 @@ import me.anno.io.binary.BinaryReader
 import me.anno.io.binary.BinaryWriter
 import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.files.InvalidRef
-import me.anno.io.text.TextWriter
+import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.Video
@@ -72,13 +72,13 @@ fun main() {
     file.writeBytes(binaryValue)
 
     // load all files into the cache
-    candidates.forEach { it.save(TextWriter(InvalidRef)) }
+    candidates.forEach { it.save(JsonStringWriter(InvalidRef)) }
 
     // text
     val text0 = System.nanoTime()
     lateinit var textValue: String
     for (i in 0 until 100) {
-        val writer = TextWriter(InvalidRef)
+        val writer = JsonStringWriter(InvalidRef)
         candidates.forEach { writer.add(it) }
         writer.writeAllInList()
         textValue = writer.toString()

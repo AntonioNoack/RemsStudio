@@ -3,14 +3,14 @@ package me.anno.remsstudio
 import me.anno.Engine
 import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX
-import me.anno.gpu.GFXBase
+import me.anno.gpu.RenderDoc.disableRenderDoc
 import me.anno.image.ImageGPUCache
 import me.anno.installer.Installer
 import me.anno.io.Streams.readText
 import me.anno.io.files.FileReference
 import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.files.InvalidRef
-import me.anno.io.json.JsonReader
+import me.anno.io.json.generic.JsonReader
 import me.anno.language.translation.NameDesc
 import me.anno.studio.StudioBase
 import me.anno.ui.Panel
@@ -191,7 +191,7 @@ object DownloadUI {
         val thumbnailHeight = 240
         val thumbnailPanel = object : ImagePanel(style) {
             override val className: String get() = "ThumbnailPanel"
-            override fun getTexture() = ImageGPUCache[thumbnailSource, false]
+            override fun getTexture() = ImageGPUCache[thumbnailSource, true]
             override fun getTooltipText(x: Float, y: Float) = thumbnailSource.toString()
             override fun onCopyRequested(x: Float, y: Float) = thumbnailSource
             override fun calculateSize(w: Int, h: Int) {
@@ -479,7 +479,7 @@ object DownloadUI {
      * */
     @JvmStatic
     fun main(args: Array<String>) {
-        GFXBase.disableRenderDoc()
+        disableRenderDoc()
         TestStudio.testUI2("DownloadTest") { createUI(DefaultConfig.style) }
     }
 

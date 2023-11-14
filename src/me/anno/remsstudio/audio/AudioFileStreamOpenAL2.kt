@@ -9,7 +9,7 @@ import me.anno.io.files.FileReference
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
 import me.anno.video.AudioCreator.Companion.playbackSampleRate
-import me.anno.video.ffmpeg.FFMPEGMetadata
+import me.anno.video.ffmpeg.MediaMetadata
 import org.apache.logging.log4j.LogManager
 import org.lwjgl.openal.AL10.*
 import java.nio.ByteBuffer
@@ -28,7 +28,7 @@ class AudioFileStreamOpenAL2(
     file: FileReference,
     repeat: LoopingState,
     var startTime: Double,
-    meta: FFMPEGMetadata,
+    meta: MediaMetadata,
     sender: Audio,
     listener: Camera,
     speed: Double
@@ -41,7 +41,7 @@ class AudioFileStreamOpenAL2(
     constructor(audio: Audio, speed: Double, globalTime: Double, listener: Camera) :
             this(
                 audio.file, audio.isLooping.value, globalTime,
-                FFMPEGMetadata.getMeta(audio.file, false)!!,
+                MediaMetadata.getMeta(audio.file, false)!!,
                 audio, listener, speed
             )
 

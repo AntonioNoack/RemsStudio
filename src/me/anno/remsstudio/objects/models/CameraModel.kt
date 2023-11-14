@@ -1,13 +1,13 @@
 package me.anno.remsstudio.objects.models
 
 import me.anno.ecs.components.mesh.Mesh
+import me.anno.gpu.buffer.DrawMode
 import me.anno.gpu.shader.ShaderLib
 import me.anno.remsstudio.RemsStudio
 import me.anno.utils.types.Floats.toRadians
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
-import org.lwjgl.opengl.GL11C
 import kotlin.math.tan
 
 object CameraModel {
@@ -91,7 +91,7 @@ object CameraModel {
         put(p00)
 
         this.positions = positions
-        drawMode = GL11C.GL_LINES
+        drawMode = DrawMode.LINES
     }
 
 

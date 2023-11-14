@@ -6,8 +6,8 @@ import me.anno.input.ActionManager
 import me.anno.input.Key
 import me.anno.io.files.FileReference
 import me.anno.io.files.FileReference.Companion.getReference
-import me.anno.io.text.TextReader
-import me.anno.io.text.TextWriter
+import me.anno.io.json.saveable.JsonStringReader
+import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.mixARGB
 import me.anno.remsstudio.RemsStudio.project
@@ -38,7 +38,7 @@ class SceneTab(var file: FileReference?, var scene: Transform, history: History?
 
     var history = history ?: try {
         // todo find project for file
-        TextReader.readFirstOrNull<History>(file!!, workspace)!!
+        JsonStringReader.readFirstOrNull<History>(file!!, workspace)!!
     } catch (e: java.lang.Exception) {
         History()
     }
@@ -102,7 +102,7 @@ class SceneTab(var file: FileReference?, var scene: Transform, history: History?
             try {
                 synchronized(scene) {
                     dst.getParent()?.mkdirs()
-                    TextWriter.save(listOf(scene, history), dst, workspace)
+                    JsonStringWriter.save(listOf(scene, history), dst, workspace)
                     file = dst
                     hasChanged = false
                     LOGGER.info("Saved!")

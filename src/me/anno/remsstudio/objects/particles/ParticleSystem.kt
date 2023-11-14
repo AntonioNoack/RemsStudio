@@ -10,7 +10,7 @@ import me.anno.input.Key
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.InvalidRef
-import me.anno.io.text.TextWriter
+import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio
@@ -455,7 +455,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
 
     open fun getSystemState(): Any? {
         // val t0 = System.nanoTime()
-        val writer = TextWriter(InvalidRef)
+        val writer = JsonStringWriter(InvalidRef)
         writer.add(spawnPosition)
         writer.add(spawnVelocity)
         writer.add(spawnRotation)

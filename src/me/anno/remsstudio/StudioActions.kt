@@ -13,6 +13,7 @@ import me.anno.io.utils.StringMap
 import me.anno.remsstudio.RemsStudio.hoveredPanel
 import me.anno.remsstudio.objects.modes.TransformVisibility
 import me.anno.remsstudio.ui.editor.TimelinePanel
+import me.anno.studio.Events.addEvent
 import me.anno.studio.StudioBase
 import me.anno.ui.WindowStack.Companion.printLayout
 import kotlin.math.round
@@ -23,7 +24,8 @@ object StudioActions {
 
         fun setEditorTimeDilation(dilation: Double): Boolean {
             return if (dilation == RemsStudio.editorTimeDilation ||
-                GFX.someWindow?.windowStack?.inFocus0?.isKeyInput() == true) false
+                GFX.someWindow?.windowStack?.inFocus0?.isKeyInput() == true
+            ) false
             else {
                 RemsStudio.editorTimeDilation = dilation
                 true
@@ -81,6 +83,7 @@ object StudioActions {
                                 data.split("\n").map { getReference(it) }
                             )
                         }
+
                         else -> {
                             hoveredPanel?.onPaste(window.mouseX, window.mouseY, data, type)
                         }
@@ -170,7 +173,7 @@ object StudioActions {
                 true
             },
             "ResetOpenGLSession" to {
-                StudioBase.addEvent { GFXState.newSession() }
+                addEvent { GFXState.newSession() }
                 true
             }
         )

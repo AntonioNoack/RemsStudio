@@ -7,7 +7,7 @@ import me.anno.gpu.GFXState.useFrame
 import me.anno.gpu.drawing.UVProjection
 import me.anno.gpu.framebuffer.DepthBufferType
 import me.anno.gpu.framebuffer.FBStack
-import me.anno.gpu.shader.Renderer
+import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.Filtering
 import me.anno.io.ISaveable

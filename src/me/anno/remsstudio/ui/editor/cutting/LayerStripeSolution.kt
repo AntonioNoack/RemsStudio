@@ -21,7 +21,7 @@ import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.centralTime
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.dtHalfLength
 import me.anno.remsstudio.ui.editor.cutting.LayerView.Companion.maxLines
 import me.anno.utils.Color.black
-import me.anno.video.ffmpeg.FFMPEGMetadata
+import me.anno.video.ffmpeg.MediaMetadata
 import org.joml.Vector4f
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -69,7 +69,7 @@ class LayerStripeSolution(
             x0: Int, x1: Int, y: Int, h: Int,
             c0: Int, c1: Int,
             frameOffset: Int, frameWidth: Int,
-            video: Video, meta: FFMPEGMetadata,
+            video: Video, meta: MediaMetadata,
             fract0: Float, fract1: Float
         ) -> Unit
     ) {
@@ -94,7 +94,7 @@ class LayerStripeSolution(
                 val isStriped = selectedTransform === tr || draggedTransform === tr
 
                 val video = tr as? Video
-                val meta = if (video == null) null else metas.getOrPut(video) { video.meta ?: Unit } as? FFMPEGMetadata
+                val meta = if (video == null) null else metas.getOrPut(video) { video.meta ?: Unit } as? MediaMetadata
 
                 val hasAudio = meta?.hasAudio ?: false
                 val hasVideo = meta?.hasVideo ?: false
@@ -274,7 +274,7 @@ class LayerStripeSolution(
         x0: Int, x1: Int, y: Int, h: Int,
         c0: Int, c1: Int,
         frameOffset: Int, frameWidth: Int,
-        video: Video, meta: FFMPEGMetadata,
+        video: Video, meta: MediaMetadata,
         fract0: Float, fract1: Float
     ) {
         val f0 = fract0 * (1f + relativeVideoBorder) - relativeVideoBorder * 0.5f
@@ -313,7 +313,7 @@ class LayerStripeSolution(
         x0: Int, x1: Int, y: Int, h: Int,
         c0: Int, c1: Int,
         frameOffset: Int, frameWidth: Int,
-        video: Video, meta: FFMPEGMetadata,
+        video: Video, meta: MediaMetadata,
         fract0: Float, fract1: Float
     ) {
         val f0 = fract0 * (1f + relativeVideoBorder) - relativeVideoBorder * 0.5f

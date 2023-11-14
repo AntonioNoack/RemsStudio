@@ -1,7 +1,7 @@
 package me.anno.remsstudio.audio.effects
 
 import me.anno.io.Saveable
-import me.anno.io.text.TextReader
+import me.anno.io.json.saveable.JsonStringReader
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
 import me.anno.studio.Inspectable
@@ -30,7 +30,7 @@ abstract class SoundEffect(val inputDomain: Domain, val outputDomain: Domain) : 
     abstract val displayName: String
     abstract val description: String
 
-    open fun clone() = TextReader.read(toString(), workspace, true).first() as SoundEffect
+    open fun clone() = JsonStringReader.read(toString(), workspace, true).first() as SoundEffect
 
     override val approxSize get() = 10
     override fun isDefaultValue() = false

@@ -5,7 +5,7 @@ import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
-import me.anno.io.text.TextReader
+import me.anno.io.json.saveable.JsonStringReader
 import me.anno.remsstudio.history.History
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.ui.sceneTabs.SceneTab
@@ -27,7 +27,7 @@ class SceneTabData() : Saveable() {
 
     fun apply(tab: SceneTab) {
         tab.file = file
-        val read by lazy { TextReader.read(file!!, workspace, true) }
+        val read by lazy { JsonStringReader.read(file!!, workspace, true) }
         tab.scene = transform ?: read.firstInstanceOrNull<Transform>() ?: Transform().run {
             // todo translate
             name = "Root"

@@ -4,7 +4,7 @@ import me.anno.Time.deltaTime
 import me.anno.Time.gameTime
 import me.anno.config.DefaultStyle.deepDark
 import me.anno.gpu.drawing.DrawRectangles.drawRect
-import me.anno.gpu.shader.Renderer
+import me.anno.gpu.shader.renderer.Renderer
 import me.anno.maths.Maths.clamp01
 import me.anno.maths.Maths.length
 import me.anno.maths.Maths.min

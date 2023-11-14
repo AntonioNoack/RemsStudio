@@ -27,7 +27,7 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.Style
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.video.MissingFrameException
-import me.anno.video.ffmpeg.FFMPEGMetadata
+import me.anno.video.ffmpeg.MediaMetadata
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
@@ -44,8 +44,8 @@ import kotlin.math.sqrt
 
 class FourierTransform : Transform() {
 
-    val meta get() = FFMPEGMetadata.getMeta(file, true)
-    val forcedMeta get() = FFMPEGMetadata.getMeta(file, false)
+    val meta get() = MediaMetadata.getMeta(file, true)
+    val forcedMeta get() = MediaMetadata.getMeta(file, false)
 
     // effect properties; default is logarithmic x scale
     val rotLin = AnimatedProperty.rotYXZ()
@@ -232,7 +232,7 @@ class FourierTransform : Transform() {
     }
 
     fun getBuffer(
-        meta: FFMPEGMetadata,
+        meta: MediaMetadata,
         getTime: (Int) -> Time
     ): Pair<FloatArray, FloatArray>? {
         val data = AudioFXCache2.getBuffer0(meta, getKey(getTime), false)

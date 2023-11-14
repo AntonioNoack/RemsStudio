@@ -1,9 +1,9 @@
 package me.anno.remsstudio.objects.models
 
 import me.anno.ecs.components.mesh.Mesh
+import me.anno.gpu.buffer.DrawMode
 import me.anno.maths.Maths.pow
 import org.joml.Vector3f
-import org.lwjgl.opengl.GL11C.GL_LINES
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -55,7 +55,7 @@ object SphereAxesModel {
 
         val buffer = Mesh()
         buffer.positions = positions
-        buffer.drawMode = GL_LINES
+        buffer.drawMode = DrawMode.LINES
         return buffer
 
     }
