@@ -2,6 +2,7 @@ package me.anno.remsstudio.audio
 
 import me.anno.animation.LoopingState
 import me.anno.audio.AudioPools.SAPool
+import me.anno.audio.AudioSliceKey
 import me.anno.audio.AudioTransfer
 import me.anno.audio.SimpleTransfer
 import me.anno.audio.openal.SoundBuffer
@@ -10,7 +11,6 @@ import me.anno.audio.streams.AudioStreamRaw.Companion.ffmpegSliceSampleDuration
 import me.anno.audio.streams.StereoShortStream
 import me.anno.cache.CacheData
 import me.anno.cache.CacheSection
-import me.anno.cache.keys.AudioSliceKey
 import me.anno.io.files.FileReference
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.mix

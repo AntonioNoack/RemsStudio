@@ -4,11 +4,11 @@ import me.anno.animation.LoopingState
 import me.anno.animation.Type
 import me.anno.audio.openal.AudioManager
 import me.anno.audio.openal.AudioTasks
-import me.anno.cache.data.ImageToTexture.Companion.imageTimeout
-import me.anno.cache.data.VideoData.Companion.framesPerContainer
-import me.anno.cache.instances.SVGMeshCache
-import me.anno.cache.instances.VideoCache.getVideoFrame
-import me.anno.cache.instances.VideoCache.getVideoFrameWithoutGenerator
+import me.anno.gpu.texture.ImageToTexture.Companion.imageTimeout
+import me.anno.video.VideoData.Companion.framesPerContainer
+import me.anno.image.svg.SVGMeshCache
+import me.anno.video.VideoCache.getVideoFrame
+import me.anno.video.VideoCache.getVideoFrameWithoutGenerator
 import me.anno.config.DefaultConfig
 import me.anno.ecs.annotations.Range
 import me.anno.gpu.GFX
@@ -20,7 +20,7 @@ import me.anno.gpu.texture.Filtering
 import me.anno.gpu.texture.Texture2D
 import me.anno.gpu.texture.TextureLib
 import me.anno.gpu.texture.TextureLib.colorShowTexture
-import me.anno.image.ImageGPUCache
+import me.anno.gpu.texture.TextureCache
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
@@ -134,7 +134,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
     val clampMode = ValueWithDefault(Clamping.MIRRORED_REPEAT)
 
     // filtering
-    val filtering = ValueWithDefaultFunc { DefaultConfig["default.video.nearest", Filtering.CUBIC] }
+    val filtering = ValueWithDefaultFunc { DefaultConfig.getFiltering("default.video.nearest", Filtering.CUBIC) }
 
     // resolution
     val videoScale = ValueWithDefaultFunc { DefaultConfig["default.video.scale", 1] }
@@ -306,7 +306,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 // draw the current texture
                 val localTime = isLooping[time, duration]
 
-                val frame = ImageGPUCache[meta.getImage(localTime), 5L, true]
+                val frame = TextureCache[meta.getImage(localTime), 5L, true]
                 if (frame == null || !frame.isCreated) onMissingImageOrFrame((localTime * 1000).toInt())
                 else {
                     lastW = frame.width
@@ -515,7 +515,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 // calculate required scale? no, without animation, we don't need to scale it down ;)
                 getVideoFrame(file, 1, 0, 1, 1.0, imageTimeout, true)
             else -> // some image
-                ImageGPUCache[file, imageTimeout, true]
+                TextureCache[file, imageTimeout, true]
         }
     }
 
@@ -548,7 +548,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
             }
             else -> {// some image
                 val tiling = tiling[time]
-                val texture = ImageGPUCache[file, imageTimeout, true]
+                val texture = TextureCache[file, imageTimeout, true]
                 if (texture == null || !texture.isCreated) onMissingImageOrFrame(0)
                 else {
                     texture.rotation?.apply(stack)
@@ -636,14 +636,14 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
 
                         if (index1 >= index0) {
                             for (i in index0..index1) {
-                                ImageGPUCache[meta.getImage(i), videoFrameTimeout, true]
+                                TextureCache[meta.getImage(i), videoFrameTimeout, true]
                             }
                         } else {
                             for (i in index1 until meta.matches.size) {
-                                ImageGPUCache[meta.getImage(i), videoFrameTimeout, true]
+                                TextureCache[meta.getImage(i), videoFrameTimeout, true]
                             }
                             for (i in 0 until index0) {
-                                ImageGPUCache[meta.getImage(i), videoFrameTimeout, true]
+                                TextureCache[meta.getImage(i), videoFrameTimeout, true]
                             }
                         }
 

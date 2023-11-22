@@ -37,7 +37,7 @@ import me.anno.gpu.shader.effects.GaussianBlur
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.GPUFiltering
 import me.anno.gpu.texture.Texture3D
-import me.anno.image.ImageGPUCache.getLUT
+import me.anno.gpu.texture.TextureCache.getLUT
 import me.anno.maths.Maths.PIf
 import me.anno.remsstudio.RemsStudio.currentCamera
 import me.anno.remsstudio.RemsStudio.gfxSettings

@@ -58,7 +58,7 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
     val clampMode = ValueWithDefault(Clamping.MIRRORED_REPEAT)
 
     // filtering
-    val filtering = ValueWithDefaultFunc { DefaultConfig["default.video.nearest", Filtering.LINEAR] }
+    val filtering = ValueWithDefaultFunc { DefaultConfig.getFiltering("default.video.nearest", Filtering.LINEAR) }
 
     var resolution = AnimatedProperty.vec2(Vector2f(1920f, 1080f))
 
@@ -258,7 +258,7 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
         }
     }
 
-    override fun readString(name: String, value: String?) {
+    override fun readString(name: String, value: String) {
         when (name) {
             "file" -> file = value?.toGlobalFile() ?: InvalidRef
             else -> super.readString(name, value)

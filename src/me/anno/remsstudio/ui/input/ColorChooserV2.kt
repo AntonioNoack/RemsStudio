@@ -37,8 +37,8 @@ class ColorChooserV2(style: Style, withAlpha: Boolean, val property: AnimatedPro
         if (lastTime != RemsStudio.editorTime) {
             lastTime = RemsStudio.editorTime
             when (val c = property[RemsStudio.editorTime]) {
-                is Vector3f -> setRGBA(c.x, c.y, c.z, 1f, false)
-                is Vector4f -> setRGBA(c, false)
+                is Vector3f -> setRGBA(c.x, c.y, c.z, 1f, -1, false)
+                is Vector4f -> setRGBA(c, -1, false)
                 else -> throw RuntimeException()
             }
         }

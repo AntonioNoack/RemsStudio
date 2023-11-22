@@ -317,7 +317,7 @@ class FourierTransform : Transform() {
         }
     }
 
-    override fun readString(name: String, value: String?) {
+    override fun readString(name: String, value: String) {
         when (name) {
             "file" -> file = value?.toGlobalFile() ?: InvalidRef
             else -> super.readString(name, value)

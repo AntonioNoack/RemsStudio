@@ -4,7 +4,7 @@ import me.anno.Engine
 import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX
 import me.anno.gpu.RenderDoc.disableRenderDoc
-import me.anno.image.ImageGPUCache
+import me.anno.gpu.texture.TextureCache
 import me.anno.installer.Installer
 import me.anno.io.Streams.readText
 import me.anno.io.files.FileReference
@@ -191,7 +191,7 @@ object DownloadUI {
         val thumbnailHeight = 240
         val thumbnailPanel = object : ImagePanel(style) {
             override val className: String get() = "ThumbnailPanel"
-            override fun getTexture() = ImageGPUCache[thumbnailSource, true]
+            override fun getTexture() = TextureCache[thumbnailSource, true]
             override fun getTooltipText(x: Float, y: Float) = thumbnailSource.toString()
             override fun onCopyRequested(x: Float, y: Float) = thumbnailSource
             override fun calculateSize(w: Int, h: Int) {

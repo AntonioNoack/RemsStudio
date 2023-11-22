@@ -8,13 +8,12 @@ import me.anno.gpu.shader.ShaderLib.v3DlMasked
 import me.anno.gpu.shader.ShaderLib.y3DMasked
 import me.anno.gpu.shader.builder.Variable
 import me.anno.gpu.shader.builder.VariableMode
-import me.anno.io.ResourceHelper
-import me.anno.io.Streams.readText
+import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.remsstudio.objects.effects.MaskType
 
 object ShaderLibV2 {
     
-    private fun case(case: Int, path: String) = ResourceHelper.loadResource(path).readText()
+    private fun case(case: Int, path: String) = getReference("res://$path").readTextSync()
         .trim().run {
             replace("\r", "")
         }.run {

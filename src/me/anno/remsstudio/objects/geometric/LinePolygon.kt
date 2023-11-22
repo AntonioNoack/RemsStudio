@@ -300,7 +300,6 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
                         "   vec3 localPosition = mix(mix(pos0, pos1, att.x), mix(pos2, pos3, att.x), att.y);\n" +
                         "   gl_Position = transform * vec4(localPosition, 1.0);\n" +
                         ShaderLib.flatNormal +
-                        ShaderLib.positionPostProcessing +
                         "   uv = uvs;\n" +
                         "   uvw = coords;\n" +
                         "   colX = mix(col0, col1, att.y);\n" +

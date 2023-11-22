@@ -7,6 +7,7 @@ import me.anno.io.Saveable
 import me.anno.io.config.ConfigBasics
 import me.anno.io.files.FileReference
 import me.anno.io.files.FileReference.Companion.getReference
+import me.anno.io.files.InvalidRef
 import me.anno.io.json.generic.JsonReader
 import me.anno.io.json.generic.JsonWriter
 import me.anno.io.json.saveable.JsonStringReader
@@ -116,7 +117,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
                         SceneTabs.closeAll()
                         for (tabData in sceneTabs) {
                             try {
-                                val tab = SceneTab(null, Transform(), null)
+                                val tab = SceneTab(InvalidRef, Transform(), null)
                                 tabData.apply(tab)
                                 SceneTabs.open(tab)
                             } catch (e: Exception) {
@@ -280,7 +281,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
         config["target.samples"] = targetSamples
         config["target.output"] = targetOutputFile.toString()
         config["recent.files"] = SceneTabs.sceneTabs
-            .filter { it.file != null }
+            .filter { it.file != InvalidRef }
             .joinToString("\n") { it.file.toString() }
         config["camera.null"] = nullCamera
         config["editor.time"] = editorTime

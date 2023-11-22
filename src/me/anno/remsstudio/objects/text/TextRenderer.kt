@@ -1,6 +1,5 @@
 package me.anno.remsstudio.objects.text
 
-import me.anno.cache.keys.TextSegmentKey
 import me.anno.fonts.FontManager
 import me.anno.fonts.PartResult
 import me.anno.fonts.mesh.TextMesh
@@ -9,6 +8,7 @@ import me.anno.gpu.GFX
 import me.anno.gpu.drawing.GFXx3D
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.gpu.GFXx3Dv2
+import me.anno.remsstudio.objects.TextSegmentKey
 import me.anno.remsstudio.objects.attractors.EffectMorphing
 import me.anno.remsstudio.objects.modes.TextRenderMode
 import me.anno.remsstudio.objects.text.Text.Companion.DEFAULT_FONT_HEIGHT

@@ -50,7 +50,7 @@ class SoundPipeline() : Saveable(), Inspectable {
             style
         ) {
 
-            override fun setValue(newValue: List<Inspectable>, notify: Boolean): Panel {
+            override fun setValue(newValue: List<Inspectable>, mask: Int, notify: Boolean): Panel {
                 if (newValue !== effects) {
                     effects.clear()
                     effects.addAll(newValue.filterIsInstance<SoundEffect>())

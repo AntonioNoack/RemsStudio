@@ -1,7 +1,6 @@
 package me.anno.remsstudio.objects.particles
 
 import me.anno.cache.CacheData
-import me.anno.cache.keys.TextSegmentKey
 import me.anno.fonts.FontManager
 import me.anno.fonts.FontManager.TextCache
 import me.anno.fonts.PartResult
@@ -11,6 +10,7 @@ import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringWriter
+import me.anno.remsstudio.objects.TextSegmentKey
 import me.anno.remsstudio.objects.text.Text
 import me.anno.studio.Inspectable
 import me.anno.ui.Style
@@ -169,7 +169,7 @@ class TextParticles : ParticleSystem() {
         }
     }
 
-    override fun readString(name: String, value: String?) {
+    override fun readString(name: String, value: String) {
         when (name) {
             "text", "font" -> text.readString(name, value)
             else -> super.readString(name, value)
@@ -180,7 +180,6 @@ class TextParticles : ParticleSystem() {
         when (name) {
             "relativeTabSize", "relativeCharSpacing", "lineBreakWidth" ->
                 text.readFloat(name, value)
-
             else -> super.readFloat(name, value)
         }
     }

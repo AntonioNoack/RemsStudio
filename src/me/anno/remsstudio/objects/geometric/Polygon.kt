@@ -7,7 +7,7 @@ import me.anno.gpu.GFX
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.Filtering
 import me.anno.gpu.texture.TextureLib.whiteTexture
-import me.anno.image.ImageGPUCache
+import me.anno.gpu.texture.TextureCache
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
@@ -50,7 +50,7 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val inset = clamp(starNess[time], 0f, 1f)
-        val image = ImageGPUCache[texture, 5000, true]
+        val image = TextureCache[texture, 5000, true]
         if (image == null && texture.hasValidName() && GFX.isFinalRendering) throw MissingFrameException(texture)
         val texture = image ?: whiteTexture
         val count = vertexCount[time]//.roundToInt()
@@ -136,7 +136,7 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
         writer.writeFile("texture", texture)
     }
 
-    override fun readString(name: String, value: String?) {
+    override fun readString(name: String, value: String) {
         when (name) {
             "texture" -> texture = value?.toGlobalFile() ?: InvalidRef
             else -> super.readString(name, value)

@@ -6,6 +6,7 @@ import me.anno.input.ActionManager
 import me.anno.input.Key
 import me.anno.io.files.FileReference
 import me.anno.io.files.FileReference.Companion.getReference
+import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringReader
 import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.language.translation.NameDesc
@@ -29,7 +30,7 @@ import me.anno.ui.editor.files.toAllowedFilename
 import org.apache.logging.log4j.LogManager
 import kotlin.concurrent.thread
 
-class SceneTab(var file: FileReference?, var scene: Transform, history: History?) : TextPanel("", DefaultConfig.style) {
+class SceneTab(var file: FileReference, var scene: Transform, history: History?) : TextPanel("", DefaultConfig.style) {
 
     companion object {
         const val maxDisplayNameLength = 15
@@ -38,12 +39,12 @@ class SceneTab(var file: FileReference?, var scene: Transform, history: History?
 
     var history = history ?: try {
         // todo find project for file
-        JsonStringReader.readFirstOrNull<History>(file!!, workspace)!!
+        JsonStringReader.readFirstOrNull<History>(file, workspace)!!
     } catch (e: java.lang.Exception) {
         History()
     }
 
-    private val longName get() = file?.name ?: scene.name
+    private val longName get() = file.nullIfUndefined()?.name ?: scene.name
     private val shortName
         get() = longName.run {
             if (length > maxDisplayNameLength) {
@@ -115,7 +116,7 @@ class SceneTab(var file: FileReference?, var scene: Transform, history: History?
     }
 
     fun save(onSuccess: () -> Unit) {
-        if (file == null) {
+        if (file == InvalidRef) {
             var name = scene.name.trim()
             if (!name.endsWith(".json", true)) name = "$name.json"
             val name0 = name
@@ -130,11 +131,11 @@ class SceneTab(var file: FileReference?, var scene: Transform, history: History?
                             .with("%1", dst.name)
                     ) {
                         file = dst
-                        save(file!!, onSuccess)
+                        save(file, onSuccess)
                     }
                 } else {
                     file = dst
-                    save(file!!, onSuccess)
+                    save(file, onSuccess)
                     rootPanel.forAll { if (it is FileExplorer) it.invalidate() }
                 }
             } else {
@@ -145,7 +146,7 @@ class SceneTab(var file: FileReference?, var scene: Transform, history: History?
                 )
             }
         } else {
-            save(file!!, onSuccess)
+            save(file, onSuccess)
         }
     }
 

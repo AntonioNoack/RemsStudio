@@ -211,7 +211,7 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
         }
     }
 
-    override fun readString(name: String, value: String?) {
+    override fun readString(name: String, value: String) {
         when (name) {
             "file" -> file = value?.toGlobalFile() ?: InvalidRef
             "selectedSites" -> selectedSites = value ?: ""

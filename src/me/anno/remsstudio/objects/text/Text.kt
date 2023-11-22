@@ -2,7 +2,6 @@ package me.anno.remsstudio.objects.text
 
 import me.anno.animation.Type
 import me.anno.cache.CacheData
-import me.anno.cache.keys.TextSegmentKey
 import me.anno.config.DefaultConfig
 import me.anno.fonts.FontManager
 import me.anno.fonts.FontManager.TextCache
@@ -17,17 +16,18 @@ import me.anno.language.translation.Dict
 import me.anno.maths.Maths.mix
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.GFXTransform
+import me.anno.remsstudio.objects.TextSegmentKey
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.lists.Element
 import me.anno.remsstudio.objects.lists.SplittableElement
 import me.anno.remsstudio.objects.modes.TextRenderMode
 import me.anno.studio.Inspectable
+import me.anno.ui.Style
 import me.anno.ui.base.Font
 import me.anno.ui.base.constraints.AxisAlignment
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
 import me.anno.utils.strings.StringHelper.smallCaps
 import me.anno.utils.structures.tuples.Quad
 import org.joml.Matrix4fArrayList
@@ -262,7 +262,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
         }
     }
 
-    override fun readString(name: String, value: String?) {
+    override fun readString(name: String, value: String) {
         when (name) {
             "text" -> text.set(value ?: "")
             "font" -> font = font.withName(value ?: "")

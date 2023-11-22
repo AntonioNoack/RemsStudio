@@ -325,7 +325,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         }
     }
 
-    override fun readString(name: String, value: String?) {
+    override fun readString(name: String, value: String) {
         when (name) {
             "lut" -> lut = value?.toGlobalFile() ?: InvalidRef
             else -> super.readString(name, value)

@@ -6,7 +6,6 @@ import me.anno.ecs.components.anim.*
 import me.anno.ecs.components.anim.BoneData.uploadJointMatrices
 import me.anno.ecs.components.mesh.Material
 import me.anno.ecs.components.mesh.MaterialCache
-import me.anno.ecs.components.mesh.Mesh
 import me.anno.ecs.components.mesh.MeshComponentBase
 import me.anno.ecs.prefab.PrefabCache
 import me.anno.engine.ui.render.ECSShaderLib
@@ -14,8 +13,8 @@ import me.anno.engine.ui.render.Renderers.previewRenderer
 import me.anno.gpu.GFX
 import me.anno.gpu.GFXState
 import me.anno.gpu.drawing.GFXx3D
-import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.shader.Shader
+import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.texture.ITexture2D
 import me.anno.gpu.texture.TextureLib.whiteTexture
 import me.anno.io.ISaveable
@@ -26,19 +25,18 @@ import me.anno.io.files.thumbs.ThumbsExt
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.fract
-import me.anno.mesh.MeshData
 import me.anno.mesh.MeshUtils
 import me.anno.mesh.MeshUtils.getScaleFromAABB
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.studio.Inspectable
 import me.anno.ui.Panel
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.groups.UpdatingContainer
 import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.EnumInput
-import me.anno.ui.Style
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.pooling.JomlPools
 import org.joml.*
@@ -240,7 +238,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                         animTexture?.bindTrulyNearest(shader, "animTexture")
                         mesh.draw(shader, index)
                     }
-                } else MeshData.warnMissingMesh(comp, mesh)
+                } else ThumbsExt.warnMissingMesh(comp, mesh)
                 false
             }
         }
@@ -340,7 +338,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         }
     }
 
-    override fun readString(name: String, value: String?) {
+    override fun readString(name: String, value: String) {
         when (name) {
             "file" -> file = value?.toGlobalFile() ?: InvalidRef
             else -> super.readString(name, value)

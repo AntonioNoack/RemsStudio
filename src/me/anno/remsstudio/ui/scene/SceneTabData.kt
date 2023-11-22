@@ -21,13 +21,13 @@ class SceneTabData() : Saveable() {
         history = tab.history
     }
 
-    var file: FileReference? = null
+    var file: FileReference = InvalidRef
     var transform: Transform? = null
     var history: History? = null
 
     fun apply(tab: SceneTab) {
         tab.file = file
-        val read by lazy { JsonStringReader.read(file!!, workspace, true) }
+        val read by lazy { JsonStringReader.read(file, workspace, true) }
         tab.scene = transform ?: read.firstInstanceOrNull<Transform>() ?: Transform().run {
             // todo translate
             name = "Root"
@@ -39,15 +39,15 @@ class SceneTabData() : Saveable() {
 
     override fun save(writer: BaseWriter) {
         writer.writeFile("file", file)
-        if (file == null) {// otherwise there isn't really a need to save it
+        if (file == InvalidRef) {// otherwise there isn't really a need to save it
             writer.writeObject(this, "transform", transform)
             writer.writeObject(this, "history", history)
         }
     }
 
-    override fun readString(name: String, value: String?) {
+    override fun readString(name: String, value: String) {
         when (name) {
-            "file" -> file = value?.toGlobalFile() ?: InvalidRef
+            "file" -> file = value.toGlobalFile() ?: InvalidRef
             else -> super.readString(name, value)
         }
     }

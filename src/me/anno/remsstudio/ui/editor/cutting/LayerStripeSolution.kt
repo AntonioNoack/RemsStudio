@@ -3,7 +3,7 @@ package me.anno.remsstudio.ui.editor.cutting
 import me.anno.Build
 import me.anno.animation.LoopingState
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
-import me.anno.cache.instances.VideoCache
+import me.anno.video.VideoCache
 import me.anno.config.DefaultConfig
 import me.anno.gpu.drawing.DrawGradients.drawRectGradient
 import me.anno.gpu.drawing.DrawRectangles

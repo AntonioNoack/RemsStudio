@@ -112,9 +112,9 @@ class HistoryState() : Saveable() {
         writer.writeDouble("editorTime", editorTime)
     }
 
-    override fun readString(name: String, value: String?) {
+    override fun readString(name: String, value: String) {
         when (name) {
-            "title" -> title = value ?: ""
+            "title" -> title = value
             else -> super.readString(name, value)
         }
     }

@@ -1,6 +1,6 @@
 package me.anno.remsstudio.bench
 
-import me.anno.cache.instances.VideoCache
+import me.anno.video.VideoCache
 import me.anno.io.files.FileReference
 import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.remsstudio.objects.Video

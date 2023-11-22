@@ -2,7 +2,7 @@ package me.anno.remsstudio.ui.editor.cutting
 
 import me.anno.Time.gameTime
 import me.anno.cache.CacheData
-import me.anno.cache.instances.VideoCache
+import me.anno.video.VideoCache
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.input.Input

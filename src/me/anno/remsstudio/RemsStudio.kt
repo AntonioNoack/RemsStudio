@@ -43,6 +43,8 @@ import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.OS
 import kotlin.math.min
 
+// todo respect masks when editing multiple instances at once
+
 // todo bugs:
 //  - my sample HDR file isn't showing anymore? :(
 //  - sometimes delete-key isn't registered as such
