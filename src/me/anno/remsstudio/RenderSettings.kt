@@ -5,7 +5,6 @@ import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX
 import me.anno.io.files.InvalidRef
 import me.anno.language.translation.NameDesc
-import me.anno.maths.Maths.mixARGB
 import me.anno.remsstudio.RemsStudio.editorTime
 import me.anno.remsstudio.RemsStudio.project
 import me.anno.remsstudio.RemsStudio.targetDuration
@@ -20,6 +19,7 @@ import me.anno.remsstudio.Rendering.renderSetPercent
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.ui.scene.StudioSceneView
 import me.anno.studio.Inspectable
+import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.text.TextPanel
@@ -29,8 +29,8 @@ import me.anno.ui.input.EnumInput
 import me.anno.ui.input.FileInput
 import me.anno.ui.input.FloatInput
 import me.anno.ui.input.IntInput
-import me.anno.ui.Style
 import me.anno.utils.Color.black
+import me.anno.utils.Color.mixARGB
 import me.anno.utils.process.DelayedTask
 import me.anno.video.ffmpeg.FFMPEGEncodingBalance
 import me.anno.video.ffmpeg.FFMPEGEncodingType

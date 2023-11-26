@@ -3,14 +3,12 @@ package me.anno.remsstudio.ui.editor.cutting
 import me.anno.Build
 import me.anno.animation.LoopingState
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
-import me.anno.video.VideoCache
 import me.anno.config.DefaultConfig
 import me.anno.gpu.drawing.DrawGradients.drawRectGradient
 import me.anno.gpu.drawing.DrawRectangles
 import me.anno.gpu.drawing.DrawStriped.drawRectStriped
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.max
-import me.anno.maths.Maths.mixARGB
 import me.anno.maths.Maths.nonNegativeModulo
 import me.anno.remsstudio.RemsStudio.nullCamera
 import me.anno.remsstudio.audio.AudioFXCache2
@@ -21,6 +19,8 @@ import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.centralTime
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.dtHalfLength
 import me.anno.remsstudio.ui.editor.cutting.LayerView.Companion.maxLines
 import me.anno.utils.Color.black
+import me.anno.utils.Color.mixARGB
+import me.anno.video.VideoCache
 import me.anno.video.ffmpeg.MediaMetadata
 import org.joml.Vector4f
 import kotlin.math.abs
@@ -57,7 +57,14 @@ class LayerStripeSolution(
     }
 
     fun keepResourcesLoaded() {
-        iteratorOverGradients(emptyList(), null, false, { _, _, _, _, _, _ -> }, { _, _, _, _, _, _ -> }, ::keepFrameLoaded)
+        iteratorOverGradients(
+            emptyList(),
+            null,
+            false,
+            { _, _, _, _, _, _ -> },
+            { _, _, _, _, _, _ -> },
+            ::keepFrameLoaded
+        )
     }
 
     private fun iteratorOverGradients(

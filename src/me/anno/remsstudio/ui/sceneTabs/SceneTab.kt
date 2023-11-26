@@ -10,7 +10,6 @@ import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringReader
 import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.language.translation.NameDesc
-import me.anno.maths.Maths.mixARGB
 import me.anno.remsstudio.RemsStudio.project
 import me.anno.remsstudio.history.History
 import me.anno.remsstudio.objects.Transform
@@ -27,6 +26,7 @@ import me.anno.ui.base.text.TextPanel
 import me.anno.ui.dragging.Draggable
 import me.anno.ui.editor.files.FileExplorer
 import me.anno.ui.editor.files.toAllowedFilename
+import me.anno.utils.Color.mixARGB
 import org.apache.logging.log4j.LogManager
 import kotlin.concurrent.thread
 

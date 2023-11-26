@@ -1,6 +1,5 @@
 package me.anno.remsstudio.audio.pattern
 
-import me.anno.Engine
 import me.anno.Time
 import me.anno.config.DefaultConfig.style
 import me.anno.gpu.drawing.DrawTexts.drawSimpleTextCharByChar
@@ -10,7 +9,6 @@ import me.anno.input.Input
 import me.anno.input.Key
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.mix
-import me.anno.maths.Maths.mixARGB
 import me.anno.maths.Maths.pow
 import me.anno.maths.Maths.unmix
 import me.anno.remsstudio.RemsStudio
@@ -21,6 +19,7 @@ import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.input.TextInput
 import me.anno.utils.Color.black
+import me.anno.utils.Color.mixARGB
 import me.anno.utils.types.Booleans.toInt
 import org.joml.Vector2f
 import kotlin.math.abs

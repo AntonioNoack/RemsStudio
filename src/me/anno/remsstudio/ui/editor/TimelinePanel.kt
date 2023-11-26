@@ -13,7 +13,6 @@ import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.fract
 import me.anno.maths.Maths.mix
-import me.anno.maths.Maths.mixARGB
 import me.anno.maths.Maths.pow
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.editorTime
@@ -26,12 +25,13 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.ui.graphs.GraphEditorBody.Companion.shouldMove
 import me.anno.remsstudio.ui.graphs.GraphEditorBody.Companion.shouldScrub
 import me.anno.ui.Panel
+import me.anno.ui.Style
 import me.anno.ui.base.constraints.AxisAlignment
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.custom.CustomContainer.Companion.isCross
-import me.anno.ui.Style
 import me.anno.utils.Color.black
+import me.anno.utils.Color.mixARGB
 import me.anno.utils.Color.mulAlpha
 import me.anno.utils.structures.tuples.Quad
 import me.anno.utils.types.Strings.formatTime
