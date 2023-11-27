@@ -49,6 +49,7 @@ import kotlin.math.min
 //  - my sample HDR file isn't showing anymore? :(
 //  - sometimes delete-key isn't registered as such
 //  - new files, like with 0 bytes, cannot be right clicked in file explorer
+//  - video files cannot be properly deleted, because files can't be deleted when reading them
 
 // todo use reflectionMap for mesh rendering where available
 //       - option to bake it around the mesh?
@@ -253,6 +254,7 @@ object RemsStudio : StudioBase("Rem's Studio", 10206, true) {
     val isPlaying get() = editorTimeDilation != 0.0
 
     val targetDuration get(): Double = project?.targetDuration ?: Double.POSITIVE_INFINITY
+    val targetTransparency get() = project?.targetTransparency ?: false
     val targetSampleRate get(): Int = project?.targetSampleRate ?: 48000
     val targetFPS get(): Double = project?.targetFPS ?: 60.0
     val targetWidth get(): Int = project?.targetWidth ?: GFX.someWindow!!.width

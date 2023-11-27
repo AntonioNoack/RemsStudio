@@ -692,8 +692,9 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
 
     override fun onMouseWheel(x: Float, y: Float, dx: Float, dy: Float, byMouse: Boolean) {
         val selectedProperty = selectedProperties?.firstOrNull()
-        if (selectedProperty == null) super.onMouseWheel(x, y, dx, dy, byMouse)
-        else {
+        if (selectedProperty == null || isShiftDown) {
+            super.onMouseWheel(x, y, dx, dy, byMouse)
+        } else {
             val scale = pow(1.05f, dx)
             dvHalfHeight *= scale
             clampValues()

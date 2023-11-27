@@ -11,6 +11,7 @@ import me.anno.remsstudio.RemsStudio.project
 import me.anno.remsstudio.RemsStudio.root
 import me.anno.remsstudio.RemsStudio.shutterPercentage
 import me.anno.remsstudio.RemsStudio.targetOutputFile
+import me.anno.remsstudio.RemsStudio.targetTransparency
 import me.anno.remsstudio.audio.AudioCreatorV2
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
@@ -115,12 +116,15 @@ object Rendering {
             width, height,
             RemsStudio.targetFPS, totalFrameCount, balance, type,
             project?.targetVideoQuality ?: defaultQuality,
+            targetTransparency,
             if (audioSources.isEmpty()) targetOutputFile else tmpFile
         )
 
         val progress = GFX.someWindow?.addProgressBar(
-            object: ProgressBar("Rendering", "Frames",
-                totalFrameCount.toDouble()){
+            object : ProgressBar(
+                "Rendering", "Frames",
+                totalFrameCount.toDouble()
+            ) {
                 override fun formatProgress(): String {
                     val progress = progress.toInt()
                     val total = total.toInt()
@@ -237,7 +241,8 @@ object Rendering {
             // if empty, skip?
             LOGGER.info("Found ${audioSources.size} audio sources")
 
-            val progress = GFX.someWindow?.addProgressBar(object: ProgressBar("Audio Override", "Samples", duration * sampleRate){
+            val progress = GFX.someWindow?.addProgressBar(object :
+                ProgressBar("Audio Override", "Samples", duration * sampleRate) {
                 override fun formatProgress(): String {
                     return "$name: ${progress.toLong()} / ${total.toLong()} $unit"
                 }
@@ -278,11 +283,15 @@ object Rendering {
 
         // todo if is empty, send a warning instead of doing something
 
-        val progress = GFX.someWindow?.addProgressBar(object: ProgressBar("Audio Export", "Samples", duration * sampleRate){
-            override fun formatProgress(): String {
-                return "$name: ${progress.toLong()} / ${total.toLong()} $unit"
+        fun createProgressBar(): ProgressBar {
+            return object : ProgressBar("Audio Export", "Samples", duration * sampleRate) {
+                override fun formatProgress(): String {
+                    return "$name: ${progress.toLong()} / ${total.toLong()} $unit"
+                }
             }
-        })
+        }
+
+        val progress = GFX.someWindow?.addProgressBar(createProgressBar())
         AudioCreatorV2(scene, findCamera(scene), audioSources, duration, sampleRate, progress).apply {
             onFinished = {
                 isRendering = false
@@ -335,7 +344,7 @@ object Rendering {
             }
         } while (file0 !== targetOutputFile)
         val importType = targetOutputFile.extension.getImportType()
-        if (importType == defaultImportType && RenderType.values().none { importType == it.importType }) {
+        if (importType == defaultImportType && RenderType.entries.none { importType == it.importType }) {
             LOGGER.warn("The file extension .${targetOutputFile.extension} is unknown! Your export may fail!")
             return targetOutputFile
         }

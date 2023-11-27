@@ -25,10 +25,7 @@ import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.frames.FrameSizeInput
-import me.anno.ui.input.EnumInput
-import me.anno.ui.input.FileInput
-import me.anno.ui.input.FloatInput
-import me.anno.ui.input.IntInput
+import me.anno.ui.input.*
 import me.anno.utils.Color.black
 import me.anno.utils.Color.mixARGB
 import me.anno.utils.process.DelayedTask
@@ -112,6 +109,16 @@ object RenderSettings : Transform() {
         }
         list += mbs
 
+        list += BooleanInput(
+            "Render Transparency",
+            "Only supported by webm at the moment.",
+            project.targetTransparency,
+            false, style
+        ).setChangeListener {
+            project.targetTransparency = it
+            save()
+        }
+
         val samples = EnumInput(
             NameDesc(
                 "GPU Samples",
@@ -142,7 +149,8 @@ object RenderSettings : Transform() {
         list += samples
 
         val shp = vi(
-            "Shutter-Percentage (0-1)", "[Motion Blur] 1 = full frame is used; 0.1 = only 1/10th of a frame time is used",
+            "Shutter-Percentage (0-1)",
+            "[Motion Blur] 1 = full frame is used; 0.1 = only 1/10th of a frame time is used",
             project.shutterPercentage,
             style
         ) as FloatInput

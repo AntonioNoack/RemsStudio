@@ -53,9 +53,11 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
 
     var useExperimentalMSAA = false
 
-    // limit to [0,1]?
-    // nice effects can be created with values outside of [0,1], so while [0,1] is the valid range,
-    // numbers outside [0,1] give artists more control
+    /**
+     * limit to [0,1]?
+     * nice effects can be created with values outside of [0,1], so while [0,1] is the valid range,
+     * numbers outside [0,1] give artists more control
+     * */
     private val useMaskColor = AnimatedProperty.float()
     private val blurThreshold = AnimatedProperty.float()
     private val effectOffset = AnimatedProperty.pos2D()
@@ -352,7 +354,8 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
             null, isInverted, style
         ) { for (x in c) x.isInverted = it }
         mask += vis(
-            c, "Use Color / Transparency", "Should the color influence the masked?", c.map { it.useMaskColor },
+            c, "Use Color / Transparency", "Should the color influence the masked?",
+            c.map { it.useMaskColor },
             style
         )
         typeSpecific(vis(c, "Effect Center", "", c.map { it.effectOffset }, style)) {

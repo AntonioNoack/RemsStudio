@@ -252,6 +252,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
     var targetDuration = config["target.duration", 5.0]
     var targetSampleRate = config["target.sampleRate", 48000]
     var targetSizePercentage = config["target.sizePercentage", 100f]
+    var targetTransparency = config["target.transparency", false]
     var targetWidth = config["target.width", 1920]
     var targetHeight = config["target.height", 1080]
     var targetFPS = config["target.fps", 30.0]
@@ -292,6 +293,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
         config["language"] = language.code
         config["target.ffmpegFlags.id"] = ffmpegFlags.id
         config["target.encodingBalance"] = ffmpegBalance.value
+        config["target.transparency"] = targetTransparency
         config["editor.timelineSnapping"] = timelineSnapping
         config["editor.timelineSnappingOffset"] = timelineSnappingOffset
         config["editor.timelineSnappingRadius"] = timelineSnappingRadius

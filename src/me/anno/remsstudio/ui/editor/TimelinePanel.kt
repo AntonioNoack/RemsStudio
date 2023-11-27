@@ -8,6 +8,7 @@ import me.anno.gpu.GFX
 import me.anno.gpu.drawing.DrawRectangles
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.drawing.DrawTexts.drawSimpleTextCharByChar
+import me.anno.input.Input
 import me.anno.input.Key
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
@@ -338,17 +339,20 @@ open class TimelinePanel(style: Style) : Panel(style) {
     }
 
     override fun onMouseWheel(x: Float, y: Float, dx: Float, dy: Float, byMouse: Boolean) {
+        if (Input.isControlDown) { // hack to allow scrolling the parent
+            super.onMouseWheel(x, y, dy, -dx, byMouse)
+        } else {
 
-        val scale = pow(1.05f, dx)
-        // set the center to the cursor
-        // works great :D
-        val normalizedX = (x - width / 2f) / (width / 2f)
-        centralTime += normalizedX * dtHalfLength * (1f - scale)
-        dtHalfLength *= scale
-        centralTime += dtHalfLength * 20f * dy / width
+            val scale = pow(1.05f, dx)
+            // set the center to the cursor
+            // works great :D
+            val normalizedX = (x - width / 2f) / (width / 2f)
+            centralTime += normalizedX * dtHalfLength * (1f - scale)
+            dtHalfLength *= scale
+            centralTime += dtHalfLength * 20f * dy / width
 
-        clampTime()
-
+            clampTime()
+        }
     }
 
     override val className get() = "TimelinePanel"
