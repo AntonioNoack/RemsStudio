@@ -330,7 +330,5 @@ class Project(var name: String, val file: FileReference) : Saveable() {
             return (ConfigBasics.configFolder.listChildren() ?: emptyList())
                 .filter { it.name.endsWith(".layout.json") }
         }
-
     }
-
 }

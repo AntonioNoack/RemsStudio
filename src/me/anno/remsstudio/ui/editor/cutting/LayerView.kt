@@ -38,7 +38,6 @@ import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.Color.white4
 import me.anno.utils.hpc.ProcessingQueue
 import me.anno.video.VideoCache
-import java.util.WeakHashMap
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -114,6 +113,8 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
         solution?.keepResourcesLoaded()
     }
 
+    override val canDrawOverBorders: Boolean get() = true
+
     var lastTime = gameTime
 
     // calculation is fast, drawing is slow
@@ -136,7 +137,6 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
                 mouseKeysDown.isNotEmpty() ||
                 keysDown.isNotEmpty() ||
                 abs(this.lastTime - gameTime) > if (needsLayoutUpdate(GFX.activeWindow!!)) 5e7 else 1e9
-
 
         if (needsUpdate && !computer.isCalculating) {
             lastTime = gameTime

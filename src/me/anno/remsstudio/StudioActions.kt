@@ -20,17 +20,38 @@ import kotlin.math.round
 
 object StudioActions {
 
-    fun register() {
+    fun nextFrame() {
+        RemsStudio.editorTime = (round(RemsStudio.editorTime * RemsStudio.targetFPS) + 1) / RemsStudio.targetFPS
+        RemsStudio.updateAudio()
+    }
 
-        fun setEditorTimeDilation(dilation: Double): Boolean {
-            return if (dilation == RemsStudio.editorTimeDilation ||
-                GFX.someWindow?.windowStack?.inFocus0?.isKeyInput() == true
-            ) false
-            else {
-                RemsStudio.editorTimeDilation = dilation
-                true
-            }
+    fun previousFrame() {
+        RemsStudio.editorTime = (round(RemsStudio.editorTime * RemsStudio.targetFPS) - 1) / RemsStudio.targetFPS
+        RemsStudio.updateAudio()
+    }
+
+    fun setEditorTimeDilation(dilation: Double, respectKeys: Boolean = true): Boolean {
+        return if (dilation == RemsStudio.editorTimeDilation ||
+            (respectKeys && GFX.someWindow?.windowStack?.inFocus0?.isKeyInput() == true)
+        ) false
+        else {
+            RemsStudio.editorTimeDilation = dilation
+            RemsStudio.updateAudio()
+            true
         }
+    }
+
+    fun jumpToStart() {
+        RemsStudio.editorTime = 0.0
+        RemsStudio.updateAudio()
+    }
+
+    fun jumpToEnd() {
+        RemsStudio.editorTime = RemsStudio.project?.targetDuration ?: 10.0
+       RemsStudio.updateAudio()
+    }
+
+    fun register() {
 
         val actions = listOf(
             "Play" to { setEditorTimeDilation(1.0) },
@@ -41,13 +62,11 @@ object StudioActions {
             "ToggleFullscreen" to { GFX.someWindow?.toggleFullscreen(); true },
             "PrintLayout" to { printLayout();true },
             "NextFrame" to {
-                RemsStudio.editorTime = (round(RemsStudio.editorTime * RemsStudio.targetFPS) + 1) / RemsStudio.targetFPS
-                RemsStudio.updateAudio()
+                nextFrame()
                 true
             },
             "PreviousFrame" to {
-                RemsStudio.editorTime = (round(RemsStudio.editorTime * RemsStudio.targetFPS) - 1) / RemsStudio.targetFPS
-                RemsStudio.updateAudio()
+                previousFrame()
                 true
             },
             "NextStep" to {
@@ -59,13 +78,11 @@ object StudioActions {
                 true
             },
             "Jump2Start" to {
-                RemsStudio.editorTime = 0.0
-                RemsStudio.updateAudio()
+                jumpToStart()
                 true
             },
             "Jump2End" to {
-                RemsStudio.editorTime = RemsStudio.project?.targetDuration ?: 10.0
-                RemsStudio.updateAudio()
+                jumpToEnd()
                 true
             },
             "DragEnd" to {
@@ -83,7 +100,6 @@ object StudioActions {
                                 data.split("\n").map { getReference(it) }
                             )
                         }
-
                         else -> {
                             hoveredPanel?.onPaste(window.mouseX, window.mouseY, data, type)
                         }
