@@ -214,10 +214,10 @@ object RenderSettings : Transform() {
             .setTooltip("Only creates an audio file; no video is rendered nor saved.")
         list += TextButton("Override Audio", false, style)
             .addLeftClickListener { overrideAudio(InvalidRef, true, callback) }
-            .setTooltip("Only creates an audio file; no video is rendered nor saved.")
+            .setTooltip("Overrides the audio of the selected file; this is useful to fix too quiet videos.")
         list += TextButton("Render Current Frame", false, style)
             .addLeftClickListener { renderFrame(targetWidth, targetHeight, editorTime, true, callback) }
-            .setTooltip("Only creates an audio file; no video is rendered nor saved.")
+            .setTooltip("Renders the current frame into an image file.")
 
     }
 

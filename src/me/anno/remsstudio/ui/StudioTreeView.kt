@@ -14,9 +14,7 @@ import me.anno.remsstudio.RemsStudio.defaultWindowStack
 import me.anno.remsstudio.RemsStudio.lastTouchedCamera
 import me.anno.remsstudio.RemsStudio.nullCamera
 import me.anno.remsstudio.Selection
-import me.anno.remsstudio.objects.Camera
-import me.anno.remsstudio.objects.Rectangle
-import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.objects.*
 import me.anno.remsstudio.objects.Transform.Companion.toTransform
 import me.anno.remsstudio.objects.effects.MaskLayer
 import me.anno.ui.Style
@@ -27,6 +25,7 @@ import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.treeView.TreeView
 import me.anno.utils.Color.black
 import me.anno.utils.Color.toARGB
+import me.anno.utils.strings.StringHelper.camelCaseToTitle
 import me.anno.utils.types.Strings.joinChars
 import org.apache.logging.log4j.LogManager
 import org.joml.Vector3f
@@ -119,9 +118,12 @@ class StudioTreeView(style: Style) :
     }
 
     override fun getTooltipText(element: Transform): String? {
-        return if (element is Camera) {
-            element.defaultDisplayName + Dict[", drag onto scene to view", "ui.treeView.dragCameraToView"]
-        } else element::class.simpleName
+        return when (element) {
+            is Camera -> element.defaultDisplayName + Dict[", drag onto scene to view", "ui.treeView.dragCameraToView"]
+            is Video -> element.type.displayName.name
+            is MeshTransform -> "Mesh" // todo translate this
+            else -> element::class.simpleName?.camelCaseToTitle()
+        }
     }
 
     override fun onPaste(x: Float, y: Float, data: String, type: String) {

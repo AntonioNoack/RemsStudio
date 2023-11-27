@@ -2,6 +2,7 @@ package me.anno.remsstudio.ui.graphs
 
 import me.anno.animation.Interpolation
 import me.anno.animation.Type
+import me.anno.gpu.drawing.DrawCurves
 import me.anno.gpu.drawing.DrawRectangles.drawBorder
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.drawing.DrawTexts
@@ -38,6 +39,7 @@ import me.anno.utils.Color.black
 import me.anno.utils.Color.mulAlpha
 import me.anno.utils.Color.toARGB
 import me.anno.utils.Color.white
+import me.anno.utils.Color.withAlpha
 import me.anno.utils.types.AnyToFloat.getFloat
 import org.apache.logging.log4j.LogManager
 import org.joml.*
@@ -47,7 +49,6 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 // todo make music x times calmer, if another audio line (voice) is on as an optional feature
-// todo move multiple keyframes at a time
 
 // todo list all animated properties of this object (abbreviated)
 
@@ -201,8 +202,6 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         updateLocalTime()
 
         val property = selectedProperty ?: return
-        // if (!property.isAnimated) return
-
         if (property !== lastProperty) {
             lastProperty = property
             autoResize(property)
@@ -246,10 +245,8 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
 
         // draw selection box
         if (isSelecting) {
-
             // draw border
             drawBorder(minSelectX, minSelectY, maxSelectX * minSelectX, maxSelectY - minSelectY, black, 1)
-
             // draw inner
             if (minSelectX + 1 < maxSelectX && minSelectY + 1 < maxSelectY) {
                 drawRect(
@@ -258,9 +255,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                     black and 0x77000000
                 )
             }
-
         }
-
 
         // draw all data points
         val yValues = IntArray(type.components)
@@ -272,29 +267,36 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             drawColoredStripes(x0, x1, y0, y1, property)
         }
 
+        // draw all values
         if (kfs.isNotEmpty()) {
-            val first = kfs[0]
-            when (first.interpolation) {
-                Interpolation.LINEAR_BOUNDED, Interpolation.STEP, Interpolation.SPLINE -> {
-                    if (getXAt(kf2Global(first.time)) > x0 + 1) {// a line is needed from left to 1st point
-                        val startValue = property[global2Kf(getTimeAt(x0.toFloat()))]!!
-                        val endX = getXAt(kf2Global(first.time)).toFloat()
-                        val endValue = first.value!!
-                        for (i in 0 until channelCount) {
-                            val startY = getYAt(getFloat(startValue, i, 0f)).toFloat()
-                            val endY = getYAt(getFloat(endValue, i, 0f)).toFloat()
-                            drawSmoothLine(
-                                x0.toFloat(), startY, endX, endY,
-                                this.x, this.y, this.width, this.height, valueColors[i], 0.5f
-                            )
-                        }
-                    }
-                }
-
-                else -> {
-                    // ...
-                }
+            val backgroundColor = backgroundColor.withAlpha(0)
+            val batch = DrawCurves.lineBatch.start()
+            for (i in valueColors.indices) {
+                valueColors[i] = valueColors[i].withAlpha(0.3f)
             }
+            var v0 = property[global2Kf(getTimeAt(x0 + 0f))]!!
+            for (x in x0 until x1) {
+                val xf0 = x.toFloat()
+                val xf1 = xf0 + 1f
+                val v1 = property[global2Kf(getTimeAt(xf1))]!!
+                for (i in 0 until channelCount) {
+                    val vy0 = getYAt(getFloat(v0, i, 0f)).toFloat()
+                    val vy1 = getYAt(getFloat(v1, i, 0f)).toFloat()
+                    // skip it, if we don't need it
+                    if (min(vy0, vy1) < y0 || max(vy0, vy1) > y1) continue
+                    DrawCurves.drawLine(
+                        xf0, vy0, xf1, vy1, 0.5f,
+                        valueColors[i],
+                        backgroundColor,
+                        false
+                    )
+                }
+                v0 = v1
+            }
+            for (i in valueColors.indices) {
+                valueColors[i] = valueColors[i].withAlpha(1f)
+            }
+            DrawCurves.lineBatch.finish(batch)
         } else {
             val value = property.defaultValue!!
             for (i in 0 until channelCount) {
@@ -323,10 +325,6 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                 yValues[i] = getYAt(value).roundToInt()
             }
 
-            if (j > 0) {// draw all lines
-                drawLines(property, x, x0, x1, j, tGlobal, channelCount, valueColors)
-            }
-
             var willBeSelected = kf in selectedKeyframes
             if (!willBeSelected && isSelecting && x in selectX) {
                 for (i in 0 until channelCount) {
@@ -345,37 +343,6 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             }
 
         }
-
-        // todo not correct, because of clamping...
-        // start is either
-        // todo we need to calculate the correct cutting point with min or max...
-        // todo sine is crazy as well ->
-        // todo we need a function similar to drawLines()
-        if (kfs.isNotEmpty()) {
-            val last = kfs.last()
-            when (last.interpolation) {
-                Interpolation.SPLINE, Interpolation.STEP, Interpolation.LINEAR_BOUNDED -> {
-                    if (getXAt(kf2Global(last.time)) < x1) {// a line is needed from last pt to end
-                        val endValue = property[global2Kf(getTimeAt(x1.toFloat()))]!!
-                        val startX = getXAt(kf2Global(last.time)).toFloat()
-                        val startValue = last.value!!
-                        for (i in 0 until channelCount) {
-                            val endY = getYAt(getFloat(endValue, i, 0f)).toFloat()
-                            val startY = getYAt(getFloat(startValue, i, 0f)).toFloat()
-                            drawSmoothLine(
-                                startX, startY, x1.toFloat(), endY,
-                                this.x, this.y, this.width, this.height, valueColors[i], 0.5f
-                            )
-                        }
-                    }
-                }
-
-                else -> {
-                    // ...
-                }
-            }
-        }
-
     }
 
     private fun drawColoredStripes(
@@ -418,62 +385,6 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
 
     // todo draw curve of animation-drivers :)
     // todo input (animated values) and output (calculated values)?
-
-    private fun drawLines(
-        property: AnimatedProperty<*>,
-        x: Int, x0: Int, x1: Int,
-        j: Int, endTime: Double,
-        channelCount: Int, valueColors: IntArray
-    ) {
-        val kfs = property.keyframes
-        val previous = kfs[j - 1]
-        val tGlobalPrev = mix(0.0, 1.0, kf2Global(previous.time))
-        val prevX = getXAt(tGlobalPrev).roundToInt()
-        val minX = max(prevX, x0)
-        val maxX = min(x, x1)
-        val stepSize = max(1, (maxX - minX) / 30)
-        val t0 = getTimeAt(minX.toFloat())
-        for (i in 0 until channelCount) {
-            var lastX = minX
-            var lastY = getYAt(getFloat(property[global2Kf(t0)], i, 0f)).toFloat()
-            fun addLine(xHere: Int, tGlobalHere: Double) {
-                val value = property[global2Kf(tGlobalHere)]!!
-                val yHere = getYAt(getFloat(value, i, 0f)).toFloat()
-                if (xHere > lastX && xHere >= x0 && lastX < x1) {
-                    drawSmoothLine(
-                        lastX.toFloat(), lastY, xHere.toFloat(), yHere,
-                        this.x, this.y, this.width, this.height, valueColors[i], 0.5f
-                    )
-                }
-                lastX = xHere
-                lastY = yHere
-            }
-            // draw differently depending on section mode
-            when (previous.interpolation) {
-                /*Interpolation.LINEAR_BOUNDED, Interpolation.LINEAR_UNBOUNDED -> {
-                    addLine(x, endTime) // done
-                }
-                Interpolation.STEP -> {
-                    val startTime = kf2Global(previous.time)
-                    var time: Double
-                    time = mix(startTime, endTime, 0.4999)
-                    addLine(getXAt(time).toInt(), time)
-                    time = mix(startTime, endTime, 0.5001)
-                    addLine(getXAt(time).toInt(), time)
-                    addLine(x, endTime)
-                }*/
-                // Interpolation.SPLINE,
-                else -> {
-                    // steps in between are required
-                    for (xHere in minX until maxX step stepSize) {
-                        val tGlobalHere = getTimeAt(xHere.toFloat())
-                        addLine(xHere, tGlobalHere)
-                    }
-                    addLine(x, endTime)
-                }
-            }
-        }
-    }
 
     fun Int.isChannelActive() = ((1 shl this) and activeChannels) != 0
 

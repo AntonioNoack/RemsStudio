@@ -118,8 +118,6 @@ object RemsStudio : StudioBase("Rem's Studio", 10205, true) {
     val defaultWindowStack get() = GFX.someWindow!!.windowStack
     var hideUnusedProperties = false
 
-    // private val LOGGER = LogManager.getLogger(RemsStudio::class)
-
     lateinit var currentCamera: Camera
     var lastTouchedCamera: Camera? = null
 
