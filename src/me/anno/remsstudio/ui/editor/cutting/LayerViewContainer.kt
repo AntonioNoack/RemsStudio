@@ -13,6 +13,7 @@ import me.anno.ui.base.components.Padding
 import me.anno.ui.base.groups.PanelListX
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.scrolling.ScrollPanelY
+import me.anno.utils.Color.mixARGB
 import me.anno.utils.structures.lists.Lists.count2
 
 class LayerViewContainer(style: Style) : ScrollPanelY(Padding(0), style) {
@@ -42,7 +43,19 @@ class LayerViewContainer(style: Style) : ScrollPanelY(Padding(0), style) {
                 }
                 .addLeftClickListener(action))
         }
-        timeControls.add(SpacerPanel(1, 1, style).apply { weight = 1f })
+        val hideButton = TextButton(
+            "Hide", "Hide Time Controls; Can be undone at the bottom of this panel",
+            false, style
+        )
+        val showButton = TextButton("Show Time Controls", style)
+        val bg = showButton.backgroundColor
+        fun space(): Panel {
+            return SpacerPanel(1, 1, style).apply {
+                backgroundColor = mixARGB(backgroundColor, bg, 0.3f)
+                weight = 1f
+            }
+        }
+        timeControls.add(space())
         addButton("|<", "Jump to start (Left Arrow + Control)") { jumpToStart() }
         addButton(".<", "Jump to previous frame (Comma)") { previousFrame() }
         addButton("<<", "Playback 5x speed backwards") { setEditorTimeDilation(-5.0) }
@@ -54,12 +67,7 @@ class LayerViewContainer(style: Style) : ScrollPanelY(Padding(0), style) {
         addButton(">>", "Playback 5x speed") { setEditorTimeDilation(+5.0) }
         addButton(">.", "Jump to next frame (Dot)") { nextFrame() }
         addButton(">|", "Jump to end (Right Arrow + Control)") { jumpToEnd() }
-        timeControls.add(SpacerPanel(1, 1, style).apply { weight = 1f })
-        val hideButton = TextButton(
-            "Hide", "Hide Time Controls; Can be undone at the bottom of this panel",
-            false, style
-        )
-        val showButton = TextButton("Show Time Controls", style)
+        timeControls.add(space())
         showButton.isVisible = false
         timeControls.add(hideButton.addLeftClickListener {
             timeControls.isVisible = false
@@ -67,9 +75,9 @@ class LayerViewContainer(style: Style) : ScrollPanelY(Padding(0), style) {
         })
         layers += timeControls
         layers += bottomButtons
-        bottomButtons.add(SpacerPanel(1, 1, style).apply { weight = 1f })
+        bottomButtons.add(space())
         bottomButtons.add(addLayerButton)
-        bottomButtons.add(SpacerPanel(1, 1, style).apply { weight = 1f })
+        bottomButtons.add(space())
         bottomButtons.add(showButton.addLeftClickListener {
             timeControls.isVisible = true
             showButton.isVisible = false
