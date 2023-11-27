@@ -263,6 +263,9 @@ object RemsStudio : StudioBase("Rem's Studio", 10205, true) {
     val shutterPercentage get() = project!!.shutterPercentage
     val history get() = currentTab?.history
     val nullCamera get() = project?.nullCamera
+    val timelineSnapping get(): Double = project?.timelineSnapping ?: 0.0
+    val timelineSnappingOffset get(): Double = project?.timelineSnappingOffset ?: 0.0
+    val timelineSnappingRadius get(): Int = project?.timelineSnappingRadius ?: 10
 
     var root = Transform()
 

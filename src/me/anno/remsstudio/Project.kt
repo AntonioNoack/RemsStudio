@@ -242,9 +242,13 @@ class Project(var name: String, val file: FileReference) : Saveable() {
     // do we need multiple targets per project? maybe... soft links!
     // do we need a target at all? -> yes
     // a project always is a folder
-    // zip this folder all the time to not waste SSD life time? -> no, we don't have that many files
+    // zip this folder all the time to not waste SSD lifetime? -> no, we don't have that many files
     // -> we need to be able to show contents of zip files then
 
+
+    var timelineSnapping = config["editor.timelineSnapping", 0.0]
+    var timelineSnappingOffset = config["editor.timelineSnappingOffset", 0.0]
+    var timelineSnappingRadius = config["editor.timelineSnappingRadius", 10]
     var targetDuration = config["target.duration", 5.0]
     var targetSampleRate = config["target.sampleRate", 48000]
     var targetSizePercentage = config["target.sizePercentage", 100f]
@@ -288,6 +292,9 @@ class Project(var name: String, val file: FileReference) : Saveable() {
         config["language"] = language.code
         config["target.ffmpegFlags.id"] = ffmpegFlags.id
         config["target.encodingBalance"] = ffmpegBalance.value
+        config["editor.timelineSnapping"] = timelineSnapping
+        config["editor.timelineSnappingOffset"] = timelineSnappingOffset
+        config["editor.timelineSnappingRadius"] = timelineSnappingRadius
         ConfigBasics.save(configFile, config.toString())
     }
 
@@ -315,7 +322,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
         val MotionBlurType = Type.INT_PLUS.withDefaultValue(8)
         val ShutterPercentageType = Type.FLOAT_PLUS.withDefaultValue(1f)
 
-         fun getUILayoutFile(name: String): FileReference {
+        fun getUILayoutFile(name: String): FileReference {
             return ConfigBasics.getConfigFile("$name.layout.json")
         }
 

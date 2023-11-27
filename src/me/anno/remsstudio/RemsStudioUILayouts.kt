@@ -93,6 +93,10 @@ object RemsStudioUILayouts {
             windowStack.push(window)
         }
 
+        options.addAction(configTitle, Dict["BPM Snap Settings", "ui.top.config.bpmSnapping"]) {
+            selectTransform(BPMSnapping)
+        }
+
         options.addAction(configTitle, Dict["Language", "ui.top.config.language"]) {
             Dict.selectLanguage(style).onMouseClicked(windowStack.mouseX, windowStack.mouseY, Key.BUTTON_LEFT, false)
         }
@@ -100,7 +104,6 @@ object RemsStudioUILayouts {
         options.addAction(configTitle, Dict["Open Config Folder", "ui.top.config.openFolder"]) {
             ConfigBasics.configFolder.openInExplorer()
         }
-
 
         /**
          * Project options

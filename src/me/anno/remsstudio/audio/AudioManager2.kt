@@ -17,8 +17,8 @@ object AudioManager2 {
         if (transform is Audio) {
             transform.startPlayback(time, dilation, camera)
         }
-        transform.children.forEach {
-            updateTime(time, dilation, it)
+        for (child in transform.children) {
+            updateTime(time, dilation, child)
         }
     }
 
@@ -27,8 +27,8 @@ object AudioManager2 {
             transform.needsUpdate = false
             transform.startPlayback(editorTime, editorTimeDilation, camera)
         }
-        for (it in transform.children) {
-            checkTree(it)
+        for (child in transform.children) {
+            checkTree(child)
         }
     }
 
@@ -36,8 +36,8 @@ object AudioManager2 {
         if (transform is Audio) {
             transform.stopPlayback()
         }
-        transform.children.forEach {
-            stop(it)
+        for (child in transform.children) {
+            stop(child)
         }
     }
 

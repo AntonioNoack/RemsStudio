@@ -2,7 +2,6 @@ package me.anno.remsstudio.ui.editor.cutting
 
 import me.anno.Time.gameTime
 import me.anno.cache.CacheData
-import me.anno.video.VideoCache
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.input.Input
@@ -38,6 +37,8 @@ import me.anno.ui.dragging.Draggable
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.Color.white4
 import me.anno.utils.hpc.ProcessingQueue
+import me.anno.video.VideoCache
+import java.util.WeakHashMap
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -282,6 +283,8 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
                         .fold(1.0) { t0, tx -> t0 * tx.timeDilation.value }
                     val dt = shiftSlowdown * dilation * dx * dtHalfLength * 2 / width
                     if (dt != 0.0) {
+                        // todo apply snapping, if possible
+                        // todo only apply for small deltas
                         RemsStudio.incrementalChange("Move Keyframes") {
                             for (kf in draggedKeyframes) {
                                 kf.time += dt
@@ -292,8 +295,6 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
             } else {
                 val thisSlot = this@LayerView.timelineSlot
                 if (dx != 0f) {
-                    //val dilation = transform.listOfInheritance
-                    //    .fold(1.0) { t0, tx -> t0 * tx.timeDilation.value }
                     RemsStudio.incrementalChange("Change Time Dilation / Offset") {
                         if (isControlDown) {
                             // todo scale around the time=0 point?
@@ -351,7 +352,6 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
                     openMenu(windowStack, options)
                 } else super.onMouseClicked(x, y, button, long)
             }
-
             else -> super.onMouseClicked(x, y, button, long)
         }
     }
@@ -395,7 +395,7 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
 
     override fun onPasteFiles(x: Float, y: Float, files: List<FileReference>) {
         val time = getTimeAt(x)
-        files.forEach { file ->
+        for (file in files) {
             addChildFromFile(RemsStudio.root, file, FileContentImporter.SoftLinkMode.ASK, true) {
                 it.timeOffset.value = time
                 it.timelineSlot.value = timelineSlot

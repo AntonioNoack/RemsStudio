@@ -38,8 +38,6 @@ import kotlin.math.max
 
 object RenderSettings : Transform() {
 
-    // render queue?
-
     override val defaultDisplayName get() = "Render Settings"
 
     override fun createInspector(
@@ -50,10 +48,9 @@ object RenderSettings : Transform() {
     ) {
 
         val project = project!!
-
         list += TextPanel(defaultDisplayName, style)
             .apply { focusTextColor = textColor }
-        list += vi(inspected, "Duration", "Video length in seconds", Type.FLOAT_PLUS, targetDuration, style) {
+        list += vi(inspected, "Duration (Seconds)", "Video length in seconds", Type.FLOAT_PLUS, targetDuration, style) {
             project.targetDuration = it
             save()
         }
@@ -66,7 +63,7 @@ object RenderSettings : Transform() {
             save()
         }
 
-        list += FrameSizeInput("Frame Size", "${project.targetWidth}x${project.targetHeight}", style)
+        list += FrameSizeInput("Frame Size (Pixels)", "${project.targetWidth}x${project.targetHeight}", style)
             .setChangeListener { w, h ->
                 project.targetWidth = max(1, w)
                 project.targetHeight = max(1, h)
@@ -83,7 +80,7 @@ object RenderSettings : Transform() {
         if (project.targetFPS !in framesRates) framesRates.add(0, project.targetFPS)
 
         list += EnumInput(
-            "Frame Rate",
+            "Frame Rate (Hz)",
             true,
             project.targetFPS.toString(),
             framesRates.map { NameDesc(it.toString()) },
@@ -145,7 +142,7 @@ object RenderSettings : Transform() {
         list += samples
 
         val shp = vi(
-            "Shutter-Percentage", "[Motion Blur] 1 = full frame is used; 0.1 = only 1/10th of a frame time is used",
+            "Shutter-Percentage (0-1)", "[Motion Blur] 1 = full frame is used; 0.1 = only 1/10th of a frame time is used",
             project.shutterPercentage,
             style
         ) as FloatInput

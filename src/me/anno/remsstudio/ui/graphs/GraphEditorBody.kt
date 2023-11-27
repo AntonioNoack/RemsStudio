@@ -43,10 +43,8 @@ import me.anno.utils.Color.withAlpha
 import me.anno.utils.types.AnyToFloat.getFloat
 import org.apache.logging.log4j.LogManager
 import org.joml.*
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
+import java.util.*
+import kotlin.math.*
 
 // todo make music x times calmer, if another audio line (voice) is on as an optional feature
 
@@ -550,6 +548,40 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         return true
     }
 
+    private val draggingRemainder = WeakHashMap<Keyframe<*>, Double>()
+    private fun snap(time: Double, snapping: Double, offset: Double): Double {
+        return round((time - offset) * snapping) / snapping + offset
+    }
+
+    fun incTime(keyframe: Keyframe<*>, deltaTime: Double, shouldSnap: Boolean) {
+        val snapping = RemsStudio.timelineSnapping
+        val offset = RemsStudio.timelineSnappingOffset
+        if (snapping > 0.0 && shouldSnap) {
+            // is bpm global? yes
+            // apply snapping, if possible
+            val oldTime = kf2Global(keyframe.time)
+            val newTime = oldTime + kf2Global(deltaTime) - kf2Global(0.0) + (draggingRemainder[keyframe] ?: 0.0)
+            val snappedTime = snap(newTime, snapping, offset)
+            draggingRemainder[keyframe] = snappedTime - newTime
+            val localTime = global2Kf(snappedTime)
+            keyframe.time = localTime
+        } else {
+            keyframe.time += deltaTime
+        }
+    }
+
+    fun shouldSnap(time: Double): Boolean {
+        // only apply for small deltas
+        //  - find the closest bpm position
+        //  - compare them
+        val snapping = RemsStudio.timelineSnapping
+        val offset = RemsStudio.timelineSnappingOffset
+        val radius = RemsStudio.timelineSnappingRadius
+        if (snapping <= 0.0) return false
+        val delta = snap(time, snapping, offset) - time
+        return abs(getXAt(delta) - getXAt(0.0)) < radius // snap if within +/- radius px
+    }
+
     override fun onMouseMoved(x: Float, y: Float, dx: Float, dy: Float) {
         val draggedKeyframe = draggedKeyframe
         val selectedProperty = selectedProperties?.firstOrNull()
@@ -560,31 +592,30 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             // dragging
             val time = getTimeAt(x)
             RemsStudio.incrementalChange("Dragging keyframe") {
+                val timeHere = global2Kf(time) // global -> local
+                val deltaTime = timeHere - draggedKeyframe.time
+                val shouldSnap = shouldSnap(time)
+                for (keyframe in selectedKeyframes) {
+                    incTime(keyframe, deltaTime, shouldSnap)
+                }
+                editorTime = kf2Global(draggedKeyframe.time)
+                updateAudio()
                 if (selectedKeyframes.size < 2) {
-                    draggedKeyframe.time = global2Kf(time) // global -> local
-                    editorTime = time
-                    updateAudio()
                     if (draggedKeyframe.value is Number || when (draggedKeyframe.value) {
                             is Vector2f, is Vector3f, is Vector4f,
                             is Vector2d, is Vector3d, is Vector4d,
                             is Quaternionf, is Quaterniond -> true
-
                             else -> false
                         }
                     ) {
-                        draggedKeyframe.setValue(draggedChannel, getValueAt(y).toFloat(), selectedProperty.type)
+                        draggedKeyframe.setValue(
+                            draggedChannel,
+                            getValueAt(y).toFloat(),
+                            selectedProperty.type
+                        )
                     }
-                    selectedProperty.sort()
-                } else {
-                    val timeHere = global2Kf(time)
-                    val deltaTime = timeHere - draggedKeyframe.time
-                    for (keyframe in selectedKeyframes) {
-                        keyframe.time += deltaTime // global -> local
-                    }
-                    editorTime = time
-                    updateAudio()
-                    selectedProperty.sort()
                 }
+                selectedProperty.sort()
             }
             invalidateDrawing()
         } else {
