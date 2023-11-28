@@ -117,9 +117,7 @@ object Scene {
                     "   return uv2;\n" +
                     "}" +
                     "vec4 getColor(vec2 uv){" +
-                    "   float zero = min(min(uv.x, 1.0-uv.x), min(uv.y, 1.0-uv.y))*1000.0;\n" +
-                    "   vec4 color = texture(tex, uv);\n" +
-                    "   return vec4(color.rgb, color.a * clamp(zero, 0.0, 1.0));\n" +
+                    "   return texture(tex, uv);\n" +
                     "}\n" +
                     "float softMin(float a, float b, float k){\n" +
                     "   return -(log(exp(k*-a)+exp(k*-b))/k);\n" +
@@ -141,7 +139,7 @@ object Scene {
                     "       vec3 raw = vec3(r, ga.x, b);\n" +
                     "       vec3 toneMapped;\n" +
                     "       switch(toneMapper){\n" +
-                    ToneMappers.values().joinToString("") {
+                    ToneMappers.entries.joinToString("") {
                         "case ${it.id}: toneMapped = ${it.glslFuncName}(raw);break;\n"
                     } + "default: toneMapped = vec3(1.0, 0.0, 1.0);\n" +
                     "       }" +
@@ -291,9 +289,11 @@ object Scene {
 
                     val color = camera.backgroundColor.getValueAt(RemsStudio.editorTime, Vector4f())
                     buffer.clearDepth()
-                    depthMask.use(false) {
-                        depthMode.use(DepthMode.ALWAYS) {
-                            drawRect(x, y, w, h, color)
+                    blendMode.use(null) {
+                        depthMask.use(false) {
+                            depthMode.use(DepthMode.ALWAYS) {
+                                drawRect(x, y, w, h, color)
+                            }
                         }
                     }
 

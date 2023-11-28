@@ -96,10 +96,6 @@ class Camera(parent: Transform? = null) : Transform(parent) {
             inspected, c, "Orbit Radius", "Orbiting Distance", "camera.orbitDis",
             c.map { it.orbitRadius }, style
         )
-        transform += vis(
-            inspected, c, "Background Color", "Clearing color for the screen", "camera.backgroundColor",
-            c.map { it.backgroundColor }, style
-        )
 
 
         val cam = getGroup("Projection", "How rays of light are mapped to the screen", "projection")
@@ -185,6 +181,10 @@ class Camera(parent: Transform? = null) : Transform(parent) {
 
 
         val color = getGroup("Color", "Tint and Tonemapping", "color")
+        color += vis(
+            inspected, c, "Background Color", "Clearing color for the screen", "camera.backgroundColor",
+            c.map { it.backgroundColor }, style
+        )
         color += vi(
             inspected, "Tone Mapping",
             "Maps large ranges of brightnesses (e.g. HDR) to monitor color space", "camera.toneMapping",
