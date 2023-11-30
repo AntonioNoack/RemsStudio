@@ -39,6 +39,7 @@ import me.anno.ui.editor.stacked.Option
 import me.anno.ui.input.TextInput
 import me.anno.ui.input.TextInputML
 import me.anno.ui.Style
+import me.anno.ui.base.components.AxisAlignment
 import me.anno.utils.Color.mulARGB
 import me.anno.utils.structures.Hierarchical
 import me.anno.utils.structures.ValueWithDefault
@@ -231,9 +232,11 @@ open class Transform() : Saveable(),
         list += TextInput("Name ($className)", "", name, style)
             .addChangeListener { for (x in c) name = it.ifEmpty { "-" } }
             .setIsSelectedListener { show(c, null) }
+            .apply { alignmentX = AxisAlignment.FILL }
         list += TextInputML("Comment", comment, style)
             .addChangeListener { for (x in c) comment = it }
             .setIsSelectedListener { show(c, null) }
+            .apply { alignmentX = AxisAlignment.FILL }
 
         val warningPanel = UpdatingTextPanel(500, style) { lastWarning }
         warningPanel.textColor = warningPanel.textColor.mulARGB(0xffff3333.toInt())

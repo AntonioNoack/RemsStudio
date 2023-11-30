@@ -15,7 +15,9 @@ import me.anno.remsstudio.objects.modes.TransformVisibility
 import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.studio.Events.addEvent
 import me.anno.studio.StudioBase
+import me.anno.ui.Panel
 import me.anno.ui.WindowStack.Companion.printLayout
+import me.anno.utils.structures.lists.Lists.any2
 import kotlin.math.round
 
 object StudioActions {
@@ -31,10 +33,18 @@ object StudioActions {
     }
 
     fun setEditorTimeDilation(dilation: Double, respectKeys: Boolean = true): Boolean {
-        return if (dilation == RemsStudio.editorTimeDilation ||
-            (respectKeys && GFX.someWindow?.windowStack?.inFocus0?.isKeyInput() == true)
-        ) false
+        val isInKeyInput = respectKeys && GFX.windows.any2 { w ->
+            w.windowStack.inFocus.any2 { p ->
+                p.anyInHierarchy { pi -> pi is Panel && pi.isKeyInput() }
+            }
+        }
+        return if (dilation == RemsStudio.editorTimeDilation || isInKeyInput) false
         else {
+            GFX.windows.map { w ->
+                w.windowStack.inFocus.map {
+                    it.printLayout(0)
+                }
+            }
             RemsStudio.editorTimeDilation = dilation
             RemsStudio.updateAudio()
             true
@@ -48,7 +58,7 @@ object StudioActions {
 
     fun jumpToEnd() {
         RemsStudio.editorTime = RemsStudio.project?.targetDuration ?: 10.0
-       RemsStudio.updateAudio()
+        RemsStudio.updateAudio()
     }
 
     fun register() {

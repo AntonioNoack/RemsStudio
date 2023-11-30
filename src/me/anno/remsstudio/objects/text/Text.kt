@@ -24,7 +24,7 @@ import me.anno.remsstudio.objects.modes.TextRenderMode
 import me.anno.studio.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.Font
-import me.anno.ui.base.constraints.AxisAlignment
+import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.SettingCategory

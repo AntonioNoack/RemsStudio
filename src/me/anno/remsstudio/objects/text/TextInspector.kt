@@ -5,13 +5,14 @@ import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
 import me.anno.studio.Inspectable
+import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.FontListMenu.createFontInput
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.color.spaces.HSLuv
 import me.anno.ui.input.BooleanInput
-import me.anno.ui.Style
+import me.anno.ui.input.TextInputML
 import org.joml.Vector3f
 import org.joml.Vector4f
 
@@ -24,18 +25,17 @@ fun Text.createInspectorWithoutSuperImpl(
     val t = inspected.filterIsInstance<Transform>()
     val c = inspected.filterIsInstance<Text>()
 
-    list += vis(inspected, c, "Text", "", "", c.map { it.text }, style)
-    /*list += TextInputML("Text", style, text[lastLocalTime])
-        .addChangeListener {
-            RemsStudio.incrementalChange("text") {
-                getSelfWithShadows().forEach { c ->
-                    c.putValue(c.text, it, true)
-                }
+    val textInput = vis(inspected, c, "Text", "", "", c.map { it.text }, style) as TextInputML
+    list += textInput
+    textInput.addChangeListener {
+        RemsStudio.incrementalChange("text") {
+            for (x in c) for (e in x.getSelfWithShadows()) {
+                e.putValue(e.text, it, true)
             }
         }
-        .setIsSelectedListener { show(null) }*/
+    }
 
-    val fontGroup = getGroup("Font", "", "font")
+    val fontGroup = getGroup("Font", "In what style text is rendered.", "font")
     fontGroup += createFontInput(font.name, style) {
         RemsStudio.largeChange("Change Font to '$it'") {
             for (x in c) for (e in x.getSelfWithShadows()) {
@@ -45,7 +45,7 @@ fun Text.createInspectorWithoutSuperImpl(
         invalidate()
     }.setIsSelectedListener { show(t, null) }
 
-    fontGroup += BooleanInput("Italic", font.isItalic, false, style)
+    fontGroup += BooleanInput("Italic", "Chooses a sideways-leaning variant of the font.", font.isItalic, false, style)
         .setChangeListener {
             RemsStudio.largeChange("Italic: $it") {
                 for (x in c) for (e in x.getSelfWithShadows()) {
@@ -55,7 +55,7 @@ fun Text.createInspectorWithoutSuperImpl(
             invalidate()
         }
         .setIsSelectedListener { show(t, null) }
-    fontGroup += BooleanInput("Bold", font.isBold, false, style)
+    fontGroup += BooleanInput("Bold", "Chooses a thicker variant of the font.", font.isBold, false, style)
         .setChangeListener {
             RemsStudio.largeChange("Bold: $it") {
                 for (x in c) for (e in x.getSelfWithShadows()) {
@@ -65,7 +65,13 @@ fun Text.createInspectorWithoutSuperImpl(
             invalidate()
         }
         .setIsSelectedListener { show(t, null) }
-    fontGroup += BooleanInput("Small Caps", smallCaps, false, style)
+    fontGroup += BooleanInput(
+        "Small Caps",
+        "This is a hack, where English letters get replaced by an UTF-8 variant in small caps.",
+        smallCaps,
+        false,
+        style
+    )
         .setChangeListener {
             RemsStudio.largeChange("Small Caps: $it") {
                 for (x in c) for (e in x.getSelfWithShadows()) {
@@ -77,9 +83,9 @@ fun Text.createInspectorWithoutSuperImpl(
         .setIsSelectedListener { show(t, null) }
 
     val alignGroup = getGroup("Alignment", "", "alignment")
-    fun align(title: String, value: List<AnimatedProperty<*>>) {
+    fun align(title: String, ttt: String, value: List<AnimatedProperty<*>>) {
         // , xAxis: Boolean, set: (self: Text, AxisAlignment) -> Unit
-        alignGroup += vis(inspected, c, title, "", "", value, style)
+        alignGroup += vis(inspected, c, title, ttt, "", value, style)
         /* operator fun AxisAlignment.get(x: Boolean) = if (x) xName else yName
          alignGroup += EnumInput(
              title, true,
@@ -96,9 +102,18 @@ fun Text.createInspectorWithoutSuperImpl(
              }*/
     }
 
-    align("Text Alignment", c.map { it.textAlignment })//, true)// { self, it -> self.textAlignment = it }
-    align("Block Alignment X", c.map { it.blockAlignmentX })//, true)// { self, it -> self.blockAlignmentX = it }
-    align("Block Alignment Y", c.map { it.blockAlignmentY })//, false)// { self, it -> self.blockAlignmentY = it }
+    align(
+        "Text Alignment",
+        "When you add a linebreak, alignment dictates whether the shorter lines will be left/center/right aligned. -1 = left, 0 = center, +1 = right.",
+        c.map { it.textAlignment })//, true)// { self, it -> self.textAlignment = it }
+    align(
+        "Block Alignment X",
+        "This sets the alignment of the whole text block.",
+        c.map { it.blockAlignmentX })//, true)// { self, it -> self.blockAlignmentX = it }
+    align(
+        "Block Alignment Y",
+        "This sets the alignment of the whole text block.",
+        c.map { it.blockAlignmentY })//, false)// { self, it -> self.blockAlignmentY = it }
 
     val spaceGroup = getGroup("Spacing", "", "spacing")
     // make this element separable from the parent???
@@ -154,7 +169,7 @@ fun Text.createInspectorWithoutSuperImpl(
             }
         }
 
-    val rpgEffects = getGroup("RPG Effects", "", "rpg-effects")
+    val rpgEffects = getGroup("RPG Effects", "This effect is for fading in/out letters one by one.", "rpg-effects")
     rpgEffects += vis(
         c, "Start Cursor", "The first character index to be drawn", c.map { it.startCursor },
         style

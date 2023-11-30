@@ -13,7 +13,7 @@ import me.anno.maths.Maths.pow
 import me.anno.maths.Maths.unmix
 import me.anno.remsstudio.RemsStudio
 import me.anno.ui.Panel
-import me.anno.ui.base.constraints.AxisAlignment
+import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption

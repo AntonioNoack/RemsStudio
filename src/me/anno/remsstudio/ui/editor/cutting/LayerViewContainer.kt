@@ -9,6 +9,7 @@ import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.SpacerPanel
 import me.anno.ui.base.buttons.TextButton
+import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.components.Padding
 import me.anno.ui.base.groups.PanelListX
 import me.anno.ui.base.groups.PanelListY
@@ -25,8 +26,7 @@ class LayerViewContainer(style: Style) : ScrollPanelY(Padding(0), style) {
     private val timeControls = PanelListX(style)
     private val bottomButtons = PanelListX(style)
 
-    private val content = this
-    private val layers = content.child as PanelListY
+    private val layers = child as PanelListY
 
     private fun setEditorTimeDilation(speed: Double) {
         RemsStudio.editorTimeDilation = if (RemsStudio.editorTimeDilation != speed) speed else 0.0
@@ -34,15 +34,18 @@ class LayerViewContainer(style: Style) : ScrollPanelY(Padding(0), style) {
     }
 
     init {
-        content.weight = 1f
+        alignmentX = AxisAlignment.FILL
         fun addButton(name: String, desc: String, action: (Panel) -> Unit) {
             timeControls.add(TextButton(name, 1.5f, style)
                 .apply {
+                    alignmentX = AxisAlignment.FILL
+                    alignmentY = AxisAlignment.FILL
                     tooltip = desc
                     padding.set(1)
                 }
                 .addLeftClickListener(action))
         }
+
         val hideButton = TextButton(
             "Hide", "Hide Time Controls; Can be undone at the bottom of this panel",
             false, style
@@ -75,9 +78,11 @@ class LayerViewContainer(style: Style) : ScrollPanelY(Padding(0), style) {
         })
         layers += timeControls
         layers += bottomButtons
-        bottomButtons.add(space())
+        timeControls.alignmentX = AxisAlignment.FILL
+        bottomButtons.alignmentX = AxisAlignment.FILL
+        addLayerButton.alignmentX = AxisAlignment.FILL
+        addLayerButton.weight = 1f
         bottomButtons.add(addLayerButton)
-        bottomButtons.add(space())
         bottomButtons.add(showButton.addLeftClickListener {
             timeControls.isVisible = true
             showButton.isVisible = false
@@ -90,6 +95,7 @@ class LayerViewContainer(style: Style) : ScrollPanelY(Padding(0), style) {
     private fun addLayer() {
         val layerIndex = layers.children.count2 { it is LayerView }
         val v = LayerView(layerIndex, style)
+        v.alignmentX = AxisAlignment.FILL
         v.parent = layers
         v.cuttingView = this
         layers.children.add(layers.children.lastIndex, v)

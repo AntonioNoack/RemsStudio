@@ -13,8 +13,9 @@ import me.anno.remsstudio.ui.input.FloatVectorInputV2
 import me.anno.remsstudio.ui.input.IntInputV2
 import me.anno.studio.Inspectable
 import me.anno.ui.Panel
-import me.anno.ui.input.*
 import me.anno.ui.Style
+import me.anno.ui.base.components.AxisAlignment
+import me.anno.ui.input.*
 import me.anno.utils.Color.toHexColor
 import me.anno.utils.Color.toVecRGBA
 import me.anno.utils.structures.ValueWithDefault
@@ -207,7 +208,7 @@ object ComponentUIV2 {
     ): Panel {
         val time = self.lastLocalTime
         val sl = { self.show(listOf(self), listOf(values)) }
-        return when (val value = values[time]) {
+        val panel = when (val value = values[time]) {
             is Int -> IntInputV2(title, title, values, time, style)
                 .setChangeListener {
                     RemsStudio.incrementalChange("Set $title to $it", title) {
@@ -313,6 +314,8 @@ object ComponentUIV2 {
                 .setTooltip(ttt)
             else -> throw RuntimeException("Type $value not yet implemented!")
         }
+        panel.alignmentX = AxisAlignment.FILL
+        return panel
     }
 
     /**
@@ -329,7 +332,7 @@ object ComponentUIV2 {
         val self = transforms[0]
         val time = self.lastLocalTime
         val sl = { self.show(transforms, allValues) }
-        return when (val value = values[time]) {
+        val panel = when (val value = values[time]) {
             is Int -> IntInputV2(title, title, values, time, style)
                 .setChangeListener {
                     RemsStudio.incrementalChange("Set $title to $it", title) {
@@ -460,7 +463,7 @@ object ComponentUIV2 {
                 .addChangeListener { x, y, z, w, _ ->
                     RemsStudio.incrementalChange("Set $title to ($x,$y,$z,$w)", title) {
                         for (i in allValues.indices) {
-                            transforms[i].putValue(allValues[i],  Quaternionf(x, y, z, w), false)
+                            transforms[i].putValue(allValues[i], Quaternionf(x, y, z, w), false)
                         }
                     }
                 }
@@ -468,6 +471,8 @@ object ComponentUIV2 {
                 .setTooltip(ttt)
             else -> throw RuntimeException("Type $value not yet implemented!")
         }
+        panel.alignmentX = AxisAlignment.FILL
+        return panel
     }
 
 }

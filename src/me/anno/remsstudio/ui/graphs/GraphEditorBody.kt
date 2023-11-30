@@ -31,7 +31,7 @@ import me.anno.remsstudio.ui.MenuUtils.askNumber
 import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.Style
-import me.anno.ui.base.constraints.AxisAlignment
+import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.editor.sceneView.Grid.drawSmoothLine
@@ -678,7 +678,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         }
     }
 
-    override fun onCopyRequested(x: Float, y: Float): String? {
+    override fun onCopyRequested(x: Float, y: Float): String {
         // copy keyframes
         // left anker or center? left for now
         val time0 = selectedKeyframes.minByOrNull { it.time }?.time ?: 0.0

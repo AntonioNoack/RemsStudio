@@ -4,6 +4,7 @@ import me.anno.animation.Interpolation
 import me.anno.remsstudio.Selection.selectedProperties
 import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
+import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.groups.PanelList
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.scrolling.ScrollPanelX
@@ -15,6 +16,7 @@ class GraphEditor(style: Style) : PanelListY(style) {
 
     init {
         this += controls
+        body.alignmentX = AxisAlignment.FILL
         body.weight = 1f
         this += body
         val cc = controls.child as PanelList

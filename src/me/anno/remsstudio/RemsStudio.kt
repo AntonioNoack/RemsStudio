@@ -35,6 +35,7 @@ import me.anno.studio.GFXSettings
 import me.anno.studio.StudioBase
 import me.anno.ui.Panel
 import me.anno.ui.Style
+import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.groups.PanelListX
 import me.anno.ui.base.groups.PanelStack
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
@@ -179,7 +180,7 @@ object RemsStudio : StudioBase("Rem's Studio", 10207, true) {
 
             override fun createBackground(style: Style): Panel {
                 val background = ScenePreview(style)
-                val grayPlane = PanelListX(style).apply { backgroundColor = 0x55777777 }
+                val grayPlane = Panel(style).apply { backgroundColor = 0x55777777 }
                 val panel = PanelStack(style)
                 panel.add(background)
                 panel.add(grayPlane)
@@ -191,6 +192,12 @@ object RemsStudio : StudioBase("Rem's Studio", 10207, true) {
                     relativeCharSpacing = 0.12f
                     invalidate()
                 }
+                panel.alignmentX = AxisAlignment.FILL
+                panel.alignmentY = AxisAlignment.FILL
+                grayPlane.alignmentX = AxisAlignment.FILL
+                grayPlane.alignmentY = AxisAlignment.FILL
+                background.alignmentX = AxisAlignment.FILL
+                background.alignmentY = AxisAlignment.FILL
                 return panel
             }
 

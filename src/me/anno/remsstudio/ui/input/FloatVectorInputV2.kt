@@ -38,34 +38,6 @@ class FloatVectorInputV2(
         }
     }
 
-    constructor(
-        title: String, visibilityKey: String, value: Vector2f, type: Type,
-        owningProperty: AnimatedProperty<*>, style: Style
-    ) : this(title, visibilityKey, type, owningProperty, style) {
-        setValue(value, false)
-    }
-
-    constructor(
-        title: String, visibilityKey: String, value: Vector2d, type: Type,
-        owningProperty: AnimatedProperty<*>, style: Style
-    ) : this(title, visibilityKey, type, owningProperty, style) {
-        setValue(value, false)
-    }
-
-    constructor(
-        title: String, visibilityKey: String, value: Vector3d, type: Type,
-        owningProperty: AnimatedProperty<*>, style: Style
-    ) : this(title, visibilityKey, type, owningProperty, style) {
-        setValue(value, false)
-    }
-
-    constructor(
-        title: String, visibilityKey: String, value: Vector4d, type: Type,
-        owningProperty: AnimatedProperty<*>, style: Style
-    ) : this(title, visibilityKey, type, owningProperty, style) {
-        setValue(value, false)
-    }
-
     override fun onPaste(x: Float, y: Float, data: String, type: String) {
         pasteVector(data)
             ?: pasteScalar(data)
