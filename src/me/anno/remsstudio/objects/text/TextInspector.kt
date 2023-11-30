@@ -22,6 +22,9 @@ fun Text.createInspectorWithoutSuperImpl(
     style: Style,
     getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
 ) {
+
+    // todo propagate all changes to shadows
+
     val t = inspected.filterIsInstance<Transform>()
     val c = inspected.filterIsInstance<Text>()
 
@@ -71,35 +74,18 @@ fun Text.createInspectorWithoutSuperImpl(
         smallCaps,
         false,
         style
-    )
-        .setChangeListener {
-            RemsStudio.largeChange("Small Caps: $it") {
-                for (x in c) for (e in x.getSelfWithShadows()) {
-                    e.smallCaps = it
-                }
+    ).setChangeListener {
+        RemsStudio.largeChange("Small Caps: $it") {
+            for (x in c) for (e in x.getSelfWithShadows()) {
+                e.smallCaps = it
             }
-            invalidate()
         }
-        .setIsSelectedListener { show(t, null) }
+        invalidate()
+    }.setIsSelectedListener { show(t, null) }
 
     val alignGroup = getGroup("Alignment", "", "alignment")
     fun align(title: String, ttt: String, value: List<AnimatedProperty<*>>) {
-        // , xAxis: Boolean, set: (self: Text, AxisAlignment) -> Unit
         alignGroup += vis(inspected, c, title, ttt, "", value, style)
-        /* operator fun AxisAlignment.get(x: Boolean) = if (x) xName else yName
-         alignGroup += EnumInput(
-             title, true,
-             value[xAxis],
-             AxisAlignment.values().map { NameDesc(it[xAxis]) }, style
-         )
-             .setIsSelectedListener { show(null) }
-             .setChangeListener { name, _, _ ->
-                 val alignment = AxisAlignment.values().first { it[xAxis] == name }
-                 RemsStudio.largeChange("Set $title to $name") {
-                     getSelfWithShadows().forEach { set(it, alignment) }
-                 }
-                 invalidate()
-             }*/
     }
 
     align(
@@ -148,26 +134,31 @@ fun Text.createInspectorWithoutSuperImpl(
         invalidate()
     }
 
-    val ops = getGroup("Operations", "", "operations")
-    ops += TextButton("Create Shadow", false, style)
-        .addLeftClickListener {
-            // such a mess is the result of copying colors from the editor ;)
-            val signalColor = Vector4f(HSLuv.toRGB(Vector3f(0.000f, 0.934f, 0.591f)), 1f)
-            val pos = Vector3f(0.01f, -0.01f, -0.001f)
-            for (x in c) {
-                val shadow = x.clone() as Text
-                shadow.name = "Shadow"
-                shadow.comment = "Keep \"shadow\" in the name for automatic property inheritance"
-                // this avoids user reports, from people, who can't see their shadow
-                // making something black should be simple
-                shadow.color.set(signalColor)
-                shadow.position.set(pos)
-                shadow.relativeLineSpacing =
-                    relativeLineSpacing // evil ;), because we link instances instead of making a copy
-                RemsStudio.largeChange("Add Text Shadow") { x.addChild(shadow) }
-                Selection.selectTransform(shadow)
-            }
+    // val ops = getGroup("Operations", "", "operations")
+    list += TextButton(
+        "Create Shadow",
+        "This creates a new text object under ourself, where some properties are synced automatically. This allows for higher customizability.\n\n" +
+                "If you want everything to be synced, use the shadow properties at the bottom of this inspector.",
+        false,
+        style
+    ).addLeftClickListener {
+        // such a mess is the result of copying colors from the editor ;)
+        val signalColor = Vector4f(HSLuv.toRGB(Vector3f(0.000f, 0.934f, 0.591f)), 1f)
+        val pos = Vector3f(0.01f, -0.01f, -0.001f)
+        for (x in c) {
+            val shadow = x.clone() as Text
+            shadow.name = "Shadow"
+            shadow.comment = "Keep \"shadow\" in the name for automatic property inheritance"
+            // this avoids user reports, from people, who can't see their shadow
+            // making something black should be simple
+            shadow.color.set(signalColor)
+            shadow.position.set(pos)
+            // evil ;), because we link instances instead of making a copy
+            shadow.relativeLineSpacing = relativeLineSpacing
+            RemsStudio.largeChange("Add Text Shadow") { x.addChild(shadow) }
+            Selection.selectTransform(shadow)
         }
+    }
 
     val rpgEffects = getGroup("RPG Effects", "This effect is for fading in/out letters one by one.", "rpg-effects")
     rpgEffects += vis(
@@ -219,10 +210,8 @@ fun Text.createInspectorWithoutSuperImpl(
         for (x in c) x.roundSDFCorners = it
         invalidate()
     }
-    // outline += vis(inspected, c, "Start Angle", "", "", c.map { it.startDegrees }, style)
-    // outline += vis(inspected, c, "End Angle", "", "", c.map { it.endDegrees }, style)
 
-    val shadows = getGroup("Shadow", "", "shadow")
+    val shadows = getGroup("Shadow", "Built-in Shadow", "shadow")
     shadows += vis(inspected, c, "Color", "", "shadow.color", c.map { it.shadowColor }, style)
     shadows += vis(inspected, c, "Offset", "", "shadow.offset", c.map { it.shadowOffset }, style)
     shadows += vis(inspected, c, "Smoothness", "", "shadow.smoothness", c.map { it.shadowSmoothness }, style)

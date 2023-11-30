@@ -134,11 +134,11 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         }
         fun add(i: Int, mode: SceneDragMode) {
             controls += SimplePanel(
-                object : TextButton(mode.displayName, true, style) {
+                object : TextButton(mode.displayName, mode.description, true, style) {
                     override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
                         draw(x0, y0, x1, y1, isHovered, isPressed || mode == this@StudioSceneView.mode)
                     }
-                }.setTooltip(mode.description),
+                },
                 true, true,
                 pad * 2 + iconSize * (i + 1), pad,
                 iconSize

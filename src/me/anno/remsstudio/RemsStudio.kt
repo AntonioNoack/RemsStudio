@@ -36,7 +36,6 @@ import me.anno.studio.StudioBase
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.components.AxisAlignment
-import me.anno.ui.base.groups.PanelListX
 import me.anno.ui.base.groups.PanelStack
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.WelcomeUI
@@ -47,7 +46,6 @@ import kotlin.math.min
 // todo respect masks when editing multiple instances at once
 
 // todo bugs:
-//  - my sample HDR file isn't showing anymore? :(
 //  - sometimes delete-key isn't registered as such
 //  - new files, like with 0 bytes, cannot be right clicked in file explorer
 //  - video files cannot be properly deleted, because files can't be deleted when reading them
@@ -68,10 +66,6 @@ import kotlin.math.min
 
 // todo scene settings: render duration & size and such should be inside there as well
 
-// todo if a resource is requested, and there is a mutex limitation, it should be rejected instead of queued
-// so we don't put strain on the cpu & memory, if we don't really need the resource
-// this is the case for audio in the timeline, when just scrolling
-
 // todo calculate in-between frames for video by motion vectors; https://www.youtube.com/watch?v=PEe-ZeVbTLo ?
 // 30 -> 60 fps
 // the topic is complicated...
@@ -88,11 +82,6 @@ import kotlin.math.min
 
 // nearby frame compression (small changes between frames, could use lower resolution) on the gpu side? maybe...
 // -> would maybe allow 60fps playback better
-
-
-// todo Version 2:
-// todo make stuff component based and compile shaders on the fly...
-// would allow easy system for pdf particles and such... maybe...
 
 // done color to alpha
 // done alpha to color
@@ -115,7 +104,7 @@ import kotlin.math.min
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
-object RemsStudio : StudioBase("Rem's Studio", 10207, true) {
+object RemsStudio : StudioBase("Rem's Studio", 10208, true) {
 
     val defaultWindowStack get() = GFX.someWindow!!.windowStack
     var hideUnusedProperties = false
