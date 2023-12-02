@@ -20,7 +20,6 @@ import me.anno.gpu.framebuffer.Framebuffer
 import me.anno.gpu.framebuffer.IFramebuffer
 import me.anno.gpu.shader.BaseShader
 import me.anno.gpu.shader.GLSLType
-import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.shader.Shader
 import me.anno.gpu.shader.ShaderFuncLib.acesToneMapping
 import me.anno.gpu.shader.ShaderFuncLib.randomGLSL
@@ -34,6 +33,7 @@ import me.anno.gpu.shader.ShaderLib.uvList
 import me.anno.gpu.shader.builder.Variable
 import me.anno.gpu.shader.builder.VariableMode
 import me.anno.gpu.shader.effects.GaussianBlur
+import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.GPUFiltering
 import me.anno.gpu.texture.Texture3D
@@ -543,14 +543,21 @@ object Scene {
                     val (transform, _) = selectedTransform.getGlobalTransformTime(time)
                     stack.next {
                         stack.mul(transform)
-                        stack.scale(0.02f)
-                        drawUICircle(stack, 1f, 0.700f, Vector4f(1f, 0.9f, 0.5f, 1f))
-                        stack.scale(1.2f)
-                        drawUICircle(stack, 1f, 0.833f, Vector4f(0f, 0f, 0f, 1f))
+                        drawSelectionRing(stack)
                     }
                 }
             }
         }
     }
+
+    fun drawSelectionRing(stack: Matrix4fArrayList) {
+        stack.scale(0.02f)
+        drawUICircle(stack, 1f, 0.700f, c0)
+        stack.scale(1.2f)
+        drawUICircle(stack, 1f, 0.833f, c1)
+    }
+
+    val c0 = Vector4f(1f, 0.9f, 0.5f, 1f)
+    val c1 = Vector4f(0f, 0f, 0f, 1f)
 
 }

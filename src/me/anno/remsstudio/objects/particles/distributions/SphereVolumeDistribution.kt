@@ -1,5 +1,6 @@
-package me.anno.remsstudio.objects.distributions
+package me.anno.remsstudio.objects.particles.distributions
 
+import me.anno.language.translation.NameDesc
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector3f
@@ -7,8 +8,7 @@ import org.joml.Vector4f
 
 class SphereVolumeDistribution(center: Vector4f, size: Vector4f, rotation: Vector4f = Vector4f()) :
     CenterSizeDistribution(
-        "Sphere",
-        "Points from the inside of the sphere", "obj.dist.sphere",
+        NameDesc("Sphere", "Points from the inside of the sphere", "obj.dist.sphere"),
         center, size, rotation
     ) {
 

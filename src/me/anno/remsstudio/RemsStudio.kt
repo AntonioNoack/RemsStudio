@@ -53,8 +53,12 @@ import kotlin.math.min
 // -> create two keyframes at the start, so it counts as being keyframed,
 // then play, and move the property
 
-// todo allow dragging animated properties (like ParticleSystem.origin.constant) in SceneView to record them
-
+// allow dragging animated properties (like ParticleSystem.origin.constant) in SceneView to record them
+//  -> you should be able to draw pseudo-lines using that
+//  -> can we add a function to actually draw, using our line-drawing mechanism?
+// todo UI panels shouldn't override what you're doing then moving time forward
+// todo dragging scale has become awfully slow
+// todo we should show with color, which fields are keyframe-animated
 
 // todo respect masks when editing multiple instances at once
 

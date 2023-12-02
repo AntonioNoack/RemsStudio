@@ -1,6 +1,6 @@
-package me.anno.remsstudio.objects.distributions
+package me.anno.remsstudio.objects.particles.distributions
 
-import me.anno.language.translation.Dict
+import me.anno.language.translation.NameDesc
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector3f
@@ -8,8 +8,11 @@ import org.joml.Vector4f
 
 class SphereHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4f = Vector4f()) :
     CenterSizeDistribution(
-        Dict["Sphere Hull", "obj.dist.sphere.hull"],
-        Dict["Distributes points from the hull of a sphere or circle, not from the volume", "obj.dist.sphere.hull.desc"],
+        NameDesc(
+            "Sphere Hull",
+            "Distributes points from the hull of a sphere or circle, not from the volume",
+            "obj.dist.sphere.hull"
+        ),
         center, size, rotation
     ) {
 
@@ -27,7 +30,7 @@ class SphereHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4
             Vector2f(
                 random.nextFloat() - 0.5f,
                 random.nextFloat() - 0.5f
-            ).mul(scale).normalize()
+            ).mul(scale.x, scale.y).normalize()
         )
     }
 
@@ -37,7 +40,7 @@ class SphereHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4
                 random.nextFloat() - 0.5f,
                 random.nextFloat() - 0.5f,
                 random.nextFloat() - 0.5f
-            ).mul(scale).normalize()
+            ).mul(scale.x, scale.y, scale.z).normalize()
         )
     }
 

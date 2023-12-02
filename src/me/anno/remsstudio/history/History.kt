@@ -25,8 +25,9 @@ class History : Saveable() {
     fun isEmpty() = states.isEmpty()
 
     fun clearToSize() {
+        assert(maxChanged > 0)
         synchronized(states) {
-            while (states.size > maxChanged && maxChanged > 0) {
+            while (states.size > maxChanged ) {
                 states.removeAt(0)
             }
         }

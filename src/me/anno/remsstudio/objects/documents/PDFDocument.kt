@@ -22,9 +22,9 @@ import me.anno.remsstudio.objects.documents.SiteSelection.parseSites
 import me.anno.remsstudio.objects.lists.Element
 import me.anno.remsstudio.objects.lists.SplittableElement
 import me.anno.studio.Inspectable
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
 import me.anno.utils.Clipping
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.structures.lists.Lists.median
@@ -110,7 +110,7 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
         val doc = ref.doc
         val quality = getQuality()
         val numberOfPages = doc.numberOfPages
-        val pages = getSelectedSitesList()
+        val pageRanges = getSelectedSitesList()
         val direction = -direction[time].toRadians()
         // find reference scale: median height (or width, or height if height > width?)
         val referenceScale = getReferenceScale(doc, numberOfPages)
@@ -121,8 +121,8 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
         val normalizer = 1f / max(abs(cos), abs(sin))
         val scale = (1f + padding) * normalizer / referenceScale
         stack.next {
-            pages.forEach {
-                for (pageNumber in max(it.first, 0)..min(it.last, numberOfPages - 1)) {
+            for (pageRange in pageRanges) {
+                for (pageNumber in max(pageRange.first, 0)..min(pageRange.last, numberOfPages - 1)) {
                     val mediaBox = doc.getPage(pageNumber).mediaBox
                     val w = mediaBox.width * scale
                     val h = mediaBox.height * scale
@@ -213,8 +213,8 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
 
     override fun readString(name: String, value: String) {
         when (name) {
-            "file" -> file = value?.toGlobalFile() ?: InvalidRef
-            "selectedSites" -> selectedSites = value ?: ""
+            "file" -> file = value.toGlobalFile()
+            "selectedSites" -> selectedSites = value
             else -> super.readString(name, value)
         }
     }

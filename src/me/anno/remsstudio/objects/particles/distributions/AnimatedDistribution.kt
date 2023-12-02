@@ -1,4 +1,4 @@
-package me.anno.remsstudio.objects.distributions
+package me.anno.remsstudio.objects.particles.distributions
 
 import me.anno.animation.Type
 import me.anno.io.ISaveable
@@ -7,7 +7,6 @@ import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.inspectable.InspectableVector
-import me.anno.studio.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.utils.structures.ValueWithDefault
@@ -19,7 +18,7 @@ import java.util.*
 
 class AnimatedDistribution(
     distribution: Distribution = ConstantDistribution(),
-    val types: List<Type>,
+    val type: Type,
     val defaultValues: List<Any>
 ) : Saveable() {
 
@@ -31,17 +30,13 @@ class AnimatedDistribution(
         }
 
     constructor() : this(Type.ANY, 0f)
-    constructor(type: Type, defaultValue: Any) : this(ConstantDistribution(), listOf(type), listOf(defaultValue))
-    constructor(type: Type, defaultValues: List<Any>) : this(ConstantDistribution(), listOf(type), defaultValues)
-
-    constructor(distribution: Distribution, type: Type, defaultValues: List<Any>) :
-            this(distribution, listOf(type), defaultValues)
+    constructor(type: Type, defaultValue: Any) : this(ConstantDistribution(), type, listOf(defaultValue))
+    constructor(type: Type, defaultValues: List<Any>) : this(ConstantDistribution(), type, defaultValues)
 
     val channels = ArrayList<AnimatedProperty<*>>()
     lateinit var properties: List<InspectableVector>
 
     fun createInspector(
-        inspected0: List<Inspectable>,
         c: List<Transform>,
         inspected: List<AnimatedDistribution>,
         list: PanelListY,
@@ -82,7 +77,7 @@ class AnimatedDistribution(
     }
 
     private fun createChannel(index: Int): AnimatedProperty<*> {
-        return AnimatedProperty<Any>(types[index % types.size]).apply {
+        return AnimatedProperty<Any>(type).apply {
             defaultValue = defaultValues[index % defaultValues.size]
         }
     }
@@ -98,8 +93,9 @@ class AnimatedDistribution(
     fun update(time: Double, random: Random) {
         if (lastDist !== distribution) update()
         distribution.random.setSeed(random.nextLong())
-        properties.forEachIndexed { index, property ->
-            when (types[index % types.size].components) {
+        for (index in properties.indices) {
+            val property = properties[index]
+            when (type.components) {
                 1 -> property.value.set(channels[index][time] as Float)
                 2 -> property.value.set(channels[index][time] as Vector2f)
                 3 -> property.value.set(channels[index][time] as Vector3f)
@@ -113,6 +109,7 @@ class AnimatedDistribution(
         return distribution.nextV1()
     }
 
+    @Suppress("unused")
     fun nextV2(time: Double, random: Random): Vector2f {
         update(time, random)
         return distribution.nextV2()
@@ -123,6 +120,7 @@ class AnimatedDistribution(
         return distribution.nextV3()
     }
 
+    @Suppress("unused")
     fun nextV4(time: Double, random: Random): Vector4f {
         update(time, random)
         return distribution.nextV4()

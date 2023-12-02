@@ -38,6 +38,9 @@ import me.anno.remsstudio.Selection.selectedTransforms
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.effects.ToneMappers
+import me.anno.remsstudio.objects.particles.ParticleSystem
+import me.anno.remsstudio.objects.particles.distributions.CenterDistribution
+import me.anno.remsstudio.objects.particles.distributions.CenterSizeDistribution
 import me.anno.remsstudio.ui.StudioFileImporter.addChildFromFile
 import me.anno.remsstudio.ui.StudioTreeView.Companion.zoomToObject
 import me.anno.remsstudio.ui.editor.ISceneView
@@ -55,9 +58,7 @@ import me.anno.utils.Color.black
 import me.anno.utils.types.Booleans.toInt
 import me.anno.utils.types.Floats.toRadians
 import org.apache.logging.log4j.LogManager
-import org.joml.Matrix4f
-import org.joml.Matrix4fArrayList
-import org.joml.Vector3f
+import org.joml.*
 import java.lang.Math.toDegrees
 import kotlin.math.atan2
 import kotlin.math.max
@@ -469,7 +470,9 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
     private val target2camera = Matrix4f()
 
     fun moveSelected(selected: List<Transform>, dx0: Float, dy0: Float) {
-        for (s in selected) moveSelected(s, dx0, dy0)
+        for (s in selected) {
+            moveSelected(s, dx0, dy0)
+        }
     }
 
     fun moveSelected(selected: Transform, dx0: Float, dy0: Float) {
@@ -506,6 +509,10 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         val delta0 = dx0 - dy0
         val delta = dx - dy
 
+        val selectedDist = (selected as? ParticleSystem)?.selectedDistribution
+        val selectedPosDist = selectedDist?.distribution as? CenterDistribution
+        val selectedRotDist = selectedPosDist as? CenterSizeDistribution
+
         when (mode) {
             SceneDragMode.MOVE -> {
 
@@ -519,12 +526,24 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                 camera2target.transformDirection(localDelta)
 
                 invalidateDrawing()
-                val newPosition = Vector3f(oldPosition).add(localDelta)
                 RemsStudio.incrementalChange("Move Object") {
-                    selected.position.addKeyframe(localTime, newPosition)
+                    if (selectedPosDist != null) {
+                        // add keyframe to selectedPosDist
+                        val ch = selectedDist.channels[CenterSizeDistribution.POSITION_INDEX]
+                        when (val prev = ch[localTime]) {
+                            is Float -> ch.addKeyframe(localTime, prev + localDelta.x)
+                            is Vector2f -> ch.addKeyframe(localTime, Vector2f(prev).add(localDelta.x, localDelta.y))
+                            is Vector3f -> ch.addKeyframe(localTime, Vector3f(prev).add(localDelta))
+                            is Vector4f -> {
+                                val localDelta1 = Vector4f(localDelta.x, localDelta.y, localDelta.z, 0f)
+                                ch.addKeyframe(localTime, Vector4f(prev).add(localDelta1))
+                            }
+                        }
+                    } else {
+                        selected.position.addKeyframe(localTime, oldPosition.add(localDelta))
+                    }
                     invalidateUI(false)
                 }
-
             }
 
             SceneDragMode.SCALE -> {
@@ -534,16 +553,46 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     if (isControlDown) Vector3f(dx0, dy0, 0f)
                     else Vector3f(delta0)
                 )
+                localDelta.mul(speed2)
                 val base = 2f
                 invalidateDrawing()
                 RemsStudio.incrementalChange("Scale Object") {
-                    selected.scale.addKeyframe(
-                        localTime, Vector3f(
-                            oldScale.x * pow(base, localDelta.x * speed2),
-                            oldScale.y * pow(base, localDelta.y * speed2),
-                            oldScale.z * pow(base, localDelta.z * speed2)
+                    if (selectedRotDist != null) {
+                        // add keyframe to selectedRotDist
+                        val ch = selectedDist.channels[CenterSizeDistribution.SCALE_INDEX]
+                        when (val prev = ch[localTime]) {
+                            is Float -> ch.addKeyframe(localTime, prev * pow(base, delta0))
+                            is Vector2f -> ch.addKeyframe(
+                                localTime, Vector2f(prev).mul(
+                                    pow(base, localDelta.x),
+                                    pow(base, localDelta.y),
+                                )
+                            )
+                            is Vector3f -> ch.addKeyframe(
+                                localTime, Vector3f(prev).mul(
+                                    pow(base, localDelta.x),
+                                    pow(base, localDelta.y),
+                                    pow(base, localDelta.z),
+                                )
+                            )
+                            is Vector4f -> ch.addKeyframe(
+                                localTime, Vector4f(prev).mul(
+                                    pow(base, localDelta.x),
+                                    pow(base, localDelta.y),
+                                    pow(base, localDelta.z),
+                                    1f,
+                                )
+                            )
+                        }
+                    } else {
+                        selected.scale.addKeyframe(
+                            localTime, oldScale.mul(
+                                pow(base, localDelta.x),
+                                pow(base, localDelta.y),
+                                pow(base, localDelta.z)
+                            )
                         )
-                    )
+                    }
                     invalidateUI(false)
                 }
             }
@@ -565,7 +614,21 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     else Vector3f(0f, 0f, -deltaDegree)
                 invalidateDrawing()
                 RemsStudio.incrementalChange("Rotate Object") {
-                    selected.rotationYXZ.addKeyframe(localTime, oldRotation + localDelta)
+                    if (selectedRotDist != null) {
+                        // add keyframe to selectedRotDist
+                        val ch = selectedDist.channels[CenterSizeDistribution.ROTATION_INDEX]
+                        when (val prev = ch[localTime]) {
+                            is Float -> ch.addKeyframe(localTime, prev - deltaDegree)
+                            is Vector2f -> ch.addKeyframe(localTime, Vector2f(prev).add(localDelta.x, localDelta.y))
+                            is Vector3f -> ch.addKeyframe(localTime, Vector3f(prev).add(localDelta))
+                            is Vector4f -> {
+                                val localDelta1 = Vector4f(localDelta.x, localDelta.y, localDelta.z, 0f)
+                                ch.addKeyframe(localTime, Vector4f(prev).add(localDelta1))
+                            }
+                        }
+                    } else {
+                        selected.rotationYXZ.addKeyframe(localTime, oldRotation.add(localDelta))
+                    }
                     invalidateUI(false)
                 }
             }

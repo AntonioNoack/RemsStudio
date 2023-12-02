@@ -1,7 +1,7 @@
-package me.anno.remsstudio.objects.distributions
+package me.anno.remsstudio.objects.particles.distributions
 
 import me.anno.io.Saveable
-import me.anno.language.translation.Dict
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.inspectable.InspectableAttribute
 import me.anno.remsstudio.objects.inspectable.InspectableVector
@@ -15,11 +15,7 @@ import org.joml.Vector3f
 import org.joml.Vector4f
 import java.util.*
 
-abstract class Distribution(val displayName: String, val description: String) :
-    Saveable(), InspectableAttribute {
-
-    constructor(displayName: String, description: String, dictPath: String) :
-            this(Dict[displayName, dictPath], Dict[description, "$dictPath.desc"])
+abstract class Distribution(val nameDesc: NameDesc) : Saveable(), InspectableAttribute {
 
     /**
      * used by nearly all distributions anyway
@@ -60,12 +56,6 @@ abstract class Distribution(val displayName: String, val description: String) :
 
     override fun isDefaultValue() = false
     override val approxSize get() = 20
-
-    fun Vector2f.mul(size: Vector4f) = mul(size.x, size.y)
-    fun Vector2f.add(delta: Vector4f) = add(delta.x, delta.y)
-
-    fun Vector3f.mul(size: Vector4f) = mul(size.x, size.y, size.z)
-    fun Vector3f.add(delta: Vector4f) = add(delta.x, delta.y, delta.z)
 
     open fun draw(stack: Matrix4fArrayList, color: Vector4f) {
         onDraw(stack, color)

@@ -12,6 +12,7 @@ import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
 import kotlin.math.max
+import kotlin.math.min
 
 class Particle(
     var type: Transform,
@@ -25,7 +26,7 @@ class Particle(
 
     private val isScaled = scale.x != 1f || scale.y != 1f || scale.z != 1f
 
-    private val maxStateCount = max((lifeTime / simulationStep).toInt() + 1, 2)
+    private val maxStateCount = max((lifeTime / simulationStep).toInt() + 2, 2)
     val hasDied get() = states.size >= maxStateCount
     val opacity get() = color.w
 
@@ -56,16 +57,10 @@ class Particle(
         return state0.position.lerp(state1.position, indexF, tmpPosition)
     }
 
-    fun getRotation(index0: Int, indexF: Float): Vector3f {
-        val state0 = states.getOrElse(index0) { states.last() }
-        val state1 = states.getOrElse(index0 + 1) { states.last() }
-        return state0.rotation.lerp(state1.rotation, indexF, tmpRotation)
-    }
-
     fun isAlive(time: Double) = (time - birthTime) in 0.0..lifeTime
 
     fun getLifeOpacity(time: Double, timeStep: Double, fadingIn: Double, fadingOut: Double): Double {
-        if (lifeTime < timeStep) return 0.0
+        // if (lifeTime < timeStep) return 0.0
         val particleTime = time - birthTime
         if (particleTime <= 0.0 || particleTime >= lifeTime) return 0.0
         val fading = fadingIn + fadingOut
@@ -94,8 +89,8 @@ class Particle(
                     val index0 = index.toInt()
                     val indexF = Maths.fract(index).toFloat()
 
-                    val state0 = states.getOrElse(index0) { states.last() }
-                    val state1 = states.getOrElse(index0 + 1) { states.last() }
+                    val state0 = states[min(index0, states.lastIndex)]
+                    val state1 = states[min(index0 + 1, states.lastIndex)]
 
                     val position = state0.position.lerp(state1.position, indexF, tmpPosition)
                     val rotation = state0.rotation.lerp(state1.rotation, indexF, tmpRotation)
@@ -109,7 +104,7 @@ class Particle(
                     // normalize time for calculated functions?
                     // node editor? like in Blender or Unreal Engine
                     val particleColor = Vector4f(this.color).mul(color)
-                    type.draw(stack, time - birthTime, particleColor)
+                    type.draw(stack, particleTime, particleColor)
 
                 } catch (e: IndexOutOfBoundsException) {
                     if (GFX.isFinalRendering) throw MissingFrameException("$this")
@@ -123,7 +118,7 @@ class Particle(
         val oldState = states.last()
         val force = Vector3f()
         val time = states.size * simulationStep + birthTime
-        forces.forEach { field ->
+        for (field in forces) {
             val subForce = field.getForce(oldState, time, aliveParticles)
             val forceLength = subForce.length()
             if (forceLength.isFinite()) {

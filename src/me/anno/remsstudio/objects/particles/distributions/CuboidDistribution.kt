@@ -1,17 +1,18 @@
-package me.anno.remsstudio.objects.distributions
+package me.anno.remsstudio.objects.particles.distributions
 
 import me.anno.ecs.components.mesh.shapes.CubemapModel
+import me.anno.language.translation.NameDesc
 import me.anno.ui.editor.sceneView.Grid
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector3f
 import org.joml.Vector4f
 
-class CuboidDistribution(center: Vector4f, size: Vector4f, rotation: Vector4f = Vector4f()) : CenterSizeDistribution(
-    "Cuboid",
-    "Selects points from the cuboid shape randomly, uniformly", "obj.dist.cuboid",
-    center, size, rotation
-) {
+class CuboidDistribution(center: Vector4f, size: Vector4f, rotation: Vector4f = Vector4f()) :
+    CenterSizeDistribution(
+        NameDesc("Cuboid", "Selects points from the cuboid shape randomly, uniformly", "obj.dist.cuboid"),
+        center, size, rotation
+    ) {
 
     constructor() : this(0f, 1f)
     constructor(center: Float, size: Float) : this(Vector4f(center), Vector4f(size))

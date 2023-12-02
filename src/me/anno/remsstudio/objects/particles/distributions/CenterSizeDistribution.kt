@@ -1,6 +1,6 @@
-package me.anno.remsstudio.objects.distributions
+package me.anno.remsstudio.objects.particles.distributions
 
-import me.anno.language.translation.Dict
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.objects.inspectable.InspectableVector
 import me.anno.utils.types.Floats.toRadians
 import org.joml.*
@@ -8,21 +8,13 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 abstract class CenterSizeDistribution(
-    displayName: String, description: String,
-    val center: Vector4f, val scale: Vector4f,
+    nameDesc: NameDesc,
+    center: Vector4f,
+    val scale: Vector4f,
     val rotation: Vector4f
-) : Distribution(displayName, description) {
+) : CenterDistribution(nameDesc, center) {
 
-    constructor(
-        displayName: String, description: String, dictPath: String,
-        center: Vector4f, scale: Vector4f, rotation: Vector4f
-    ) : this(
-        Dict[displayName, dictPath], Dict[description, "$dictPath.desc"],
-        center, scale, rotation
-    )
-
-    fun transform(v: Float) =
-        v * scale.x + center.x
+    fun transform(v: Float): Float = v * scale.x + center.x
 
     fun transform(v: Vector2f): Vector2f =
         rotate(v.mul(Vector2f(scale.x, scale.y))).add(center.x, center.y)
@@ -81,6 +73,12 @@ abstract class CenterSizeDistribution(
             InspectableVector(scale, "Radius / Size", InspectableVector.PType.SCALE),
             InspectableVector(rotation, "Rotation", InspectableVector.PType.ROTATION)
         )
+    }
+
+    companion object {
+        val POSITION_INDEX = 0
+        val SCALE_INDEX = 1
+        val ROTATION_INDEX = 2
     }
 
 }

@@ -1,6 +1,7 @@
-package me.anno.remsstudio.objects.distributions
+package me.anno.remsstudio.objects.particles.distributions
 
 import me.anno.ecs.components.mesh.shapes.CubemapModel
+import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.max
 import me.anno.ui.editor.sceneView.Grid
 import org.joml.Matrix4fArrayList
@@ -11,8 +12,7 @@ import kotlin.math.abs
 
 class CuboidHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4f = Vector4f()) :
     CenterSizeDistribution(
-        "Cuboid Hull",
-        "Selects points from the cuboid hull randomly, uniformly", "obj.dist.cuboidHull",
+        NameDesc("Cuboid Hull", "Selects points from the cuboid hull randomly, uniformly", "obj.dist.cuboidHull"),
         center, size, rotation
     ) {
 

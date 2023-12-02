@@ -5,6 +5,7 @@ import me.anno.io.find.PropertyFinder
 import me.anno.remsstudio.RemsStudio.root
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.objects.particles.distributions.Distribution
 import me.anno.studio.Inspectable
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.utils.structures.maps.BiMap
@@ -13,7 +14,7 @@ import org.apache.logging.log4j.LogManager
 object Selection {
 
     // todo make it possible to select multiple stuff
-    // todo to edit common properties of all selected members <3 :D
+    //  to edit common properties of all selected members <3 :D
 
     private val LOGGER = LogManager.getLogger(Selection::class)
 
@@ -86,20 +87,6 @@ object Selection {
         val inspectables = foundProperties.withIndex().map { (i, it) -> it as? Inspectable ?: transforms[i] }
         val properties = foundProperties.map { it as? AnimatedProperty<*> }
 
-        /*if (uuids != selectedUUIDs)
-            println("UUIDs changed $selectedUUIDs -> $uuids")
-        if (propName != selectedPropName)
-            println("PropName changed $selectedPropName -> $propName")
-        if (inspectables != selectedInspectables)
-            println("Inspectables changed $selectedInspectables -> $inspectables")
-        if (properties != selectedProperties)
-            println("Properties changed $selectedProperties -> $properties")
-        if (transforms != selectedTransforms)
-            println(
-                "Transforms changed ${selectedTransforms.map { System.identityHashCode(it) }} -> " +
-                        "${transforms.map { System.identityHashCode(it) }}"
-            )*/
-
         if (
             uuids != selectedUUIDs ||
             propName != selectedPropName ||
@@ -107,7 +94,6 @@ object Selection {
             properties != selectedProperties ||
             transforms != selectedTransforms
         ) {
-            // LOGGER.info("$newName:$propName from ${transform?.className}:${property?.className}")
             RemsStudio.largeChange("Select ${transforms.firstOrNull()?.name ?: "Nothing"}:$propName") {
                 selectedUUIDs = uuids
                 selectedPropName = propName
