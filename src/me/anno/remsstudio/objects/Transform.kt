@@ -694,7 +694,7 @@ open class Transform() : Saveable(),
 
     fun <V> vi(
         inspected: List<Inspectable>,
-        title: String, ttt: String, dictPath: String,
+        title: String, ttt: String, dictPath: String, visibilityKey: String,
         type: Type?, value: V,
         style: Style, setValue: (V) -> Unit
     ): Panel {
@@ -702,26 +702,34 @@ open class Transform() : Saveable(),
             inspected,
             Dict[title, "obj.$dictPath"],
             Dict[ttt, "obj.$dictPath.desc"],
-            type,
-            value,
-            style,
-            setValue
+            visibilityKey, type, value, style, setValue
         )
     }
 
     fun <V> vi(
         inspected: List<Inspectable>,
-        title: String, ttt: String, dictPath: String,
+        title: String, ttt: String,dictPath: String,visibilityKey: String,
         type: Type?, value: ValueWithDefault<V>,
         style: Style
-    ) = vi(inspected, Dict[title, "obj.$dictPath"], Dict[ttt, "obj.$dictPath.desc"], type, value, style)
+    ) = vi(inspected, Dict[title, "obj.$dictPath"], Dict[ttt, "obj.$dictPath.desc"], visibilityKey, type, value, style)
 
     fun <V> vis(
         inspected: List<Inspectable>,
-        title: String,
-        ttt: String, dictPath: String, type: Type?,
+        title: String, ttt: String, dictPath: String, type: Type?, visibilityKey: String,
         values: List<ValueWithDefault<V>>, style: Style
-    ) = vis(inspected, Dict[title, "obj.$dictPath"], Dict[ttt, "obj.$dictPath.desc"], type, values, style)
+    ) = vis(inspected, Dict[title, "obj.$dictPath"], Dict[ttt, "obj.$dictPath.desc"],
+        visibilityKey, type, values, style)
+
+    fun <V> vi(
+        inspected: List<Inspectable>,
+        title: String, ttt: String,visibilityKey: String,
+        type: Type?, value: ValueWithDefault<V>,
+        style: Style
+    ): Panel {
+        return vi(inspected, title, ttt, visibilityKey, type, value.value, style) {
+            value.value = it
+        }
+    }
 
     fun <V> vi(
         inspected: List<Inspectable>,
@@ -729,18 +737,15 @@ open class Transform() : Saveable(),
         type: Type?, value: ValueWithDefault<V>,
         style: Style
     ): Panel {
-        return vi(inspected, title, ttt, type, value.value, style) {
-            value.value = it
-        }
+        return vi(inspected, title, ttt, title, type, value, style)
     }
 
     fun <V> vis(
         inspected: List<Inspectable>,
-        title: String,
-        ttt: String, type: Type?,
+        title: String, ttt: String, visibilityKey: String, type: Type?,
         values: List<ValueWithDefault<V>>, style: Style
     ): Panel {
-        return vi(inspected, title, ttt, type, values[0].value, style) {
+        return vi(inspected, title, ttt, visibilityKey, type, values[0].value, style) {
             for (x in values) x.value = it
         }
     }
@@ -752,19 +757,28 @@ open class Transform() : Saveable(),
      * */
     fun <V> vi(
         inspected: List<Inspectable>,
+        title: String, ttt: String, visibilityKey: String,
+        type: Type?, value: V,
+        style: Style, setValue: (V) -> Unit
+    ): Panel {
+        return ComponentUIV2.vi(inspected, this, title, ttt, visibilityKey, type, value, style, setValue)
+    }
+
+    fun <V> vi(
+        inspected: List<Inspectable>,
         title: String, ttt: String,
         type: Type?, value: V,
         style: Style, setValue: (V) -> Unit
     ): Panel {
-        return ComponentUIV2.vi(inspected, this, title, ttt, type, value, style, setValue)
+        return ComponentUIV2.vi(inspected, this, title, ttt, title, type, value, style, setValue)
     }
 
     fun vis(
-        inspected: List<Inspectable>,
         selves: List<Transform>,
         title: String,
         ttt: String,
         dictSubPath: String,
+        visibilityKey: String,
         values: List<AnimatedProperty<*>>,
         style: Style
     ): Panel {
@@ -772,9 +786,19 @@ open class Transform() : Saveable(),
             selves,
             Dict[title, "obj.$dictSubPath"],
             Dict[ttt, "obj.$dictSubPath.desc"],
+            visibilityKey,
             values,
             style
         )
+    }
+
+    fun vis(
+        selves: List<Transform>,
+        title: String, ttt: String,
+        values: List<AnimatedProperty<*>>,
+        style: Style
+    ): Panel {
+        return vis(selves, title, ttt, title, values, style)
     }
 
     /**
@@ -782,18 +806,23 @@ open class Transform() : Saveable(),
      * title, tool tip text, type, start value
      * modifies the AnimatedProperty-Object, so no callback is needed
      * */
+    fun vi(title: String, ttt: String, visibilityKey: String, values: AnimatedProperty<*>, style: Style): Panel {
+        return ComponentUIV2.vi(this, title, ttt, visibilityKey, values, style)
+    }
+
     fun vi(title: String, ttt: String, values: AnimatedProperty<*>, style: Style): Panel {
-        return ComponentUIV2.vi(this, title, ttt, values, style)
+        return ComponentUIV2.vi(this, title, ttt, title, values, style)
     }
 
     fun vis(
         selves: List<Transform>,
         title: String,
         ttt: String,
+        visibilityKey: String,
         values: List<AnimatedProperty<*>?>,
         style: Style
     ): Panel {
-        return ComponentUIV2.vis(selves, title, ttt, values, style)
+        return ComponentUIV2.vis(selves, title, ttt, visibilityKey, values, style)
     }
 
     override fun onDestroy() {}
@@ -873,13 +902,6 @@ open class Transform() : Saveable(),
     open fun getRelativeSize() = Vector3f(1f)
 
     companion object {
-
-        inline fun <reified C> List<Transform>.map2(mapper: (C) -> AnimatedProperty<*>): List<AnimatedProperty<*>?> {
-            return map {
-                if (it is C) mapper(it)
-                else null
-            }
-        }
 
         fun drawUICircle(stack: Matrix4fArrayList, scale: Float = 0.02f, inner: Float = 0.7f, color: Vector4f) {
             // draw a small symbol to indicate pivot

@@ -248,8 +248,7 @@ class FourierTransform : Transform() {
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
-        val t = inspected.filterIsInstance<Transform>()
-        val c = t.filterIsInstance<FourierTransform>()
+        val c = inspected.filterIsInstance<FourierTransform>()
         val fourier = getGroup("Fourier Transform", "", "fourier")
         list.addChild(vi(inspected, "Audio File", "", null, file, style) { for (x in c) x.file = it })
         fourier.addChild(
@@ -277,13 +276,13 @@ class FourierTransform : Transform() {
                 null, maxBufferIndex, style
             ) { for (x in c) x.maxBufferIndex = it })
         val amplitude = getGroup("Amplitude", "", "amplitude")
-        amplitude.addChild(vis(t, "Position, Linear", "", t.map2<FourierTransform> { it.posLin }, style))
-        amplitude.addChild(vis(t, "Position, Logarithmic", "", t.map2<FourierTransform> { it.posLog }, style))
-        amplitude.addChild(vis(t, "Rotation, Linear", "", t.map2<FourierTransform> { it.rotLin }, style))
-        amplitude.addChild(vis(t, "Rotation, Logarithmic", "", t.map2<FourierTransform> { it.rotLog }, style))
-        amplitude.addChild(vis(t, "Scale, Offset", "", t.map2<FourierTransform> { it.scaOff }, style))
-        amplitude.addChild(vis(t, "Scale, Linear", "", t.map2<FourierTransform> { it.scaLin }, style))
-        amplitude.addChild(vis(t, "Scale, Logarithmic", "", t.map2<FourierTransform> { it.scaLog }, style))
+        amplitude.addChild(vis(c, "Position, Linear", "", c.map { it.posLin }, style))
+        amplitude.addChild(vis(c, "Position, Logarithmic", "", c.map { it.posLog }, style))
+        amplitude.addChild(vis(c, "Rotation, Linear", "", c.map { it.rotLin }, style))
+        amplitude.addChild(vis(c, "Rotation, Logarithmic", "", c.map { it.rotLog }, style))
+        amplitude.addChild(vis(c, "Scale, Offset", "", c.map { it.scaOff }, style))
+        amplitude.addChild(vis(c, "Scale, Linear", "", c.map { it.scaLin }, style))
+        amplitude.addChild(vis(c, "Scale, Logarithmic", "", c.map { it.scaLog }, style))
     }
 
     override fun drawChildrenAutomatically(): Boolean = false

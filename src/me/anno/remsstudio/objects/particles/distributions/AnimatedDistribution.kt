@@ -39,6 +39,7 @@ class AnimatedDistribution(
     fun createInspector(
         c: List<Transform>,
         inspected: List<AnimatedDistribution>,
+        name: String,
         list: PanelListY,
         transform: Transform,
         style: Style
@@ -57,7 +58,8 @@ class AnimatedDistribution(
             val property = properties[index]
             // could this crash? only if another property had differing amounts of channels
             list += transform.vis(
-                c, property.title, property.description, inspected.map { it.channels[index] },
+                c, property.title, property.description, "$name/${property.title}",
+                inspected.map { it.channels[index] },
                 style
             )
         }

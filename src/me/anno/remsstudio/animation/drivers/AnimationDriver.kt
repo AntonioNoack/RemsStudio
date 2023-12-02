@@ -72,8 +72,8 @@ abstract class AnimationDriver : Saveable(), Inspectable {
     ) {
         val transform = transforms[0]
         list += transform.vis(
-            listOf(transform), listOf(transform), "Amplitude", "Scale of randomness",
-            "driver.amplitude", listOf(amplitude), style
+            listOf(transform), "Amplitude", "Scale of randomness", "driver.amplitude",
+            listOf(amplitude), style
         )
         list += transform.vi(
             inspected, "Frequency", "How fast it's changing", "driver.frequency",

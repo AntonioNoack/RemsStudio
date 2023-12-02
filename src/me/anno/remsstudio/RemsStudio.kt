@@ -59,8 +59,9 @@ import kotlin.math.min
 //  -> you should be able to draw pseudo-lines using that
 //  -> can we add a function to actually draw, using our line-drawing mechanism?
 // todo UI panels shouldn't override what you're doing then moving time forward
-// todo dragging scale has become awfully slow
 // todo we should show with color, which fields are keyframe-animated
+// todo bug: sometimes, clicking on a property, hangs the graph editor to flickering, and doesn't animate properly, I think...
+// todo bug: when on Distribution.center, all other .center unfold, too, and you cannot reselect it
 
 // todo respect masks when editing multiple instances at once
 

@@ -20,9 +20,7 @@ import me.anno.remsstudio.RemsStudioUILayouts.createDefaultMainUI
 import me.anno.remsstudio.history.History
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.ui.StudioFileExplorer
-import me.anno.remsstudio.ui.StudioTreeView
-import me.anno.remsstudio.ui.StudioUITypeLibrary
+import me.anno.remsstudio.ui.*
 import me.anno.remsstudio.ui.editor.cutting.LayerViewContainer
 import me.anno.remsstudio.ui.scene.SceneTabData
 import me.anno.remsstudio.ui.scene.StudioSceneView
@@ -180,6 +178,8 @@ class Project(var name: String, val file: FileReference) : Saveable() {
                         "FileExplorer" -> StudioFileExplorer(project?.scenes, style)
                         "CuttingView", "LayerViewContainer" -> LayerViewContainer(style)
                         "SceneView", "StudioSceneView" -> StudioSceneView(style)
+                        "PropertyInspector" -> StudioPropertyInspector({ Selection.selectedInspectables }, style)
+                        "TimeControlsPanel" -> TimeControlsPanel(style)
                         else -> library.getType(type)?.constructor?.invoke()
                     }
                     if (obj == null) {

@@ -24,6 +24,7 @@ import me.anno.remsstudio.Selection.selectedTransforms
 import me.anno.remsstudio.animation.Keyframe
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.Video
+import me.anno.remsstudio.ui.MenuUtils.drawTypeInCorner
 import me.anno.remsstudio.ui.StudioFileImporter.addChildFromFile
 import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.studio.StudioBase
@@ -113,7 +114,8 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
         solution?.keepResourcesLoaded()
     }
 
-    override val canDrawOverBorders: Boolean get() = true
+    override val canDrawOverBorders: Boolean
+        get() = true
 
     var lastTime = gameTime
 
@@ -126,6 +128,11 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
         // 80-100µ for background and time axis
         drawBackground(x0, y0, x1, y1)
         drawTimeAxis(x0, y0, x1, y1, timelineSlot == 0)
+
+        val parent = uiParent
+        if (parent != null && parent.children.lastOrNull { it is LayerView } == this) {
+            drawTypeInCorner("Cutting", fontColor)
+        }
 
         // val t1 = System.nanoTime()
         val solution = solution

@@ -19,8 +19,8 @@ import me.anno.remsstudio.objects.forces.ForceField
 import me.anno.remsstudio.objects.forces.impl.BetweenParticleGravity
 import me.anno.remsstudio.objects.particles.distributions.*
 import me.anno.studio.Inspectable
-import me.anno.ui.Panel
 import me.anno.ui.Style
+import me.anno.ui.base.SpyPanel
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.menu.Menu.openMenu
@@ -30,11 +30,9 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.files.FileExplorerEntry.Companion.drawLoadingCircle
 import me.anno.ui.editor.stacked.Option
 import me.anno.ui.input.BooleanInput
-import me.anno.utils.Color.white
 import me.anno.utils.hpc.HeavyProcessing.processBalanced
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
-import me.anno.utils.structures.lists.Lists.any2
 import me.anno.video.MissingFrameException
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
@@ -311,33 +309,17 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
         fun vi(c: List<ParticleSystem>, name: String, description: String, properties: List<AnimatedDistribution>) {
             val property = properties.first()
             fun getName() = "$name: ${property.distribution.className.split("Distribution").first()}"
-            val group = getGroup(getName(), "", "$viCtr")
-            group.setTooltip(description)
-            group.addChild(object : Panel(style) {
-
-                override fun calculateSize(w: Int, h: Int) {
-                    minW = 20
-                    minH = 1
-                }
-
-                val bg0 = backgroundColor
-                override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
-                    backgroundColor = if(properties.any2 { it === selectedDistribution }) white else bg0
-                    super.onDraw(x0, y0, x1, y1)
-                }
-
-                override fun onUpdate() {
-                    super.onUpdate()
-                    if (group.isAnyChildInFocus) {
-                        var needsUpdate = false
-                        for (i in c.indices) {
-                            if (c[i].selectedDistribution !== properties[i]) {
-                                c[i].selectedDistribution = properties[i]
-                                needsUpdate = true
-                            }
+            val group = getGroup(getName(), description, "$viCtr")
+            group.addChild(SpyPanel(style) {
+                if (group.isAnyChildInFocus) {
+                    var needsUpdate = false
+                    for (i in c.indices) {
+                        if (c[i].selectedDistribution !== properties[i]) {
+                            c[i].selectedDistribution = properties[i]
+                            needsUpdate = true
                         }
-                        if (needsUpdate) invalidateUI(true)
                     }
+                    if (needsUpdate) invalidateUI(true)
                 }
             })
             group.addRightClickListener {
@@ -354,12 +336,12 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
                             clearCache()
                             group.content.clear()
                             group.titlePanel.text = getName()
-                            property.createInspector(c, properties, group.content, this, style)
+                            property.createInspector(c, properties, name, group.content, this, style)
                         }
                     }
                 )
             }
-            property.createInspector(c, properties, group.content, this, style)
+            property.createInspector(c, properties, name, group.content, this, style)
             viCtr++
         }
 
@@ -381,7 +363,6 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
         val general = getGroup("Particle System", "", "particles")
 
         general += vis(
-            inspected,
             c,
             "Spawn Rate",
             "How many particles are spawned per second",

@@ -95,12 +95,12 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
 
         val geo = getGroup("Geometry", "", "geometry")
         geo += vis(
-            inspected, c, "Vertex Count", "Quads, Triangles, all possible", "polygon.vertexCount",
-            c.map { it.vertexCount }, style
+            c, "Vertex Count", "Quads, Triangles, all possible", "polygon.vertexCount", c.map { it.vertexCount },
+            style
         )
         geo += vis(
-            inspected, c, "Star-ness", "Works best with even vertex count", "polygon.star-ness",
-            c.map { it.starNess }, style
+            c, "Star-ness", "Works best with even vertex count", "polygon.star-ness", c.map { it.starNess },
+            style
         )
         geo += vi(
             inspected, "Auto-Align",

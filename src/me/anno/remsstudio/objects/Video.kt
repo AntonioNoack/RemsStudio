@@ -47,7 +47,6 @@ import me.anno.remsstudio.objects.models.SpeakerModel.drawSpeakers
 import me.anno.remsstudio.objects.modes.VideoType
 import me.anno.remsstudio.objects.modes.editorFPS
 import me.anno.studio.Inspectable
-import me.anno.studio.StudioBase
 import me.anno.ui.Panel
 import me.anno.ui.base.SpyPanel
 import me.anno.ui.base.buttons.TextButton
@@ -911,13 +910,13 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
 
 
         ColorGrading.createInspector(
-            inspected, c, c.map { it.cgPower }, c.map { it.cgSaturation }, c.map { it.cgSlope },
-            c.map { it.cgOffsetAdd }, c.map { it.cgOffsetSub },
-            { img(it) }, getGroup, style
+            c, c.map { it.cgPower }, c.map { it.cgSaturation }, c.map { it.cgSlope }, c.map { it.cgOffsetAdd },
+            c.map { it.cgOffsetSub }, { img(it) },
+            getGroup, style
         )
 
         val audio = getGroup("Audio", "", "audio")
-        audio += aud(vis(inspected, c, "Amplitude", "How loud it is", "audio.amplitude", c.map { it.amplitude }, style))
+        audio += aud(vis(c, "Amplitude", "How loud it is", "audio.amplitude", c.map { it.amplitude }, style))
         audio += aud(vi(inspected, "Is 3D Sound", "Sound becomes directional", "audio.3d", null, is3D, style) {
             for (x in c) x.is3D = it
             AudioManager.requestUpdate()

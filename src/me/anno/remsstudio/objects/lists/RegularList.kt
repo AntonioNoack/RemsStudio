@@ -154,27 +154,29 @@ class RegularList(parent: Transform? = null) : GFXTransform(parent) {
 
         val child = getGroup("Per-Child Transform", "For the n-th child, it is applied (n-1) times.", "per-child")
         child += vis(
-            inspected, c, "Offset/Child", "", "array.offset",
-            c.map { it.perChildTranslation }, style
+            c, "Offset/Child", "", "array.offset", c.map { it.perChildTranslation },
+            style
         )
-        child += vis(inspected, c, "Rotation/Child", "", "array.rotation", c.map { it.perChildRotation }, style)
-        child += vis(inspected, c, "Scale/Child", "", "array.scale", c.map { it.perChildScale }, style)
+        child += vis(c, "Rotation/Child", "", "array.rotation", c.map { it.perChildRotation }, style)
+        child += vis(c, "Scale/Child", "", "array.scale", c.map { it.perChildScale }, style)
         child += vis(
-            inspected, c, "Delay/Child", "Temporal delay between each child", "array.delay",
-            c.map { it.perChildDelay }, style
+            c, "Delay/Child", "Temporal delay between each child", "array.delay", c.map { it.perChildDelay },
+            style
         )
 
         val instances = getGroup("Instances", "", "children")
-        instances += vis(inspected, c, "Instance Count", "", "array.instanceCount", c.map { it.instanceCount }, style)
+        instances += vis(c, "Instance Count", "", "array.instanceCount", c.map { it.instanceCount }, style)
         instances += vi(
             inspected, "Selection Mode", "", "array.selectionMode",
             null, selectionMode, style
         ) { for (x in c) selectionMode = it }
         instances += vis(
-            inspected, c, "Selection Seed",
+            c,
+            "Selection Seed",
             "Only for randomized selection mode; change it, if you have bad luck, or copies of this array, which shall look different",
             "array.selectionSeed",
-            c.map { it.selectionSeed }, style
+            c.map { it.selectionSeed },
+            style
         )
 
     }

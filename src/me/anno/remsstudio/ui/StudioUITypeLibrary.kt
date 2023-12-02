@@ -4,21 +4,20 @@ import me.anno.config.DefaultConfig
 import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
-import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
+import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.ui.editor.TimelinePanel
+import me.anno.remsstudio.ui.editor.cutting.LayerViewContainer
+import me.anno.remsstudio.ui.graphs.GraphEditor
+import me.anno.remsstudio.ui.scene.StudioSceneView
 import me.anno.ui.Panel
 import me.anno.ui.base.menu.Menu.askName
 import me.anno.ui.custom.Type
 import me.anno.ui.custom.UITypeLibrary
-import me.anno.ui.editor.PropertyInspector
-import me.anno.remsstudio.ui.editor.TimelinePanel
-import me.anno.remsstudio.ui.editor.cutting.LayerViewContainer
-import me.anno.remsstudio.ui.scene.StudioSceneView
 import me.anno.ui.editor.files.FileExplorer.Companion.invalidateFileExplorers
 import me.anno.ui.editor.files.FileExplorerOption
 import me.anno.ui.editor.files.toAllowedFilename
-import me.anno.remsstudio.ui.graphs.GraphEditor
 
 class StudioUITypeLibrary : UITypeLibrary(typeList) {
 
@@ -46,15 +45,22 @@ class StudioUITypeLibrary : UITypeLibrary(typeList) {
         }
 
         val typeList = listOf<Pair<String, () -> Panel>>(
-            Dict["Scene View", "ui.customize.sceneView"] to { StudioSceneView(DefaultConfig.style) },
-            Dict["Tree View", "ui.customize.treeView"] to { StudioTreeView(DefaultConfig.style) },
+            Dict["Scene", "ui.customize.sceneView"] to
+                    { StudioSceneView(DefaultConfig.style) },
+            Dict["Tree", "ui.customize.treeView"] to
+                    { StudioTreeView(DefaultConfig.style) },
             Dict["Properties", "ui.customize.inspector"] to
-                    { PropertyInspector({ Selection.selectedInspectables }, DefaultConfig.style) },
-            Dict["Cutting Panel", "ui.customize.cuttingPanel"] to { LayerViewContainer(DefaultConfig.style) },
-            Dict["Timeline", "ui.customize.timeline"] to { TimelinePanel(DefaultConfig.style) },
-            Dict["Animations", "ui.customize.graphEditor"] to { GraphEditor(DefaultConfig.style) },
+                    { StudioPropertyInspector({ Selection.selectedInspectables }, DefaultConfig.style) },
+            Dict["Cutting", "ui.customize.cuttingPanel"] to
+                    { LayerViewContainer(DefaultConfig.style) },
+            Dict["Timeline", "ui.customize.timeline"] to
+                    { TimelinePanel(DefaultConfig.style) },
+            Dict["Keyframe Editor", "ui.customize.graphEditor"] to
+                    { GraphEditor(DefaultConfig.style) },
             Dict["Files", "ui.customize.fileExplorer"] to
-                    { StudioFileExplorer(RemsStudio.project?.scenes, DefaultConfig.style) }
+                    { StudioFileExplorer(RemsStudio.project?.scenes, DefaultConfig.style) },
+            Dict["Play Controls", "ui.customize.timeControl"] to
+                    { TimeControlsPanel(DefaultConfig.style) }
         ).map { Type(it.first, it.second) }.toMutableList()
     }
 

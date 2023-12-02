@@ -2,6 +2,7 @@ package me.anno.remsstudio.ui
 
 import me.anno.config.DefaultConfig
 import me.anno.config.DefaultConfig.style
+import me.anno.config.DefaultStyle
 import me.anno.gpu.drawing.DrawTexts.getTextSizeX
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringWriter
@@ -17,6 +18,7 @@ import me.anno.remsstudio.Selection
 import me.anno.remsstudio.objects.*
 import me.anno.remsstudio.objects.Transform.Companion.toTransform
 import me.anno.remsstudio.objects.effects.MaskLayer
+import me.anno.remsstudio.ui.MenuUtils.drawTypeInCorner
 import me.anno.ui.Style
 import me.anno.ui.base.Font
 import me.anno.ui.base.menu.Menu
@@ -264,6 +266,12 @@ class StudioTreeView(style: Style) :
     override fun addChild(element: Transform, child: Any, type: Char, index: Int): Boolean {
         element.addChild(index, child as Transform)
         return true
+    }
+
+    private val fontColor = style.getColor("textColor", DefaultStyle.fontGray)
+    override fun drawBackground(x0: Int, y0: Int, x1: Int, y1: Int, dx: Int, dy: Int) {
+        super.drawBackground(x0, y0, x1, y1, dx, dy)
+        drawTypeInCorner("Tree", fontColor)
     }
 
     override val className get() = "StudioTreeView"

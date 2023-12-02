@@ -18,10 +18,8 @@ import me.anno.remsstudio.Rendering.renderPart
 import me.anno.remsstudio.Rendering.renderSetPercent
 import me.anno.remsstudio.Selection.selectTransform
 import me.anno.remsstudio.Selection.selectedTransforms
-import me.anno.remsstudio.ui.StudioFileExplorer
-import me.anno.remsstudio.ui.StudioTreeView
+import me.anno.remsstudio.ui.*
 import me.anno.remsstudio.ui.StudioTreeView.Companion.openAddMenu
-import me.anno.remsstudio.ui.StudioUITypeLibrary
 import me.anno.remsstudio.ui.editor.cutting.LayerViewContainer
 import me.anno.remsstudio.ui.graphs.GraphEditor
 import me.anno.remsstudio.ui.scene.StudioSceneView
@@ -29,6 +27,8 @@ import me.anno.remsstudio.ui.sceneTabs.SceneTabs
 import me.anno.studio.Projects.getRecentProjects
 import me.anno.studio.StudioBase.Companion.instance
 import me.anno.ui.Panel
+import me.anno.ui.Style
+import me.anno.ui.WindowStack.Companion.createReloadWindow
 import me.anno.ui.base.SpacerPanel
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.menu.Menu.askName
@@ -40,12 +40,9 @@ import me.anno.ui.custom.CustomContainer
 import me.anno.ui.custom.CustomList
 import me.anno.ui.debug.ConsoleOutputPanel.Companion.createConsoleWithStats
 import me.anno.ui.editor.OptionBar
-import me.anno.ui.editor.PropertyInspector
 import me.anno.ui.editor.WelcomeUI
 import me.anno.ui.editor.config.ConfigPanel
 import me.anno.ui.editor.files.toAllowedFilename
-import me.anno.ui.Style
-import me.anno.ui.WindowStack.Companion.createReloadWindow
 import me.anno.utils.files.OpenInBrowser.openInBrowser
 import org.apache.logging.log4j.LogManager
 import java.net.URL
@@ -246,23 +243,23 @@ object RemsStudioUILayouts {
         val customUI = CustomList(true, style)
         customUI.weight = 10f
 
-        val animationWindow = CustomList(false, style)
-        customUI.add(animationWindow, 2f)
+        val topHalf = CustomList(false, style)
+        customUI.add(topHalf, 2f)
 
         val library = StudioUITypeLibrary()
 
-        val treeFiles = CustomList(true, style)
-        treeFiles += CustomContainer(StudioTreeView(style), library, style)
-        treeFiles += CustomContainer(StudioFileExplorer(project?.scenes, style), library, style)
-        animationWindow.add(CustomContainer(treeFiles, library, style), 0.5f)
-        animationWindow.add(CustomContainer(StudioSceneView(style), library, style), 2f)
-        animationWindow.add(
-            CustomContainer(
-                PropertyInspector({ Selection.selectedInspectables }, style),
-                library, style
-            ), 0.5f
-        )
-        animationWindow.weight = 1f
+        val topLeft = CustomList(true, style)
+        topLeft += CustomContainer(StudioTreeView(style), library, style)
+        topLeft += CustomContainer(StudioFileExplorer(project?.scenes, style), library, style)
+        topHalf.add(CustomContainer(topLeft, library, style), 0.5f)
+
+        val sceneAndTime = CustomList(true, style)
+        sceneAndTime.add(CustomContainer(StudioSceneView(style), library, style), 0.9f)
+        sceneAndTime.add(CustomContainer(TimeControlsPanel(style), library, style), 0.1f)
+        topHalf.add(sceneAndTime, 2f)
+        val properties = StudioPropertyInspector({ Selection.selectedInspectables }, style)
+        topHalf.add(CustomContainer(properties, library, style), 0.5f)
+        topHalf.weight = 1f
 
         val timeline = GraphEditor(style)
         customUI.add(CustomContainer(timeline, library, style), 0.25f)

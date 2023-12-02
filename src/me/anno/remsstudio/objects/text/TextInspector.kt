@@ -28,7 +28,7 @@ fun Text.createInspectorWithoutSuperImpl(
     val t = inspected.filterIsInstance<Transform>()
     val c = inspected.filterIsInstance<Text>()
 
-    val textInput = vis(inspected, c, "Text", "", "", c.map { it.text }, style) as TextInputML
+    val textInput = vis(c, "Text", "", "", c.map { it.text }, style) as TextInputML
     list += textInput
     textInput.addChangeListener {
         RemsStudio.incrementalChange("text") {
@@ -85,7 +85,7 @@ fun Text.createInspectorWithoutSuperImpl(
 
     val alignGroup = getGroup("Alignment", "", "alignment")
     fun align(title: String, ttt: String, value: List<AnimatedProperty<*>>) {
-        alignGroup += vis(inspected, c, title, ttt, "", value, style)
+        alignGroup += vis(c, title, ttt, "", value, style)
     }
 
     align(
@@ -113,10 +113,10 @@ fun Text.createInspectorWithoutSuperImpl(
         invalidate()
     }
     spaceGroup += vis(
-        inspected, c, "Line Spacing",
-        "How much lines are apart from each other",
+        c, "Line Spacing", "How much lines are apart from each other",
         "text.lineSpacing",
-        c.map { it.relativeLineSpacing }, style
+        c.map { it.relativeLineSpacing },
+        style
     )
     spaceGroup += vi(
         inspected, "Tab Size", "Relative tab size, in widths of o's", "text.tabSpacing",
@@ -178,30 +178,34 @@ fun Text.createInspectorWithoutSuperImpl(
         null, renderingMode, style
     ) { for (x in c) x.renderingMode = it }
     outline += vis(
-        inspected, c, "Color 1", "First Outline Color", "outline.color1",
-        c.map { it.outlineColor0 }, style
+        c, "Color 1", "First Outline Color", "outline.color1", c.map { it.outlineColor0 },
+        style
     )
     outline += vis(
-        inspected, c, "Color 2", "Second Outline Color", "outline.color2",
-        c.map { it.outlineColor1 }, style
+        c, "Color 2", "Second Outline Color", "outline.color2", c.map { it.outlineColor1 },
+        style
     )
     outline += vis(
-        inspected, c, "Color 3", "Third Outline Color", "outline.color3",
-        c.map { it.outlineColor2 }, style
+        c, "Color 3", "Third Outline Color", "outline.color3", c.map { it.outlineColor2 },
+        style
     )
     outline += vis(
-        inspected, c, "Widths", "[Main, 1st, 2nd, 3rd]", "outline.widths",
-        c.map { it.outlineWidths }, style
+        c, "Widths", "[Main, 1st, 2nd, 3rd]", "outline.widths", c.map { it.outlineWidths },
+        style
     )
     outline += vis(
-        inspected, c, "Smoothness", "How smooth the edge is, [Main, 1st, 2nd, 3rd]", "outline.smoothness",
-        c.map { it.outlineSmoothness }, style
+        c,
+        "Smoothness",
+        "How smooth the edge is, [Main, 1st, 2nd, 3rd]",
+        "outline.smoothness",
+        c.map { it.outlineSmoothness },
+        style
     )
     outline += vis(
-        inspected, c, "Depth",
-        "For non-merged SDFs to join close characters correctly; needs a distance from the background",
+        c, "Depth", "For non-merged SDFs to join close characters correctly; needs a distance from the background",
         "outline.depth",
-        c.map { it.outlineDepth }, style
+        c.map { it.outlineDepth },
+        style
     )
     outline += vi(
         inspected, "Rounded Corners", "Makes corners curvy", "outline.roundCorners",
@@ -212,8 +216,8 @@ fun Text.createInspectorWithoutSuperImpl(
     }
 
     val shadows = getGroup("Shadow", "Built-in Shadow", "shadow")
-    shadows += vis(inspected, c, "Color", "", "shadow.color", c.map { it.shadowColor }, style)
-    shadows += vis(inspected, c, "Offset", "", "shadow.offset", c.map { it.shadowOffset }, style)
-    shadows += vis(inspected, c, "Smoothness", "", "shadow.smoothness", c.map { it.shadowSmoothness }, style)
+    shadows += vis(c, "Color", "", "shadow.color", c.map { it.shadowColor }, style)
+    shadows += vis(c, "Offset", "", "shadow.offset", c.map { it.shadowOffset }, style)
+    shadows += vis(c, "Smoothness", "", "shadow.smoothness", c.map { it.shadowSmoothness }, style)
 
 }

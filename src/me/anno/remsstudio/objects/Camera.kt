@@ -93,30 +93,30 @@ class Camera(parent: Transform? = null) : Transform(parent) {
 
         val transform = getGroup("Transform", "", "transform")
         transform += vis(
-            inspected, c, "Orbit Radius", "Orbiting Distance", "camera.orbitDis",
-            c.map { it.orbitRadius }, style
+            c, "Orbit Radius", "Orbiting Distance", "camera.orbitDis", c.map { it.orbitRadius },
+            style
         )
 
 
         val cam = getGroup("Projection", "How rays of light are mapped to the screen", "projection")
         cam += vis(
-            inspected, c, "FOV", "Field Of View, in degrees, vertical", "camera.fov",
-            c.map { it.fovYDegrees }, style
+            c, "FOV", "Field Of View, in degrees, vertical", "camera.fov", c.map { it.fovYDegrees },
+            style
         )
         cam += vis(
-            inspected, c, "Perspective - Orthographic",
-            "Sets back the camera", "camera.orthographicness",
-            c.map { it.orthographicness }, style
+            c, "Perspective - Orthographic", "Sets back the camera",
+            "camera.orthographicness", c.map { it.orthographicness },
+            style
         )
 
         val depth = getGroup("Depth", "Z-axis related settings; from camera perspective", "depth")
         depth += vis(
-            inspected, c, "Near Z", "Closest Visible Distance", "camera.depth.near",
-            c.map { it.nearZ }, style
+            c, "Near Z", "Closest Visible Distance", "camera.depth.near", c.map { it.nearZ },
+            style
         )
         depth += vis(
-            inspected, c, "Far Z", "Farthest Visible Distance", "camera.depth.far",
-            c.map { it.farZ }, style
+            c, "Far Z", "Farthest Visible Distance", "camera.depth.far", c.map { it.farZ },
+            style
         )
         depth += vi(
             inspected, "Use Depth",
@@ -130,16 +130,16 @@ class Camera(parent: Transform? = null) : Transform(parent) {
 
         val chroma = getGroup("Chromatic Aberration", "Effect occurring in cheap lenses", "chroma")
         chroma += vis(
-            inspected, c, "Strength", "How large the effect is", "camera.chromaStrength",
-            c.map { it.chromaticAberration }, style
+            c, "Strength", "How large the effect is", "camera.chromaStrength", c.map { it.chromaticAberration },
+            style
         )
         chroma += vis(
-            inspected, c, "Offset", "Offset", "camera.chromaOffset",
-            c.map { it.chromaticOffset }, style
+            c, "Offset", "Offset", "camera.chromaOffset", c.map { it.chromaticOffset },
+            style
         )
         chroma += vis(
-            inspected, c, "Rotation", "Rotation/angle in Degrees", "camera.chromaRotation",
-            c.map { it.chromaticAngle }, style
+            c, "Rotation", "Rotation/angle in Degrees", "camera.chromaRotation", c.map { it.chromaticAngle },
+            style
         )
 
 
@@ -156,34 +156,38 @@ class Camera(parent: Transform? = null) : Transform(parent) {
 
         val vignette = getGroup("Vignette", "Darkens/colors the border", "vignette")
         vignette += vis(
-            inspected, c, "Vignette Color", "Color of border", "vignette.color",
-            c.map { it.vignetteColor }, style
+            c, "Vignette Color", "Color of border", "vignette.color", c.map { it.vignetteColor },
+            style
         )
         vignette += vis(
-            inspected, c, "Vignette Strength", "Strength of colored border", "vignette.strength",
-            c.map { it.vignetteStrength }, style
+            c, "Vignette Strength", "Strength of colored border", "vignette.strength", c.map { it.vignetteStrength },
+            style
         )
 
 
         val bloom = getGroup("Bloom", "Adds a light halo around bright objects", "bloom")
         bloom += vis(
-            inspected, c, "Intensity", "Brightness of effect, 0 = off", "bloom.intensity",
-            c.map { it.bloomIntensity }, style
+            c, "Intensity", "Brightness of effect, 0 = off", "bloom.intensity", c.map { it.bloomIntensity },
+            style
         )
         bloom += vis(
-            inspected, c, "Effect Size", "How much it is blurred", "bloom.size",
-            c.map { it.bloomSize }, style
+            c, "Effect Size", "How much it is blurred", "bloom.size", c.map { it.bloomSize },
+            style
         )
         bloom += vis(
-            inspected, c, "Threshold", "Minimum brightness", "bloom.threshold",
-            c.map { it.bloomThreshold }, style
+            c, "Threshold", "Minimum brightness", "bloom.threshold", c.map { it.bloomThreshold },
+            style
         )
 
 
         val color = getGroup("Color", "Tint and Tonemapping", "color")
         color += vis(
-            inspected, c, "Background Color", "Clearing color for the screen", "camera.backgroundColor",
-            c.map { it.backgroundColor }, style
+            c,
+            "Background Color",
+            "Clearing color for the screen",
+            "camera.backgroundColor",
+            c.map { it.backgroundColor },
+            style
         )
         color += vi(
             inspected, "Tone Mapping",
@@ -196,8 +200,8 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         ) { for (x in c) x.lut = it }
 
         ColorGrading.createInspector(
-            inspected, c, c.map { it.cgPower }, c.map { it.cgSaturation }, c.map { it.cgSlope },
-            c.map { it.cgOffsetAdd }, c.map { it.cgOffsetSub }, { it }, getGroup, style
+            c, c.map { it.cgPower }, c.map { it.cgSaturation }, c.map { it.cgSlope }, c.map { it.cgOffsetAdd },
+            c.map { it.cgOffsetSub }, { it }, getGroup, style
         )
 
         val editor = getGroup("Editor", "Settings, which only effect editing", "editor")
