@@ -18,7 +18,13 @@ class NumberInputComponentV2(
     style: Style
 ) : NumberInputComponent(visibilityKey, style) {
 
-    val indexInProperty get() = indexInParent - 1
+    val indexInProperty
+        get() = uiParent.run {
+            if (this == null) 0
+            else children
+                .filterIsInstance<NumberInputComponentV2>()
+                .indexOf(this)
+        }
 
     init {
         setResetListener { AnyToDouble.getDouble(owningProperty.type.defaultValue, indexInProperty, 0.0).toString() }

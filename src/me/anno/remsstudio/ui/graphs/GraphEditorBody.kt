@@ -639,7 +639,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             val time = global2Kf(getTimeAt(x))
             RemsStudio.largeChange("Created keyframe at ${time}s") {
                 selectedProperty.isAnimated = true
-                selectedProperty.addKeyframe(time, selectedProperty[time]!!, propertyDt)
+                selectedProperty.addKeyframe(time, selectedProperty[time]!!, keyframeSnappingDt)
                 selectedProperty.checkIsAnimated()
             }
         } else LOGGER.info("Please select a property first!")

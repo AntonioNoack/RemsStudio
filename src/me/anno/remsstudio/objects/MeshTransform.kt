@@ -153,14 +153,12 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         val localTransform = Matrix4x3fArrayList()
 
         if (normalizeScale) {
-            entity.validateAABBs()
-            val scale = getScaleFromAABB(entity.aabb)
+            val scale = getScaleFromAABB(entity.getBounds())
             localTransform.scale(scale)
         }
 
         if (centerMesh) {
-            entity.validateAABBs()
-            MeshUtils.centerStackFromAABB(localTransform, entity.aabb)
+            MeshUtils.centerStackFromAABB(localTransform, entity.getBounds())
         }
 
         drawHierarchy(

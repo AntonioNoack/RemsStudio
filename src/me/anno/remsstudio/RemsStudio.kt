@@ -43,9 +43,23 @@ import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.OS
 import kotlin.math.min
 
+// record properties:
+//  - right click -> record, then the video editor at whatever speed
+//  - and the user can manipulate the properties while time passes by...
+//  - add a recording-stop button somehow... maybe when time speed is changing? no...
+//  - add a red dot, and a red border around that field somehow
+// record multiple properties at once?
+// which rate should we record at???...
+// -> create two keyframes at the start, so it counts as being keyframed,
+// then play, and move the property
+
+// todo allow dragging animated properties (like ParticleSystem.origin.constant) in SceneView to record them
+
+
 // todo respect masks when editing multiple instances at once
 
 // todo bugs:
+//  - shadows on SDF text have a black border, but they shouldn't
 //  - sometimes delete-key isn't registered as such
 //  - new files, like with 0 bytes, cannot be right clicked in file explorer
 //  - video files cannot be properly deleted, because files can't be deleted when reading them
@@ -63,8 +77,6 @@ import kotlin.math.min
 // todo gizmos
 
 // Launch4j
-
-// todo scene settings: render duration & size and such should be inside there as well
 
 // todo calculate in-between frames for video by motion vectors; https://www.youtube.com/watch?v=PEe-ZeVbTLo ?
 // 30 -> 60 fps
@@ -98,9 +110,6 @@ import kotlin.math.min
 // todo saturation/lightness controls by hue
 
 // to do Mod with "hacked"-text effect for text: swizzle characters and introduce others?
-
-// todo bug: shift should select from-to, not two element
-// todo bug?: controls should select things one by one
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 

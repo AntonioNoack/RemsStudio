@@ -205,14 +205,7 @@ object TextRenderer {
             if (localMin < localMax) {
 
                 val key = keys[index]
-
                 val offsetX = (width - part.lineWidth * scaleX) * textAlignment01
-                /* when (textAlignment) {
-                    AxisAlignment.MIN -> 0f
-                    AxisAlignment.CENTER -> (width - part.lineWidth * scaleX) / 2f
-                    AxisAlignment.MAX -> (width - part.lineWidth * scaleX)
-                } */
-
                 val lineDeltaX = dx + part.xPos * scaleX + offsetX
                 val lineDeltaY = dy + part.yPos * scaleY * lineOffset
 

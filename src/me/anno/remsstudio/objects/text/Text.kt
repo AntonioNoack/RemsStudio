@@ -248,7 +248,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
             "textAlignment" -> textAlignment.set(AxisAlignment.find(value)?.id?.toFloat() ?: return)
             "blockAlignmentX" -> blockAlignmentX.set(AxisAlignment.find(value)?.id?.toFloat() ?: return)
             "blockAlignmentY" -> blockAlignmentY.set(AxisAlignment.find(value)?.id?.toFloat() ?: return)
-            "renderingMode" -> renderingMode = TextRenderMode.values().firstOrNull { it.id == value } ?: renderingMode
+            "renderingMode" -> renderingMode = TextRenderMode.entries.firstOrNull { it.id == value } ?: renderingMode
             else -> super.readInt(name, value)
         }
     }

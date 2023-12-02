@@ -177,10 +177,10 @@ open class Transform() : Saveable(),
         val time = global2Kf(editorTime)
         if (updateHistory) {
             RemsStudio.incrementalChange("Change Keyframe Value") {
-                list.addKeyframe(time, value, TimelinePanel.propertyDt)
+                list.addKeyframe(time, value, TimelinePanel.keyframeSnappingDt)
             }
         } else {
-            list.addKeyframe(time, value, TimelinePanel.propertyDt)
+            list.addKeyframe(time, value, TimelinePanel.keyframeSnappingDt)
         }
     }
 
@@ -757,16 +757,6 @@ open class Transform() : Saveable(),
         style: Style, setValue: (V) -> Unit
     ): Panel {
         return ComponentUIV2.vi(inspected, this, title, ttt, type, value, style, setValue)
-    }
-
-    fun vi(
-        title: String,
-        ttt: String,
-        dictSubPath: String,
-        values: AnimatedProperty<*>,
-        style: Style
-    ): Panel {
-        return vi(Dict[title, "obj.$dictSubPath"], Dict[ttt, "obj.$dictSubPath.desc"], values, style)
     }
 
     fun vis(
