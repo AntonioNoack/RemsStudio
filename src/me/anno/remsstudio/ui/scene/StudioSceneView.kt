@@ -235,8 +235,10 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         RemsStudio.root.claimResources(et, et + loadedTimeSeconds * if (edt == 0.0) 1.0 else edt, 1f, 1f)
     }
 
-    private val stableSize = StableWindowSize()
+    override val canDrawOverBorders: Boolean
+        get() = true
 
+    private val stableSize = StableWindowSize()
     override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
 
         val mode = if (camera.toneMapping == ToneMappers.RAW8) colorRenderer else colorSqRenderer
@@ -256,7 +258,6 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         drawBorder(x, y, width, height, white, bth)
         drawBorder(x + bth, y + bth, width - bt, height - bt, black, bth)
         // filled with scene background color anyway
-        // drawRect(x + bt, y + bt, w - 2 * bt, h - 2 * bt, deepDark)
         DrawRectangles.finishBatch(b)
 
         val x00 = x + dx
@@ -283,6 +284,9 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             }
             drawChildren(x0, y0, x1, y1)
         }
+
+        // todo this text is always black... why???
+        // drawTypeInCorner("Scene", white)
 
     }
 

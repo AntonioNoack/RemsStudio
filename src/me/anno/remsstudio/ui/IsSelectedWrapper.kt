@@ -20,8 +20,8 @@ class IsSelectedWrapper(panel: Panel, val getIsSelected: () -> Boolean) :
         panel.alignmentY = AxisAlignment.FILL
     }
 
-    var color = getSelectionColor(style)
-    var strength = 0f
+    private var color = getSelectionColor(style)
+    private var strength = 0f
 
     private var isSelected = false
         set(value) {
@@ -50,7 +50,7 @@ class IsSelectedWrapper(panel: Panel, val getIsSelected: () -> Boolean) :
     companion object {
         val decaySpeed = 2.0
         fun getSelectionColor(style: Style): Int {
-            return style.getColor("selectionColor", 0x44ff66 or Color.black)
+            return style.getColor("selectionColor", 0x44ccff or Color.black)
         }
     }
 }

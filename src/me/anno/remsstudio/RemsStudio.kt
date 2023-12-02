@@ -58,8 +58,8 @@ import kotlin.math.min
 // allow dragging animated properties (like ParticleSystem.origin.constant) in SceneView to record them
 //  -> you should be able to draw pseudo-lines using that
 //  -> can we add a function to actually draw, using our line-drawing mechanism?
-// todo UI panels shouldn't override what you're doing then moving time forward
-// todo we should show with color, which fields are keyframe-animated
+// todo UI panels shouldn't override what you're doing when moving time forward
+// done we should show with color, which fields are keyframe-animated -> we're rendering a frame around them :)
 // todo bug: sometimes, clicking on a property, hangs the graph editor to flickering, and doesn't animate properly, I think...
 
 // todo respect masks when editing multiple instances at once

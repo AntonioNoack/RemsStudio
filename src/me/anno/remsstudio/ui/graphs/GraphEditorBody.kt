@@ -7,8 +7,6 @@ import me.anno.gpu.drawing.DrawCurves
 import me.anno.gpu.drawing.DrawRectangles.drawBorder
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.drawing.DrawTexts
-import me.anno.gpu.drawing.DrawTexts.drawSimpleTextCharByChar
-import me.anno.gpu.drawing.DrawTexts.drawText
 import me.anno.gpu.drawing.DrawTextures.drawTexture
 import me.anno.gpu.texture.TextureLib.colorShowTexture
 import me.anno.input.Input.isControlDown
@@ -41,7 +39,6 @@ import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.editor.sceneView.Grid.drawSmoothLine
-import me.anno.utils.Color
 import me.anno.utils.Color.black
 import me.anno.utils.Color.mulAlpha
 import me.anno.utils.Color.toARGB
@@ -356,8 +353,10 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
 
         // only draw if we have something to animate
         drawBorder(x, y, width, height, selectionColor.withAlpha(selectionStrength), 1)
-        if (selectionStrength > 0.01f) invalidateDrawing()
-        selectionStrength *= dtTo10(IsSelectedWrapper.decaySpeed * Time.deltaTime).toFloat()
+        if (!property.isAnimated) {
+            if (selectionStrength > 0.01f) invalidateDrawing()
+            selectionStrength *= dtTo10(IsSelectedWrapper.decaySpeed * Time.deltaTime).toFloat()
+        }
     }
 
     var selectionColor = IsSelectedWrapper.getSelectionColor(style)

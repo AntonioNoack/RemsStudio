@@ -318,7 +318,7 @@ object ComponentUIV2 {
             else -> throw RuntimeException("Type $value not yet implemented!")
         }
         panel.alignmentX = AxisAlignment.FILL
-        return panel
+        return IsAnimatedWrapper(panel, values)
     }
 
     /**
@@ -329,10 +329,10 @@ object ComponentUIV2 {
     fun vis(
         transforms: List<Transform>,
         title: String, ttt: String, visibilityKey: String,
-        values: List<AnimatedProperty<*>?>,
+        values: List<AnimatedProperty<*>>,
         style: Style
     ): Panel {
-        val sampleValues = values[0]!!
+        val sampleValues = values[0]
         val self = transforms[0]
         val time = self.lastLocalTime
         val panel = when (val value = sampleValues[time]) {
@@ -463,7 +463,8 @@ object ComponentUIV2 {
             }
             setTooltip(ttt)
         }
-        val wrapper = IsSelectedWrapper(panel) {
+        val wrapper0 = IsAnimatedWrapper(panel, values.first()!!)
+        val wrapper = IsSelectedWrapper(wrapper0) {
             Selection.selectedProperties == values &&
                     InputVisibility[title]
         }

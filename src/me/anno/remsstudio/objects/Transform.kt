@@ -827,7 +827,7 @@ open class Transform() : Saveable(),
         title: String,
         ttt: String,
         visibilityKey: String,
-        values: List<AnimatedProperty<*>?>,
+        values: List<AnimatedProperty<*>>,
         style: Style
     ): Panel {
         return ComponentUIV2.vis(selves, title, ttt, visibilityKey, values, style)
