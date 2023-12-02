@@ -27,8 +27,8 @@ class FloatVectorInputV2(
         private val LOGGER = LogManager.getLogger(FloatVectorInputV2::class)
     }
 
-    constructor(title: String, property: AnimatedProperty<*>, time: Double, style: Style) :
-            this(title, title, property.type, property, style) {
+    constructor(title: String, visibilityKey: String, property: AnimatedProperty<*>, time: Double, style: Style) :
+            this(title, visibilityKey, property.type, property, style) {
         when (val value = property[time]) {
             is Vector2f -> setValue(value, false)
             is Vector3f -> setValue(value, false)

@@ -244,7 +244,7 @@ object ComponentUIV2 {
                 }
                 .setIsSelectedListener(sl)
                 .setTooltip(ttt)
-            is Vector2f -> FloatVectorInputV2(title, values, time, style)
+            is Vector2f -> FloatVectorInputV2(title, visibilityKey, values, time, style)
                 .addChangeListener { x, y, _, _, _ ->
                     RemsStudio.incrementalChange("Set $title to ($x,$y)", title) {
                         self.putValue(values, Vector2f(x.toFloat(), y.toFloat()), false)
@@ -264,7 +264,7 @@ object ComponentUIV2 {
                         .setIsSelectedListener(sl)
                         .setTooltip(ttt)
                 } else {
-                    FloatVectorInputV2(title, values, time, style)
+                    FloatVectorInputV2(title, visibilityKey, values, time, style)
                         .addChangeListener { x, y, z, _, _ ->
                             RemsStudio.incrementalChange("Set $title to ($x,$y,$z)", title) {
                                 self.putValue(values, Vector3f(x.toFloat(), y.toFloat(), z.toFloat()), false)
@@ -285,7 +285,7 @@ object ComponentUIV2 {
                         .setIsSelectedListener(sl)
                         .setTooltip(ttt)
                 } else {
-                    FloatVectorInputV2(title, values, time, style)
+                    FloatVectorInputV2(title, visibilityKey, values, time, style)
                         .addChangeListener { x, y, z, w, _ ->
                             RemsStudio.incrementalChange("Set $title to ($x,$y,$z,$w)", title) {
                                 self.putValue(
@@ -307,7 +307,7 @@ object ComponentUIV2 {
                 }
                 .setIsSelectedListener(sl)
                 .setTooltip(ttt)
-            is Quaternionf -> FloatVectorInputV2(title, values, time, style)
+            is Quaternionf -> FloatVectorInputV2(title, visibilityKey, values, time, style)
                 .addChangeListener { x, y, z, w, _ ->
                     RemsStudio.incrementalChange("Set $title to ($x,$y,$z,$w)", title) {
                         self.putValue(values, Quaternionf(x, y, z, w), false)
@@ -370,7 +370,7 @@ object ComponentUIV2 {
                         }
                     }
                 }
-            is Vector2f -> FloatVectorInputV2(title, sampleValues, time, style)
+            is Vector2f -> FloatVectorInputV2(title, visibilityKey, sampleValues, time, style)
                 .addChangeListener { x, y, _, _, _ ->
                     RemsStudio.incrementalChange("Set $title to ($x,$y)", title) {
                         // multiple instances?
@@ -392,7 +392,7 @@ object ComponentUIV2 {
                         }
                         .setResetListener { toColor(sampleValues.defaultValue) }
                 } else {
-                    FloatVectorInputV2(title, sampleValues, time, style)
+                    FloatVectorInputV2(title, visibilityKey, sampleValues, time, style)
                         .addChangeListener { x, y, z, _, _ ->
                             RemsStudio.incrementalChange("Set $title to ($x,$y,$z)", title) {
                                 // multiple instances?
@@ -419,7 +419,7 @@ object ComponentUIV2 {
                         }
                         .setResetListener { toColor(sampleValues.defaultValue) }
                 } else {
-                    FloatVectorInputV2(title, sampleValues, time, style)
+                    FloatVectorInputV2(title, visibilityKey, sampleValues, time, style)
                         .addChangeListener { x, y, z, w, _ ->
                             RemsStudio.incrementalChange("Set $title to ($x,$y,$z,$w)", title) {
                                 // multiple instances?
@@ -442,7 +442,7 @@ object ComponentUIV2 {
                         }
                     }
                 }
-            is Quaternionf -> FloatVectorInputV2(title, sampleValues, time, style)
+            is Quaternionf -> FloatVectorInputV2(title, visibilityKey, sampleValues, time, style)
                 .addChangeListener { x, y, z, w, _ ->
                     RemsStudio.incrementalChange("Set $title to ($x,$y,$z,$w)", title) {
                         for (i in values.indices) {

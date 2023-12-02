@@ -5,7 +5,6 @@ import me.anno.io.find.PropertyFinder
 import me.anno.remsstudio.RemsStudio.root
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.objects.particles.distributions.Distribution
 import me.anno.studio.Inspectable
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.utils.structures.maps.BiMap

@@ -42,7 +42,7 @@ import me.anno.ui.editor.WelcomeUI
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.OS
 import me.anno.utils.hpc.ProcessingQueue
-import javax.management.DynamicMBean
+import org.apache.logging.log4j.LogManager
 import kotlin.math.min
 
 // record properties:
@@ -61,7 +61,6 @@ import kotlin.math.min
 // todo UI panels shouldn't override what you're doing then moving time forward
 // todo we should show with color, which fields are keyframe-animated
 // todo bug: sometimes, clicking on a property, hangs the graph editor to flickering, and doesn't animate properly, I think...
-// todo bug: when on Distribution.center, all other .center unfold, too, and you cannot reselect it
 
 // todo respect masks when editing multiple instances at once
 
@@ -383,6 +382,8 @@ object RemsStudio : StudioBase("Rem's Studio", 10208, true) {
         Build.isDebug = false
         Build.isShipped = true
         Build.lock()
+
+        LogManager.enableLogger("InputVisibility")
 
         if (args.isEmpty()) {
             run()

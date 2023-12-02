@@ -300,11 +300,11 @@ open class Transform() : Saveable(),
         // time
         val timeGroup = getGroup("Time", "", "time")
         timeGroup += vis(
-            inspected, "Start Time", "Delay the animation", "", null,
+            inspected, "Start Time", "Delay the animation", null,
             c.map { it.timeOffset }, style
         )
         timeGroup += vis(
-            inspected, "Time Multiplier", "Speed up the animation", "",
+            inspected, "Time Multiplier", "Speed up the animation",
             dilationType, c.map { it.timeDilation }, style
         )
         timeGroup += vis(
@@ -748,6 +748,14 @@ open class Transform() : Saveable(),
         return vi(inspected, title, ttt, visibilityKey, type, values[0].value, style) {
             for (x in values) x.value = it
         }
+    }
+
+    fun <V> vis(
+        inspected: List<Inspectable>,
+        title: String, ttt: String, type: Type?,
+        values: List<ValueWithDefault<V>>, style: Style
+    ): Panel {
+        return vis(inspected, title, ttt, title, type, values, style)
     }
 
     /**

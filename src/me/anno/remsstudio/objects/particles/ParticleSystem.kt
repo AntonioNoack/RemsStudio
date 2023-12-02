@@ -316,6 +316,8 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
                     for (i in c.indices) {
                         if (c[i].selectedDistribution !== properties[i]) {
                             c[i].selectedDistribution = properties[i]
+                            // todo I feel like this isn't working with regards to the keyframe editor
+                            println("Focus -> selecting $name")
                             needsUpdate = true
                         }
                     }
@@ -353,12 +355,12 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
         vt("initPosition", "Initial Position", "Where the particles spawn", c.map { it.spawnPosition })
         vt("initVelocity", "Initial Velocity", "How fast the particles are, when they are spawned",
             c.map { it.spawnVelocity })
-        vi(c, "Initial Rotation", "How the particles are rotated initially", c.map { it.spawnRotation })
-        vi(c, "Rotation Velocity", "How fast the particles are rotating", c.map { it.spawnRotationVelocity })
+        vt("initRotation", "Initial Rotation", "How the particles are rotated initially", c.map { it.spawnRotation })
+        vt("angularVel", "Rotation Velocity", "How fast the particles are rotating", c.map { it.spawnRotationVelocity })
 
-        vi(c, "Color", "Initial particle color", c.map { it.spawnColor })
-        vi(c, "Opacity", "Initial particle opacity (1-transparency)", c.map { it.spawnOpacity })
-        vi(c, "Size", "Initial particle size", c.map { it.spawnSize })
+        vt("color", "Color", "Initial particle color", c.map { it.spawnColor })
+        vt("opacity", "Opacity", "Initial particle opacity (1-transparency)", c.map { it.spawnOpacity })
+        vt("size", "Size", "Initial particle size", c.map { it.spawnSize })
 
         val general = getGroup("Particle System", "", "particles")
 

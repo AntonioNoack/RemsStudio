@@ -57,6 +57,7 @@ class AnimatedDistribution(
         for (index in properties.indices) {
             val property = properties[index]
             // could this crash? only if another property had differing amounts of channels
+            println("Preparing UI for ${"$name/${property.title}"} with ${inspected.map { it.channels[index].keyframes.size }}x")
             list += transform.vis(
                 c, property.title, property.description, "$name/${property.title}",
                 inspected.map { it.channels[index] },
