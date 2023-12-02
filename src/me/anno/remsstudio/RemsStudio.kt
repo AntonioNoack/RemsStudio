@@ -41,6 +41,8 @@ import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.WelcomeUI
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.OS
+import me.anno.utils.hpc.ProcessingQueue
+import javax.management.DynamicMBean
 import kotlin.math.min
 
 // record properties:
@@ -306,7 +308,9 @@ object RemsStudio : StudioBase("Rem's Studio", 10208, true) {
     fun incrementalChange(title: String, run: () -> Unit) =
         incrementalChange(title, title, run)
 
-    fun incrementalChange(title: String, groupCode: Any, run: () -> Unit) {
+    val savingWorker = ProcessingQueue("Saving")
+
+    fun incrementalChange(title: String, groupCode: String, run: () -> Unit) {
         val history = history ?: return run()
         val code = groupCode to keyUpCtr
         if (lastCode != code) {
@@ -314,7 +318,14 @@ object RemsStudio : StudioBase("Rem's Studio", 10208, true) {
             lastCode = code
         } else {
             run()
-            history.update(title, code)
+            // register for change
+            if (savingWorker.remaining == 0) {
+                savingWorker += {
+                    synchronized(history) {
+                        history.update(title, code)
+                    }
+                }
+            }
         }
         currentTab?.hasChanged = true
         invalidateUI(false)
@@ -329,11 +340,13 @@ object RemsStudio : StudioBase("Rem's Studio", 10208, true) {
 
     private fun change(title: String, code: Any, run: () -> Unit) {
         val history = history ?: return run()
-        if (history.isEmpty()) {
-            history.put("Start State", Unit)
+        synchronized(history) {
+            if (history.isEmpty()) {
+                history.put("Start State", Unit)
+            }
+            run()
+            history.put(title, code)
         }
-        run()
-        history.put(title, code)
     }
 
     fun updateAudio() {
