@@ -13,7 +13,9 @@ fun main() {
     prop.addKeyframe(1.0, 1f)
     prop.addKeyframe(2.0, 2f)
 
-    prop.keyframes.forEach { it.interpolation = Interpolation.EASE_IN }
+    for (kf in prop.keyframes) {
+        kf.interpolation = Interpolation.EASE_IN
+    }
 
     val asString = prop.toString()
     val fromString = JsonStringReader.read(asString, InvalidRef, false)

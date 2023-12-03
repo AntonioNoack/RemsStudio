@@ -60,7 +60,9 @@ fun main() {
                     val y = values[valueKey]!![index].toFloat()
                     p.addKeyframe(time.toDouble(), Vector3f(x, y, z))
                 }
-                p.keyframes.forEach { it.interpolation = Interpolation.STEP }
+                for (kf in p.keyframes) {
+                    kf.interpolation = Interpolation.STEP
+                }
                 circle
             }
         }

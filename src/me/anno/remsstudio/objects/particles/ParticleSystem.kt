@@ -15,7 +15,6 @@ import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.animation.AnimationIntegral.findIntegralX
 import me.anno.remsstudio.animation.AnimationIntegral.getIntegral
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.objects.particles.LifeTimeCalculation.findReasonableLastTime
 import me.anno.remsstudio.objects.particles.distributions.*
 import me.anno.remsstudio.objects.particles.forces.ForceField
 import me.anno.remsstudio.objects.particles.forces.impl.BetweenParticleGravity
@@ -258,9 +257,11 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
 
         // draw all forces
         if (!isFinalRendering) {
-            children.filterIsInstance<ForceField>().forEach {
-                stack.next {
-                    it.draw(stack, time, color)
+            for (force in children) {
+                if (force is ForceField) {
+                    stack.next {
+                        force.draw(stack, time, color)
+                    }
                 }
             }
             val dist = selectedDistribution

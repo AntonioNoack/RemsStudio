@@ -1,20 +1,20 @@
 package me.anno.remsstudio.audio.effects.impl
 
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
-import me.anno.remsstudio.audio.effects.Domain
-import me.anno.remsstudio.audio.effects.SoundEffect
-import me.anno.remsstudio.audio.effects.Time
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
-import me.anno.remsstudio.objects.Audio
-import me.anno.remsstudio.objects.Camera
-import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.ui.base.groups.PanelListY
-import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.mix
 import me.anno.maths.Maths.pow
+import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.audio.effects.Domain
+import me.anno.remsstudio.audio.effects.SoundEffect
+import me.anno.remsstudio.audio.effects.Time
+import me.anno.remsstudio.objects.Audio
+import me.anno.remsstudio.objects.Camera
+import me.anno.ui.Style
+import me.anno.ui.base.groups.PanelListY
+import me.anno.ui.editor.SettingCategory
 import me.anno.utils.hpc.HeavyProcessing.processBalanced
 import kotlin.math.abs
 import kotlin.math.log2
@@ -60,7 +60,8 @@ class EqualizerEffect : SoundEffect(Domain.FREQUENCY_DOMAIN, Domain.FREQUENCY_DO
     override fun readObjectArray(name: String, values: Array<ISaveable?>) {
         when (name) {
             "sliders" -> {
-                values.forEachIndexed { index, iSaveable ->
+                for (index in values.indices) {
+                    val iSaveable = values[index]
                     sliders.getOrNull(index)?.copyFrom(iSaveable)
                 }
             }

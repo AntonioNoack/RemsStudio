@@ -40,11 +40,11 @@ object StudioActions {
         }
         return if (dilation == RemsStudio.editorTimeDilation || isInKeyInput) false
         else {
-            GFX.windows.map { w ->
-                w.windowStack.inFocus.map {
-                    it.printLayout(0)
+            /*for (w in GFX.windows) {
+                for (panel in w.windowStack.inFocus) {
+                    panel.printLayout(0)
                 }
-            }
+            }*/
             RemsStudio.editorTimeDilation = dilation
             RemsStudio.updateAudio()
             true
@@ -135,8 +135,11 @@ object StudioActions {
             "ShowAllObjects" to {
                 if (RemsStudio.root.listOfAll.any { it.visibility == TransformVisibility.VIDEO_ONLY }) {
                     RemsStudio.largeChange("Show all objects") {
-                        RemsStudio.root.listOfAll.filter { it.visibility == TransformVisibility.VIDEO_ONLY }
-                            .forEach { it.visibility = TransformVisibility.VISIBLE }
+                        for (panel in RemsStudio.root.listOfAll) {
+                            if (panel.visibility == TransformVisibility.VIDEO_ONLY) {
+                                panel.visibility = TransformVisibility.VISIBLE
+                            }
+                        }
                     }
                     true
                 } else false

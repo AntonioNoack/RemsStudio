@@ -364,7 +364,7 @@ class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
     override fun readObjectArray(name: String, values: Array<ISaveable?>) {
         when (name) {
             "keyframes", "vs" -> {
-                values.filterIsInstance<Keyframe<*>>().forEach { value ->
+                for (value in values.filterIsInstance<Keyframe<*>>()) {
                     val castValue = type.acceptOrNull(value.value!!)
                     if (castValue != null) {
                         @Suppress("UNCHECKED_CAST")

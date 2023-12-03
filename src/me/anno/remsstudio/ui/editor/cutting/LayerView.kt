@@ -189,16 +189,15 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
             var ht1 = getTimeAt(window.mouseX + 5f)
             val hx0 = getXAt(ht0)
             val hx1 = getXAt(ht1)
-            val inheritance = transform.listOfInheritance.toList().reversed()
-            inheritance.forEach {
-                ht0 = it.getLocalTime(ht0)
-                ht1 = it.getLocalTime(ht1)
+            for (tr in transform.listOfInheritanceReversed) {
+                ht0 = tr.getLocalTime(ht0)
+                ht1 = tr.getLocalTime(ht1)
             }
             val keyframes = draggedKeyframes ?: color[ht0, ht1]
             hoveredKeyframes = keyframes
             var x = x0 - 1
-            keyframes.forEach {
-                val relativeTime = (it.time - ht0) / (ht1 - ht0)
+            for (kf in keyframes) {
+                val relativeTime = (kf.time - ht0) / (ht1 - ht0)
                 val x2 = mix(hx0, hx1, relativeTime).toInt()
                 if (x2 > x) {
                     drawRect(x2, y0, 1, y1 - y0, accentColor)
@@ -226,7 +225,7 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
                     tr.updateLocalColor(p.lastLocalColor, localTime)
                 }
             }
-            drawn.forEach { tr ->
+            for (tr in drawn) {
                 val color = tr.lastLocalColor
                 val alpha = color.w * alphaMultiplier
                 if (alpha >= minAlpha && tr.isVisible(tr.lastLocalTime)) {

@@ -9,9 +9,9 @@ import me.anno.gpu.framebuffer.DepthBufferType
 import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.framebuffer.Framebuffer
 import me.anno.gpu.framebuffer.IFramebuffer
-import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.shader.effects.BokehBlur
 import me.anno.gpu.shader.effects.GaussianBlur
+import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.GPUFiltering
 import me.anno.gpu.texture.Texture2D
@@ -27,10 +27,10 @@ import me.anno.remsstudio.objects.geometric.Circle
 import me.anno.remsstudio.objects.geometric.Polygon
 import me.anno.studio.Inspectable
 import me.anno.ui.Panel
+import me.anno.ui.Style
 import me.anno.ui.base.SpyPanel
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector4f
@@ -40,9 +40,6 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
 
     override fun getDocumentationURL(): URL? = URL("https://remsstudio.phychi.com/?s=learn/masks")
 
-    // just a little expensive...
-    // todo why is multisampling sometimes black?
-    // it's not yet production ready...
     val samples get() = if (useExperimentalMSAA && mayUseMSAA) 8 else 1
 
     // seems better, because it should not influence the alpha values
@@ -409,7 +406,7 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
 
     override fun readInt(name: String, value: Int) {
         when (name) {
-            "type" -> type = MaskType.values().firstOrNull { it.id == value } ?: type
+            "type" -> type = MaskType.entries.firstOrNull { it.id == value } ?: type
             else -> super.readInt(name, value)
         }
     }
@@ -420,16 +417,24 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
     companion object {
         fun create(mask: List<Transform>?, masked: List<Transform>?): MaskLayer {
             val maskLayer = MaskLayer(null)
-            val mask2 = Transform(maskLayer)
-            mask2.name = "Mask Folder"
+            val maskFolder = Transform(maskLayer)
+            maskFolder.name = "Mask Folder"
             if (mask == null) {
-                Circle(mask2).innerRadius.set(0.5f)
-            } else mask.forEach { mask2.addChild(it) }
-            val masked2 = Transform(maskLayer)
-            masked2.name = "Masked Folder"
+                Circle(maskFolder).innerRadius.set(0.5f)
+            } else {
+                for (child in mask) {
+                    maskFolder.addChild(child)
+                }
+            }
+            val maskedFolder = Transform(maskLayer)
+            maskedFolder.name = "Masked Folder"
             if (masked == null) {
-                Polygon(masked2)
-            } else masked.forEach { masked2.addChild(it) }
+                Polygon(maskedFolder)
+            } else {
+                for (child in masked) {
+                    maskedFolder.addChild(child)
+                }
+            }
             return maskLayer
         }
     }

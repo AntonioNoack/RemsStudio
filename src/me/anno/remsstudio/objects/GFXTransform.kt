@@ -11,9 +11,10 @@ import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.attractors.EffectColoring
 import me.anno.remsstudio.objects.attractors.EffectMorphing
 import me.anno.studio.Inspectable
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
+import me.anno.utils.structures.lists.Lists.none2
 import me.anno.utils.types.Floats.put3
 import org.joml.Vector3f
 import org.joml.Vector4f
@@ -138,7 +139,7 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
         // has no ability to display them
         if (shader["forceFieldColorCount"] < 0) return
 
-        if (children.none { it is EffectColoring }) {
+        if (children.none2 { it is EffectColoring }) {
             shader.v1i("forceFieldColorCount", 0)
             return
         }
@@ -146,9 +147,9 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
         var attractors = children
             .filterIsInstance<EffectColoring>()
 
-        attractors.forEach {
-            it.lastLocalTime = it.getLocalTime(time)
-            it.lastInfluence = it.influence[it.lastLocalTime]
+        for (attractor in attractors) {
+            attractor.lastLocalTime = attractor.getLocalTime(time)
+            attractor.lastInfluence = attractor.influence[attractor.lastLocalTime]
         }
 
         if (attractors.size > maxColorForceFields)

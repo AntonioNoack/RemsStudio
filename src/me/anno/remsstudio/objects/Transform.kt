@@ -852,6 +852,18 @@ open class Transform() : Saveable(),
             }
         }
 
+    /**
+     * return from this to root all parents
+     * */
+    val listOfInheritanceReversed: Sequence<Transform>
+        get() = sequence {
+            val parent = parent
+            if (parent != null) {
+                yieldAll(parent.listOfInheritance)
+            }
+            yield(this@Transform)
+        }
+
     fun getDepth(): Int {
         var element: Transform? = this
         var ctr = 0

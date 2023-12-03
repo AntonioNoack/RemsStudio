@@ -98,14 +98,12 @@ open class TimelinePanel(style: Style) : Panel(style) {
             lastOwner = Selection.selectedTransforms.firstOrNull() ?: lastOwner
 
             val owner = lastOwner
-            val child2root = owner.listOfInheritance.toList()
-            val root2child = child2root.reversed()
 
             // only simple time transforms are supported
             time0 = 0.0
             time1 = 1.0
 
-            root2child.forEach { t ->
+            for (t in owner.listOfInheritanceReversed) {
                 // localTime0 = (parentTime - timeOffset) * timeDilation
                 val offset = t.timeOffset.value
                 val dilation = t.timeDilation.value

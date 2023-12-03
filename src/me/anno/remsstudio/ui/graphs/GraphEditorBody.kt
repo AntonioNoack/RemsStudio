@@ -168,9 +168,11 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         if (property.isAnimated) {
             add(property[t0])
             add(property[t1])
-            property.keyframes
-                .filter { it.time in t0..t1 }
-                .forEach { add(it.value) }
+            for (kf in property.keyframes) {
+                if (kf.time in t0..t1) {
+                    add(kf.value)
+                }
+            }
         } else add(property.defaultValue)
 
         centralValue = (maxValue + minValue) * 0.5
@@ -412,7 +414,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         var bestChannel = 0
         val maxMargin = dotSize * 2.0 / 3.0 + 1.0
         var bestDistance = maxMargin
-        property.keyframes.forEach { kf ->
+        for (kf in property.keyframes) {
             val globalT = mix(0.0, 1.0, kf2Global(kf.time))
             val dx = x - getXAt(globalT)
             if (abs(dx) < maxMargin) {
@@ -678,16 +680,15 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             val selectedProperty = selectedProperties?.firstOrNull()
             val target = selectedProperty ?: return super.onPaste(x, y, data, type)
             val targetType = target.type
-            val parsedKeyframes = JsonStringReader.read(data, workspace, true).filterIsInstance<Keyframe<*>>()
+            val parsedKeyframes = JsonStringReader.read(data, workspace, true)
+                .filterIsInstance<Keyframe<*>>()
             if (parsedKeyframes.isNotEmpty()) {
                 RemsStudio.largeChange("Pasted Keyframes") {
-                    parsedKeyframes.forEach { sth ->
-                        sth.apply {
-                            val castValue = targetType.acceptOrNull(value!!)
-                            if (castValue != null) {
-                                target.addKeyframe(time + time0, castValue)
-                            } else LOGGER.warn("$targetType doesn't accept $value")
-                        }
+                    for (kf in parsedKeyframes) {
+                        val castValue = targetType.acceptOrNull(kf.value!!)
+                        if (castValue != null) {
+                            target.addKeyframe(kf.time + time0, castValue)
+                        } else LOGGER.warn("$targetType doesn't accept ${kf.value}")
                     }
                 }
             }
@@ -743,10 +744,12 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                         NameDesc("Interpolation", "", "ui.graphEditor.interpolation.title"),
                         Interpolation.values().map { mode ->
                             MenuOption(NameDesc(mode.displayName, mode.description, "")) {
-                                selectedKeyframes.forEach {
-                                    it.interpolation = mode
+                                RemsStudio.incrementalChange("Change interpolation type") {
+                                    for (kf in selectedKeyframes) {
+                                        kf.interpolation = mode
+                                    }
+                                    invalidateDrawing()
                                 }
-                                invalidateDrawing()
                             }
                         })
                 }
