@@ -460,7 +460,9 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     val dx = speed * touches.values.sumOf { (it.x - it.lastX).toDouble() }.toFloat() * size
                     val dy = speed * touches.values.sumOf { (it.y - it.lastY).toDouble() }.toFloat() * size
                     moveSelected(camera, dx, dy)
-                    touches.forEach { it.value.update() }
+                    for (touch in touches) {
+                        touch.value.update()
+                    }
                     invalidateDrawing()
                 }
             }
@@ -590,7 +592,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                         }
                     } else {
                         selected.scale.addKeyframe(
-                            localTime, oldScale.mul(
+                            localTime, Vector3f(oldScale).mul(
                                 pow(base, localDelta.x),
                                 pow(base, localDelta.y),
                                 pow(base, localDelta.z)
@@ -631,7 +633,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                             }
                         }
                     } else {
-                        selected.rotationYXZ.addKeyframe(localTime, oldRotation.add(localDelta))
+                        selected.rotationYXZ.addKeyframe(localTime, Vector3f(oldRotation).add(localDelta))
                     }
                     invalidateUI(false)
                 }
