@@ -10,7 +10,10 @@ import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.Style
 import me.anno.ui.input.FloatVectorInput
 import org.apache.logging.log4j.LogManager
-import org.joml.*
+import org.joml.Quaternionf
+import org.joml.Vector2f
+import org.joml.Vector3f
+import org.joml.Vector4f
 
 class FloatVectorInputV2(
     title: String,

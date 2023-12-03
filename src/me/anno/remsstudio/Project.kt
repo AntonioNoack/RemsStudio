@@ -167,7 +167,6 @@ class Project(var name: String, val file: FileReference) : Saveable() {
             val notFound = HashSet<String>()
             val style = style
             fun load(arr: List<*>?): Panel? {
-                // println("Loading $arr")
                 arr ?: return null
                 return try {
                     val type = arr[0] as? String ?: return null

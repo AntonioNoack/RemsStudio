@@ -58,9 +58,7 @@ object RemsStudioUILayouts {
         // todo Alt + Letter = pseudo-click on menu
 
         val style = DefaultConfig.style
-
         val ui = PanelListY(style)
-
         val options = OptionBar(style)
 
         val configTitle = Dict["Config", "ui.top.config"]
@@ -253,19 +251,17 @@ object RemsStudioUILayouts {
         topLeft += CustomContainer(StudioFileExplorer(project?.scenes, style), library, style)
         topHalf.add(CustomContainer(topLeft, library, style), 0.5f)
 
-        val sceneAndTime = CustomList(true, style)
-        sceneAndTime.add(CustomContainer(StudioSceneView(style), library, style), 0.9f)
-        sceneAndTime.add(CustomContainer(TimeControlsPanel(style), library, style), 0.1f)
-        topHalf.add(sceneAndTime, 2f)
+        topHalf.add(CustomContainer(StudioSceneView(style), library, style), 2f)
+
+        val propertiesAndTime = CustomList(true, style)
         val properties = StudioPropertyInspector({ Selection.selectedInspectables }, style)
-        topHalf.add(CustomContainer(properties, library, style), 0.5f)
+        propertiesAndTime.add(CustomContainer(properties, library, style), 0.95f)
+        propertiesAndTime.add(CustomContainer(TimeControlsPanel(style), library, style), 0.05f)
+        topHalf.add(propertiesAndTime, 0.5f)
         topHalf.weight = 1f
 
-        val timeline = GraphEditor(style)
-        customUI.add(CustomContainer(timeline, library, style), 0.25f)
-
-        val linear = LayerViewContainer(style)
-        customUI.add(CustomContainer(linear, library, style), 0.25f)
+        customUI.add(CustomContainer(GraphEditor(style), library, style), 0.25f)
+        customUI.add(CustomContainer(LayerViewContainer(style), library, style), 0.25f)
 
         return customUI
 

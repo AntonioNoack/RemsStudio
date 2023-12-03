@@ -90,7 +90,9 @@ class HistoryState() : Saveable() {
         state.title = title
         state.selectedUUIDs = Selection.selectedTransforms.map { it.getUUID() }
         state.usedCameras = defaultWindowStack.map { window ->
-            window.panel.listOfAll.filterIsInstance<StudioSceneView>().map { it.camera.getUUID() }.toList()
+            window.panel.listOfAll.toList()
+                .filterIsInstance<StudioSceneView>()
+                .map { it.camera.getUUID() }.toList()
         }.join().toIntArray()
 
     }

@@ -3,11 +3,13 @@ package me.anno.remsstudio.objects.particles
 import me.anno.remsstudio.objects.particles.distributions.AnimatedDistribution
 import me.anno.remsstudio.objects.particles.forces.ForceField
 import me.anno.remsstudio.objects.particles.forces.impl.BetweenParticleGravity
-import me.anno.utils.LOGGER
 import me.anno.utils.structures.lists.Lists.none2
+import org.apache.logging.log4j.LogManager
 import kotlin.math.min
 
 object LifeTimeCalculation {
+
+    private val LOGGER = LogManager.getLogger(LifeTimeCalculation::class)
 
     // todo use this, but for it to work we need to support jumps in ParticleSystem.states
     fun findReasonableLastTime(time: Double, forces: List<ForceField>, lifeTime: AnimatedDistribution): Double {
