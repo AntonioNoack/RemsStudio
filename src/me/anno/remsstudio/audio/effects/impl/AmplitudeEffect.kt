@@ -13,7 +13,8 @@ import me.anno.ui.Style
 import me.anno.maths.Maths.mix
 import me.anno.utils.hpc.HeavyProcessing.processBalanced
 
-// todo different distance based effects <3 :D
+// different distance based effects <3 :D
+//  -> falloff
 // todo velocity-based effects
 // todo normalize amplitude effect
 // todo limit amplitude effect (straight cut-off; smooth-cut-off)

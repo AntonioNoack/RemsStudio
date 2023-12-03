@@ -42,30 +42,13 @@ import me.anno.ui.editor.WelcomeUI
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.OS
 import me.anno.utils.hpc.ProcessingQueue
-import org.apache.logging.log4j.LogManager
 import kotlin.math.min
-
-// record properties:
-//  - right click -> record, then the video editor at whatever speed
-//  - and the user can manipulate the properties while time passes by...
-//  - add a recording-stop button somehow... maybe when time speed is changing? no...
-//  - add a red dot, and a red border around that field somehow
-// record multiple properties at once?
-// which rate should we record at???...
-// -> create two keyframes at the start, so it counts as being keyframed,
-// then play, and move the property
-
-// allow dragging animated properties (like ParticleSystem.origin.constant) in SceneView to record them
-//  -> you should be able to draw pseudo-lines using that
-//  -> can we add a function to actually draw, using our line-drawing mechanism?
-// done we should show with color, which fields are keyframe-animated -> we're rendering a frame around them :)
 
 // todo respect masks when editing multiple instances at once
 
 // todo bugs:
 //  - shadows on SDF text have a black border, but they shouldn't
 //  - sometimes delete-key isn't registered as such
-//  - new files, like with 0 bytes, cannot be right clicked in file explorer
 //  - video files cannot be properly deleted, because files can't be deleted when reading them
 
 // todo use reflectionMap for mesh rendering where available
@@ -99,8 +82,6 @@ import kotlin.math.min
 // nearby frame compression (small changes between frames, could use lower resolution) on the gpu side? maybe...
 // -> would maybe allow 60fps playback better
 
-// done color to alpha
-// done alpha to color
 // todo discard alpha being > or < than x / map alpha
 
 // todo splines for the polygon line

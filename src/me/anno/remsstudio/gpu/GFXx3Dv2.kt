@@ -335,7 +335,7 @@ object GFXx3Dv2 {
     private val tmp1 = Vector3f()
     private val tmp2 = Vector4f()
 
-    fun colorGradingUniforms(video: Video?, time: Double, shader: Shader) {
+    private fun colorGradingUniforms(video: Video?, time: Double, shader: Shader) {
         if (video != null) {
             tmp0.set(video.cgOffsetAdd[time, tmp0])
             tmp1.set(video.cgOffsetSub[time, tmp1])
