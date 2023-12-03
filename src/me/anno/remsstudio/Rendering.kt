@@ -144,6 +144,8 @@ object Rendering {
             isRendering = false
             progress?.finish()
             callback()
+            tmpFile.invalidate()
+            targetOutputFile.invalidate()
         }
 
         videoCreator.init()
