@@ -58,10 +58,7 @@ import kotlin.math.min
 // allow dragging animated properties (like ParticleSystem.origin.constant) in SceneView to record them
 //  -> you should be able to draw pseudo-lines using that
 //  -> can we add a function to actually draw, using our line-drawing mechanism?
-// todo UI panels shouldn't override what you're doing when moving time forward
 // done we should show with color, which fields are keyframe-animated -> we're rendering a frame around them :)
-// todo mark groups, which have animated properties inside them. how?
-// todo bug: sometimes, clicking on a property, hangs the graph editor to flickering, and doesn't animate properly, I think...
 
 // todo respect masks when editing multiple instances at once
 
@@ -120,7 +117,7 @@ import kotlin.math.min
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
-object RemsStudio : StudioBase("Rem's Studio", 10208, true) {
+object RemsStudio : StudioBase("Rem's Studio", 10300, true) {
 
     val defaultWindowStack get() = GFX.someWindow!!.windowStack
     var hideUnusedProperties = false
