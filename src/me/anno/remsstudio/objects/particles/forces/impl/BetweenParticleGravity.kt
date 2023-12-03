@@ -1,9 +1,9 @@
-package me.anno.remsstudio.objects.forces.impl
+package me.anno.remsstudio.objects.particles.forces.impl
 
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.remsstudio.objects.forces.ForceField
+import me.anno.remsstudio.objects.particles.forces.ForceField
 import me.anno.remsstudio.objects.inspectable.InspectableAnimProperty
 import me.anno.remsstudio.objects.particles.Particle
 import me.anno.remsstudio.objects.particles.ParticleState
@@ -14,7 +14,7 @@ import org.joml.Vector4f
 
 class BetweenParticleGravity : ForceField(
     "Between-Particle Gravity",
-    "Gravity towards all other particles", "betweenParticleGravity"
+    "Gravity towards all other particles; expensive to compute", "betweenParticleGravity"
 ) {
 
     val exponent = AnimatedProperty.float(2f)

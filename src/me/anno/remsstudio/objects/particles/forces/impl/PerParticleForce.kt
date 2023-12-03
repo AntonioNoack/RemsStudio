@@ -1,6 +1,6 @@
-package me.anno.remsstudio.objects.forces.impl
+package me.anno.remsstudio.objects.particles.forces.impl
 
-import me.anno.remsstudio.objects.forces.ForceField
+import me.anno.remsstudio.objects.particles.forces.ForceField
 import org.joml.Matrix4fArrayList
 import org.joml.Vector4f
 

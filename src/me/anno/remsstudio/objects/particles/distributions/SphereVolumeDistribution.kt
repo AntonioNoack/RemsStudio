@@ -5,6 +5,7 @@ import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector3f
 import org.joml.Vector4f
+import kotlin.math.abs
 
 class SphereVolumeDistribution(center: Vector4f, size: Vector4f, rotation: Vector4f = Vector4f()) :
     CenterSizeDistribution(
@@ -18,6 +19,10 @@ class SphereVolumeDistribution(center: Vector4f, size: Vector4f, rotation: Vecto
 
     override fun nextV1(): Float {
         return transform(random.nextFloat() * 2f - 1f)
+    }
+
+    override fun maxV1(): Float {
+        return abs(scale.x) + center.x
     }
 
     override fun nextV2(): Vector2f {

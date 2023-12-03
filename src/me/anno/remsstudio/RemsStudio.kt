@@ -60,6 +60,7 @@ import kotlin.math.min
 //  -> can we add a function to actually draw, using our line-drawing mechanism?
 // todo UI panels shouldn't override what you're doing when moving time forward
 // done we should show with color, which fields are keyframe-animated -> we're rendering a frame around them :)
+// todo mark groups, which have animated properties inside them. how?
 // todo bug: sometimes, clicking on a property, hangs the graph editor to flickering, and doesn't animate properly, I think...
 
 // todo respect masks when editing multiple instances at once

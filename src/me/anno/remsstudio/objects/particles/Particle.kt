@@ -3,7 +3,7 @@ package me.anno.remsstudio.objects.particles
 import me.anno.gpu.GFX
 import me.anno.maths.Maths
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.objects.forces.ForceField
+import me.anno.remsstudio.objects.particles.forces.ForceField
 import me.anno.utils.structures.lists.UnsafeArrayList
 import me.anno.utils.types.Floats.f2
 import me.anno.utils.types.Floats.toRadians

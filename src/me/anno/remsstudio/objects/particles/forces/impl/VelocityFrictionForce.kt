@@ -1,4 +1,4 @@
-package me.anno.remsstudio.objects.forces.impl
+package me.anno.remsstudio.objects.particles.forces.impl
 
 import me.anno.remsstudio.objects.particles.Particle
 import me.anno.remsstudio.objects.particles.ParticleState

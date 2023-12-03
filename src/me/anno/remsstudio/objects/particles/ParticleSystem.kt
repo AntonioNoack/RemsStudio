@@ -15,9 +15,10 @@ import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.animation.AnimationIntegral.findIntegralX
 import me.anno.remsstudio.animation.AnimationIntegral.getIntegral
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.objects.forces.ForceField
-import me.anno.remsstudio.objects.forces.impl.BetweenParticleGravity
+import me.anno.remsstudio.objects.particles.LifeTimeCalculation.findReasonableLastTime
 import me.anno.remsstudio.objects.particles.distributions.*
+import me.anno.remsstudio.objects.particles.forces.ForceField
+import me.anno.remsstudio.objects.particles.forces.impl.BetweenParticleGravity
 import me.anno.studio.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.SpyPanel
@@ -84,16 +85,17 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
     override fun getStartTime(): Double = Double.NEGATIVE_INFINITY
     override fun getEndTime(): Double = Double.POSITIVE_INFINITY
 
+    val forces get() = children.filterIsInstance<ForceField>()
+
     private fun spawnIfRequired(time: Double, onlyFirst: Boolean) {
 
-        val lastTime = particles.lastOrNull()?.birthTime ?: 0.0
+        val lastTime = particles.lastOrNull()?.birthTime ?: 0.0 // findReasonableLastTime(time, forces, lifeTime)
         val spawnRate = spawnRate
         val sinceThenIntegral = spawnRate.getIntegral(lastTime, time, false)
 
         var missingChildren = sinceThenIntegral.toInt()
         if (missingChildren > 0) {
-
-            if (onlyFirst) missingChildren = max(1, missingChildren)
+            if (onlyFirst) missingChildren = 1
 
             val ps = particles.size
 
@@ -123,11 +125,10 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
         val startTime = System.nanoTime()
 
         if (aliveParticles.isNotEmpty()) {
-
             val simulationStep = simulationStep
-            val forces = children.filterIsInstance<ForceField>()
+            val forces = forces
             val hasHeavyComputeForce = forces.any { it is BetweenParticleGravity }
-            var currentTime = aliveParticles.map { it.lastTime(simulationStep) }.minOrNull() ?: return true
+            var currentTime = aliveParticles.minOfOrNull { it.lastTime(simulationStep) } ?: return true
             while (currentTime < time) {
 
                 // 10 ms timeout
@@ -141,7 +142,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
                 val needsUpdate = aliveParticles.filter { it.lastTime(simulationStep) < currentTime }
 
                 // update all particles, which need an update
-                if (hasHeavyComputeForce) {
+                if (hasHeavyComputeForce && needsUpdate.isNotEmpty()) {
                     // just process the first entries...
                     val limit = max(65536 / needsUpdate.size, 10)
                     if (needsUpdate.size > limit) {
@@ -165,10 +166,8 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
             }
 
         } else {
-
             spawnIfRequired(time, true)
             return aliveParticles.isEmpty() || step(time)
-
         }
 
         return true
@@ -316,8 +315,6 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
                     for (i in c.indices) {
                         if (c[i].selectedDistribution !== properties[i]) {
                             c[i].selectedDistribution = properties[i]
-                            // todo I feel like this isn't working with regards to the keyframe editor
-                            println("Focus -> selecting $name")
                             needsUpdate = true
                         }
                     }

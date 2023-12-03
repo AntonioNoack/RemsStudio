@@ -1,6 +1,6 @@
-package me.anno.remsstudio.objects.forces.types
+package me.anno.remsstudio.objects.particles.forces.types
 
-import me.anno.remsstudio.objects.forces.ForceField
+import me.anno.remsstudio.objects.particles.forces.ForceField
 import me.anno.remsstudio.objects.particles.Particle
 import me.anno.remsstudio.objects.particles.ParticleState
 import org.joml.Vector3f

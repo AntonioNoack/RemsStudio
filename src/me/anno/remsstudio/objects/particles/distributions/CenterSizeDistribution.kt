@@ -4,6 +4,7 @@ import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.objects.inspectable.InspectableVector
 import me.anno.utils.types.Floats.toRadians
 import org.joml.*
+import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -65,6 +66,10 @@ abstract class CenterSizeDistribution(
 
     override fun nextV1(): Float {
         return transform(random.nextFloat() - 0.5f)
+    }
+
+    override fun maxV1(): Float {
+        return 0.5f * abs(scale.x) + center.x
     }
 
     override fun listProperties(): List<InspectableVector> {

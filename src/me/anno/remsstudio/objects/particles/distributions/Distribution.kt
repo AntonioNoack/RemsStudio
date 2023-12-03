@@ -38,6 +38,10 @@ abstract class Distribution(val nameDesc: NameDesc) : Saveable(), InspectableAtt
         throw RuntimeException("Four components are not supported in ${javaClass.simpleName}")
     }
 
+    open fun maxV1(): Float {
+        throw RuntimeException("Single component is not supported in ${javaClass.simpleName}")
+    }
+
     open fun listProperties(): List<InspectableVector> = emptyList()
 
     override fun createInspector(list: PanelList, actor: Transform, style: Style) {

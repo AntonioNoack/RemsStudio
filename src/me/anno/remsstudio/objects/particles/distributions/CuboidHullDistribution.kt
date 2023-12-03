@@ -24,6 +24,10 @@ class CuboidHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4
         return transform(if (x > 0.5f) 1f else -1f)
     }
 
+    override fun maxV1(): Float {
+        return abs(scale.x) + center.x
+    }
+
     override fun nextV2(): Vector2f {
         val maxScale = max(abs(scale.x), abs(scale.y))
         var x = (random.nextFloat() * 2f - 1f) * scale.x / maxScale

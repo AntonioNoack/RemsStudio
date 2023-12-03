@@ -57,7 +57,6 @@ class AnimatedDistribution(
         for (index in properties.indices) {
             val property = properties[index]
             // could this crash? only if another property had differing amounts of channels
-            println("Preparing UI for ${"$name/${property.title}"} with ${inspected.map { it.channels[index].keyframes.size }}x")
             list += transform.vis(
                 c, property.title, property.description, "$name/${property.title}",
                 inspected.map { it.channels[index] },
@@ -94,8 +93,12 @@ class AnimatedDistribution(
     }
 
     fun update(time: Double, random: Random) {
-        if (lastDist !== distribution) update()
+        update(time)
         distribution.random.setSeed(random.nextLong())
+    }
+
+    fun update(time: Double) {
+        if (lastDist !== distribution) update()
         for (index in properties.indices) {
             val property = properties[index]
             when (type.components) {
@@ -110,6 +113,11 @@ class AnimatedDistribution(
     fun nextV1(time: Double, random: Random): Float {
         update(time, random)
         return distribution.nextV1()
+    }
+
+    fun maxV1(time: Double): Float {
+        update(time)
+        return distribution.maxV1()
     }
 
     @Suppress("unused")

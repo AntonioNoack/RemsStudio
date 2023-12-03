@@ -293,6 +293,11 @@ class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
         return driver?.getFloatValue(time, vi, driverIndex) ?: av
     }
 
+    fun nextKeyframe(time: Double): Double {
+        return keyframes.firstOrNull { it.time > time }?.time
+            ?: Double.POSITIVE_INFINITY
+    }
+
     private fun toCalc(a: V): Any {
         return when (a) {
             is Int -> a.toDouble()

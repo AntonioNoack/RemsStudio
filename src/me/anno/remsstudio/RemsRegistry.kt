@@ -22,7 +22,7 @@ import me.anno.remsstudio.objects.attractors.EffectColoring
 import me.anno.remsstudio.objects.attractors.EffectMorphing
 import me.anno.remsstudio.objects.documents.PDFDocument
 import me.anno.remsstudio.objects.effects.MaskLayer
-import me.anno.remsstudio.objects.forces.impl.*
+import me.anno.remsstudio.objects.particles.forces.impl.*
 import me.anno.remsstudio.objects.geometric.Circle
 import me.anno.remsstudio.objects.geometric.LinePolygon
 import me.anno.remsstudio.objects.geometric.Polygon

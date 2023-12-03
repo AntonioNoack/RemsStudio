@@ -1,10 +1,10 @@
-package me.anno.remsstudio.objects.forces.impl
+package me.anno.remsstudio.objects.particles.forces.impl
 
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.objects.inspectable.InspectableAnimProperty
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.remsstudio.objects.forces.types.RelativeForceField
+import me.anno.remsstudio.objects.particles.forces.types.RelativeForceField
 import me.anno.maths.Maths.pow
 import org.joml.Vector3f
 

@@ -1,11 +1,11 @@
-package me.anno.remsstudio.objects.forces
+package me.anno.remsstudio.objects.particles.forces
 
 import me.anno.config.DefaultConfig
 import me.anno.language.translation.Dict
 import me.anno.maths.Maths
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.objects.forces.impl.*
+import me.anno.remsstudio.objects.particles.forces.impl.*
 import me.anno.remsstudio.objects.inspectable.InspectableAnimProperty
 import me.anno.remsstudio.objects.models.ArrowModel
 import me.anno.remsstudio.objects.particles.Particle
@@ -130,6 +130,12 @@ abstract class ForceField(val displayName: String, val descriptionI: String) : T
             stack.rotateZ(+atan2(force.y, Maths.length(force.x, force.z)))
             stack.scale(force.length() * visualForceScale)
         }
+    }
+
+    fun drawForce(stack: Matrix4fArrayList, force: Vector3f) {
+        stack.rotateY(-atan2(force.z, force.x))
+        stack.rotateZ(+atan2(force.y, Maths.length(force.x, force.z)))
+        stack.scale(force.length() * visualForceScale)
     }
 
     fun getDirection(time: Double): Vector3f {

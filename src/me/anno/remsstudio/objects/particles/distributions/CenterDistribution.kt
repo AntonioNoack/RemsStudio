@@ -16,6 +16,7 @@ abstract class CenterDistribution(
 ) : Distribution(nameDesc) {
 
     override fun nextV1(): Float = center.x
+    override fun maxV1(): Float = center.x
 
     override fun nextV2(): Vector2f {
         return Vector2f(center.x, center.y)
