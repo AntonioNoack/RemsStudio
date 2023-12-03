@@ -101,9 +101,10 @@ object RenderSettings : Transform() {
         val mbs = vi(
             "Motion-Blur-Steps", "0,1 = no motion blur, e.g. 16 = decent motion blur, sub-frames per frame",
             project.motionBlurSteps, style
-        ) as IntInput
-        val mbsListener = mbs.changeListener
-        mbs.setChangeListener {
+        )
+        val mbs0 = mbs.child as IntInput
+        val mbsListener = mbs0.changeListener
+        mbs0.setChangeListener {
             mbsListener(it)
             save()
         }
@@ -153,9 +154,10 @@ object RenderSettings : Transform() {
             "[Motion Blur] 1 = full frame is used; 0.1 = only 1/10th of a frame time is used",
             project.shutterPercentage,
             style
-        ) as FloatInput
-        val shpListener = shp.changeListener
-        shp.setChangeListener {
+        )
+        val shp0 = shp.child as FloatInput
+        val shpListener = shp0.changeListener
+        shp0.setChangeListener {
             shpListener(it)
             save()
         }
@@ -192,8 +194,7 @@ object RenderSettings : Transform() {
         }
 
         updateFileInputColor()
-        fileInput.setChangeListener {
-            val file = it//File(it)
+        fileInput.setChangeListener { file ->
             project.targetOutputFile = file
             updateFileInputColor()
             save()

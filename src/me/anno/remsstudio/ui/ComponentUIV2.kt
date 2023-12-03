@@ -208,7 +208,7 @@ object ComponentUIV2 {
         self: Transform,
         title: String, ttt: String, visibilityKey: String,
         values: AnimatedProperty<*>, style: Style
-    ): Panel {
+    ): IsAnimatedWrapper {
         val time = self.lastLocalTime
         val sl = { self.show(listOf(self), listOf(values)) }
         val panel = when (val value = values[time]) {

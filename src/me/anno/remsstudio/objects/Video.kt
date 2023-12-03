@@ -45,7 +45,6 @@ import me.anno.remsstudio.objects.lists.Element
 import me.anno.remsstudio.objects.lists.SplittableElement
 import me.anno.remsstudio.objects.models.SpeakerModel.drawSpeakers
 import me.anno.remsstudio.objects.modes.VideoType
-import me.anno.remsstudio.objects.modes.editorFPS
 import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.base.SpyPanel
@@ -106,6 +105,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
     Audio(file, parent), SplittableElement {
 
     companion object {
+
+        val editorFPS = intArrayOf(1, 2, 3, 5, 10, 24, 30, 60, 90, 120, 144, 240, 300, 360)
 
         private val LOGGER = LogManager.getLogger(Video::class)
 
@@ -1085,5 +1086,4 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         clone.needsImageUpdate = needsImageUpdate
         return clone
     }
-
 }

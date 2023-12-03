@@ -26,6 +26,7 @@ import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.modes.TransformVisibility
 import me.anno.remsstudio.objects.particles.ParticleSystem
 import me.anno.remsstudio.ui.ComponentUIV2
+import me.anno.remsstudio.ui.IsAnimatedWrapper
 import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.global2Kf
 import me.anno.studio.Inspectable
@@ -814,11 +815,11 @@ open class Transform() : Saveable(),
      * title, tool tip text, type, start value
      * modifies the AnimatedProperty-Object, so no callback is needed
      * */
-    fun vi(title: String, ttt: String, visibilityKey: String, values: AnimatedProperty<*>, style: Style): Panel {
+    fun vi(title: String, ttt: String, visibilityKey: String, values: AnimatedProperty<*>, style: Style): IsAnimatedWrapper {
         return ComponentUIV2.vi(this, title, ttt, visibilityKey, values, style)
     }
 
-    fun vi(title: String, ttt: String, values: AnimatedProperty<*>, style: Style): Panel {
+    fun vi(title: String, ttt: String, values: AnimatedProperty<*>, style: Style): IsAnimatedWrapper {
         return ComponentUIV2.vi(this, title, ttt, title, values, style)
     }
 
