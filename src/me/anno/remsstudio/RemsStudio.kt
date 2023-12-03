@@ -384,8 +384,6 @@ object RemsStudio : StudioBase("Rem's Studio", 10208, true) {
         Build.isShipped = true
         Build.lock()
 
-        LogManager.enableLogger("InputVisibility")
-
         if (args.isEmpty()) {
             run()
         } else {

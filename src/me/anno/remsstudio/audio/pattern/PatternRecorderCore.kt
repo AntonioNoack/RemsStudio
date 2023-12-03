@@ -4,11 +4,9 @@ import me.anno.Time
 import me.anno.config.DefaultConfig.style
 import me.anno.gpu.drawing.DrawTexts.drawSimpleTextCharByChar
 import me.anno.gpu.drawing.GFXx2D.drawCircle
-import me.anno.image.ImageWriter
 import me.anno.input.Input
 import me.anno.input.Key
 import me.anno.language.translation.NameDesc
-import me.anno.maths.Maths.mix
 import me.anno.maths.Maths.pow
 import me.anno.maths.Maths.unmix
 import me.anno.remsstudio.RemsStudio
@@ -21,8 +19,6 @@ import me.anno.ui.input.TextInput
 import me.anno.utils.Color.black
 import me.anno.utils.Color.mixARGB
 import me.anno.utils.types.Booleans.toInt
-import org.joml.Vector2f
-import kotlin.math.abs
 import kotlin.math.min
 
 /**
@@ -124,7 +120,6 @@ class PatternRecorderCore(val tp: TextInput) : Panel(style) {
     }
 
     companion object {
-
         fun create(v0: DoubleArray? = null, changeListener: ((DoubleArray) -> Unit)? = null): Panel {
             val l = PanelListY(style)
             val e = TextInput(style)
@@ -142,34 +137,6 @@ class PatternRecorderCore(val tp: TextInput) : Panel(style) {
             l.add(p)
             l.add(e)
             return l
-        }
-
-        @JvmStatic
-        fun main(args: Array<String>) {
-            // testUI { create() }
-
-            // test time mapping visually :)
-            val steps = 500
-            val minT = 0f
-            val maxT = 10f
-            val rhythm = doubleArrayOf(1.0, 3.0, 5.0, 7.0, 9.0)
-            val timestamps = doubleArrayOf(-10.0, 10.0, -10.0, 10.0, -10.0)
-
-            val pts = (0 until steps).map {
-                mix(minT, maxT, it / (steps - 1f))
-            }.map {
-                Vector2f(it, -mapTime(rhythm, timestamps, it.toDouble()).toFloat())
-            }
-            val maxGradient = 2f * (maxT - minT) / steps
-            for (i in 1 until steps) {
-                if (abs(pts[i].y - pts[i - 1].y) > maxGradient) {
-                    println("${pts[i - 1]},${pts[i]}")
-                }
-            }
-            ImageWriter.writeImageCurve(
-                steps, steps, true,
-                -1, 0, 1, pts, ""
-            )
         }
 
         fun mapTime(rhythm: DoubleArray, timestamps: DoubleArray, t: Double): Double {
@@ -190,6 +157,5 @@ class PatternRecorderCore(val tp: TextInput) : Panel(style) {
             val localTime = t - if (isRightSide) t1 else t0
             return dstTime + localTime
         }
-
     }
 }

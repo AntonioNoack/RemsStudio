@@ -149,41 +149,6 @@ class StudioTreeView(style: Style) :
 
     companion object {
 
-        @JvmStatic
-        fun main(args: Array<String>) {
-            // test for layout width bugs
-            // works now :)
-            val s = 1024
-            println("\uD83C\uDF9E️" == "\uD83C\uDF9E")
-            val font0 = Font("Verdana", 15)
-            val font1 = Font("Segoe UI Emoji", 15)
-            println(listOf(127902).joinChars())
-            println(listOf(127902).joinChars().codePoints().toList())
-            println(getTextSizeX(font0, listOf(127902).joinChars(), s, s))
-            println(getTextSizeX(font1, listOf(127902).joinChars(), s, s))
-            println(getTextSizeX(font0, listOf(65039).joinChars(), s, s))
-            println(getTextSizeX(font1, listOf(65039).joinChars(), s, s))
-            println("\uD83C\uDF9E️")
-            println("\uD83C\uDF9E️".codePoints().toList())
-            println("xx " + listOf(127902).joinChars().length)
-            println("xx " + listOf(65039).joinChars().length)
-            println(
-                "xx " + "\uD83C\uDF9E️".length + "\uD83C\uDF9E".length + " xx " + "\uD83C\uDF9E️".codePoints().toList()
-                    .joinChars().length
-            )
-            println("xx " + "\uD83C\uDF9E️".codePoints().toList().joinChars().codePoints().toList())
-            println(getTextSizeX(font0, "\uD83C\uDF9E️", s, s))
-            println(getTextSizeX(font1, "\uD83C\uDF9E️", s, s))
-            println("\uD83C\uDFA5️")
-            println("\uD83C\uDFA5️".codePoints().toList())
-            println(getTextSizeX(font0, "\uD83C\uDFA5️", s, s))
-            println(getTextSizeX(font1, "\uD83C\uDFA5️", s, s))
-            println(getTextSizeX(font0, "\uD83C\uDFA5", s, s))
-            println(getTextSizeX(font1, "\uD83C\uDFA5", s, s))
-            val tp = TextPanel("\uD83C\uDFA5️", style)
-            println(tp.font)
-        }
-
         fun zoomToObject(obj: Transform) {
             // instead of asking for the name, move the camera towards the target
             // todo also zoom in/out correctly to match the object...
@@ -194,8 +159,9 @@ class StudioTreeView(style: Style) :
             val cameraToWorld = camera.parent?.getGlobalTransform(time)
             val objectToWorld = obj.getGlobalTransform(time)
             val objectWorldPosition = objectToWorld.transformPosition(Vector3f(0f, 0f, 0f))
-            val objectCameraPosition = if (cameraToWorld == null) objectWorldPosition else (cameraToWorld.invert()
-                .transformPosition(objectWorldPosition))
+            @Suppress("IfThenToElvis")
+            val objectCameraPosition = if (cameraToWorld == null) objectWorldPosition else
+                    cameraToWorld.invert().transformPosition(objectWorldPosition)
             LOGGER.info(objectCameraPosition)
             // apply this movement
             RemsStudio.largeChange("Move Camera to Object") {

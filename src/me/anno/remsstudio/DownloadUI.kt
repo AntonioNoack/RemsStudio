@@ -164,7 +164,7 @@ object DownloadUI {
         return listOf(progress)
     }
 
-    private fun createUI(style: Style): List<Panel> {
+    fun createUI(style: Style): List<Panel> {
 
         // start and end time if possible -> doesn't seem possible :/
         // done quality settings if possible
@@ -472,15 +472,6 @@ object DownloadUI {
 
     fun openUI(style: Style, windowStack: WindowStack) {
         Menu.openMenuByPanels(windowStack, NameDesc("Download Media (yt-dlp)"), createUI(style))
-    }
-
-    /**
-     * Test for this UI
-     * */
-    @JvmStatic
-    fun main(args: Array<String>) {
-        disableRenderDoc()
-        TestStudio.testUI2("DownloadTest") { createUI(DefaultConfig.style) }
     }
 
 }

@@ -253,11 +253,6 @@ object RemsCLI {
         } else defaultValue
     }
 
-    private fun readText(source: String): String {
-        return if (source.startsWith("text://", true)) source.substring(7)
-        else getReference(source).readTextSync()
-    }
-
     private fun printHelp(options: Options) {
         val formatter = HelpFormatter()
         formatter.printHelp("RemsStudio", options)

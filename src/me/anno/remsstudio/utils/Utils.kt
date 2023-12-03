@@ -5,7 +5,6 @@ import me.anno.io.utils.StringMap
 import me.anno.remsstudio.animation.AnimatedProperty
 
 object Utils {
-
     fun <V> StringMap.getAnimated(key: String, type: Type): AnimatedProperty<V> {
         val v = when (val value = this[key]) {
             is AnimatedProperty<*> -> {
@@ -33,5 +32,4 @@ object Utils {
         set(key, v2)
         return v2
     }
-
 }
