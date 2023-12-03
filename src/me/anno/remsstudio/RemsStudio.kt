@@ -44,6 +44,7 @@ import me.anno.utils.OS
 import me.anno.utils.hpc.ProcessingQueue
 import kotlin.math.min
 
+// todo bug: when editing a driver, we should see its curve
 // todo respect masks when editing multiple instances at once
 
 // todo make music x times calmer, if another audio line (voice) is on as an optional feature
@@ -100,7 +101,7 @@ import kotlin.math.min
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
-object RemsStudio : StudioBase("Rem's Studio", 10300, true) {
+object RemsStudio : StudioBase("Rem's Studio", 10301, true) {
 
     val defaultWindowStack get() = GFX.someWindow!!.windowStack
     var hideUnusedProperties = false

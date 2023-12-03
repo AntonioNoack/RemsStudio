@@ -276,7 +276,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         }
 
         // draw all values
-        if (kfs.isNotEmpty()) {
+        if (kfs.isNotEmpty() || property.drivers.any { it != null  }) {
             val backgroundColor = backgroundColor.withAlpha(0)
             val batch = DrawCurves.lineBatch.start()
             for (i in valueColors.indices) {

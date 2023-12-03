@@ -546,7 +546,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                             }
                         }
                     } else {
-                        selected.position.addKeyframe(localTime, oldPosition.add(localDelta))
+                        selected.position.addKeyframe(localTime, Vector3f(oldPosition).add(localDelta))
                     }
                     invalidateUI(false)
                 }
