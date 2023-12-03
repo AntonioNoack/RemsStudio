@@ -46,6 +46,8 @@ import kotlin.math.min
 
 // todo respect masks when editing multiple instances at once
 
+// todo make music x times calmer, if another audio line (voice) is on as an optional feature
+
 // todo bugs:
 //  - shadows on SDF text have a black border, but they shouldn't
 //  - sometimes delete-key isn't registered as such

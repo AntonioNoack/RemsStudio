@@ -47,7 +47,14 @@ object RenderSettings : Transform() {
         val project = project!!
         list += TextPanel(defaultDisplayName, style)
             .apply { focusTextColor = textColor }
-        list += vi(inspected, "Duration (Seconds)", "Video length in seconds", Type.FLOAT_PLUS, targetDuration, style) {
+        list += vi(
+            inspected,
+            "Duration (Seconds)",
+            "Video length in seconds",
+            Type.FLOAT_PLUS,
+            targetDuration,
+            style
+        ) { it, _ ->
             project.targetDuration = it
             save()
         }
@@ -55,7 +62,7 @@ object RenderSettings : Transform() {
         list += vi(
             inspected, "Relative Frame Size (%)", "For rendering tests, in percent",
             Type.FLOAT_PERCENT, project.targetSizePercentage, style
-        ) {
+        ) { it, _ ->
             project.targetSizePercentage = it
             save()
         }

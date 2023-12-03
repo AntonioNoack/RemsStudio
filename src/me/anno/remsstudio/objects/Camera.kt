@@ -127,7 +127,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
             inspected, "Use Depth",
             "Causes Z-Fighting, but allows 3D", "camera.depth.enabled",
             null, useDepth, style
-        ) { for (x in c) x.useDepth = it }
+        ) { it, _ -> for (x in c) x.useDepth = it }
         /*depth += vi(
             "Order By Z", "Transparent objects need to be sorted to appear correctly", null, order, style
         ) { order = it }*/
@@ -207,12 +207,12 @@ class Camera(parent: Transform? = null) : Transform(parent) {
             "Maps large ranges of brightnesses (e.g. HDR) to monitor color space", "camera.toneMapping",
             "camera.toneMapping",
             null, toneMapping, style
-        ) { for (x in c) x.toneMapping = it }
+        ) { it, _ -> for (x in c) x.toneMapping = it }
         color += vi(
             inspected, "Look Up Table",
             "LUT, Look Up Table for colors, formatted like in UE4", "camera.lut",
             "camera.toneMapping", null, lut, style
-        ) { for (x in c) x.lut = it }
+        ) { it, _ -> for (x in c) x.lut = it }
 
         ColorGrading.createInspector(
             c, c.map { it.cgPower }, c.map { it.cgSaturation }, c.map { it.cgSlope }, c.map { it.cgOffsetAdd },
@@ -224,7 +224,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
             inspected, "Only Show Target",
             "Forces the viewport to have the correct aspect ratio",
             null, onlyShowTarget, style
-        ) { for (x in c) x.onlyShowTarget = it }
+        ) { it, _ -> for (x in c) x.onlyShowTarget = it }
 
         val ops = getGroup("Operations", "Actions", "operations")
         ops += TextButton("Reset Transform", "If accidentally moved", "obj.camera.resetTransform", false, style)
@@ -346,7 +346,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
 
     override fun readString(name: String, value: String) {
         when (name) {
-            "lut" -> lut = value?.toGlobalFile() ?: InvalidRef
+            "lut" -> lut = value.toGlobalFile()
             else -> super.readString(name, value)
         }
     }
@@ -360,7 +360,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
 
     override fun readInt(name: String, value: Int) {
         when (name) {
-            "toneMapping" -> toneMapping = ToneMappers.values().firstOrNull { it.id == value } ?: toneMapping
+            "toneMapping" -> toneMapping = ToneMappers.entries.firstOrNull { it.id == value } ?: toneMapping
             else -> super.readInt(name, value)
         }
     }

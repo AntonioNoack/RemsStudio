@@ -108,7 +108,7 @@ fun Text.createInspectorWithoutSuperImpl(
         "Space between individual characters",
         "text.characterSpacing",
         null, relativeCharSpacing, style
-    ) {
+    ) { it, _ ->
         RemsStudio.incrementalChange("char space") { for (x in c) x.relativeCharSpacing = it }
         invalidate()
     }
@@ -121,7 +121,7 @@ fun Text.createInspectorWithoutSuperImpl(
     spaceGroup += vi(
         inspected, "Tab Size", "Relative tab size, in widths of o's", "text.tabSpacing",
         Text.tabSpaceType, relativeTabSize, style
-    ) {
+    ) { it, _ ->
         RemsStudio.incrementalChange("tab size") { for (x in c) x.relativeTabSize = it }
         invalidate()
     }
@@ -129,7 +129,7 @@ fun Text.createInspectorWithoutSuperImpl(
         inspected, "Line Break Width",
         "How broad the text shall be, at maximum; < 0 = no limit", "text.widthLimit",
         Text.lineBreakType, lineBreakWidth, style
-    ) {
+    ) { it, _ ->
         RemsStudio.incrementalChange("line break width") { for (x in c) x.lineBreakWidth = it }
         invalidate()
     }
@@ -176,7 +176,7 @@ fun Text.createInspectorWithoutSuperImpl(
         inspected, "Rendering Mode",
         "Mesh: Sharp, Signed Distance Fields: with outline", "text.renderingMode",
         null, renderingMode, style
-    ) { for (x in c) x.renderingMode = it }
+    ) { it, _ -> for (x in c) x.renderingMode = it }
     outline += vis(
         c, "Color 1", "First Outline Color", "outline.color1", c.map { it.outlineColor0 },
         style
@@ -210,7 +210,7 @@ fun Text.createInspectorWithoutSuperImpl(
     outline += vi(
         inspected, "Rounded Corners", "Makes corners curvy", "outline.roundCorners",
         null, roundSDFCorners, style
-    ) {
+    ) { it, _ ->
         for (x in c) x.roundSDFCorners = it
         invalidate()
     }

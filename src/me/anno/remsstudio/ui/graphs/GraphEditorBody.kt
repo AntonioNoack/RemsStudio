@@ -50,8 +50,6 @@ import org.joml.*
 import java.util.*
 import kotlin.math.*
 
-// todo make music x times calmer, if another audio line (voice) is on as an optional feature
-
 // todo list all animated properties of this object (abbreviated)
 
 class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {

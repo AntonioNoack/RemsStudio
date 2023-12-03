@@ -6,8 +6,8 @@ import me.anno.ecs.components.mesh.Mesh
 import me.anno.gpu.GFX
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.Filtering
-import me.anno.gpu.texture.TextureLib.whiteTexture
 import me.anno.gpu.texture.TextureCache
+import me.anno.gpu.texture.TextureLib.whiteTexture
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
@@ -106,23 +106,23 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
             inspected, "Auto-Align",
             "Rotate 45°/90, and scale a bit; for rectangles", "polygon.autoAlign",
             null, autoAlign, style
-        ) { for (x in c) x.autoAlign = it }
-        geo += vi(inspected, "Extrude", "Makes it 3D", "polygon.extrusion", null, is3D, style) {
-            for (x in c) x.is3D = it
-        }
+        ) { it, _ -> for (x in c) x.autoAlign = it }
+        geo += vi(
+            inspected, "Extrude", "Makes it 3D", "polygon.extrusion", null, is3D, style
+        ) { it, _ -> for (x in c) x.is3D = it }
 
         val tex = getGroup("Pattern", "", "texture")
         tex += vi(
             inspected, "Pattern Texture",
             "For patterns like gradients radially; use a mask layer for images with polygon shape", "polygon.pattern",
             null, texture, style
-        ) { for (x in c) x.texture = it }
+        ) { it, _ -> for (x in c) x.texture = it }
         tex += vi(
             inspected, "Filtering",
             "Pixelated or soft look of pixels?",
             "texture.filtering",
             null, filtering, style
-        ) { for (x in c) x.filtering = it }
+        ) { it, _ -> for (x in c) x.filtering = it }
 
     }
 
@@ -138,7 +138,7 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
 
     override fun readString(name: String, value: String) {
         when (name) {
-            "texture" -> texture = value?.toGlobalFile() ?: InvalidRef
+            "texture" -> texture = value.toGlobalFile()
             else -> super.readString(name, value)
         }
     }

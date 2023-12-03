@@ -10,9 +10,9 @@ import me.anno.remsstudio.audio.effects.SoundEffect
 import me.anno.remsstudio.audio.effects.Time
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
 import org.joml.Vector3f
 
 abstract class Falloff : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
@@ -74,7 +74,7 @@ abstract class Falloff : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
             Type.FLOAT_PLUS_EXP,
             halfDistance,
             style
-        ) { halfDistance = it })
+        ) { it, _ -> halfDistance = it })
     }
 
 }

@@ -181,16 +181,23 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<PDFDocument>()
         val doc = getGroup("Document", "", "docs")
-        doc += vi(inspected, "Path", "", null, file, style) { for (x in c) x.file = it }
-        doc += vi(inspected, "Pages", "", null, selectedSites, style) { for (x in c) x.selectedSites = it }
+        doc += vi(
+            inspected, "Path", "", null, file, style
+        ) { it, _ -> for (x in c) x.file = it }
+        doc += vi(
+            inspected, "Pages", "Comma separated list of page numbers. Ranges like 1-9 are fine, too.",
+            null, selectedSites, style
+        ) { it, _ -> for (x in c) x.selectedSites = it }
         doc += vis(c, "Padding", "", c.map { it.padding }, style)
         doc += vis(c, "Direction", "Top-Bottom/Left-Right in Degrees", c.map { it.direction }, style)
-        doc += vi(inspected, "Editor Quality", "", Type.FLOAT_PLUS, editorQuality, style) {
-            for (x in c) x.editorQuality = it
-        }
-        doc += vi(inspected, "Render Quality", "", Type.FLOAT_PLUS, renderQuality, style) {
-            for (x in c) x.renderQuality = it
-        }
+        doc += vi(
+            inspected, "Editor Quality", "Factor for resolution; applied in editor",
+            Type.FLOAT_PLUS, editorQuality, style
+        ) { it, _ -> for (x in c) x.editorQuality = it }
+        doc += vi(
+            inspected, "Render Quality", "Factor for resolution; applied when rendering",
+            Type.FLOAT_PLUS, renderQuality, style
+        ) { it, _ -> for (x in c) x.renderQuality = it }
     }
 
     override fun save(writer: BaseWriter) {

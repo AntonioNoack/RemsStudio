@@ -22,9 +22,9 @@ import me.anno.remsstudio.audio.AudioFXCache2.getTime
 import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.Time
 import me.anno.studio.Inspectable
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.video.MissingFrameException
 import me.anno.video.ffmpeg.MediaMetadata
@@ -250,13 +250,15 @@ class FourierTransform : Transform() {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<FourierTransform>()
         val fourier = getGroup("Fourier Transform", "", "fourier")
-        list.addChild(vi(inspected, "Audio File", "", null, file, style) { for (x in c) x.file = it })
+        list.addChild(vi(
+            inspected, "Audio File", "", null, file, style
+        ) { it, _ -> for (x in c) x.file = it })
         fourier.addChild(
             vi(
                 inspected, "Sample Rate", "What the highest frequency should be",
                 // higher frequencies are eliminated, because we interpolate samples (I think...)
                 sampleRateType, sampleRate, style
-            ) { for (x in c) x.sampleRate = max(64, it) })
+            ) { it, _ -> for (x in c) x.sampleRate = max(64, it) })
         fourier.addChild(
             vi(
                 inspected, "Buffer Size",
@@ -264,17 +266,17 @@ class FourierTransform : Transform() {
                 bufferSizeType,
                 bufferSize,
                 style
-            ) { for (x in c) x.bufferSize = max(64, it) })
+            ) { it, _ -> for (x in c) x.bufferSize = max(64, it) })
         fourier.addChild(
             vi(
                 inspected, "Buffer Min", "Use only a part of the fourier transform; -1 = disabled",
                 null, minBufferIndex, style
-            ) { for (x in c) x.minBufferIndex = it })
+            ) { it, _ -> for (x in c) x.minBufferIndex = it })
         fourier.addChild(
             vi(
                 inspected, "Buffer Max", "Use only a part of the fourier transform; -1 = disabled",
                 null, maxBufferIndex, style
-            ) { for (x in c) x.maxBufferIndex = it })
+            ) { it, _ -> for (x in c) x.maxBufferIndex = it })
         val amplitude = getGroup("Amplitude", "", "amplitude")
         amplitude.addChild(vis(c, "Position, Linear", "", c.map { it.posLin }, style))
         amplitude.addChild(vis(c, "Position, Logarithmic", "", c.map { it.posLog }, style))
@@ -318,7 +320,7 @@ class FourierTransform : Transform() {
 
     override fun readString(name: String, value: String) {
         when (name) {
-            "file" -> file = value?.toGlobalFile() ?: InvalidRef
+            "file" -> file = value.toGlobalFile()
             else -> super.readString(name, value)
         }
     }

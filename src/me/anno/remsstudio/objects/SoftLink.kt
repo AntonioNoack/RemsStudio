@@ -22,11 +22,11 @@ import me.anno.remsstudio.gpu.GFXx3Dv2.draw3DVideo
 import me.anno.remsstudio.objects.text.Text
 import me.anno.remsstudio.ui.StudioFileImporter.addChildFromFile
 import me.anno.studio.Inspectable
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.editor.frames.FrameSizeInput
-import me.anno.ui.Style
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
@@ -183,13 +183,13 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
         val t = inspected.filterIsInstance<Transform>()
         val c = inspected.filterIsInstance<SoftLink>()
         val link = getGroup("Link Data", "", "softLink")
-        link += vi(inspected, "File", "Where the data is to be loaded from", "", null, file, style) {
-            for (x in c) x.file = it
-        }
+        link += vi(
+            inspected, "File", "Where the data is to be loaded from", "", null, file, style
+        ) { it, _ -> for (x in c) x.file = it }
         link += vi(
             inspected, "Camera Index", "Which camera should be chosen, 0 = none, 1 = first, ...", "",
             Type.INT_PLUS, cameraIndex, style
-        ) { for (x in c) x.cameraIndex = it }
+        ) { it, _ -> for (x in c) x.cameraIndex = it }
         list += FrameSizeInput(
             "Resolution",
             resolution[lastLocalTime].run { "${x.roundToInt()} x ${y.roundToInt()}" }, style
@@ -207,17 +207,17 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
         )
         list += vi(
             inspected, "UV-Projection", "Can be used for 360°-Videos", null, uvProjection.value, style
-        ) { for (x in c) x.uvProjection.value = it }
+        ) { it, _ -> for (x in c) x.uvProjection.value = it }
         list += vi(
             inspected, "Filtering", "Pixelated look?", "texture.filtering", null, filtering.value, style
-        ) { for (x in c) x.filtering.value = it }
+        ) { it, _ -> for (x in c) x.filtering.value = it }
         list += vi(
             inspected, "Clamping", "For tiled images", "texture.clamping", null, clampMode.value, style
-        ) { for (x in c) x.clampMode.value = it }
+        ) { it, _ -> for (x in c) x.clampMode.value = it }
         // not ready yet
-        link += vi(inspected, "Enable Postprocessing", "", "", null, renderToTexture, style) {
-            for (x in c) x.renderToTexture = it
-        }
+        link += vi(
+            inspected, "Enable Postprocessing", "", "", null, renderToTexture, style
+        ) { it, _ -> for (x in c) x.renderToTexture = it }
     }
 
     override fun save(writer: BaseWriter) {
@@ -260,7 +260,7 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
 
     override fun readString(name: String, value: String) {
         when (name) {
-            "file" -> file = value?.toGlobalFile() ?: InvalidRef
+            "file" -> file = value.toGlobalFile()
             else -> super.readString(name, value)
         }
     }

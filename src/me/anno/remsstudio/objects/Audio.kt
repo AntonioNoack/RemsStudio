@@ -123,7 +123,7 @@ abstract class Audio(var file: FileReference = InvalidRef, parent: Transform? = 
 
     override fun readString(name: String, value: String) {
         when (name) {
-            "src", "file", "path" -> file = value?.toGlobalFile() ?: InvalidRef
+            "src", "file", "path" -> file = value.toGlobalFile()
             else -> super.readString(name, value)
         }
     }

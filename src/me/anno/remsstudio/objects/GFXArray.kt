@@ -7,9 +7,9 @@ import me.anno.language.translation.Dict
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.modes.ArraySelectionMode
 import me.anno.studio.Inspectable
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
 import me.anno.utils.types.Floats.toRadians
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
@@ -146,34 +146,33 @@ class GFXArray(parent: Transform? = null) : GFXTransform(parent) {
 
         val child = getGroup("Per-Child Transform", "For the n-th child, it is applied (n-1) times.", "per-child")
         child += vis(
-            c,
-            "Offset/Child",
-            "Translation from one child to the next",
-            "array.offset",
-            c.map { it.perChildTranslation },
-            style
+            c, "Offset/Child", "Translation from one child to the next",
+            "array.offset", "array.offset", c.map { it.perChildTranslation }, style
         )
         child += vis(
-            c, "Rotation/Child", "Rotation from one child to the next", "array.rotation", c.map { it.perChildRotation },
-            style
+            c, "Rotation/Child", "Rotation from one child to the next",
+            "array.rotation", "array.rotation", c.map { it.perChildRotation }, style
         )
         child += vis(
-            c, "Scale/Child", "Scale factor from one child to the next", "array.scale", c.map { it.perChildScale },
-            style
+            c, "Scale/Child", "Scale factor from one child to the next",
+            "array.scale", "array.scale", c.map { it.perChildScale }, style
         )
         child += vis(
-            c, "Delay/Child", "Temporal delay from one child to the next", "array.delay", c.map { it.perChildDelay },
-            style
+            c, "Delay/Child", "Temporal delay from one child to the next",
+            "array.delay", "array.delay", c.map { it.perChildDelay }, style
         )
 
         val instances = getGroup("Instances", "", "children")
-        instances += vis(c, "Instance Count", "", "array.instanceCount", c.map { it.instanceCount }, style)
-        instances += vi(inspected, "Selection Mode", "", "array.selectionMode", null, selectionMode, style) {
-            for (x in c) x.selectionMode = it
-        }
         instances += vis(
-            c,
-            "Selection Seed",
+            c, "Instance Count", "",
+            "array.instanceCount", "array.instanceCount", c.map { it.instanceCount }, style
+        )
+        instances += vi(
+            c, "Selection Mode", "",
+            "array.selectionMode", "array.selectionMode", null, selectionMode, style
+        ) { it, _ -> for (x in c) x.selectionMode = it }
+        instances += vis(
+            c, "Selection Seed",
             "Only for randomized selection mode; change it, if you have bad luck, or copies of this array, which shall look different",
             "array.selectionSeed",
             c.map { it.selectionSeed },

@@ -78,7 +78,7 @@ abstract class AnimationDriver : Saveable(), Inspectable {
         list += transform.vi(
             inspected, "Frequency", "How fast it's changing", "driver.frequency",
             Type.DOUBLE, frequency, style
-        ) { frequency = it }
+        ) { it, _ -> frequency = it }
     }
 
     fun show(toShow: List<AnimatedProperty<*>>?) {

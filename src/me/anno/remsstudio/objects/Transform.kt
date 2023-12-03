@@ -32,6 +32,8 @@ import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.global2Kf
 import me.anno.studio.Inspectable
 import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.Panel
+import me.anno.ui.Style
+import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.text.LinkPanel
 import me.anno.ui.base.text.UpdatingTextPanel
@@ -39,8 +41,6 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.stacked.Option
 import me.anno.ui.input.TextInput
 import me.anno.ui.input.TextInputML
-import me.anno.ui.Style
-import me.anno.ui.base.components.AxisAlignment
 import me.anno.utils.Color.mulARGB
 import me.anno.utils.structures.Hierarchical
 import me.anno.utils.structures.ValueWithDefault
@@ -296,7 +296,10 @@ open class Transform() : Saveable(),
         )
 
         // kind of color...
-        colorGroup += vi(inspected, "Blend Mode", "", null, blendMode, style) { for (x in c) x.blendMode = it }
+        colorGroup += vi(
+            inspected, "Blend Mode", "How this' element color is combined with what was rendered before that.",
+            null, blendMode, style
+        ) { it, _ -> for (x in c) x.blendMode = it }
 
         // time
         val timeGroup = getGroup("Time", "", "time")
@@ -316,15 +319,18 @@ open class Transform() : Saveable(),
         val editorGroup = getGroup("Editor", "", "editor")
         editorGroup += vi(
             inspected, "Timeline Slot", "< 1 means invisible", Type.INT_PLUS, timelineSlot.value, style
-        ) { for (x in c) x.timelineSlot.value = it }
+        ) { it, _ -> for (x in c) x.timelineSlot.value = it }
         // todo warn of invisible elements somehow!...
         editorGroup += vi(
             inspected, "Visibility", "", null, visibility, style
-        ) { for (x in c) x.visibility = it }
+        ) { it, _ -> for (x in c) x.visibility = it }
 
         if (parent?.acceptsWeight() == true) {
             val psGroup = getGroup("Particle System Child", "", "particles")
-            psGroup += vi(inspected, "Weight", "For particle systems", Type.FLOAT_PLUS, weight, style) {
+            psGroup += vi(
+                inspected, "Weight", "For particle systems",
+                Type.FLOAT_PLUS, weight, style
+            ) { it, _ ->
                 for (x in c) {
                     x.weight = it
                     (x.parent as? ParticleSystem)?.apply {
@@ -697,7 +703,7 @@ open class Transform() : Saveable(),
         inspected: List<Inspectable>,
         title: String, ttt: String, dictPath: String, visibilityKey: String,
         type: Type?, value: V,
-        style: Style, setValue: (V) -> Unit
+        style: Style, setValue: (value: V, mask: Int) -> Unit
     ): Panel {
         return vi(
             inspected,
@@ -709,7 +715,7 @@ open class Transform() : Saveable(),
 
     fun <V> vi(
         inspected: List<Inspectable>,
-        title: String, ttt: String,dictPath: String,visibilityKey: String,
+        title: String, ttt: String, dictPath: String, visibilityKey: String,
         type: Type?, value: ValueWithDefault<V>,
         style: Style
     ) = vi(inspected, Dict[title, "obj.$dictPath"], Dict[ttt, "obj.$dictPath.desc"], visibilityKey, type, value, style)
@@ -718,17 +724,21 @@ open class Transform() : Saveable(),
         inspected: List<Inspectable>,
         title: String, ttt: String, dictPath: String, type: Type?, visibilityKey: String,
         values: List<ValueWithDefault<V>>, style: Style
-    ) = vis(inspected, Dict[title, "obj.$dictPath"], Dict[ttt, "obj.$dictPath.desc"],
-        visibilityKey, type, values, style)
+    ) = vis(
+        inspected, Dict[title, "obj.$dictPath"], Dict[ttt, "obj.$dictPath.desc"],
+        visibilityKey, type, values, style
+    )
 
     fun <V> vi(
         inspected: List<Inspectable>,
-        title: String, ttt: String,visibilityKey: String,
+        title: String, ttt: String, visibilityKey: String,
         type: Type?, value: ValueWithDefault<V>,
         style: Style
     ): Panel {
-        return vi(inspected, title, ttt, visibilityKey, type, value.value, style) {
-            value.value = it
+        return vi(inspected, title, ttt, visibilityKey, type, value.value, style) { newValue, mask ->
+            // todo respect mask
+            // todo assign to all???
+            value.value = newValue
         }
     }
 
@@ -746,8 +756,11 @@ open class Transform() : Saveable(),
         title: String, ttt: String, visibilityKey: String, type: Type?,
         values: List<ValueWithDefault<V>>, style: Style
     ): Panel {
-        return vi(inspected, title, ttt, visibilityKey, type, values[0].value, style) {
-            for (x in values) x.value = it
+        return vi(inspected, title, ttt, visibilityKey, type, values[0].value, style) { newValue, mask ->
+            // todo respect mask
+            for (x in values) {
+                x.value = newValue
+            }
         }
     }
 
@@ -768,7 +781,7 @@ open class Transform() : Saveable(),
         inspected: List<Inspectable>,
         title: String, ttt: String, visibilityKey: String,
         type: Type?, value: V,
-        style: Style, setValue: (V) -> Unit
+        style: Style, setValue: (value: V, mask: Int) -> Unit
     ): Panel {
         return ComponentUIV2.vi(inspected, this, title, ttt, visibilityKey, type, value, style, setValue)
     }
@@ -777,7 +790,7 @@ open class Transform() : Saveable(),
         inspected: List<Inspectable>,
         title: String, ttt: String,
         type: Type?, value: V,
-        style: Style, setValue: (V) -> Unit
+        style: Style, setValue: (value: V, mask: Int) -> Unit
     ): Panel {
         return ComponentUIV2.vi(inspected, this, title, ttt, title, type, value, style, setValue)
     }
@@ -815,7 +828,13 @@ open class Transform() : Saveable(),
      * title, tool tip text, type, start value
      * modifies the AnimatedProperty-Object, so no callback is needed
      * */
-    fun vi(title: String, ttt: String, visibilityKey: String, values: AnimatedProperty<*>, style: Style): IsAnimatedWrapper {
+    fun vi(
+        title: String,
+        ttt: String,
+        visibilityKey: String,
+        values: AnimatedProperty<*>,
+        style: Style
+    ): IsAnimatedWrapper {
         return ComponentUIV2.vi(this, title, ttt, visibilityKey, values, style)
     }
 

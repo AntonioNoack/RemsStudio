@@ -273,16 +273,18 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<MeshTransform>()
 
-        list += vi(inspected, "File", "", null, file, style) { for (x in c) x.file = it }
+        list += vi(
+            inspected, "File", "", null, file, style
+        ) { it, _ -> for (x in c) x.file = it }
 
         list += vi(
             inspected, "Normalize Scale", "A quicker fix than manually finding the correct scale",
             null, normalizeScale, style
-        ) { for (x in c) x.normalizeScale = it }
+        ) { it, _ -> for (x in c) x.normalizeScale = it }
         list += vi(
             inspected, "Center Mesh", "If your mesh is off-center, this corrects it",
             null, centerMesh, style
-        ) { for (x in c) x.centerMesh = it }
+        ) { it, _ -> for (x in c) x.centerMesh = it }
 
         // the list of available animations depends on the model
         // but still, it's like an enum: only a certain set of animations is available
@@ -338,7 +340,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
 
     override fun readString(name: String, value: String) {
         when (name) {
-            "file" -> file = value?.toGlobalFile() ?: InvalidRef
+            "file" -> file = value.toGlobalFile()
             else -> super.readString(name, value)
         }
     }

@@ -5,10 +5,10 @@ import me.anno.language.translation.Dict
 import me.anno.maths.Maths.fract
 import me.anno.remsstudio.objects.Transform
 import me.anno.studio.Inspectable
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.TextInputML
-import me.anno.ui.Style
 import org.joml.Matrix4fArrayList
 import org.joml.Vector4f
 import java.net.URL
@@ -110,7 +110,7 @@ class Timer(parent: Transform? = null) : Text("", parent) {
     ) {
         super.createInspector(inspected, list, style, getGroup)
         list.children.removeIf { it is TextInputML && it.base.placeholder == "Text" }
-        list += vi(inspected, "Format", "ss=sec, mm=min, hh=hours, dd=days, s3=millis", null, format, style) {
+        list += vi(inspected, "Format", "ss=sec, mm=min, hh=hours, dd=days, s3=millis", null, format, style) { it, _ ->
             for (x in inspected) if (x is Timer) x.format = it
         }
     }

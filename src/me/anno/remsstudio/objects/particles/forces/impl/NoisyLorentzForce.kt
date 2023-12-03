@@ -8,9 +8,9 @@ import me.anno.remsstudio.objects.inspectable.InspectableAnimProperty
 import me.anno.remsstudio.objects.particles.Particle
 import me.anno.remsstudio.objects.particles.ParticleState
 import me.anno.studio.Inspectable
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
 import org.joml.Vector3f
 import org.joml.Vector4f
 import java.util.*
@@ -74,7 +74,7 @@ class NoisyLorentzForce : PerParticleForce(
     ) {
         super.createInspector(inspected, list, style, getGroup)
         getGroup("Force Field", "", "forces") +=
-            vi(inspected, "Seed", "For the random component", null, seed, style) {
+            vi(inspected, "Seed", "For the random component", null, seed, style) { it, _ ->
                 for (x in inspected) if (x is NoisyLorentzForce) x.seed = it
             }
     }

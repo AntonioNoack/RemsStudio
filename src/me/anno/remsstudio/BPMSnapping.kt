@@ -31,7 +31,7 @@ object BPMSnapping : Transform() {
             Type.FLOAT_PLUS,
             RemsStudio.timelineSnapping * 60.0,
             style
-        ) {
+        ) { it, _ ->
             project.timelineSnapping = it / 60.0
             RenderSettings.save()
         }
@@ -39,7 +39,7 @@ object BPMSnapping : Transform() {
             inspected, "BPM Offset (Seconds)",
             "If your beat doesn't start at zero seconds.",
             Type.FLOAT, RemsStudio.timelineSnappingOffset, style
-        ) {
+        ) { it, _ ->
             project.timelineSnappingOffset = it
             RenderSettings.save()
         }
@@ -47,7 +47,7 @@ object BPMSnapping : Transform() {
             inspected, "Snapping Radius (Pixels)",
             "For how many pixels left and right snapping should apply.",
             Type.INT_PLUS, RemsStudio.timelineSnappingRadius, style
-        ) {
+        ) { it, _ ->
             project.timelineSnappingRadius = it
             RenderSettings.save()
         }

@@ -4,23 +4,16 @@ import me.anno.animation.LoopingState
 import me.anno.animation.Type
 import me.anno.audio.openal.AudioManager
 import me.anno.audio.openal.AudioTasks
-import me.anno.gpu.texture.ImageToTexture.Companion.imageTimeout
-import me.anno.video.VideoData.Companion.framesPerContainer
-import me.anno.image.svg.SVGMeshCache
-import me.anno.video.VideoCache.getVideoFrame
-import me.anno.video.VideoCache.getVideoFrameWithoutGenerator
 import me.anno.config.DefaultConfig
 import me.anno.ecs.annotations.Range
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.drawing.GFXx3D.draw3D
 import me.anno.gpu.drawing.UVProjection
-import me.anno.gpu.texture.Clamping
-import me.anno.gpu.texture.Filtering
-import me.anno.gpu.texture.Texture2D
-import me.anno.gpu.texture.TextureLib
+import me.anno.gpu.texture.*
+import me.anno.gpu.texture.ImageToTexture.Companion.imageTimeout
 import me.anno.gpu.texture.TextureLib.colorShowTexture
-import me.anno.gpu.texture.TextureCache
+import me.anno.image.svg.SVGMeshCache
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
@@ -47,6 +40,7 @@ import me.anno.remsstudio.objects.models.SpeakerModel.drawSpeakers
 import me.anno.remsstudio.objects.modes.VideoType
 import me.anno.studio.Inspectable
 import me.anno.ui.Panel
+import me.anno.ui.Style
 import me.anno.ui.base.SpyPanel
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
@@ -55,7 +49,6 @@ import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.EnumInput
 import me.anno.ui.input.FloatInput
-import me.anno.ui.Style
 import me.anno.utils.Clipping
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
@@ -69,9 +62,12 @@ import me.anno.video.BlankFrameDetector
 import me.anno.video.ImageSequenceMeta
 import me.anno.video.ImageSequenceMeta.Companion.imageSequenceIdentifier
 import me.anno.video.MissingFrameException
+import me.anno.video.VideoCache.getVideoFrame
+import me.anno.video.VideoCache.getVideoFrameWithoutGenerator
+import me.anno.video.VideoData.Companion.framesPerContainer
+import me.anno.video.ffmpeg.IsFFMPEGOnly.isFFMPEGOnlyExtension
 import me.anno.video.ffmpeg.MediaMetadata
 import me.anno.video.ffmpeg.MediaMetadata.Companion.getMeta
-import me.anno.video.ffmpeg.IsFFMPEGOnly.isFFMPEGOnlyExtension
 import me.anno.video.formats.gpu.GPUFrame
 import org.apache.logging.log4j.LogManager
 import org.joml.Matrix4f
@@ -836,7 +832,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         infoGroup += aud(UpdatingTextPanel(250, style) { "Sample Rate: ${lastMeta?.audioSampleRate} samples/s" })
         infoGroup += aud(UpdatingTextPanel(250, style) { "Sample Count: ${lastMeta?.audioSampleCount} samples" })
 
-        list += vi(inspected, "File Location", "Source file of this video", null, file, style) { newFile ->
+        list += vi(inspected, "File Location", "Source file of this video", null, file, style) { newFile, _ ->
             for (x in c) x.file = newFile
         }
 
@@ -851,23 +847,23 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
             vi(
                 inspected, "UV-Projection", "Can be used for 360°-Videos",
                 null, uvProjection.value, style
-            ) { for (x in c) x.uvProjection.value = it })
+            ) { it, _ -> for (x in c) x.uvProjection.value = it })
         uvMap += img(
             vi(
                 inspected, "Filtering", "Pixelated look?", "texture.filtering",
                 null, filtering.value, style
-            ) { for (x in c) x.filtering.value = it })
+            ) { it, _ -> for (x in c) x.filtering.value = it })
         uvMap += img(
             vi(
                 inspected, "Clamping", "For tiled images", "texture.clamping",
                 null, clampMode.value, style
-            ) { for (x in c) x.clampMode.value = it })
+            ) { it, _ -> for (x in c) x.clampMode.value = it })
 
         val time = getGroup("Time", "", "time")
         time += vi(
             inspected, "Looping Type", "Whether to repeat the song/video", "video.loopingType",
             null, isLooping.value, style
-        ) {
+        ) { it, _ ->
             for (x in c) x.isLooping.value = it
             AudioManager.requestUpdate()
         }
@@ -918,7 +914,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
 
         val audio = getGroup("Audio", "", "audio")
         audio += aud(vis(c, "Amplitude", "How loud it is", "audio.amplitude", c.map { it.amplitude }, style))
-        audio += aud(vi(inspected, "Is 3D Sound", "Sound becomes directional", "audio.3d", null, is3D, style) {
+        audio += aud(vi(inspected, "Is 3D Sound", "Sound becomes directional", "audio.3d", null, is3D, style) { it, _ ->
             for (x in c) x.is3D = it
             AudioManager.requestUpdate()
         })

@@ -327,9 +327,9 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<MaskLayer>()
         val mask = getGroup("Mask Settings", "Masks are multipurpose objects", "mask")
-        mask += vi(inspected, "Type", "Specifies what kind of mask it is", null, type, style) {
-            for (x in c) x.type = it
-        }
+        mask += vi(
+            inspected, "Type", "Specifies what kind of mask it is", null, type, style
+        ) { it, _ -> for (x in c) x.type = it }
 
         fun typeSpecific(panel: Panel, isVisible: (MaskType) -> Boolean) {
             mask += panel
@@ -349,7 +349,7 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
         mask += vi(
             inspected, "Invert Mask", "Changes transparency with opacity",
             null, isInverted, style
-        ) { for (x in c) x.isInverted = it }
+        ) { it, _ -> for (x in c) x.isInverted = it }
         mask += vis(
             c, "Use Color / Transparency", "Should the color influence the masked?",
             c.map { it.useMaskColor },
@@ -370,19 +370,21 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
         mask += vi(
             inspected, "Make Huge", "Scales the mask, without affecting the children",
             null, isFullscreen, style
-        ) { for (x in c) x.isFullscreen = it }
+        ) { it, _ -> for (x in c) x.isFullscreen = it }
         mask += vi(
             inspected, "Use MSAA(!)",
             "MSAA is experimental, may not always work",
             null, useExperimentalMSAA, style
-        ) { for (x in c) x.useExperimentalMSAA = it }
+        ) { it, _ -> for (x in c) x.useExperimentalMSAA = it }
 
         val greenScreen =
             getGroup("Green Screen", "Type needs to be green-screen; cuts out a specific color", "greenScreen")
         greenScreen += vis(c, "Similarity", "", c.map { it.greenScreenSimilarity }, style)
         greenScreen += vis(c, "Smoothness", "", c.map { it.greenScreenSmoothness }, style)
         greenScreen += vis(c, "Spill Value", "", c.map { it.greenScreenSpillValue }, style)
-        greenScreen += vi(inspected, "Invert Mask 2", "", null, isInverted2, style) { for (x in c) x.isInverted2 = it }
+        greenScreen += vi(
+            inspected, "Invert Mask 2", "", null, isInverted2, style
+        ) { it, _ -> for (x in c) x.isInverted2 = it }
 
         val transition = getGroup("Transition", "Type needs to be transition", "transition")
         transition += vis(c, "Progress", "", c.map { it.transitionProgress }, style)
@@ -391,11 +393,11 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
         editor += vi(
             inspected, "Show Mask", "for debugging purposes; shows the stencil",
             null, showMask, style
-        ) { for (x in c) x.showMask = it }
+        ) { it, _ -> for (x in c) x.showMask = it }
         editor += vi(
             inspected, "Show Masked", "for debugging purposes",
             null, showMasked, style
-        ) { for (x in c) x.showMasked = it }
+        ) { it, _ -> for (x in c) x.showMasked = it }
 
         list += SpyPanel(style) {
             greenScreen.isVisible = type == MaskType.GREEN_SCREEN

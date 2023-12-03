@@ -374,7 +374,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
             inspected, "Simulation Step",
             "Larger values are faster, while smaller values are more accurate for forces",
             Type.DOUBLE, simulationStep, style
-        ) {
+        ) { it, _ ->
             if (it > 1e-9) for (x in c) x.simulationStep = it
             clearCache()
         }
@@ -386,7 +386,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
             .setChangeListener { for (x in c) x.showChildren = it }
             .setIsSelectedListener { show(inspected.filterIsInstance<Transform>(), null) }
 
-        general += vi(inspected, "Seed", "The seed for all randomness", null, seed, style) {
+        general += vi(inspected, "Seed", "The seed for all randomness", null, seed, style) { it, _ ->
             for (x in c) x.seed = it
             clearCache()
         }

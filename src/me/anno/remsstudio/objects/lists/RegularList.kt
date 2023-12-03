@@ -9,9 +9,9 @@ import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.modes.ArraySelectionMode
 import me.anno.studio.Inspectable
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
 import me.anno.utils.types.Floats.toRadians
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
@@ -169,7 +169,7 @@ class RegularList(parent: Transform? = null) : GFXTransform(parent) {
         instances += vi(
             inspected, "Selection Mode", "", "array.selectionMode",
             null, selectionMode, style
-        ) { for (x in c) selectionMode = it }
+        ) { it, _ -> for (x in c) selectionMode = it }
         instances += vis(
             c,
             "Selection Seed",

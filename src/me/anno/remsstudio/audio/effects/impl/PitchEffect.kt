@@ -10,9 +10,9 @@ import me.anno.remsstudio.audio.effects.SoundEffect
 import me.anno.remsstudio.audio.effects.Time
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
 import me.anno.utils.types.Casting.castToFloat2
 import kotlin.math.abs
 
@@ -38,12 +38,12 @@ class PitchEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
             inspected,
             "Inverse Speed", "Making something play faster, increases the pitch; this is undone by this node",
             null, inverseSpeed, style
-        ) { inverseSpeed = it }
+        ) { it, _ -> inverseSpeed = it }
         list += audio.vi(
             inspected,
             "Value", "Pitch height, if Inverse Speed = false",
             pitchType, pitch, style
-        ) { pitch = it }
+        ) { it, _ -> pitch = it }
     }
 
     var inverseSpeed = false
