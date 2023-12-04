@@ -4,6 +4,7 @@ import me.anno.config.DefaultConfig
 import me.anno.gpu.drawing.UVProjection
 import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.utils.StringMap
+import me.anno.remsstudio.gpu.TexFiltering
 import me.anno.remsstudio.objects.*
 import me.anno.remsstudio.objects.attractors.EffectColoring
 import me.anno.remsstudio.objects.attractors.EffectMorphing
@@ -28,8 +29,7 @@ object RemsConfig {
             this["ffmpeg.path", getReference(OS.downloads, "lib\\ffmpeg\\bin\\ffmpeg.exe")]
 
             this["lastUsed.fonts.count", 5]
-            this["default.video.nearest", false]
-            this["default.image.nearest", false]
+            this["default.video.filtering", TexFiltering.CUBIC]
 
             this["format.svg.stepsPerDegree", 0.1f]
             this["objects.polygon.maxEdges", 1000]

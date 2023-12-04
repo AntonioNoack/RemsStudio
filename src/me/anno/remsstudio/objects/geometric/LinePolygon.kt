@@ -1,25 +1,16 @@
 package me.anno.remsstudio.objects.geometric
 
-import me.anno.cache.CacheSection
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.GFXx3D
 import me.anno.gpu.drawing.UVProjection
-import me.anno.gpu.shader.BaseShader
-import me.anno.gpu.shader.GLSLType
 import me.anno.gpu.shader.Shader
-import me.anno.gpu.shader.ShaderLib
-import me.anno.gpu.shader.ShaderLib.y3D
-import me.anno.gpu.shader.builder.Variable
-import me.anno.gpu.shader.builder.VariableMode
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.maths.Maths
 import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.remsstudio.gpu.ShaderLibV2.getForceFieldColor
-import me.anno.remsstudio.gpu.ShaderLibV2.getTextureLib
-import me.anno.remsstudio.gpu.ShaderLibV2.hasForceFieldColor
+import me.anno.remsstudio.gpu.ShaderLibV2.linePolygonShader
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.attractors.EffectColoring
@@ -208,7 +199,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
             // todo use correct forward direction
             val forward = Vector3f(0f, 0f, 1f)
 
-            val shader = shader.value
+            val shader = linePolygonShader.value
 
             fun drawSegment(i0: Float, i1: Float, alpha: Float) {
                 val p0 = getPosition(i0)
@@ -282,40 +273,4 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
     private fun getPosition(m0: Matrix4f) = m0.getTranslation(Vector3f())
 
     override fun drawChildrenAutomatically(): Boolean = false
-
-    companion object {
-        val cache = CacheSection("LineCache")
-        val shader = BaseShader(
-            // todo uniforms + attributes to variables
-            "linePolygon", listOf(
-                Variable(GLSLType.V3F, "coords", VariableMode.ATTR),
-                Variable(GLSLType.V2F, "uvs", VariableMode.ATTR),
-                Variable(GLSLType.M4x4, "transform"),
-                Variable(GLSLType.V4F, "tiling"),
-                Variable(GLSLType.V3F, "pos0"), Variable(GLSLType.V3F, "pos1"),
-                Variable(GLSLType.V3F, "pos2"), Variable(GLSLType.V3F, "pos3"),
-                Variable(GLSLType.V4F, "col0"), Variable(GLSLType.V4F, "col1"),
-                Variable(GLSLType.V1F, "zDistance", VariableMode.OUT)
-            ), "" +
-                    "void main(){\n" +
-                    "   vec2 att = coords.xy*0.5+0.5;\n" +
-                    "   vec3 localPosition = mix(mix(pos0, pos1, att.x), mix(pos2, pos3, att.x), att.y);\n" +
-                    "   gl_Position = transform * vec4(localPosition, 1.0);\n" +
-                    ShaderLib.flatNormal +
-                    "   uv = uvs;\n" +
-                    "   uvw = coords;\n" +
-                    "   colX = mix(col0, col1, att.y);\n" +
-                    "}", y3D + Variable(GLSLType.V4F, "colX"), listOf(), "" +
-                    getTextureLib +
-                    getForceFieldColor +
-                    "void main(){\n" +
-                    "   vec4 color = colX;\n" +
-                    "   if($hasForceFieldColor) color *= getForceFieldColor(finalPosition);\n" +
-                    // does work, just the error should be cleaner...
-                    // "   gl_FragDepth += 0.01 * random(uv);\n" +
-                    "   gl_FragColor = color;\n" +
-                    "}"
-        )
-    }
-
 }

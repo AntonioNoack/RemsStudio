@@ -9,8 +9,11 @@ import me.anno.ecs.annotations.Range
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.drawing.UVProjection
-import me.anno.gpu.texture.*
+import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.ImageToTexture.Companion.imageTimeout
+import me.anno.gpu.texture.Texture2D
+import me.anno.gpu.texture.TextureCache
+import me.anno.gpu.texture.TextureLib
 import me.anno.gpu.texture.TextureLib.colorShowTexture
 import me.anno.image.svg.SVGMeshCache
 import me.anno.io.ISaveable
@@ -30,10 +33,11 @@ import me.anno.remsstudio.RemsStudio.targetHeight
 import me.anno.remsstudio.RemsStudio.targetWidth
 import me.anno.remsstudio.Scene
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.remsstudio.gpu.TexFiltering
 import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.remsstudio.gpu.GFXx3Dv2.draw3DVideo
 import me.anno.remsstudio.gpu.GFXxSVGv2
+import me.anno.remsstudio.gpu.TexFiltering
+import me.anno.remsstudio.gpu.TexFiltering.Companion.getFiltering
 import me.anno.remsstudio.objects.lists.Element
 import me.anno.remsstudio.objects.lists.SplittableElement
 import me.anno.remsstudio.objects.models.SpeakerModel.drawSpeakers
@@ -130,7 +134,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
     val clampMode = ValueWithDefault(Clamping.MIRRORED_REPEAT)
 
     // filtering
-    val filtering = ValueWithDefaultFunc { DefaultConfig.getFiltering("default.video.nearest", TexFiltering.CUBIC) }
+    val filtering = ValueWithDefaultFunc { DefaultConfig.getFiltering("default.video.filtering", TexFiltering.CUBIC) }
 
     // resolution
     val videoScale = ValueWithDefaultFunc { DefaultConfig["default.video.scale", 1] }
@@ -410,7 +414,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
             val isVisible = Clipping.isPlaneVisible(stack, meta.videoWidth * scale, meta.videoHeight * scale)
             if (time >= 0.0 && (isLooping != LoopingState.PLAY_ONCE || time <= duration) && isVisible) {
 
-                // use full fps when rendering to correctly render at max fps with time dilation
+                // use the full fps when rendering to correctly render at max fps with time dilation
                 // issues arise, when multiple frames should be interpolated together into one
                 // at this time, we chose the center frame only.
                 val videoFPS = if (isFinalRendering) sourceFPS else min(sourceFPS, editorVideoFPS.value.toDouble())
@@ -536,6 +540,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 val texture = getVideoFrame(file, 1, 0, 1, 1.0, imageTimeout, true)
                 if (texture == null || !texture.isCreated) onMissingImageOrFrame(0)
                 else {
+                    lastW = texture.width
+                    lastH = texture.height
                     draw3DVideo(
                         this, time, stack, texture, color,
                         filtering.value, clampMode.value, tiling, uvProjection.value
@@ -552,7 +558,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                     lastH = texture.height
                     draw3DVideo(
                         this, time, stack, texture, color,
-                        this.filtering.value, this.clampMode.value, tiling, uvProjection.value
+                        filtering.value, clampMode.value, tiling, uvProjection.value
                     )
                 }
             }

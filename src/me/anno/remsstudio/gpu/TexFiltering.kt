@@ -1,7 +1,9 @@
 package me.anno.remsstudio.gpu
 
+import me.anno.config.DefaultConfig
 import me.anno.gpu.texture.Filtering
 import me.anno.language.translation.NameDesc
+import java.util.*
 
 /**
  * high-level texture filtering used in Rem's Studio
@@ -18,5 +20,26 @@ enum class TexFiltering(private val baseIsNearest: Boolean, val id: Int, val nam
 
     fun find(value: Int): TexFiltering {
         return entries.firstOrNull { it.id == value } ?: this
+    }
+
+    companion object {
+        fun DefaultConfig.getFiltering(key: String, default: TexFiltering): TexFiltering {
+            return when (val value = this[key]) {
+                is Boolean -> if (value) TexFiltering.NEAREST else TexFiltering.LINEAR
+                is Int -> default.find(value)
+                is String -> {
+                    when (value.lowercase(Locale.ENGLISH)) {
+                        "true", "t", "nearest" -> TexFiltering.NEAREST
+                        "false", "f", "linear" -> TexFiltering.LINEAR
+                        "cubic", "bicubic" -> TexFiltering.CUBIC
+                        else -> default
+                    }
+                }
+                else -> {
+                    set(key, default)
+                    default
+                }
+            }
+        }
     }
 }

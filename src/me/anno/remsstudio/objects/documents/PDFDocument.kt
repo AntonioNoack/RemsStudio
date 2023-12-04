@@ -3,12 +3,12 @@ package me.anno.remsstudio.objects.documents
 import me.anno.animation.Type
 import me.anno.cache.instances.PDFCache
 import me.anno.cache.instances.PDFCache.getTexture
+import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.GFX.viewportHeight
 import me.anno.gpu.GFX.viewportWidth
 import me.anno.gpu.drawing.UVProjection
 import me.anno.gpu.texture.Clamping
-import me.anno.remsstudio.gpu.TexFiltering
 import me.anno.gpu.texture.TextureLib.colorShowTexture
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
@@ -16,6 +16,8 @@ import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.gpu.GFXx3Dv2
+import me.anno.remsstudio.gpu.TexFiltering
+import me.anno.remsstudio.gpu.TexFiltering.Companion.getFiltering
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.documents.SiteSelection.parseSites
@@ -27,6 +29,8 @@ import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.utils.Clipping
 import me.anno.utils.files.LocalFile.toGlobalFile
+import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
+import me.anno.utils.structures.ValueWithDefaultFunc
 import me.anno.utils.structures.lists.Lists.median
 import me.anno.utils.types.Floats.toRadians
 import me.anno.utils.types.Strings.isBlank2
@@ -97,6 +101,7 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
     }
 
     fun getQuality() = if (isFinalRendering) renderQuality else editorQuality
+    val filtering = ValueWithDefaultFunc { DefaultConfig.getFiltering("default.video.filtering", TexFiltering.CUBIC) }
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
@@ -150,7 +155,7 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
                         } else {
                             GFXx3Dv2.draw3DVideo(
                                 this, time, stack, texture, color,
-                                TexFiltering.LINEAR, Clamping.CLAMP, null, UVProjection.Planar
+                                filtering.value, Clamping.CLAMP, null, UVProjection.Planar
                             )
                         }
                     }
@@ -198,6 +203,10 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
             inspected, "Render Quality", "Factor for resolution; applied when rendering",
             Type.FLOAT_PLUS, renderQuality, style
         ) { it, _ -> for (x in c) x.renderQuality = it }
+        doc += vi(
+            inspected, "Filtering", "Pixelated look?", "texture.filtering",
+            null, filtering.value, style
+        ) { it, _ -> for (x in c) x.filtering.value = it }
     }
 
     override fun save(writer: BaseWriter) {
@@ -208,6 +217,7 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
         writer.writeObject(this, "direction", direction)
         writer.writeFloat("editorQuality", editorQuality)
         writer.writeFloat("renderQuality", renderQuality)
+        writer.writeMaybe(this, "filtering", filtering)
     }
 
     override fun readFloat(name: String, value: Float) {
@@ -215,6 +225,13 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
             "editorQuality" -> editorQuality = value
             "renderQuality" -> renderQuality = value
             else -> super.readFloat(name, value)
+        }
+    }
+
+    override fun readInt(name: String, value: Int) {
+        when (name) {
+            "filtering" -> filtering.value = filtering.value.find(value)
+            else -> super.readInt(name, value)
         }
     }
 

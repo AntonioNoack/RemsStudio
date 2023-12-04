@@ -484,4 +484,36 @@ object ShaderLibV2 {
 
     lateinit var shader3DSVG: BaseShader
 
+    val linePolygonShader = BaseShader(
+        // todo uniforms + attributes to variables
+        "linePolygon", listOf(
+            Variable(GLSLType.V3F, "coords", VariableMode.ATTR),
+            Variable(GLSLType.V2F, "uvs", VariableMode.ATTR),
+            Variable(GLSLType.M4x4, "transform"),
+            Variable(GLSLType.V4F, "tiling"),
+            Variable(GLSLType.V3F, "pos0"), Variable(GLSLType.V3F, "pos1"),
+            Variable(GLSLType.V3F, "pos2"), Variable(GLSLType.V3F, "pos3"),
+            Variable(GLSLType.V4F, "col0"), Variable(GLSLType.V4F, "col1"),
+            Variable(GLSLType.V1F, "zDistance", VariableMode.OUT)
+        ), "" +
+                "void main(){\n" +
+                "   vec2 att = coords.xy*0.5+0.5;\n" +
+                "   vec3 localPosition = mix(mix(pos0, pos1, att.x), mix(pos2, pos3, att.x), att.y);\n" +
+                "   gl_Position = transform * vec4(localPosition, 1.0);\n" +
+                ShaderLib.flatNormal +
+                "   uv = uvs;\n" +
+                "   uvw = coords;\n" +
+                "   colX = mix(col0, col1, att.y);\n" +
+                "}", ShaderLib.y3D + Variable(GLSLType.V4F, "colX"), listOf(), "" +
+                getTextureLib +
+                getForceFieldColor +
+                "void main(){\n" +
+                "   vec4 color = colX;\n" +
+                "   if($hasForceFieldColor) color *= getForceFieldColor(finalPosition);\n" +
+                // does work, just the error should be cleaner...
+                // "   gl_FragDepth += 0.01 * random(uv);\n" +
+                "   gl_FragColor = color;\n" +
+                "}"
+    )
+
 }
