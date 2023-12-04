@@ -10,7 +10,7 @@ import me.anno.gpu.shader.ShaderLib.coordsUVVertexShader
 import me.anno.gpu.shader.ShaderLib.createShader
 import me.anno.gpu.shader.ShaderLib.uvList
 import me.anno.gpu.texture.Clamping
-import me.anno.gpu.texture.GPUFiltering
+import me.anno.gpu.texture.Filtering
 import me.anno.gpu.texture.Texture2D
 
 object OpticalFlow {
@@ -30,8 +30,8 @@ object OpticalFlow {
             flow.v2f("scale", 1f, 1f)
             flow.v2f("offset", 1f / w, 1f / h)
             flow.v1f("lambda", lambda)
-            t0.bind(0, GPUFiltering.LINEAR, Clamping.CLAMP)
-            t1.bind(1, GPUFiltering.LINEAR, Clamping.CLAMP)
+            t0.bind(0, Filtering.LINEAR, Clamping.CLAMP)
+            t1.bind(1, Filtering.LINEAR, Clamping.CLAMP)
             flat01.draw(flow)
         }
 
@@ -45,14 +45,14 @@ object OpticalFlow {
 
         val blurH = FBStack["blurH", w, h, 4, false, 1, DepthBufferType.NONE]
         useFrame(blurH, Renderer.colorRenderer) {
-            flowT.bindTexture0(0, GPUFiltering.TRULY_NEAREST, Clamping.CLAMP)
+            flowT.bindTexture0(0, Filtering.TRULY_NEAREST, Clamping.CLAMP)
             blur.v1f("horizontalPass", 1f)
             flat01.draw(blur)
         }
 
         val blurV = FBStack["blurV", w, h, 4, false, 1, DepthBufferType.NONE]
         useFrame(blurV, Renderer.colorRenderer) {
-            blurH.bindTexture0(0, GPUFiltering.LINEAR, Clamping.CLAMP)
+            blurH.bindTexture0(0, Filtering.LINEAR, Clamping.CLAMP)
             blur.v1f("horizontalPass", 0f)
             flat01.draw(blur)
         }
@@ -65,8 +65,8 @@ object OpticalFlow {
             repos.use()
             repos.v2f("amt", displacement * 0.25f)
 
-            t0.bind(0, GPUFiltering.LINEAR, Clamping.CLAMP)
-            blurV.bindTextures(1, GPUFiltering.LINEAR, Clamping.CLAMP)
+            t0.bind(0, Filtering.LINEAR, Clamping.CLAMP)
+            blurV.bindTextures(1, Filtering.LINEAR, Clamping.CLAMP)
             flat01.draw(repos)
 
         }

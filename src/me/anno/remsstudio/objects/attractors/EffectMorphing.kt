@@ -7,14 +7,17 @@ import me.anno.language.translation.Dict
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
 import me.anno.studio.Inspectable
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
 
 class EffectMorphing : Transform() {
 
     var lastInfluence = 0f
-    val influence = AnimatedProperty.float(1f)
+
+    val zooming = AnimatedProperty.float(1f)
+    val motion = AnimatedProperty.vec2()
+    val swirl = AnimatedProperty.float()
     val sharpness = AnimatedProperty.float(20f)
 
     override val className get() = "EffectMorphing"
@@ -30,20 +33,26 @@ class EffectMorphing : Transform() {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<EffectMorphing>()
         val fx = getGroup("Effect", "", "effects")
-        fx += vis(c, "Strength", "The effective scale", c.map { it.influence }, style)
+        fx += vis(c, "Strength", "The effective scale", c.map { it.zooming }, style)
+        fx += vis(c, "Motion", "Moves pixels left/right/up/down", c.map { it.motion }, style)
+        fx += vis(c, "Swirl", "Swirls pixels around the center", c.map { it.swirl }, style)
         fx += vis(c, "Sharpness", "How sharp the lens effect is", c.map { it.sharpness }, style)
     }
 
     override fun save(writer: BaseWriter) {
         super.save(writer)
-        writer.writeObject(this, "influence", influence)
+        writer.writeObject(this, "influence", zooming)
+        writer.writeObject(this, "motion", motion)
+        writer.writeObject(this, "swirl", swirl)
         writer.writeObject(this, "sharpness", sharpness)
     }
 
     override fun readObject(name: String, value: ISaveable?) {
         when (name) {
-            "influence" -> influence.copyFrom(value)
+            "influence" -> zooming.copyFrom(value)
             "sharpness" -> sharpness.copyFrom(value)
+            "motion" -> motion.copyFrom(value)
+            "swirl" -> swirl.copyFrom(value)
             else -> super.readObject(name, value)
         }
     }

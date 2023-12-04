@@ -8,7 +8,6 @@ import me.anno.config.DefaultConfig
 import me.anno.ecs.annotations.Range
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.isFinalRendering
-import me.anno.gpu.drawing.GFXx3D.draw3D
 import me.anno.gpu.drawing.UVProjection
 import me.anno.gpu.texture.*
 import me.anno.gpu.texture.ImageToTexture.Companion.imageTimeout
@@ -31,6 +30,7 @@ import me.anno.remsstudio.RemsStudio.targetHeight
 import me.anno.remsstudio.RemsStudio.targetWidth
 import me.anno.remsstudio.Scene
 import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.gpu.TexFiltering
 import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.remsstudio.gpu.GFXx3Dv2.draw3DVideo
 import me.anno.remsstudio.gpu.GFXxSVGv2
@@ -130,7 +130,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
     val clampMode = ValueWithDefault(Clamping.MIRRORED_REPEAT)
 
     // filtering
-    val filtering = ValueWithDefaultFunc { DefaultConfig.getFiltering("default.video.nearest", Filtering.CUBIC) }
+    val filtering = ValueWithDefaultFunc { DefaultConfig.getFiltering("default.video.nearest", TexFiltering.CUBIC) }
 
     // resolution
     val videoScale = ValueWithDefaultFunc { DefaultConfig["default.video.scale", 1] }
@@ -320,10 +320,10 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         }
 
         if (!wasDrawn && !isFinalRendering) {
-            draw3D(
+            GFXx3Dv2.draw3D(
                 stack, colorShowTexture, 16, 9,
                 Vector4f(0.5f, 0.5f, 0.5f, 1f).mul(color),
-                Filtering.NEAREST, Clamping.REPEAT, tiling16x9, uvProjection.value
+                TexFiltering.NEAREST, Clamping.REPEAT, tiling16x9, uvProjection.value
             )
         }
 
@@ -465,10 +465,10 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         }
 
         if (!wasDrawn) {
-            draw3D(
+            GFXx3Dv2.draw3D(
                 stack, colorShowTexture, 16, 9,
                 Vector4f(0.5f, 0.5f, 0.5f, 1f).mul(color),
-                Filtering.NEAREST, Clamping.REPEAT, tiling16x9, uvProjection.value
+                TexFiltering.NEAREST, Clamping.REPEAT, tiling16x9, uvProjection.value
             )
         }
     }
@@ -526,7 +526,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                     GFXxSVGv2.draw3DSVG(
                         this, time,
                         stack, bufferData, TextureLib.whiteTexture,
-                        color, Filtering.NEAREST, clampMode.value, tiling[time]
+                        color, TexFiltering.NEAREST, clampMode.value, tiling[time]
                     )
                 }
             }

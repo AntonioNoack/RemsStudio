@@ -322,7 +322,7 @@ object TextRenderer {
 
                     firstTimeDrawing = false
 
-                } else GFXx3D.drawOutlinedText(stack, offset, scale, texture, hasUVAttractors)
+                } else GFXx3Dv2.drawOutlinedText(stack, offset, scale, texture, hasUVAttractors)
 
             } else if (sdf?.isValid != true) {
 
@@ -355,7 +355,7 @@ object TextRenderer {
                 GFXx3Dv2.draw3DText(element, time, offset, stack, buffer, color)
                 firstTimeDrawing = false
             } else {
-                GFXx3D.draw3DTextWithOffset(buffer, offset)
+                GFXx3Dv2.draw3DTextWithOffset(buffer, offset)
             }
         }
 

@@ -9,7 +9,7 @@ import me.anno.gpu.framebuffer.DepthBufferType
 import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.texture.Clamping
-import me.anno.gpu.texture.Filtering
+import me.anno.remsstudio.gpu.TexFiltering
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
@@ -58,7 +58,7 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
     val clampMode = ValueWithDefault(Clamping.MIRRORED_REPEAT)
 
     // filtering
-    val filtering = ValueWithDefaultFunc { DefaultConfig.getFiltering("default.video.nearest", Filtering.LINEAR) }
+    val filtering = ValueWithDefaultFunc { DefaultConfig.getFiltering("default.video.nearest", TexFiltering.LINEAR) }
 
     var resolution = AnimatedProperty.vec2(Vector2f(1920f, 1080f))
 

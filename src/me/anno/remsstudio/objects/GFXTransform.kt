@@ -1,13 +1,12 @@
 package me.anno.remsstudio.objects
 
-import me.anno.gpu.drawing.GFXx3D.uploadAttractors0
 import me.anno.gpu.shader.Shader
-import me.anno.gpu.shader.ShaderLib.colorForceFieldBuffer
-import me.anno.gpu.shader.ShaderLib.maxColorForceFields
-import me.anno.gpu.shader.ShaderLib.uvForceFieldBuffer
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.gpu.ShaderLibV2.colorForceFieldBuffer
+import me.anno.remsstudio.gpu.ShaderLibV2.maxColorForceFields
+import me.anno.remsstudio.gpu.ShaderLibV2.uvForceFieldBuffer
 import me.anno.remsstudio.objects.attractors.EffectColoring
 import me.anno.remsstudio.objects.attractors.EffectMorphing
 import me.anno.studio.Inspectable
@@ -78,33 +77,33 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
             return
         }
 
-        var attractors = children
+        var morphings = children
             .filterIsInstance<EffectMorphing>()
 
-        for (index in attractors.indices) {
-            val attr = attractors[index]
+        for (index in morphings.indices) {
+            val attr = morphings[index]
             attr.lastLocalTime = attr.getLocalTime(time)
-            attr.lastInfluence = attr.influence[attr.lastLocalTime]
+            attr.lastInfluence = attr.zooming[attr.lastLocalTime]
         }
 
-        attractors = attractors.filter {
+        morphings = morphings.filter {
             it.lastInfluence != 0f
         }
 
-        if (attractors.size > maxColorForceFields)
-            attractors = attractors
+        if (morphings.size > maxColorForceFields)
+            morphings = morphings
                 .sortedByDescending { it.lastInfluence }
                 .subList(0, maxColorForceFields)
 
-        shader.v1i("forceFieldUVCount", attractors.size)
-        if (attractors.isNotEmpty()) {
+        shader.v1i("forceFieldUVCount", morphings.size)
+        if (morphings.isNotEmpty()) {
             val loc1 = shader["forceFieldUVs"]
             val buffer = uvForceFieldBuffer
             if (loc1 > -1) {
                 buffer.position(0)
-                for (attractor in attractors) {
-                    val localTime = attractor.lastLocalTime
-                    val position = transformLocally(attractor.position[localTime], time)
+                for (morphing in morphings) {
+                    val localTime = morphing.lastLocalTime
+                    val position = transformLocally(morphing.position[localTime], time)
                     buffer.put(position.x * 0.5f + 0.5f)
                     buffer.put(position.y * 0.5f + 0.5f)
                     buffer.put(position.z)
@@ -117,11 +116,11 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                 buffer.position(0)
                 val sx = if (this is Video) 1f / lastW else 1f
                 val sy = if (this is Video) 1f / lastH else 1f
-                for (attractor in attractors) {
-                    val localTime = attractor.lastLocalTime
-                    val weight = attractor.lastInfluence
-                    val sharpness = attractor.sharpness[localTime]
-                    val scale = attractor.scale[localTime]
+                for (morphing in morphings) {
+                    val localTime = morphing.lastLocalTime
+                    val weight = morphing.lastInfluence
+                    val sharpness = morphing.sharpness[localTime]
+                    val scale = morphing.scale[localTime]
                     buffer.put(sqrt(sy / sx) * weight * scale.z / scale.x)
                     buffer.put(sqrt(sx / sy) * weight * scale.z / scale.y)
                     buffer.put(10f / (scale.z * weight * weight))
@@ -204,6 +203,11 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
     companion object {
         fun uploadAttractors(transform: GFXTransform?, shader: Shader, time: Double) {
             transform?.uploadAttractors(shader, time) ?: uploadAttractors0(shader)
+        }
+
+        fun uploadAttractors0(shader: Shader) {
+            shader.v1i("forceFieldUVCount", 0)
+            shader.v1i("forceFieldUVCount", 0)
         }
     }
 

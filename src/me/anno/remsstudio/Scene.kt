@@ -25,7 +25,6 @@ import me.anno.gpu.shader.ShaderFuncLib.acesToneMapping
 import me.anno.gpu.shader.ShaderFuncLib.randomGLSL
 import me.anno.gpu.shader.ShaderFuncLib.reinhardToneMapping
 import me.anno.gpu.shader.ShaderFuncLib.uchimuraToneMapping
-import me.anno.gpu.shader.ShaderLib.ascColorDecisionList
 import me.anno.gpu.shader.ShaderLib.brightness
 import me.anno.gpu.shader.ShaderLib.coordsUVVertexShader
 import me.anno.gpu.shader.ShaderLib.createShader
@@ -35,7 +34,7 @@ import me.anno.gpu.shader.builder.VariableMode
 import me.anno.gpu.shader.effects.GaussianBlur
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.texture.Clamping
-import me.anno.gpu.texture.GPUFiltering
+import me.anno.gpu.texture.Filtering
 import me.anno.gpu.texture.Texture3D
 import me.anno.gpu.texture.TextureCache.getLUT
 import me.anno.maths.Maths.PIf
@@ -43,6 +42,7 @@ import me.anno.remsstudio.RemsStudio.currentCamera
 import me.anno.remsstudio.RemsStudio.gfxSettings
 import me.anno.remsstudio.RemsStudio.nullCamera
 import me.anno.remsstudio.Selection.selectedTransforms
+import me.anno.remsstudio.gpu.ShaderLibV2.colorGrading
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Camera.Companion.DEFAULT_VIGNETTE_STRENGTH
 import me.anno.remsstudio.objects.Transform
@@ -109,7 +109,7 @@ object Scene {
                     acesToneMapping +
                     uchimuraToneMapping +
                     brightness +
-                    ascColorDecisionList +
+                    colorGrading +
                     "vec2 distort(vec2 uv, vec2 nuv, vec2 duv){" +
                     "   vec2 nuv2 = nuv + duv;\n" +
                     "   float r2 = dot(nuv2,nuv2), r4 = r2*r2;\n" +
@@ -185,7 +185,7 @@ object Scene {
         name: String,
         previous: IFramebuffer,
         offset: Int,
-        nearest: GPUFiltering,
+        nearest: Filtering,
         samples: Int?
     ): IFramebuffer {
         val next = FBStack[name, previous.width, previous.height, 4, usesFPBuffers, samples
@@ -384,7 +384,7 @@ object Scene {
         lut: Texture3D
     ) {
 
-        val lutBuffer = getNextBuffer("Scene-LUT", buffer, 0, GPUFiltering.LINEAR, 1)
+        val lutBuffer = getNextBuffer("Scene-LUT", buffer, 0, Filtering.LINEAR, 1)
         useFrame(lutBuffer) {
             drawColors(isFakeColorRendering, camera, cameraTime, w, h, flipY)
         }
@@ -395,8 +395,8 @@ object Scene {
          * */
         val lutShader = lutShader.value
         lutShader.use()
-        lut.bind(1, GPUFiltering.LINEAR, Clamping.CLAMP)
-        lutBuffer.bindTextures(0, GPUFiltering.TRULY_NEAREST, Clamping.CLAMP)
+        lut.bind(1, Filtering.LINEAR, Clamping.CLAMP)
+        lutBuffer.bindTextures(0, Filtering.TRULY_NEAREST, Clamping.CLAMP)
         flat01.draw(lutShader)
         GFX.check()
 
@@ -411,7 +411,7 @@ object Scene {
         h: Int,
         flipY: Boolean
     ) {
-        buffer.bindTextures(0, GPUFiltering.TRULY_NEAREST, Clamping.CLAMP)
+        buffer.bindTextures(0, Filtering.TRULY_NEAREST, Clamping.CLAMP)
         drawColors(isFakeColorRendering, camera, cameraTime, w, h, flipY)
     }
 
@@ -422,7 +422,7 @@ object Scene {
 
         // create blurred version
         GaussianBlur.draw(buffer, bloomSize, w, h, 1, bloomThreshold, false, Matrix4fArrayList())
-        val bloomed = getNextBuffer("Scene-Bloom", buffer, 0, GPUFiltering.TRULY_NEAREST, 1)
+        val bloomed = getNextBuffer("Scene-Bloom", buffer, 0, Filtering.TRULY_NEAREST, 1)
 
         // add it on top
         useFrame(bloomed) {

@@ -13,7 +13,7 @@ import me.anno.gpu.shader.effects.BokehBlur
 import me.anno.gpu.shader.effects.GaussianBlur
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.texture.Clamping
-import me.anno.gpu.texture.GPUFiltering
+import me.anno.gpu.texture.Filtering
 import me.anno.gpu.texture.Texture2D
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
@@ -238,8 +238,8 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
                 GaussianBlur.draw(masked, pixelSize, w, h, 2, threshold, isFullscreen, stack)
 
                 // GFX.drawMode = oldDrawMode
-                masked.bindTexture0(1, GPUFiltering.TRULY_NEAREST, Clamping.CLAMP)
-                mask.bindTexture0(0, GPUFiltering.TRULY_NEAREST, Clamping.CLAMP)
+                masked.bindTexture0(1, Filtering.TRULY_NEAREST, Clamping.CLAMP)
+                mask.bindTexture0(0, Filtering.TRULY_NEAREST, Clamping.CLAMP)
 
                 GFX.check()
 
@@ -263,9 +263,9 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
                 val srcBuffer = (src0 as Framebuffer).ssBuffer ?: src0
                 BokehBlur.draw(srcBuffer.textures!![0], temp, pixelSize, Scene.usesFPBuffers)
 
-                temp.bindTexture0(2, GPUFiltering.TRULY_NEAREST, Clamping.CLAMP)
-                masked.bindTexture0(1, GPUFiltering.TRULY_NEAREST, Clamping.CLAMP)
-                mask.bindTexture0(0, GPUFiltering.TRULY_NEAREST, Clamping.CLAMP)
+                temp.bindTexture0(2, Filtering.TRULY_NEAREST, Clamping.CLAMP)
+                masked.bindTexture0(1, Filtering.TRULY_NEAREST, Clamping.CLAMP)
+                mask.bindTexture0(0, Filtering.TRULY_NEAREST, Clamping.CLAMP)
 
                 draw3DMasked(
                     stack, color,
@@ -285,8 +285,8 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
 
                 BoxBlur.draw(masked, w, h, iw, ih, 2, stack)
 
-                masked.bindTexture0(1, GPUFiltering.TRULY_NEAREST, Clamping.CLAMP)
-                mask.bindTexture0(0, GPUFiltering.TRULY_NEAREST, Clamping.CLAMP)
+                masked.bindTexture0(1, Filtering.TRULY_NEAREST, Clamping.CLAMP)
+                mask.bindTexture0(0, Filtering.TRULY_NEAREST, Clamping.CLAMP)
 
                 GFX.check()
 
@@ -301,9 +301,9 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
             }*/
             else -> {
 
-                masked.bindTextures(1, GPUFiltering.TRULY_NEAREST, Clamping.MIRRORED_REPEAT)
+                masked.bindTextures(1, Filtering.TRULY_NEAREST, Clamping.MIRRORED_REPEAT)
                 GFX.check()
-                mask.bindTextures(0, GPUFiltering.TRULY_NEAREST, Clamping.CLAMP)
+                mask.bindTextures(0, Filtering.TRULY_NEAREST, Clamping.CLAMP)
                 GFX.check()
                 draw3DMasked(
                     stack, color,

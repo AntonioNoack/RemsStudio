@@ -5,7 +5,7 @@ import me.anno.config.DefaultConfig
 import me.anno.ecs.components.mesh.Mesh
 import me.anno.gpu.GFX
 import me.anno.gpu.texture.Clamping
-import me.anno.gpu.texture.Filtering
+import me.anno.remsstudio.gpu.TexFiltering
 import me.anno.gpu.texture.TextureCache
 import me.anno.gpu.texture.TextureLib.whiteTexture
 import me.anno.io.ISaveable
@@ -42,7 +42,7 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
 
     var texture: FileReference = InvalidRef
     var autoAlign = false
-    var filtering = Filtering.LINEAR
+    var filtering = TexFiltering.LINEAR
 
     var is3D = false
     var vertexCount = AnimatedProperty.intPlus(5)

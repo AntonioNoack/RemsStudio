@@ -176,6 +176,7 @@ object DownloadUI {
             "Paste your link here", style, InvalidRef,
             emptyList(), false
         )
+        srcInput.alignmentX = AxisAlignment.FILL
 
         val dstFolder = RemsStudio.project?.scenes ?: StudioBase.workspace
         val dstPanel = FileInput(
@@ -183,9 +184,11 @@ object DownloadUI {
             dstFolder.getChild(System.currentTimeMillis().toString(16)),
             emptyList(), false
         )
+        dstPanel.alignmentX = AxisAlignment.FILL
 
         val infoPanel = TextPanel("", style)
         infoPanel.isVisible = false
+        infoPanel.alignmentX = AxisAlignment.FILL
 
         var thumbnailSource: FileReference = InvalidRef
         val thumbnailHeight = 240

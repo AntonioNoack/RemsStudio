@@ -5,7 +5,7 @@ import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.GFXState
 import me.anno.gpu.blending.BlendMode
-import me.anno.gpu.drawing.GFXx3D.draw3DCircle
+import me.anno.gpu.drawing.GFXx3D
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.io.ISaveable
 import me.anno.io.Saveable
@@ -948,7 +948,8 @@ open class Transform() : Saveable(),
             if (!isFinalRendering) {
                 stack.pushMatrix()
                 stack.scale(scale)
-                draw3DCircle(stack, inner, 0f, 360f, color)
+                // doesn't need effects
+                GFXx3D.draw3DCircle(stack, inner, 0f, 360f, color)
                 stack.popMatrix()
             }
         }

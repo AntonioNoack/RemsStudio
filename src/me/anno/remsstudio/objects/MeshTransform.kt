@@ -29,6 +29,7 @@ import me.anno.mesh.MeshUtils
 import me.anno.mesh.MeshUtils.getScaleFromAABB
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.Style
@@ -114,7 +115,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         val shader = ECSShaderLib.pbrModelShader.value
         shader.use()
         whiteTexture.bindTrulyNearest(shader, "reflectionPlane")
-        GFXx3D.shader3DUniforms(shader, cameraMatrix, color)
+        GFXx3Dv2.shader3DUniforms(shader, cameraMatrix, color)
         uploadAttractors(shader, time)
 
         val animations = findAnimations(entity)

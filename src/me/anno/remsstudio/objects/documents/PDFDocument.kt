@@ -8,7 +8,7 @@ import me.anno.gpu.GFX.viewportHeight
 import me.anno.gpu.GFX.viewportWidth
 import me.anno.gpu.drawing.UVProjection
 import me.anno.gpu.texture.Clamping
-import me.anno.gpu.texture.Filtering
+import me.anno.remsstudio.gpu.TexFiltering
 import me.anno.gpu.texture.TextureLib.colorShowTexture
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
@@ -144,13 +144,13 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
                                 stack.scale(x, 1f, 1f)
                                 GFXx3Dv2.draw3DVideo(
                                     this, time, stack, texture, color,
-                                    Filtering.NEAREST, Clamping.CLAMP, null, UVProjection.Planar
+                                    TexFiltering.NEAREST, Clamping.CLAMP, null, UVProjection.Planar
                                 )
                             }
                         } else {
                             GFXx3Dv2.draw3DVideo(
                                 this, time, stack, texture, color,
-                                Filtering.LINEAR, Clamping.CLAMP, null, UVProjection.Planar
+                                TexFiltering.LINEAR, Clamping.CLAMP, null, UVProjection.Planar
                             )
                         }
                     }

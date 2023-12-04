@@ -224,7 +224,9 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
 
     // switch between manual control and autopilot for time :)
     // -> do this by disabling controls when playing, excepts when it's the inspector camera (?)
-    val mayControlCamera get() = camera === nullCamera || isPaused
+    val mayControlCamera
+        get() = if (DefaultConfig["ui.editor.lockCameraWhenPlaying", false]) camera === nullCamera || isPaused
+        else true
 
     fun claimResources() {
         // this is expensive, so do it only when the time changed
@@ -813,7 +815,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
     override fun onMouseClicked(x: Float, y: Float, button: Key, long: Boolean) {
         onInteraction()
         invalidateDrawing()
-        if ((parent as? CustomContainer)?.clicked(x, y) != true) {
+        if (button == Key.BUTTON_LEFT && (parent as? CustomContainer)?.clicked(x, y) != true) {
 
             var isProcessed = false
             val xi = x.toInt()
@@ -841,7 +843,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     invalidateDrawing()
                 }
             }
-        }
+        } else super.onMouseClicked(x, y, button, long)
     }
 
     override fun onPaste(x: Float, y: Float, data: String, type: String) {

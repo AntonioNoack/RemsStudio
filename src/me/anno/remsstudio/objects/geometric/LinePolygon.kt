@@ -17,6 +17,9 @@ import me.anno.maths.Maths
 import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.gpu.ShaderLibV2.getForceFieldColor
+import me.anno.remsstudio.gpu.ShaderLibV2.getTextureLib
+import me.anno.remsstudio.gpu.ShaderLibV2.hasForceFieldColor
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.attractors.EffectColoring
@@ -282,39 +285,37 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
 
     companion object {
         val cache = CacheSection("LineCache")
-        val shader by lazy {
-            BaseShader(
-                // todo uniforms + attributes to variables
-                "linePolygon", listOf(
-                    Variable(GLSLType.V3F, "coords", VariableMode.ATTR),
-                    Variable(GLSLType.V2F, "uvs", VariableMode.ATTR),
-                    Variable(GLSLType.M4x4, "transform"),
-                    Variable(GLSLType.V4F, "tiling"),
-                    Variable(GLSLType.V3F, "pos0"), Variable(GLSLType.V3F, "pos1"),
-                    Variable(GLSLType.V3F, "pos2"), Variable(GLSLType.V3F, "pos3"),
-                    Variable(GLSLType.V4F, "col0"), Variable(GLSLType.V4F, "col1"),
-                    Variable(GLSLType.V1F, "zDistance", VariableMode.OUT)
-                ), "" +
-                        "void main(){\n" +
-                        "   vec2 att = coords.xy*0.5+0.5;\n" +
-                        "   vec3 localPosition = mix(mix(pos0, pos1, att.x), mix(pos2, pos3, att.x), att.y);\n" +
-                        "   gl_Position = transform * vec4(localPosition, 1.0);\n" +
-                        ShaderLib.flatNormal +
-                        "   uv = uvs;\n" +
-                        "   uvw = coords;\n" +
-                        "   colX = mix(col0, col1, att.y);\n" +
-                        "}", y3D + Variable(GLSLType.V4F, "colX"), listOf(), "" +
-                        ShaderLib.getTextureLib +
-                        ShaderLib.getColorForceFieldLib +
-                        "void main(){\n" +
-                        "   vec4 color = colX;\n" +
-                        "   if(${ShaderLib.hasForceFieldColor}) color *= getForceFieldColor(finalPosition);\n" +
-                        // does work, just the error should be cleaner...
-                        // "   gl_FragDepth += 0.01 * random(uv);\n" +
-                        "   gl_FragColor = color;\n" +
-                        "}"
-            )
-        }
+        val shader = BaseShader(
+            // todo uniforms + attributes to variables
+            "linePolygon", listOf(
+                Variable(GLSLType.V3F, "coords", VariableMode.ATTR),
+                Variable(GLSLType.V2F, "uvs", VariableMode.ATTR),
+                Variable(GLSLType.M4x4, "transform"),
+                Variable(GLSLType.V4F, "tiling"),
+                Variable(GLSLType.V3F, "pos0"), Variable(GLSLType.V3F, "pos1"),
+                Variable(GLSLType.V3F, "pos2"), Variable(GLSLType.V3F, "pos3"),
+                Variable(GLSLType.V4F, "col0"), Variable(GLSLType.V4F, "col1"),
+                Variable(GLSLType.V1F, "zDistance", VariableMode.OUT)
+            ), "" +
+                    "void main(){\n" +
+                    "   vec2 att = coords.xy*0.5+0.5;\n" +
+                    "   vec3 localPosition = mix(mix(pos0, pos1, att.x), mix(pos2, pos3, att.x), att.y);\n" +
+                    "   gl_Position = transform * vec4(localPosition, 1.0);\n" +
+                    ShaderLib.flatNormal +
+                    "   uv = uvs;\n" +
+                    "   uvw = coords;\n" +
+                    "   colX = mix(col0, col1, att.y);\n" +
+                    "}", y3D + Variable(GLSLType.V4F, "colX"), listOf(), "" +
+                    getTextureLib +
+                    getForceFieldColor +
+                    "void main(){\n" +
+                    "   vec4 color = colX;\n" +
+                    "   if($hasForceFieldColor) color *= getForceFieldColor(finalPosition);\n" +
+                    // does work, just the error should be cleaner...
+                    // "   gl_FragDepth += 0.01 * random(uv);\n" +
+                    "   gl_FragColor = color;\n" +
+                    "}"
+        )
     }
 
 }

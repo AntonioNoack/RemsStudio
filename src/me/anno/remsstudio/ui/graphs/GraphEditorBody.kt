@@ -19,6 +19,7 @@ import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.dtTo10
+import me.anno.maths.Maths.hasFlag
 import me.anno.maths.Maths.length
 import me.anno.maths.Maths.mix
 import me.anno.maths.Maths.pow
@@ -45,6 +46,7 @@ import me.anno.utils.Color.toARGB
 import me.anno.utils.Color.white
 import me.anno.utils.Color.withAlpha
 import me.anno.utils.types.AnyToFloat.getFloat
+import me.anno.utils.types.Booleans.toInt
 import org.apache.logging.log4j.LogManager
 import org.joml.*
 import java.util.*
@@ -52,7 +54,7 @@ import kotlin.math.*
 
 // todo list all animated properties of this object (abbreviated)
 
-class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
+class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(style.getChild("deep")) {
 
     var draggedKeyframe: Keyframe<*>? = null
     var draggedChannel = 0
@@ -67,7 +69,19 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
     var isSelecting = false
     val select0 = Vector2f()
 
-    var activeChannels = -1
+    val activeChannels: Int
+        get() {
+            val comp = selectedProperties?.firstOrNull()
+            val type = comp?.type
+            return if (type != null) {
+                var sum = 0
+                for (i in 0 until type.components) {
+                    sum += editor.channelMasks[i]
+                        .isChecked.toInt(1 shl i)
+                }
+                if (sum == 0) -1 else sum
+            } else -1
+        }
 
     override fun getVisualState() = Triple(super.getVisualState(), centralValue, dvHalfHeight)
 
@@ -75,13 +89,6 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
 
     fun getValueAt(my: Float) = centralValue - dvHalfHeight * normAxis11(my, y, height)
     fun getYAt(value: Float) = y + height * normValue01(value)
-
-    override fun calculateSize(w: Int, h: Int) {
-        super.calculateSize(w, h)
-        val size = 5
-        minW = size
-        minH = size
-    }
 
     private fun getValueString(value: Float, step: Float) =
         getValueString(abs(value), step, if (value < 0) '-' else '+')
@@ -250,6 +257,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         val maxSelectY = max(window.mouseDownY, window.mouseY).toInt()
         val selectX = minSelectX - halfSize..maxSelectX + halfSize
         val selectY = minSelectY - halfSize..maxSelectY + halfSize
+        val activeChannels = activeChannels
 
         // draw selection box
         if (isSelecting) {
@@ -276,11 +284,12 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         }
 
         // draw all values
-        if (kfs.isNotEmpty() || property.drivers.any { it != null  }) {
+        if (kfs.isNotEmpty() || property.drivers.any { it != null }) {
             val backgroundColor = backgroundColor.withAlpha(0)
             val batch = DrawCurves.lineBatch.start()
             for (i in valueColors.indices) {
-                valueColors[i] = valueColors[i].withAlpha(0.3f)
+                val alpha = if (i.isChannelActive(activeChannels)) 0.3f else 0.1f
+                valueColors[i] = valueColors[i].withAlpha(alpha)
             }
             var v0 = property[global2Kf(getTimeAt(x0 + 0f))]!!
             for (x in x0 until x1) {
@@ -318,6 +327,13 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             }
         }
 
+        // set channel alpha for keyframes depending on whether their channel is active
+        for (i in valueColors.indices) {
+            valueColors[i] = valueColors[i]
+                .withAlpha(if (i.isChannelActive(activeChannels)) 1f else 0.5f)
+        }
+
+        // draw keyframes
         for ((j, kf) in kfs.withIndex()) {
 
             val tGlobal = kf2Global(kf.time)
@@ -336,7 +352,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             var willBeSelected = kf in selectedKeyframes
             if (!willBeSelected && isSelecting && x in selectX) {
                 for (i in 0 until channelCount) {
-                    if (yValues[i] in selectY && i.isChannelActive()) {
+                    if (yValues[i] in selectY && i.isChannelActive(activeChannels)) {
                         willBeSelected = true
                         break
                     }
@@ -346,7 +362,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             for (i in 0 until channelCount) {
                 drawDot(
                     x, yValues[i], valueColors[i],
-                    willBeSelected// && (draggedKeyframe !== kf || draggedChannel.and(1 shl i) != 0)
+                    willBeSelected
                 )
             }
         }
@@ -403,7 +419,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
     // todo draw curve of animation-drivers :)
     // todo input (animated values) and output (calculated values)?
 
-    fun Int.isChannelActive() = ((1 shl this) and activeChannels) != 0
+    fun Int.isChannelActive(activeChannels: Int) = activeChannels.hasFlag(1 shl this)
 
     fun getKeyframeAt(x: Float, y: Float): Pair<Keyframe<*>, Int>? {
         val selectedProperty = selectedProperties?.firstOrNull()
@@ -412,12 +428,13 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         var bestChannel = 0
         val maxMargin = dotSize * 2.0 / 3.0 + 1.0
         var bestDistance = maxMargin
+        val activeChannels = activeChannels
         for (kf in property.keyframes) {
             val globalT = mix(0.0, 1.0, kf2Global(kf.time))
             val dx = x - getXAt(globalT)
             if (abs(dx) < maxMargin) {
                 for (channel in 0 until property.type.components) {
-                    if (channel.isChannelActive()) {
+                    if (channel.isChannelActive(activeChannels)) {
                         val dy = y - getYAt(kf.getChannelAsFloat(channel))
                         if (abs(dy) < maxMargin) {
                             val distance = length(dx, dy)
@@ -445,14 +462,14 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
             max(minY, maxY)
         )
         val halfSize = dotSize / 2
-        val selectedProperty = selectedProperties?.firstOrNull()
-        val property = selectedProperty ?: return emptyList()
+        val property = selectedProperties?.firstOrNull() ?: return emptyList()
         val keyframes = ArrayList<Keyframe<*>>()
+        val activeChannels = activeChannels
         keyframes@ for (kf in property.keyframes) {
             val globalT = mix(0.0, 1.0, kf2Global(kf.time))
             if (getXAt(globalT) in minX - halfSize..maxX + halfSize) {
                 for (channel in 0 until property.type.components) {
-                    if (channel.isChannelActive()) {
+                    if (channel.isChannelActive(activeChannels)) {
                         if (getYAt(kf.getChannelAsFloat(channel)) in minY - halfSize..maxY + halfSize) {
                             keyframes += kf
                             continue@keyframes
@@ -464,11 +481,6 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         return keyframes
     }
 
-    // todo only work on one channel, vs working on all?
-    // todo this would allow us to copy only z for example
-
-    // todo if there are multiples selected, allow them to be moved (?)
-
     override fun onKeyDown(x: Float, y: Float, key: Key) {
         // find the dragged element
         if (!isHovered || (key != Key.BUTTON_LEFT && key != Key.BUTTON_RIGHT)) {
@@ -479,7 +491,7 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         val atCursor = getKeyframeAt(x, y)
         if (atCursor != null && selectedKeyframes.size > 1 && atCursor.first in selectedKeyframes) {
             draggedKeyframe = atCursor.first
-            draggedChannel = -1
+            draggedChannel = activeChannels
         } else {
             draggedKeyframe = null
             if (key == Key.BUTTON_LEFT) {
@@ -610,6 +622,9 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
         } else if (draggedKeyframe != null && selectedProperty != null) {
             // dragging
             val time = getTimeAt(x)
+            // if there are multiples selected, allow them to be moved via shift key
+            val moveValues = isShiftDown || selectedKeyframes.size < 2
+            val property = selectedProperties?.firstOrNull()
             RemsStudio.incrementalChange("Dragging keyframe") {
                 val timeHere = global2Kf(time) // global -> local
                 val deltaTime = timeHere - draggedKeyframe.time
@@ -619,19 +634,30 @@ class GraphEditorBody(style: Style) : TimelinePanel(style.getChild("deep")) {
                 }
                 editorTime = kf2Global(draggedKeyframe.time)
                 updateAudio()
-                if (selectedKeyframes.size < 2) {
-                    if (draggedKeyframe.value is Number || when (draggedKeyframe.value) {
+                if (moveValues) {
+                    if (when (draggedKeyframe.value) {
+                            is Number,
                             is Vector2f, is Vector3f, is Vector4f,
                             is Vector2d, is Vector3d, is Vector4d,
                             is Quaternionf, is Quaterniond -> true
                             else -> false
                         }
                     ) {
-                        draggedKeyframe.setValue(
-                            draggedChannel,
-                            getValueAt(y).toFloat(),
-                            selectedProperty.type
-                        )
+                        if (selectedKeyframes.size == 1) {
+                            val newValue = getValueAt(y).toFloat()
+                            draggedKeyframe.setValue(draggedChannel, newValue, selectedProperty.type)
+                        } else if (property != null) {
+                            val dv = (getValueAt(dy) - getValueAt(0f)).toFloat()
+                            for (ch in 0 until property.type.components) {
+                                if (draggedChannel.hasFlag(1 shl ch)) {
+                                    for (kf in selectedKeyframes) {
+                                        val oldValue = getFloat(kf.value, ch, 0f)
+                                        val newValue = oldValue + dv
+                                        kf.setValue(ch, newValue, selectedProperty.type)
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 selectedProperty.sort()

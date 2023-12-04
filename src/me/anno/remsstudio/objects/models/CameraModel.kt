@@ -4,6 +4,7 @@ import me.anno.ecs.components.mesh.Mesh
 import me.anno.gpu.buffer.DrawMode
 import me.anno.gpu.shader.ShaderLib
 import me.anno.remsstudio.RemsStudio
+import me.anno.remsstudio.gpu.ShaderLibV2
 import me.anno.utils.types.Floats.toRadians
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
@@ -25,7 +26,7 @@ object CameraModel {
         val scaleY = scaleZ * tan(fov.toRadians() / 2f)
         val scaleX = scaleY * RemsStudio.targetWidth / RemsStudio.targetHeight
         stack.scale(scaleX, scaleY, scaleZ)
-        val shader = ShaderLib.lineShader3D.value
+        val shader = ShaderLibV2.lineShader3D.value
 
         // todo show the standard level only on user request, or when DOF is enabled
         // todo render the intersections instead
