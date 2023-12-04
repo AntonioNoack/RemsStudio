@@ -6,6 +6,7 @@ import me.anno.gpu.shader.BaseShader
 import me.anno.gpu.shader.GLSLType
 import me.anno.gpu.shader.ShaderFuncLib
 import me.anno.gpu.shader.ShaderLib
+import me.anno.gpu.shader.ShaderLib.quatRot
 import me.anno.gpu.shader.ShaderLib.v3DMasked
 import me.anno.gpu.shader.ShaderLib.v3DlMasked
 import me.anno.gpu.shader.ShaderLib.y3DMasked
@@ -77,16 +78,21 @@ object ShaderLibV2 {
 
     val maxUVForceFields = DefaultConfig["objects.attractors.scale.maxCount", 12]
     val getForceFieldUVs = "" +
+            "mat2 rot(float angle){\n" +
+            "   float c = cos(angle), s = sin(angle);\n" +
+            "   return mat2(c,-s,+s,c);\n" +
+            "}\n" +
             "uniform int forceFieldUVCount;\n" +
-            "uniform vec3[$maxUVForceFields] forceFieldUVs;\n" + // xyz
+            "uniform vec4[$maxUVForceFields] forceFieldUVs;\n" + // xyz, swirl
             "uniform vec4[$maxUVForceFields] forceFieldUVSpecs;\n" + // size, power
             "vec3 getForceFieldUVs(vec3 uvw){\n" +
             "   vec3 sumUVs = uvw;\n" +
             "   for(int i=0;i<forceFieldUVCount;i++){\n" +
-            "       vec3 position = forceFieldUVs[i];\n" +
+            "       vec3 position = forceFieldUVs[i].xyz;\n" +
             "       vec4 sizePower = forceFieldUVSpecs[i];\n" +
             "       vec3 positionDelta = uvw - position;\n" +
-            "       float weight = sizePower.x / (1.0 + pow(sizePower.z * dot(positionDelta, positionDelta), sizePower.w));\n" +
+            "       float lenSq = dot(positionDelta, positionDelta);\n" +
+            "       float weight = sizePower.x / (1.0 + pow(sizePower.z * lenSq, sizePower.w));\n" +
             "       sumUVs += weight * positionDelta;\n" +
             "   }\n" +
             "   return sumUVs;\n" +
@@ -94,17 +100,21 @@ object ShaderLibV2 {
             "vec2 getForceFieldUVs(vec2 uv){\n" +
             "   vec2 sumUVs = uv;\n" +
             "   for(int i=0;i<forceFieldUVCount;i++){\n" +
-            "       vec3 position = forceFieldUVs[i];\n" +
+            "       vec4 positionSwirl = forceFieldUVs[i];\n" +
             "       vec4 sizePower = forceFieldUVSpecs[i];\n" +
-            "       vec2 positionDelta = (uv - position.xy) * sizePower.xy;\n" +
-            "       float weight = 1.0 / (1.0 + pow(sizePower.z * dot(positionDelta, positionDelta), sizePower.w));\n" +
-            "       sumUVs += weight * positionDelta;\n" +
+            "       vec2 position = positionSwirl.xy;\n" +
+            "       vec2 swirl = positionSwirl.zw;\n" +
+            "       vec2 positionDelta = (uv - position) * sizePower.xy;\n" +
+            "       float lenSq = dot(positionDelta, positionDelta);\n" +
+            "       float weight = 1.0 / (1.0 + pow(sizePower.z * lenSq, sizePower.w));\n" +
+            "       float swirlAngle = swirl.x / (swirl.y + lenSq);\n" +
+            "       sumUVs += rot(swirlAngle) * (weight * positionDelta);\n" +
             "   }\n" +
             "   return sumUVs;\n" +
             "}\n"
 
     val uvForceFieldBuffer: FloatBuffer = ByteBufferPool
-        .allocateDirect(3 * maxUVForceFields)
+        .allocateDirect(4 * maxUVForceFields)
         .order(ByteOrder.nativeOrder())
         .asFloatBuffer()
 

@@ -62,12 +62,12 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
         return pos
     }
 
-    fun uploadAttractors(shader: Shader, time: Double) {
-        uploadUVAttractors(shader, time)
+    fun uploadAttractors(shader: Shader, time: Double, is3D: Boolean) {
+        uploadUVAttractors(shader, time, is3D)
         uploadColorAttractors(shader, time)
     }
 
-    fun uploadUVAttractors(shader: Shader, time: Double) {
+    fun uploadUVAttractors(shader: Shader, time: Double, is3D: Boolean) {
 
         // has no ability to display them
         if (shader["forceFieldUVCount"] < 0) return
@@ -106,10 +106,16 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                     val position = transformLocally(morphing.position[localTime], time)
                     buffer.put(position.x * 0.5f + 0.5f)
                     buffer.put(position.y * 0.5f + 0.5f)
-                    buffer.put(position.z)
+                    if (is3D) {
+                        buffer.put(position.z)
+                        buffer.put(0f)
+                    } else {
+                        buffer.put(morphing.swirlStrength[localTime])
+                        buffer.put(1f / morphing.swirlPower[localTime])
+                    }
                 }
                 buffer.position(0)
-                shader.v3fs(loc1, buffer)
+                shader.v4fs(loc1, buffer)
             }
             val loc2 = shader["forceFieldUVSpecs"]
             if (loc2 > -1) {
@@ -201,8 +207,8 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
     }
 
     companion object {
-        fun uploadAttractors(transform: GFXTransform?, shader: Shader, time: Double) {
-            transform?.uploadAttractors(shader, time) ?: uploadAttractors0(shader)
+        fun uploadAttractors(transform: GFXTransform?, shader: Shader, time: Double, is3D: Boolean) {
+            transform?.uploadAttractors(shader, time, is3D) ?: uploadAttractors0(shader)
         }
 
         fun uploadAttractors0(shader: Shader) {

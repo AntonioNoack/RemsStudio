@@ -17,7 +17,8 @@ class EffectMorphing : Transform() {
 
     val zooming = AnimatedProperty.float(1f)
     val motion = AnimatedProperty.vec2()
-    val swirl = AnimatedProperty.float()
+    val swirlStrength = AnimatedProperty.float()
+    val swirlPower = AnimatedProperty.float(1f)
     val sharpness = AnimatedProperty.float(20f)
 
     override val className get() = "EffectMorphing"
@@ -33,17 +34,31 @@ class EffectMorphing : Transform() {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<EffectMorphing>()
         val fx = getGroup("Effect", "", "effects")
-        fx += vis(c, "Strength", "The effective scale", c.map { it.zooming }, style)
-        fx += vis(c, "Motion", "Moves pixels left/right/up/down", c.map { it.motion }, style)
-        fx += vis(c, "Swirl", "Swirls pixels around the center", c.map { it.swirl }, style)
-        fx += vis(c, "Sharpness", "How sharp the lens effect is", c.map { it.sharpness }, style)
+        fx += vis(c, "Strength", "The effective scale",
+            c.map { it.zooming }, style
+        )
+        if(false) fx += vis(c, "Motion", "Moves pixels left/right/up/down",
+            c.map { it.motion }, style
+        )
+        fx += vis(
+            c, "Swirl Strength", "How badly/which way around it swirls",
+            c.map { it.swirlStrength }, style
+        )
+        fx += vis(
+            c, "Swirl Power", "How badly it swirls; 1 ~ wobble, 20 ~ swirls (at 1 Swirl Strength)",
+            c.map { it.swirlPower }, style
+        )
+        fx += vis(c, "Sharpness", "How sharp the lens effect is",
+            c.map { it.sharpness }, style
+        )
     }
 
     override fun save(writer: BaseWriter) {
         super.save(writer)
         writer.writeObject(this, "influence", zooming)
         writer.writeObject(this, "motion", motion)
-        writer.writeObject(this, "swirl", swirl)
+        writer.writeObject(this, "swirl", swirlStrength)
+        writer.writeObject(this, "swirlPower", swirlPower)
         writer.writeObject(this, "sharpness", sharpness)
     }
 
@@ -52,7 +67,8 @@ class EffectMorphing : Transform() {
             "influence" -> zooming.copyFrom(value)
             "sharpness" -> sharpness.copyFrom(value)
             "motion" -> motion.copyFrom(value)
-            "swirl" -> swirl.copyFrom(value)
+            "swirl" -> swirlStrength.copyFrom(value)
+            "swirlPower" -> swirlPower.copyFrom(value)
             else -> super.readObject(name, value)
         }
     }

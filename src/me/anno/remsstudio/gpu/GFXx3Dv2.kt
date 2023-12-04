@@ -37,8 +37,8 @@ import kotlin.math.min
 
 object GFXx3Dv2 {
 
-    fun defineAdvancedGraphicalFeatures(shader: Shader, transform: Transform?, time: Double) {
-        (transform as? GFXTransform)?.uploadAttractors(shader, time) ?: uploadAttractors0(shader)
+    fun defineAdvancedGraphicalFeatures(shader: Shader, transform: Transform?, time: Double, is3D: Boolean) {
+        (transform as? GFXTransform)?.uploadAttractors(shader, time, is3D) ?: uploadAttractors0(shader)
         shader.v4f("gfxId", transform?.clickId ?: -1)
         colorGradingUniforms(transform as? Video, time, shader)
     }
@@ -109,7 +109,7 @@ object GFXx3Dv2 {
         shader.use()
         shader3DUniforms(shader, stack, color)
         shader.v3f("offset", offset)
-        GFXTransform.uploadAttractors(that, shader, time)
+        GFXTransform.uploadAttractors(that, shader, time, false)
         mesh.draw(shader, 0)
         GFX.check()
     }
@@ -128,7 +128,7 @@ object GFXx3Dv2 {
     ) {
         val shader = get3DShader(GPUFrame.swizzleStages[""]).value
         shader.use()
-        defineAdvancedGraphicalFeatures(shader, video, time)
+        defineAdvancedGraphicalFeatures(shader, video, time, uvProjection != UVProjection.Planar)
         shader3DUniforms(shader, stack, texture.width, texture.height, color, tiling, filtering, uvProjection)
         texture.bind(0, filtering.convert(), clamping)
         uvProjection.mesh.draw(shader, 0)
@@ -159,7 +159,7 @@ object GFXx3Dv2 {
         val shader0 = get3DShader(v0)
         val shader = shader0.value
         shader.use()
-        defineAdvancedGraphicalFeatures(shader, video, time)
+        defineAdvancedGraphicalFeatures(shader, video, time, uvProjection != UVProjection.Planar)
         shader3DUniforms(shader, stack, v0.width, v0.height, color, tiling, filtering, uvProjection)
         colorGradingUniforms(video as? Video, time, shader)
         v0.bindUVCorrection(shader)
@@ -177,7 +177,7 @@ object GFXx3Dv2 {
         val shader0 = get3DShader(texture)
         val shader = shader0.value
         shader.use()
-        defineAdvancedGraphicalFeatures(shader, video, time)
+        defineAdvancedGraphicalFeatures(shader, video, time,uvProjection != UVProjection.Planar)
         shader3DUniforms(shader, stack, texture.width, texture.height, color, tiling, filtering, uvProjection)
         colorGradingUniforms(video as? Video, time, shader)
         texture.bind(0, filtering.convert(), clamping)
@@ -196,7 +196,7 @@ object GFXx3Dv2 {
         val shader = ShaderLibV2.shader3DPolygon.value
         shader.use()
         shader.v4f("gfxId", polygon.clickId)
-        polygon.uploadAttractors(shader, time)
+        polygon.uploadAttractors(shader, time, false)
         shader3DUniforms(shader, stack, texture.width, texture.height, color, null, filtering, null)
         shader.v1f("inset", inset)
         texture.bind(0, filtering.convert(), clamping)
@@ -204,19 +204,14 @@ object GFXx3Dv2 {
         GFX.check()
     }
 
+    val outlineStatsBuffer: FloatBuffer = BufferUtils.createFloatBuffer(ShaderLibV2.maxOutlineColors * 4)
     fun drawOutlinedText(
-        that: GFXTransform,
-        time: Double,
+        that: GFXTransform, time: Double,
         stack: Matrix4fArrayList,
-        offset: Vector2f,
-        scale: Vector2f,
+        offset: Vector2f, scale: Vector2f,
         texture: Texture2D,
-        color: Vector4f,
-        colorCount: Int,
-        colors: Array<Vector4f>,
-        distances: FloatArray,
-        smoothness: FloatArray,
-        depth: Float,
+        color: Vector4f, colorCount: Int, colors: Array<Vector4f>,
+        distances: FloatArray, smoothness: FloatArray, depth: Float,
         hasUVAttractors: Boolean
     ) {
 
@@ -228,7 +223,7 @@ object GFXx3Dv2 {
         val shader = ShaderLibV2.shaderSDFText.value
         shader.use()
 
-        defineAdvancedGraphicalFeatures(shader, that, time)
+        defineAdvancedGraphicalFeatures(shader, that, time, false)
 
         shader.v4f("tint", color)
 
@@ -283,61 +278,6 @@ object GFXx3Dv2 {
         GFX.check()
     }
 
-    val outlineStatsBuffer: FloatBuffer = BufferUtils.createFloatBuffer(ShaderLibV2.maxOutlineColors * 4)
-    fun drawOutlinedText(
-        stack: Matrix4fArrayList,
-        transform: Transform?,
-        time: Double,
-        offset: Vector2f,
-        scale: Vector2f,
-        texture: Texture2D,
-        color: Vector4f,
-        colorCount: Int,
-        colors: Array<Vector4f>,
-        distances: FloatArray,
-        smoothness: FloatArray,
-        depth: Float,
-        hasUVAttractors: Boolean
-    ) {
-
-        val shader = ShaderLibV2.shaderSDFText.value
-        shader.use()
-
-        defineAdvancedGraphicalFeatures(shader, transform, time)
-
-        shader.v4f("tint", color)
-
-        val cc = min(colorCount, ShaderLibV2.maxOutlineColors)
-
-        /**
-         * u4[ maxColors ] colors
-         * u2[ maxColors ] distSmooth
-         * uniform int colorCount
-         * */
-        val buffer = outlineStatsBuffer
-        buffer.position(0)
-        for (i in 0 until cc) {
-            val colorI = colors[i]
-            buffer.put(colorI.x)
-            buffer.put(colorI.y)
-            buffer.put(colorI.z)
-            buffer.put(colorI.w)
-        }
-        buffer.position(0)
-        shader.v4Array("colors", buffer)
-        buffer.position(0)
-        for (i in 0 until cc) {
-            buffer.put(distances[i])
-            buffer.put(smoothness[i])
-        }
-        buffer.position(0)
-        shader.v2Array("distSmoothness", buffer)
-        shader.v1i("colorCount", cc)
-        shader.v1f("depth", depth * 0.00001f)
-
-        drawOutlinedText(stack, offset, scale, texture, hasUVAttractors)
-    }
-
     private val circleData = Mesh().apply {
 
         val slices = 128
@@ -380,7 +320,7 @@ object GFXx3Dv2 {
     ) {
         val shader = shader3DCircle.value
         shader.use()
-        defineAdvancedGraphicalFeatures(shader, that, time)
+        defineAdvancedGraphicalFeatures(shader, that, time, false)
         shader3DUniforms(shader, stack, 1, 1, color, null, TexFiltering.NEAREST, null)
         circleParams(innerRadius, startDegrees, endDegrees, shader)
         circleData.draw(shader, 0)

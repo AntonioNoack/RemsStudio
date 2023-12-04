@@ -116,7 +116,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         shader.use()
         whiteTexture.bindTrulyNearest(shader, "reflectionPlane")
         GFXx3Dv2.shader3DUniforms(shader, cameraMatrix, color)
-        uploadAttractors(shader, time)
+        uploadAttractors(shader, time, false)
 
         val animations = findAnimations(entity)
         val animation = animations[animationName]

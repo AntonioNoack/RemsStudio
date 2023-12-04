@@ -220,7 +220,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
             }
 
             shader.use()
-            uploadAttractors(shader, time)
+            uploadAttractors(shader, time, false)
             for (i in 1 until mappedIndices.size) {
                 val i0 = mappedIndices[i - 1]
                 val i1 = mappedIndices[i]
