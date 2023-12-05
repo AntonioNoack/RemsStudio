@@ -49,11 +49,11 @@ import kotlin.math.min
 // todo right-click option to remove linear sections from keyframe panel;
 // todo right-click option to thin out sections from keyframe panel;
 // todo right-click option to select by specific channel only (e.g. to rect-select all y over 0.5);
-// todo morphing: swirl
 // todo morphing: up/down/left/right
 // todo morphing: rect/hexagon shape?, rotate it?
 // todo hexagon/triangle/rectangle pixelation: rotate it?
 // done record multiple properties at once, e.g. camera motion and rotation
+// done morphing: swirl
 
 // todo respect masks when editing multiple instances at once
 

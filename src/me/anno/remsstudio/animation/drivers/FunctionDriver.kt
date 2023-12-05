@@ -5,6 +5,8 @@ import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
 import me.anno.parser.SimpleExpressionParser.parseDouble
 import me.anno.parser.SimpleExpressionParser.preparse
+import me.anno.remsstudio.objects.Transform
+import me.anno.studio.Inspectable
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.TextInputML
@@ -18,11 +20,15 @@ class FunctionDriver : AnimationDriver() {
     var formulaParts: CountingList? = preparse(formula)
 
     override fun createInspector(
-        list: PanelListY, style: Style,
+        inspected: List<Inspectable>,
+        list: PanelListY,
+        transforms: List<Transform>,
+        style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        super.createInspector(list, style, getGroup)
+        super.createInspector(inspected, list, transforms, style, getGroup)
         list += TextInputML(Dict["Function f(time)", "driver.function"], formula, style)
+            .apply { base.enableSpellcheck = false }
             .addChangeListener { formula = it; updateFormula() }
             .setIsSelectedListener { show(null) }
             .setTooltip(Dict["Example: sin(time*pi)", "driver.function.desc"])
@@ -64,7 +70,7 @@ class FunctionDriver : AnimationDriver() {
         else Dict["Function f(time)", "driver.function"]
 
     companion object {
-        // could support more, but is useless anyways xD
+        // could support more, but is useless anyway xD
         val maxFormulaDisplayLength get() = DefaultConfig["driver.formula.maxLength", 15]
     }
 

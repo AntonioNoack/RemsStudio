@@ -7,10 +7,10 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.parser.SimpleExpressionParser.parseDouble
 import me.anno.parser.SimpleExpressionParser.preparse
 import me.anno.studio.Inspectable
-import me.anno.ui.Panel
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.TextInput
 import me.anno.ui.Style
+import me.anno.ui.base.groups.PanelListY
 import me.anno.utils.structures.lists.CountingList
 import kotlin.math.PI
 import kotlin.math.sin
@@ -30,7 +30,7 @@ class HarmonicDriver : AnimationDriver() {
 
     override fun createInspector(
         inspected: List<Inspectable>,
-        list: MutableList<Panel>,
+        list: PanelListY,
         transforms: List<Transform>,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory

@@ -93,6 +93,7 @@ object Selection {
             properties != selectedProperties ||
             transforms != selectedTransforms
         ) {
+            // println("Selecting $uuids/$propName/${inspectables.map { it.javaClass.simpleName }}/${transforms.map { getIdFromTransform(it) }}")
             RemsStudio.largeChange("Select ${transforms.firstOrNull()?.name ?: "Nothing"}:$propName") {
                 selectedUUIDs = uuids
                 selectedPropName = propName

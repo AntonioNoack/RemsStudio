@@ -8,8 +8,8 @@ import me.anno.maths.noise.FullNoise
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
 import me.anno.studio.Inspectable
-import me.anno.ui.Panel
 import me.anno.ui.Style
+import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import kotlin.math.min
 
@@ -44,7 +44,7 @@ class PerlinNoiseDriver : AnimationDriver() {
 
     override fun createInspector(
         inspected: List<Inspectable>,
-        list: MutableList<Panel>,
+        list: PanelListY,
         transforms: List<Transform>,
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
