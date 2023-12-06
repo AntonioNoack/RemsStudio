@@ -12,8 +12,9 @@ import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.ui.scene.StudioSceneView
 import me.anno.remsstudio.ui.sceneTabs.SceneTabs
+import me.anno.ui.Panel
+import me.anno.ui.base.groups.PanelGroup
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
-import me.anno.utils.structures.lists.Lists.join
 
 class HistoryState() : Saveable() {
 
@@ -90,11 +91,24 @@ class HistoryState() : Saveable() {
         state.title = title
         state.selectedUUIDs = Selection.selectedTransforms.map { it.getUUID() }
         state.usedCameras = defaultWindowStack.map { window ->
-            window.panel.listOfAll.toList()
+            asyncSequenceOfAll(window.panel)
                 .filterIsInstance<StudioSceneView>()
                 .map { it.camera.getUUID() }.toList()
-        }.join().toIntArray()
+        }.flatten().toIntArray()
 
+    }
+
+    private fun asyncSequenceOfAll(panel: Panel): Sequence<Panel> {
+        return sequence {
+            yield(panel)
+            if (panel is PanelGroup) {
+                val children = panel.children
+                for (i in children.indices) {
+                    val child = children.getOrNull(i) ?: break
+                    yieldAll(asyncSequenceOfAll(child))
+                }
+            }
+        }
     }
 
     companion object {

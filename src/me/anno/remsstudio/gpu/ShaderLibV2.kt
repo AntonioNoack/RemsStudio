@@ -109,7 +109,7 @@ object ShaderLibV2 {
             "       vec2 swirl = positionSwirl.zw;\n" +
             "       vec2 positionDelta = (uv - position) * sizePower.xy;\n" +
             "       float lenSq = dot(positionDelta, positionDelta);\n" +
-            "       float weight = pow(1.0 + chromatic, channel) * 1.0 / (1.0 + pow(sizePower.z * lenSq, sizePower.w));\n" +
+            "       float weight = exp(chromatic * channel) / (1.0 + pow(sizePower.z * lenSq, sizePower.w));\n" +
             "       float swirlAngle = swirl.x / (swirl.y + lenSq);\n" +
             "       sumUVs += rot(swirlAngle) * (weight * positionDelta);\n" +
             "   }\n" +
