@@ -97,8 +97,8 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
 
         shader.v1i("forceFieldUVCount", morphings.size)
         if (morphings.isNotEmpty()) {
-            val loc1 = shader["forceFieldUVs"]
             val buffer = uvForceFieldBuffer
+            val loc1 = shader["forceFieldUVs"]
             if (loc1 > -1) {
                 buffer.position(0)
                 for (morphing in morphings) {
@@ -117,7 +117,7 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                 buffer.position(0)
                 shader.v4fs(loc1, buffer)
             }
-            val loc2 = shader["forceFieldUVSpecs"]
+            val loc2 = shader["forceFieldUVData0"]
             if (loc2 > -1) {
                 buffer.position(0)
                 val sx = if (this is Video) 1f / lastW else 1f
@@ -134,6 +134,16 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                 }
                 buffer.position(0)
                 shader.v4fs(loc2, buffer)
+            }
+            val loc3 = shader["forceFieldUVData1"]
+            if (loc3 > -1) {
+                buffer.position(0)
+                for (morphing in morphings) {
+                    val localTime = morphing.lastLocalTime
+                    buffer.put(morphing.chromatic[localTime])
+                }
+                buffer.position(0)
+                shader.v1fs(loc3, buffer)
             }
         }
 

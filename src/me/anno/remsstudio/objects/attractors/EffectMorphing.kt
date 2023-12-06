@@ -16,7 +16,7 @@ class EffectMorphing : Transform() {
     var lastInfluence = 0f
 
     val zooming = AnimatedProperty.float(1f)
-    val motion = AnimatedProperty.vec2()
+    val chromatic = AnimatedProperty.float()
     val swirlStrength = AnimatedProperty.float()
     val swirlPower = AnimatedProperty.float(1f)
     val sharpness = AnimatedProperty.float(20f)
@@ -37,8 +37,9 @@ class EffectMorphing : Transform() {
         fx += vis(c, "Strength", "The effective scale",
             c.map { it.zooming }, style
         )
-        if(false) fx += vis(c, "Motion", "Moves pixels left/right/up/down",
-            c.map { it.motion }, style
+        // like https://www.youtube.com/watch?v=QbwgQSwMSGM, at 6:27
+        fx += vis(c, "Chromatic Aberration", "Separates the effect for R/G/B channels; only works for video/images.",
+            c.map { it.chromatic }, style
         )
         fx += vis(
             c, "Swirl Strength", "How badly/which way around it swirls",
@@ -56,7 +57,7 @@ class EffectMorphing : Transform() {
     override fun save(writer: BaseWriter) {
         super.save(writer)
         writer.writeObject(this, "influence", zooming)
-        writer.writeObject(this, "motion", motion)
+        writer.writeObject(this, "chromatic", chromatic)
         writer.writeObject(this, "swirl", swirlStrength)
         writer.writeObject(this, "swirlPower", swirlPower)
         writer.writeObject(this, "sharpness", sharpness)
@@ -66,7 +67,7 @@ class EffectMorphing : Transform() {
         when (name) {
             "influence" -> zooming.copyFrom(value)
             "sharpness" -> sharpness.copyFrom(value)
-            "motion" -> motion.copyFrom(value)
+            "chromatic" -> chromatic.copyFrom(value)
             "swirl" -> swirlStrength.copyFrom(value)
             "swirlPower" -> swirlPower.copyFrom(value)
             else -> super.readObject(name, value)

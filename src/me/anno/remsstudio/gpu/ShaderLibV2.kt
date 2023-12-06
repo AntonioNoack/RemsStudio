@@ -84,12 +84,14 @@ object ShaderLibV2 {
             "}\n" +
             "uniform int forceFieldUVCount;\n" +
             "uniform vec4[$maxUVForceFields] forceFieldUVs;\n" + // xyz, swirl
-            "uniform vec4[$maxUVForceFields] forceFieldUVSpecs;\n" + // size, power
-            "vec3 getForceFieldUVs(vec3 uvw){\n" +
+            "uniform vec4[$maxUVForceFields] forceFieldUVData0;\n" + // size, power
+            "uniform float[$maxUVForceFields] forceFieldUVData1;\n" + // chromatic
+            "vec3 getForceFieldUVs(vec3 uvw, float channel){\n" +
             "   vec3 sumUVs = uvw;\n" +
             "   for(int i=0;i<forceFieldUVCount;i++){\n" +
             "       vec3 position = forceFieldUVs[i].xyz;\n" +
-            "       vec4 sizePower = forceFieldUVSpecs[i];\n" +
+            "       vec4 sizePower = forceFieldUVData0[i];\n" +
+            // todo chroma, swirl?
             "       vec3 positionDelta = uvw - position;\n" +
             "       float lenSq = dot(positionDelta, positionDelta);\n" +
             "       float weight = sizePower.x / (1.0 + pow(sizePower.z * lenSq, sizePower.w));\n" +
@@ -97,16 +99,17 @@ object ShaderLibV2 {
             "   }\n" +
             "   return sumUVs;\n" +
             "}\n" +
-            "vec2 getForceFieldUVs(vec2 uv){\n" +
+            "vec2 getForceFieldUVs(vec2 uv, float channel){\n" +
             "   vec2 sumUVs = uv;\n" +
             "   for(int i=0;i<forceFieldUVCount;i++){\n" +
             "       vec4 positionSwirl = forceFieldUVs[i];\n" +
-            "       vec4 sizePower = forceFieldUVSpecs[i];\n" +
+            "       vec4 sizePower = forceFieldUVData0[i];\n" +
+            "       float chromatic = forceFieldUVData1[i];\n" +
             "       vec2 position = positionSwirl.xy;\n" +
             "       vec2 swirl = positionSwirl.zw;\n" +
             "       vec2 positionDelta = (uv - position) * sizePower.xy;\n" +
             "       float lenSq = dot(positionDelta, positionDelta);\n" +
-            "       float weight = 1.0 / (1.0 + pow(sizePower.z * lenSq, sizePower.w));\n" +
+            "       float weight = pow(1.0 + chromatic, channel) * 1.0 / (1.0 + pow(sizePower.z * lenSq, sizePower.w));\n" +
             "       float swirlAngle = swirl.x / (swirl.y + lenSq);\n" +
             "       sumUVs += rot(swirlAngle) * (weight * positionDelta);\n" +
             "   }\n" +
@@ -134,10 +137,10 @@ object ShaderLibV2 {
             "   float v = atan(uvw.y, length(uvw.xz))*${1.0 / PI}+0.5;\n" +
             "   return vec2(u, v);\n" +
             "}\n" +
-            "vec2 getProjectedUVs(vec2 uv, vec3 uvw){\n" +
+            "vec2 getProjectedUVs(vec2 uv, vec3 uvw, float channel){\n" +
             "   return uvProjection == ${UVProjection.Equirectangular.id} ?\n" +
-            "       ($hasForceFieldUVs ? getProjectedUVs(getForceFieldUVs(uvw)) : getProjectedUVs(uvw)) :\n" +
-            "       ($hasForceFieldUVs ? getProjectedUVs(getForceFieldUVs(uv))  : getProjectedUVs(uv));\n" +
+            "       ($hasForceFieldUVs ? getProjectedUVs(getForceFieldUVs(uvw, channel)) : getProjectedUVs(uvw)) :\n" +
+            "       ($hasForceFieldUVs ? getProjectedUVs(getForceFieldUVs(uv, channel))  : getProjectedUVs(uv));\n" +
             "}\n" +
             "#define dot2(a) dot(a,a)\n" +
             "vec4 getTexture(sampler2D tex, vec2 uv, vec2 duv){\n" +
@@ -266,7 +269,8 @@ object ShaderLibV2 {
             getTextureLib +
             getForceFieldColor +
             "void main(){\n" +
-            "   vec4 color = getTexture(tex, getProjectedUVs(uv, uvw));\n" +
+            // todo enable chroma separation for this?
+            "   vec4 color = getTexture(tex, getProjectedUVs(uv, uvw, 0.0));\n" +
             "   if($hasForceFieldColor) color *= getForceFieldColor(finalPosition);\n" +
             "   finalColor = color.rgb;\n" +
             "   finalAlpha = color.a;\n" +
@@ -312,7 +316,8 @@ object ShaderLibV2 {
                 getForceFieldUVs +
                 "void main(){\n" +
                 "   vec3 localPos0 = coords + offset;\n" +
-                "   vec2 pseudoUV2 = getForceFieldUVs(localPos0.xy*.5+.5);\n" +
+                // to do enable chroma separation for this? (probably impossible like that)
+                "   vec2 pseudoUV2 = getForceFieldUVs(localPos0.xy*.5+.5, 0.0);\n" +
                 "   finalPosition = $hasForceFieldUVs ? vec3(pseudoUV2*2.0-1.0, coords.z + offset.z) : localPos0;\n" +
                 "   gl_Position = matMul(transform, vec4(finalPosition, 1.0));\n" +
                 ShaderLib.flatNormal +
@@ -341,7 +346,8 @@ object ShaderLibV2 {
                 "void main(){\n" +
                 "   uv = coords.xy * 0.5 + 0.5;\n" +
                 "   vec2 localPos0 = coords.xy * scale + offset;\n" +
-                "   vec2 pseudoUV2 = getForceFieldUVs(localPos0*.5+.5);\n" +
+                // to do enable chroma separation for this? (probably impossible like that)
+                "   vec2 pseudoUV2 = getForceFieldUVs(localPos0*.5+.5, 0.0);\n" +
                 "   finalPosition = vec3($hasForceFieldUVs ? pseudoUV2*2.0-1.0 : localPos0, 0);\n" +
                 "   gl_Position = matMul(transform, vec4(finalPosition, 1.0));\n" +
                 "}", ShaderLib.y3D, listOf(

@@ -406,10 +406,18 @@ object GFXx3Dv2 {
                         ShaderLib.brightness +
                         colorGrading +
                         "void main(){\n" +
-                        "   vec2 finalUV = getProjectedUVs(uv, uvw);\n" +
-                        "   vec4 color;\n" +
-                        key.body +
-                        "   color.rgb = colorGrading(color.rgb);\n" +
+                        "   vec2 uvR = getProjectedUVs(uv, uvw, -1.0);\n" +
+                        "   vec2 uvG = getProjectedUVs(uv, uvw,  0.0);\n" +
+                        "   vec2 uvB = getProjectedUVs(uv, uvw, +1.0);\n" +
+                        "   vec2 finalUV;\n" +
+                        "   vec4 color; vec3 result = vec3(1.0);\n" +
+                        "   {\n finalUV = uvR;\n" + key.body +  "}\n" +
+                        "   result.r = color.r;\n" +
+                        "   {\n finalUV = uvB;\n" + key.body +  "}\n" +
+                        "   result.b = color.b;\n" +
+                        "   {\n finalUV = uvG;\n" + key.body +  "}\n" + // + alpha
+                        "   result.g = color.g;\n" +
+                        "   color.rgb = colorGrading(result.rgb);\n" +
                         "   if($hasForceFieldColor) color *= getForceFieldColor(finalPosition);\n" +
                         "   finalColor = color.rgb;\n" +
                         "   finalAlpha = color.a;\n" +
