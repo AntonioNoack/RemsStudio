@@ -445,20 +445,24 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
     open fun getSystemState(): Any? {
         // val t0 = System.nanoTime()
         val writer = JsonStringWriter(InvalidRef)
-        writer.add(spawnPosition)
-        writer.add(spawnVelocity)
-        writer.add(spawnRotation)
-        writer.add(spawnRotationVelocity)
-        writer.add(spawnRate)
-        writer.add(lifeTime)
-        writer.add(spawnColor)
-        writer.add(spawnOpacity)
-        writer.add(spawnSize)
+        var lastChanged = listOf(
+            spawnPosition,
+            spawnVelocity,
+            spawnRotation,
+            spawnRotationVelocity,
+            lifeTime,
+            spawnColor,
+            spawnOpacity,
+            spawnSize
+        ).maxOfOrNull { it.lastChanged }!!
+        lastChanged = max(lastChanged, spawnRate.lastChanged)
         val builder = writer.getFoolishWriteAccess()
         builder.append(simulationStepI.value)
+        builder.append(lastChanged)
         for (it in children) {
             if (it is ForceField) {
                 it.parent = null
+                // todo instead of the force field, can we add all its class plus its properties.lastChanged?
                 writer.add(it)
             } else {
                 builder.append(it.weight)

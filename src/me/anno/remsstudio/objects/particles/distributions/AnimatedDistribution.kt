@@ -36,6 +36,8 @@ class AnimatedDistribution(
     val channels = ArrayList<AnimatedProperty<*>>()
     lateinit var properties: List<InspectableVector>
 
+    val lastChanged get() = channels.maxOfOrNull { it.lastChanged } ?: 0L
+
     fun createInspector(
         c: List<Transform>,
         inspected: List<AnimatedDistribution>,

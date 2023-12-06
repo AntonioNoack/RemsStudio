@@ -217,15 +217,20 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
             val root = RemsStudio.root
             root.lastLocalTime = root.getLocalTime(globalTime)
             root.updateLocalColor(white4, root.lastLocalTime)
-            for (tr in computer.calculated) {
-                if (tr !== root) {
-                    val p = tr.parent ?: continue
-                    val localTime = tr.getLocalTime(p.lastLocalTime)
-                    tr.lastLocalTime = localTime
-                    tr.updateLocalColor(p.lastLocalColor, localTime)
+            val calculated = computer.calculated
+            if (calculated != null) {
+                for (i in calculated.indices) {
+                    val tr = calculated[i]
+                    if (tr !== root) {
+                        val p = tr.parent ?: continue
+                        val localTime = tr.getLocalTime(p.lastLocalTime)
+                        tr.lastLocalTime = localTime
+                        tr.updateLocalColor(p.lastLocalColor, localTime)
+                    }
                 }
             }
-            for (tr in drawn) {
+            for (i in drawn.indices) {
+                val tr = drawn[i]
                 val color = tr.lastLocalColor
                 val alpha = color.w * alphaMultiplier
                 if (alpha >= minAlpha && tr.isVisible(tr.lastLocalTime)) {

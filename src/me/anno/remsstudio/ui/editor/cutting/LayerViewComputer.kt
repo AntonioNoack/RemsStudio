@@ -11,7 +11,7 @@ import org.joml.Vector4f
 class LayerViewComputer(private val view: LayerView) {
 
     var isCalculating = false
-    lateinit var calculated: List<Transform>
+    var calculated: List<Transform>? = null
 
     fun calculateSolution(x0: Int, y0: Int, x1: Int, y1: Int) {
 

@@ -1,5 +1,6 @@
 package me.anno.remsstudio.animation
 
+import me.anno.Time
 import me.anno.animation.Interpolation
 import me.anno.animation.Type
 import me.anno.gpu.GFX.glThread
@@ -84,6 +85,7 @@ class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
     val drivers = arrayOfNulls<AnimationDriver>(type.components)
 
     var isAnimated = false
+    var lastChanged = 0L
     val keyframes = UnsafeArrayList<Keyframe<V>>()
 
     fun ensureCorrectType(v: Any?): V {
@@ -145,14 +147,17 @@ class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
                 val newFrame = Keyframe(time, value, interpolation)
                 keyframes.add(newFrame)
                 sort()
+                lastChanged = Time.nanoTime
                 return newFrame
             } else {
                 if (keyframes.size >= 1) {
                     keyframes[0].value = value
+                    lastChanged = Time.nanoTime
                     return keyframes[0]
                 } else {
                     val newFrame = Keyframe(time, value, Interpolation.SPLINE)
                     keyframes.add(newFrame)
+                    lastChanged = Time.nanoTime
                     return newFrame
                 }
             }
@@ -179,6 +184,7 @@ class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
     fun remove(keyframe: Keyframe<*>): Boolean {
         checkThread()
         synchronized(this) {
+            lastChanged = Time.nanoTime
             return keyframes.remove(keyframe)
         }
     }
@@ -406,6 +412,7 @@ class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
         }
         if (value is AnimationDriver) {
             drivers[index] = value
+            lastChanged = Time.nanoTime
         } else WrongClassType.warn("driver", value)
     }
 
@@ -426,6 +433,7 @@ class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
             for (i in 0 until type.components) {
                 this.drivers[i] = obj.drivers.getOrNull(i)
             }
+            lastChanged = Time.nanoTime
         } else LOGGER.warn("copy-from-object $obj is not an AnimatedProperty!")
     }
 
@@ -435,6 +443,7 @@ class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
             drivers[i] = null
         }
         keyframes.clear()
+        lastChanged = Time.nanoTime
     }
 
     override fun isDefaultValue() =

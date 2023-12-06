@@ -85,9 +85,6 @@ class LayerStripeSolution(
         val h = y1 - y0
 
         val xTimeCorrection = ((referenceTime - centralTime) * w / (dtHalfLength * 2)).roundToInt()
-
-        val metas = HashMap<Any, Any>()
-
         val timeOffset = (-centralTime / (2f * dtHalfLength) * w).toInt()
 
         for ((lineIndex, gradients) in lines.withIndex()) {
@@ -101,7 +98,7 @@ class LayerStripeSolution(
                 val isStriped = selectedTransform === tr || draggedTransform === tr
 
                 val video = tr as? Video
-                val meta = if (video == null) null else metas.getOrPut(video) { video.meta ?: Unit } as? MediaMetadata
+                val meta = video?.meta
 
                 val hasAudio = meta?.hasAudio ?: false
                 val hasVideo = meta?.hasVideo ?: false
