@@ -1,17 +1,14 @@
 package me.anno.remsstudio.ui
 
 import me.anno.config.DefaultStyle
-import me.anno.gpu.drawing.DrawTexts
 import me.anno.io.files.FileReference
 import me.anno.remsstudio.objects.Transform.Companion.toTransform
 import me.anno.remsstudio.ui.MenuUtils.drawTypeInCorner
 import me.anno.remsstudio.ui.sceneTabs.SceneTabs
+import me.anno.ui.Style
 import me.anno.ui.editor.files.FileExplorer
 import me.anno.ui.editor.files.FileExplorerOption
 import me.anno.ui.editor.files.toAllowedFilename
-import me.anno.ui.Style
-import me.anno.ui.base.components.AxisAlignment
-import me.anno.utils.Color
 import me.anno.utils.files.Files
 
 class StudioFileExplorer(file: FileReference?, style: Style) : FileExplorer(file, style) {

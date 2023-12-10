@@ -2,18 +2,14 @@ package me.anno.remsstudio.ui.scene
 
 import me.anno.Time.deltaTime
 import me.anno.Time.gameTime
-import me.anno.config.DefaultStyle.deepDark
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.maths.Maths.clamp01
 import me.anno.maths.Maths.length
-import me.anno.maths.Maths.min
 import me.anno.maths.Maths.mixAngle
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.editorTime
 import me.anno.remsstudio.RemsStudio.nullCamera
-import me.anno.remsstudio.RemsStudio.targetHeight
-import me.anno.remsstudio.RemsStudio.targetWidth
 import me.anno.remsstudio.Scene
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.ui.editor.ISceneView
@@ -83,68 +79,17 @@ class ScenePreview(style: Style) : PanelList(null, style.getChild("sceneView")),
         camera.position.set(pos)
     }
 
+    private val mutingColor = style.getColor("welcome.mutingColor", 0x55777777)
     override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
-
-        // GFX.check()
-
         updatePosition()
-
-        drawRect(x, y, width, height, deepDark)
-
-        val window = window!!
-        width = min(width, window.width - x)
-        height = min(height, window.height - y)
-
-        var dx = 0
-        var dy = 0
-        var rw = width
-        var rh = height
-
-        val camera = camera
-        if (camera.onlyShowTarget) {
-            if (width * targetHeight > targetWidth * height) {
-                rw = height * targetWidth / targetHeight
-                dx = (width - rw) / 2
-            } else {
-                rh = width * targetHeight / targetWidth
-                dy = (height - rh) / 2
-            }
-        }
-
-        // check if the size stayed the same;
-        // because resizing all framebuffers is expensive (causes lag)
-        val matchesSize = lastW == rw && lastH == rh
-        val wasNotRecentlyUpdated = lastSizeUpdate + 1e8 < gameTime
-        if (matchesSize) {
-            if (wasNotRecentlyUpdated) {
-                goodW = rw
-                goodH = rh
-            }
-        } else {
-            lastSizeUpdate = gameTime
-            lastW = rw
-            lastH = rh
-        }
-
-        if (goodW == 0 || goodH == 0) {
-            goodW = rw
-            goodH = rh
-        }
-
-        // prevent us drawing over the size of the frame
-        goodW = min(goodW, window.width - (x + dx))
-        goodH = min(goodH, window.height - (y + dy))
-
-        drawRect(x + dx, y + dy, rw, rh, black)
+        drawRect(x0, y0, x1 - x0, y1 - y0, black)
         Scene.draw(
             camera, RemsStudio.root,
-            x + dx, y + dy,
-            goodW, goodH,
+            x0, y0, x1 - x0, y1 - y0,
             editorTime, false,
             Renderer.colorRenderer,
             this
         )
-
+        drawRect(x0, y0, x1 - x0, y1 - y0, mutingColor)
     }
-
 }

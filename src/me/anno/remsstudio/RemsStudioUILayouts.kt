@@ -142,7 +142,7 @@ object RemsStudioUILayouts {
         options.addAction(
             renderTitle,
             Dict["Override Audio", "ui.top.render.overrideAudio"]
-        ) { overrideAudio(InvalidRef, true, callback) }
+        ) { overrideAudio(callback) }
         options.addAction(renderTitle, Dict["Audio Only", "ui.top.audioOnly"]) { renderAudio(true, callback) }
 
         /**

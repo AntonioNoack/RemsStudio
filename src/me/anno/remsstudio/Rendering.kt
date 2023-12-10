@@ -16,15 +16,13 @@ import me.anno.remsstudio.audio.AudioCreatorV2
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.objects.Video
-import me.anno.remsstudio.objects.modes.VideoType
 import me.anno.remsstudio.video.FrameTaskV2
 import me.anno.remsstudio.video.videoAudioCreatorV2
+import me.anno.studio.StudioBase
 import me.anno.ui.base.menu.Menu.ask
 import me.anno.ui.base.menu.Menu.msg
-import me.anno.ui.base.menu.Menu.openMenu
-import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.base.progress.ProgressBar
+import me.anno.utils.files.FileChooser
 import me.anno.utils.types.Strings.defaultImportType
 import me.anno.utils.types.Strings.getImportType
 import me.anno.video.VideoCreator
@@ -186,80 +184,57 @@ object Rendering {
         return cameras.firstOrNull() ?: RemsStudio.nullCamera ?: Camera()
     }
 
-    fun overrideAudio(video: FileReference, ask: Boolean, callback: () -> Unit) {
-
+    fun overrideAudio(callback: () -> Unit) {
         if (isRendering) return onAlreadyRendering()
-
-        val targetOutputFile = findTargetOutputFile(RenderType.VIDEO)
-        if (targetOutputFile.exists && ask) {
-            return askOverridingIsAllowed(targetOutputFile) {
-                overrideAudio(video, false, callback)
+        FileChooser.selectFiles(
+            NameDesc("Choose source file"),
+            allowFiles = true, allowFolders = false,
+            allowMultiples = false, toSave = false,
+            startFolder = project?.scenes ?: StudioBase.workspace,
+            filters = emptyList() // todo video filter
+        ) {
+            if (it.size == 1) {
+                val video = it.first()
+                if (video != project?.targetOutputFile) {
+                    overrideAudio(video, callback)
+                } else LOGGER.warn("Files must not be the same")
             }
         }
+    }
 
-        if (video == InvalidRef || !video.exists || video == targetOutputFile) {
-            // ask, which video should be selected
-            val videos = root.listOfAll.filterIsInstance<Video>()
-                .filter {
-                    it.file != InvalidRef && it.file.exists &&
-                            it.type == VideoType.VIDEO && it.file != video &&
-                            it.file != targetOutputFile
-                }.toList()
-            when (videos.size) {
-                0 -> {
-                    // warning / file selector
-                    LOGGER.warn("Could not find video in scene!")
-                }
-                // ok :)
-                1 -> overrideAudio(videos[0].file, ask, callback)
-                // we need to ask
-                else -> {
-                    // todo ask which video is the right one
-                    val windowStack = GFX.someWindow!!.windowStack
-                    openMenu(windowStack, NameDesc(
-                        "Select the target video",
-                        "Where the video part is defined; will also decide the length",
-                        "ui.rendering.selectTargetVideo"
-                    ), videos.map {
-                        MenuOption(NameDesc(it.name.ifEmpty { it.file.name }, it.file.absolutePath, "")) {
-                            overrideAudio(it.file, ask, callback)
-                        }
-                    })
-                }
+    fun overrideAudio(video: FileReference, callback: () -> Unit) {
+
+        val meta = getMeta(video, false)!!
+
+        isRendering = true
+        LOGGER.info("Rendering audio onto video")
+
+        val duration = meta.duration
+        val sampleRate = max(1, RemsStudio.targetSampleRate)
+
+        val scene = root.clone()
+        val audioSources = filterAudio(scene)
+
+        // if empty, skip?
+        LOGGER.info("Found ${audioSources.size} audio sources")
+
+        // todo progress bar didn't show up :/, why?
+        val progress = GFX.someWindow?.addProgressBar(object :
+            ProgressBar("Audio Override", "Samples", duration * sampleRate) {
+            override fun formatProgress(): String {
+                return "$name: ${progress.toLong()} / ${total.toLong()} $unit"
             }
-        } else {
-
-            val meta = getMeta(video, false)!!
-
-            isRendering = true
-            LOGGER.info("Rendering audio onto video")
-
-            val duration = meta.duration
-            val sampleRate = max(1, RemsStudio.targetSampleRate)
-
-            val scene = root.clone()
-            val audioSources = filterAudio(scene)
-
-            // if empty, skip?
-            LOGGER.info("Found ${audioSources.size} audio sources")
-
-            val progress = GFX.someWindow?.addProgressBar(object :
-                ProgressBar("Audio Override", "Samples", duration * sampleRate) {
-                override fun formatProgress(): String {
-                    return "$name: ${progress.toLong()} / ${total.toLong()} $unit"
-                }
-            })
-            AudioCreatorV2(scene, findCamera(scene), audioSources, duration, sampleRate, progress).apply {
-                onFinished = {
-                    isRendering = false
-                    progress?.finish()
-                    callback()
-                }
-                thread(name = "Rendering::renderAudio()") {
-                    createOrAppendAudio(targetOutputFile, video, false)
-                }
+        })
+        AudioCreatorV2(scene, findCamera(scene), audioSources, duration, sampleRate, progress).apply {
+            onFinished = {
+                isRendering = false
+                progress?.finish()
+                callback()
+                targetOutputFile.invalidate()
             }
-
+            thread(name = "Rendering::renderAudio()") {
+                createOrAppendAudio(targetOutputFile, video, false)
+            }
         }
     }
 
@@ -299,6 +274,7 @@ object Rendering {
                 isRendering = false
                 progress?.finish()
                 callback()
+                targetOutputFile.invalidate()
             }
             thread(name = "Rendering::renderAudio()") {
                 createOrAppendAudio(targetOutputFile, InvalidRef, false)

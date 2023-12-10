@@ -4,6 +4,8 @@ import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.ui.IsAnimatedWrapper
+import me.anno.remsstudio.ui.IsSelectedWrapper
 import me.anno.studio.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
@@ -28,8 +30,10 @@ fun Text.createInspectorWithoutSuperImpl(
     val t = inspected.filterIsInstance<Transform>()
     val c = inspected.filterIsInstance<Text>()
 
-    val textInput = vis(c, "Text", "", "", c.map { it.text }, style) as TextInputML
-    list += textInput
+    val textInput0 = vis(c, "Text", "", "", c.map { it.text }, style) as IsSelectedWrapper
+    list += textInput0
+    val textInput1 = textInput0.child as IsAnimatedWrapper
+    val textInput = textInput1.child as TextInputML
     textInput.addChangeListener {
         RemsStudio.incrementalChange("text") {
             for (x in c) for (e in x.getSelfWithShadows()) {

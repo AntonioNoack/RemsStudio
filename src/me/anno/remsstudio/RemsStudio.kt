@@ -36,13 +36,14 @@ import me.anno.studio.StudioBase
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.components.AxisAlignment
-import me.anno.ui.base.groups.PanelStack
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.WelcomeUI
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.OS
 import me.anno.utils.hpc.ProcessingQueue
 import kotlin.math.min
+
+// todo bug: text cannot be selected property because of the dragging change
 
 // todo bug: when editing a driver, we should see its curve
 // todo bug: there is a webm file, whose video is black, and the audio only plays in the file explorer, not the studio :(
@@ -176,10 +177,6 @@ object RemsStudio : StudioBase("Rem's Studio", 10301, true) {
 
             override fun createBackground(style: Style): Panel {
                 val background = ScenePreview(style)
-                val grayPlane = Panel(style).apply { backgroundColor = 0x55777777 }
-                val panel = PanelStack(style)
-                panel.add(background)
-                panel.add(grayPlane)
                 root.children.clear()
                 Text("Rem's Studio", root).apply {
                     blockAlignmentX.set(0f)
@@ -188,13 +185,9 @@ object RemsStudio : StudioBase("Rem's Studio", 10301, true) {
                     relativeCharSpacing = 0.12f
                     invalidate()
                 }
-                panel.alignmentX = AxisAlignment.FILL
-                panel.alignmentY = AxisAlignment.FILL
-                grayPlane.alignmentX = AxisAlignment.FILL
-                grayPlane.alignmentY = AxisAlignment.FILL
                 background.alignmentX = AxisAlignment.FILL
                 background.alignmentY = AxisAlignment.FILL
-                return panel
+                return background
             }
 
             override fun loadProject(name: String, folder: FileReference): Pair<String, FileReference> {

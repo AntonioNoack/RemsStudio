@@ -16,10 +16,11 @@ import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.mix
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Transform
-import me.anno.utils.Sleep.waitUntilDefined
+import me.anno.utils.ShutdownException
+import me.anno.utils.Sleep.waitUntil
 import me.anno.utils.structures.tuples.ShortPair
-import me.anno.video.ffmpeg.MediaMetadata
 import me.anno.video.ffmpeg.FFMPEGStream.Companion.getAudioSequence
+import me.anno.video.ffmpeg.MediaMetadata
 import org.joml.Vector3f
 import kotlin.math.abs
 import kotlin.math.max
@@ -72,8 +73,8 @@ class AudioStreamRaw2(
 
         val ffmpegSliceSampleCount = ffmpegSliceSampleCount
         val sliceIndex = index / ffmpegSliceSampleCount
-        val soundBuffer: SoundBuffer = if (sliceIndex == lastSliceIndex) {
-            lastSoundBuffer!!
+        val soundBuffer: SoundBuffer? = if (sliceIndex == lastSliceIndex) {
+            lastSoundBuffer
         } else {
             val file = file
             val ffmpegSliceSampleDuration = ffmpegSliceSampleDuration
@@ -82,18 +83,18 @@ class AudioStreamRaw2(
             val sliceTime = sliceIndex * ffmpegSliceSampleDuration
             val soundBuffer = AudioCache2.getEntry(key, timeout, false) {
                 val sequence = getAudioSequence(file, sliceTime, ffmpegSliceSampleDuration, ffmpegSampleRate)
-                val buffer = waitUntilDefined(true) { sequence.soundBuffer }
-                CacheData(buffer to sequence.channels)
-            } as CacheData<*>
+                waitUntil(true) { sequence.soundBuffer != null || sequence.isEmpty }
+                CacheData(sequence.soundBuffer to sequence.channels)
+            } as? CacheData<*> ?: throw ShutdownException()
             val sv = soundBuffer.value as Pair<*, *>
-            val sb = sv.first as SoundBuffer
+            val sb = sv.first as? SoundBuffer
             lastSoundBuffer = sb
             lastSliceIndex = sliceIndex
             lastChannels = sv.second as Int
             sb
         }
 
-        val data = soundBuffer.data!!
+        val data = soundBuffer?.data ?: return shortPair.set(0, 0)
         val localIndex = (index % ffmpegSliceSampleCount).toInt()
         val arrayIndex0 = localIndex * lastChannels // for stereo
 
