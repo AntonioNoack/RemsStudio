@@ -42,6 +42,8 @@ import me.anno.remsstudio.objects.lists.Element
 import me.anno.remsstudio.objects.lists.SplittableElement
 import me.anno.remsstudio.objects.models.SpeakerModel.drawSpeakers
 import me.anno.remsstudio.objects.modes.VideoType
+import me.anno.remsstudio.ui.editor.cutting.LayerView
+import me.anno.studio.Events.addEvent
 import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.Style
@@ -192,7 +194,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
 
     override fun getEndTime(): Double = when (isLooping.value) {
         LoopingState.PLAY_ONCE -> {
-            when (type) {
+            if (stayVisibleAtEnd) Double.POSITIVE_INFINITY
+            else when (type) {
                 VideoType.IMAGE_SEQUENCE -> imageSequenceMeta?.duration
                 VideoType.IMAGE -> Double.POSITIVE_INFINITY
                 VideoType.UNKNOWN -> Double.POSITIVE_INFINITY
@@ -204,7 +207,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
 
     override fun isVisible(localTime: Double): Boolean {
         val looping = isLooping.value
-        return localTime >= 0.0 && (looping != LoopingState.PLAY_ONCE || localTime < lastDuration)
+        return localTime >= 0.0 && (stayVisibleAtEnd || looping != LoopingState.PLAY_ONCE || localTime < lastDuration)
     }
 
     override fun transformLocally(pos: Vector3f, time: Double): Vector3f {
@@ -583,7 +586,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                     val isLooping = isLooping.value
 
                     if (sourceFPS > 0.0) {
-                        if (maxT >= 0.0 && (isLooping != LoopingState.PLAY_ONCE || minT < duration)) {
+                        if (maxT >= 0.0 && (stayVisibleAtEnd || isLooping != LoopingState.PLAY_ONCE || minT < duration)) {
 
                             // use full fps when rendering to correctly render at max fps with time dilation
                             // issues arise, when multiple frames should be interpolated together into one
@@ -614,7 +617,6 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                                     )
                                 }
                             }
-
                         }
                     }
                 }
@@ -627,7 +629,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                     val duration = meta.duration
                     val isLooping = isLooping.value
 
-                    if (maxT >= 0.0 && (isLooping != LoopingState.PLAY_ONCE || minT < duration)) {
+                    if (maxT >= 0.0 && (stayVisibleAtEnd || isLooping != LoopingState.PLAY_ONCE || minT < duration)) {
 
                         // draw the current texture
                         val localTime0 = isLooping[minT, duration]
@@ -865,13 +867,37 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 null, clampMode.value, style
             ) { it, _ -> for (x in c) x.clampMode.value = it })
 
+        fun invalidateTimeline() {
+            AudioManager.requestUpdate()
+            // todo this needs multiple frames of invalidation, probably...
+            /*addEvent { // needs a little timeout
+                for (window in GFX.windows) {
+                    for (window1 in window.windowStack) {
+                        window1.panel.forAllVisiblePanels {
+                            if (it is LayerView) it.invalidateLayout()
+                        }
+                    }
+                }
+            }*/
+        }
+
         val time = getGroup("Time", "", "time")
         time += vi(
             inspected, "Looping Type", "Whether to repeat the song/video", "video.loopingType",
+            "video.loopingType",
             null, isLooping.value, style
         ) { it, _ ->
             for (x in c) x.isLooping.value = it
-            AudioManager.requestUpdate()
+            invalidateTimeline()
+        }
+        time += vi(
+            inspected, "Stay Visible At End",
+            "Normally a video fades out, or loops; this lets it stay on the last frame",
+            "video.stayVisibleAtEnd", "video.stayVisibleAtEnd",
+            null, stayVisibleAtEnd, style
+        ) { it, _ ->
+            for (x in c) x.stayVisibleAtEnd = it
+            invalidateTimeline()
         }
 
         val editor = getGroup("Editor", "", "editor")
@@ -981,6 +1007,14 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         writer.writeObject(this, "cgSlope", cgSlope)
         writer.writeObject(this, "cgPower", cgPower)
         writer.writeMaybe(this, "editorVideoFPS", editorVideoFPS)
+        writer.writeBoolean("stayVisibleAtEnd", stayVisibleAtEnd)
+    }
+
+    override fun readBoolean(name: String, value: Boolean) {
+        when (name) {
+            "stayVisibleAtEnd" -> stayVisibleAtEnd = value
+            else -> super.readBoolean(name, value)
+        }
     }
 
     override fun readObject(name: String, value: ISaveable?) {

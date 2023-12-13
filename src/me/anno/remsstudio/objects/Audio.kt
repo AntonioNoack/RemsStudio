@@ -33,6 +33,8 @@ abstract class Audio(var file: FileReference = InvalidRef, parent: Transform? = 
         else LoopingState.PLAY_ONCE
     }
 
+    var stayVisibleAtEnd = false
+
     var is3D = false
 
     open val meta get() = getMeta(file, true)
