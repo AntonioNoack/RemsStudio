@@ -2,17 +2,17 @@ package me.anno.remsstudio.objects
 
 import me.anno.config.DefaultConfig
 import me.anno.ecs.Entity
+import me.anno.ecs.EntityQuery.forAllComponents
+import me.anno.ecs.EntityQuery.hasComponent
 import me.anno.ecs.components.anim.*
 import me.anno.ecs.components.anim.BoneData.uploadJointMatrices
-import me.anno.ecs.components.mesh.Material
-import me.anno.ecs.components.mesh.MaterialCache
 import me.anno.ecs.components.mesh.MeshComponentBase
 import me.anno.ecs.prefab.PrefabCache
 import me.anno.engine.ui.render.ECSShaderLib
 import me.anno.engine.ui.render.Renderers.previewRenderer
 import me.anno.gpu.GFX
 import me.anno.gpu.GFXState
-import me.anno.gpu.drawing.GFXx3D
+import me.anno.gpu.pipeline.Pipeline
 import me.anno.gpu.shader.Shader
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.texture.ITexture2D
@@ -219,9 +219,9 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             shader.v1f("worldScale", 1f) // correct?
             // todo tint is not working (needed for blending in for example)
             shader.v4f("tint", color)
-            shader.v4f("gfxId", clickId)
+            shader.v4f("finalId", clickId)
 
-            entity.anyComponent(MeshComponentBase::class) { comp ->
+            entity.forAllComponents(MeshComponentBase::class) { comp ->
                 val mesh = comp.getMesh()
                 if (mesh?.positions != null) {
                     mesh.checkCompleteness()
@@ -229,16 +229,13 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                     val materialOverrides = comp.materials
                     val materials = mesh.materials
                     for (index in 0 until mesh.numMaterials) {
-                        val m0 = materialOverrides.getOrNull(index)?.nullIfUndefined()
-                        val m1 = m0 ?: materials.getOrNull(index)
-                        val material = MaterialCache[m1, Material.defaultMaterial]
+                        val material = Pipeline.getMaterial(materialOverrides, materials, index)
                         shader.v1i("hasVertexColors", if (material.enableVertexColors) mesh.hasVertexColors else 0)
                         material.bind(shader)
                         animTexture?.bindTrulyNearest(shader, "animTexture")
                         mesh.draw(shader, index)
                     }
                 } else ThumbsExt.warnMissingMesh(comp, mesh)
-                false
             }
         }
 

@@ -43,8 +43,6 @@ import me.anno.utils.OS
 import me.anno.utils.hpc.ProcessingQueue
 import kotlin.math.min
 
-// todo bug: text cannot be selected property because of the dragging change
-
 // todo bug: when editing a driver, we should see its curve
 // todo bug: there is a webm file, whose video is black, and the audio only plays in the file explorer, not the studio :(
 // todo right-click option to remove linear sections from keyframe panel;
@@ -112,7 +110,7 @@ import kotlin.math.min
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
-object RemsStudio : StudioBase("Rem's Studio", 10301, true) {
+object RemsStudio : StudioBase("Rem's Studio", 10301, true), WelcomeUI {
 
     val defaultWindowStack get() = GFX.someWindow!!.windowStack
     var hideUnusedProperties = false
@@ -159,8 +157,6 @@ object RemsStudio : StudioBase("Rem's Studio", 10301, true) {
         ShaderLibV2.init()
     }
 
-    lateinit var welcomeUI: WelcomeUI
-
     override fun isSelected(obj: Any?): Boolean {
         return contains(obj, Selection.selectedInspectables) ||
                 contains(obj, Selection.selectedProperties) ||
@@ -171,45 +167,38 @@ object RemsStudio : StudioBase("Rem's Studio", 10301, true) {
         return list != null && obj in list
     }
 
-    override fun createUI() {
-        Dict.loadDefault()
-        welcomeUI = object : WelcomeUI() {
-
-            override fun createBackground(style: Style): Panel {
-                val background = ScenePreview(style)
-                root.children.clear()
-                Text("Rem's Studio", root).apply {
-                    blockAlignmentX.set(0f)
-                    blockAlignmentY.set(0f)
-                    textAlignment.set(0f)
-                    relativeCharSpacing = 0.12f
-                    invalidate()
-                }
-                background.alignmentX = AxisAlignment.FILL
-                background.alignmentY = AxisAlignment.FILL
-                return background
-            }
-
-            override fun loadProject(name: String, folder: FileReference): Pair<String, FileReference> {
-                val project = RemsStudio.loadProject(name, folder)
-                return Pair(project.name, project.file)
-            }
-
-            override fun createProjectUI() {
-                RemsStudioUILayouts.createEditorUI(welcomeUI)
-            }
+    override fun createBackground(style: Style): Panel {
+        val background = ScenePreview(style)
+        root.children.clear()
+        Text("Rem's Studio", root).apply {
+            blockAlignmentX.set(0f)
+            blockAlignmentY.set(0f)
+            textAlignment.set(0f)
+            relativeCharSpacing = 0.12f
+            invalidate()
         }
-        welcomeUI.create(this)
-        StudioActions.register()
-        ActionManager.init()
+        background.alignmentX = AxisAlignment.FILL
+        background.alignmentY = AxisAlignment.FILL
+        return background
     }
 
-    fun loadProject(name: String, folder: FileReference): Project {
+    override fun loadProject(name: String, folder: FileReference): Pair<String, FileReference> {
         val project = Project(name.trim(), folder)
         RemsStudio.project = project
         project.open()
         GFX.someWindow?.title = "Rem's Studio: ${project.name}"
-        return project
+        return Pair(project.name, project.file)
+    }
+
+    override fun createProjectUI() {
+        RemsStudioUILayouts.createEditorUI(this)
+    }
+
+    override fun createUI() {
+        Dict.loadDefault()
+        create(this)
+        StudioActions.register()
+        ActionManager.init()
     }
 
     override fun openHistory() {

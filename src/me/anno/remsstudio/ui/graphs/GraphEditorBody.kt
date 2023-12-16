@@ -76,8 +76,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
             return if (type != null) {
                 var sum = 0
                 for (i in 0 until type.components) {
-                    sum += editor.channelMasks[i]
-                        .isChecked.toInt(1 shl i)
+                    sum += editor.channelMasks[i].value.toInt(1 shl i)
                 }
                 if (sum == 0) -1 else sum
             } else -1

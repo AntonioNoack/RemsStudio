@@ -39,7 +39,7 @@ object GFXx3Dv2 {
 
     fun defineAdvancedGraphicalFeatures(shader: Shader, transform: Transform?, time: Double, is3D: Boolean) {
         (transform as? GFXTransform)?.uploadAttractors(shader, time, is3D) ?: uploadAttractors0(shader)
-        shader.v4f("gfxId", transform?.clickId ?: -1)
+        shader.v4f("finalId", transform?.clickId ?: -1)
         colorGradingUniforms(transform as? Video, time, shader)
     }
 
@@ -195,7 +195,7 @@ object GFXx3Dv2 {
     ) {
         val shader = ShaderLibV2.shader3DPolygon.value
         shader.use()
-        shader.v4f("gfxId", polygon.clickId)
+        shader.v4f("finalId", polygon.clickId)
         polygon.uploadAttractors(shader, time, false)
         shader3DUniforms(shader, stack, texture.width, texture.height, color, null, filtering, null)
         shader.v1f("inset", inset)

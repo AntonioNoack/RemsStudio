@@ -45,7 +45,6 @@ import kotlin.math.roundToInt
 class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
 
     // todo display name?
-    // done: audio, video
 
     // todo select multiple elements to move them around together
     // todo they shouldn't be parent and children, because that would have awkward results...
@@ -76,14 +75,6 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
 
     var hoveredTransform: Transform? = null
     var hoveredKeyframes: List<Keyframe<*>>? = null
-
-    // performance is very low... fix that...
-    // especially, if it's not changing
-    // two ideas:
-    //  kind of done - render only every x frames + on request
-    // actually done - calculation async
-    // instanced arrays, because we have soo many stripes?
-    // we could optimize simple, not manipulated stripes... -> we optimize with linear approximations
 
     companion object {
         val minAlphaInt = 1
