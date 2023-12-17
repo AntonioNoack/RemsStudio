@@ -42,8 +42,6 @@ import me.anno.remsstudio.objects.lists.Element
 import me.anno.remsstudio.objects.lists.SplittableElement
 import me.anno.remsstudio.objects.models.SpeakerModel.drawSpeakers
 import me.anno.remsstudio.objects.modes.VideoType
-import me.anno.remsstudio.ui.editor.cutting.LayerView
-import me.anno.studio.Events.addEvent
 import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.Style
@@ -963,10 +961,15 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                     if (component == null) {
                         AudioTasks.addTask("start", 5) {
                             val audio2 = Video(file, null)
+                            audio2.update() // load type
                             audio2.startPlayback(0.0, 1.0, nullCamera!!)
                             component = audio2.component
                         }
-                    } else AudioTasks.addTask("stop", 1) { stopPlayback() }
+                    } else {
+                        AudioTasks.addTask("stop", 1) {
+                            stopPlayback()
+                        }
+                    }
                 } else LOGGER.warn("Separated playback is only available with paused editor")
             }
             .setTooltip("Listen to the audio separated from the rest"))

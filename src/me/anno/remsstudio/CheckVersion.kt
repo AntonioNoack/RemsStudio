@@ -15,6 +15,7 @@ import java.net.URI
 import java.net.URL
 import kotlin.concurrent.thread
 
+@Suppress("unused")
 object CheckVersion {
 
     private fun formatVersion(version: Int): String {

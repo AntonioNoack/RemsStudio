@@ -179,7 +179,6 @@ object RemsStudioUILayouts {
         }
         options.addAction(windowTitle, Dict["Save Layout", "ui.top.saveUILayout"]) {
             askName(windowStack, NameDesc("Layout Name"), "ui", NameDesc("Save"), {
-                // todo ask-for-file-name-menu
                 val trimmed = it.trim()
                 if (trimmed.toAllowedFilename() == trimmed) {
                     if (Project.getUILayoutFile(trimmed).exists) {

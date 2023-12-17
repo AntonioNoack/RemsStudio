@@ -3,10 +3,12 @@ package me.anno.remsstudio
 import me.anno.animation.Type
 import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX
-import me.anno.io.files.InvalidRef
+import me.anno.io.base.BaseWriter
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio.editorTime
+import me.anno.remsstudio.RemsStudio.motionBlurSteps
 import me.anno.remsstudio.RemsStudio.project
+import me.anno.remsstudio.RemsStudio.shutterPercentage
 import me.anno.remsstudio.RemsStudio.targetDuration
 import me.anno.remsstudio.RemsStudio.targetHeight
 import me.anno.remsstudio.RemsStudio.targetOutputFile
@@ -103,8 +105,6 @@ object RenderSettings : Transform() {
             }
             .setTooltip("0 = lossless, 23 = default, 51 = worst; worse results have smaller file sizes")
 
-        // todo still cannot be animated... why???
-        // todo why is the field not showing up?
         val mbs = vi(
             "Motion-Blur-Steps", "0,1 = no motion blur, e.g. 16 = decent motion blur, sub-frames per frame",
             project.motionBlurSteps, style
@@ -243,6 +243,13 @@ object RenderSettings : Transform() {
     private fun actuallySave() {
         save()
         project!!.saveConfig()
+    }
+
+    override fun save(writer: BaseWriter) {
+        super.save(writer)
+        // hack for us to allow editing animated properties
+        writer.writeObject(this, "motionBlurSteps", motionBlurSteps)
+        writer.writeObject(this, "shutterPercentage", shutterPercentage)
     }
 
 }

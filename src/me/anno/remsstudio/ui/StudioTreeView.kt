@@ -58,19 +58,22 @@ class StudioTreeView(style: Style) :
 
     override fun removeChild(parent: Transform, child: Transform) {
         parent.removeChild(child)
+        invalidateLayout()
     }
 
     override fun setCollapsed(element: Transform, collapsed: Boolean) {
         element.isCollapsedI.value = collapsed
+        invalidateLayout()
     }
-
 
     override fun setName(element: Transform, name: String) {
         element.nameI.value = name
+        invalidateLayout()
     }
 
     override fun destroy(element: Transform) {
         element.onDestroy()
+        invalidateLayout()
     }
 
     override fun canBeInserted(parent: Transform, element: Transform, index: Int): Boolean {

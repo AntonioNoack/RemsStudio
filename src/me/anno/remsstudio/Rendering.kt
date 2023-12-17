@@ -35,8 +35,6 @@ import kotlin.concurrent.thread
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-// todo f2 to rename something in the tree view
-// todo test-playback button not working?
 object Rendering {
 
     var isRendering = false
@@ -104,7 +102,6 @@ object Rendering {
 
         val scene = root.clone()
 
-        // todo make gifs with audio
         val audioSources = if (isGif) emptyList() else filterAudio(scene)
 
         val balance = project?.ffmpegBalance ?: FFMPEGEncodingBalance.M0
