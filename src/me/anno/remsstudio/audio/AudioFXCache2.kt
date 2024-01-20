@@ -40,7 +40,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
 
     data class EffectKey(val effect: SoundEffect, val data: Any, val previous: EffectKey?)
 
-    class PipelineKey(
+    data class PipelineKey(
         val file: FileReference,
         val time0: Time,
         val time1: Time,

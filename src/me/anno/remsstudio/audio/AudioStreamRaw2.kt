@@ -9,6 +9,7 @@ import me.anno.audio.openal.SoundBuffer
 import me.anno.audio.streams.AudioStreamRaw.Companion.averageSamples
 import me.anno.audio.streams.AudioStreamRaw.Companion.ffmpegSliceSampleDuration
 import me.anno.audio.streams.StereoShortStream
+import me.anno.cache.AsyncCacheData
 import me.anno.cache.CacheData
 import me.anno.cache.CacheSection
 import me.anno.io.MediaMetadata
@@ -86,7 +87,7 @@ class AudioStreamRaw2(
                 val sequence = getAudioSequence(file, sliceTime, ffmpegSliceSampleDuration, ffmpegSampleRate)
                 waitUntil(true) { sequence.hasValue }
                 sequence
-            } as? CacheData<*> ?: throw ShutdownException()
+            } as AsyncCacheData<*>
             val sv = soundBuffer.value as SoundBuffer
             lastSoundBuffer = sv
             lastSliceIndex = sliceIndex
