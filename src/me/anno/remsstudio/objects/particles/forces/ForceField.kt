@@ -11,7 +11,7 @@ import me.anno.remsstudio.objects.models.ArrowModel
 import me.anno.remsstudio.objects.particles.Particle
 import me.anno.remsstudio.objects.particles.ParticleState
 import me.anno.remsstudio.objects.particles.ParticleSystem
-import me.anno.studio.Inspectable
+import me.anno.engine.inspector.Inspectable
 import me.anno.ui.base.groups.PanelList
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory

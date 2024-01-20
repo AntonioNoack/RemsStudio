@@ -1,6 +1,6 @@
 package me.anno.remsstudio.audio.effects.falloff
 
-import me.anno.animation.Type
+import me.anno.ui.input.NumberType
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
 import me.anno.io.base.BaseWriter
 import me.anno.maths.Maths.mix
@@ -71,7 +71,7 @@ abstract class Falloff : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
         list.add(audio.vi(
             selectedTransforms, "Half Distance",
             "Distance, where the amplitude is 50%",
-            Type.FLOAT_PLUS_EXP,
+            NumberType.FLOAT_PLUS_EXP,
             halfDistance,
             style
         ) { it, _ -> halfDistance = it })

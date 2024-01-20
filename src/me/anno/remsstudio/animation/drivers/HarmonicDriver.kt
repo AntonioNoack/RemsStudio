@@ -6,7 +6,7 @@ import me.anno.language.translation.Dict
 import me.anno.remsstudio.objects.Transform
 import me.anno.parser.SimpleExpressionParser.parseDouble
 import me.anno.parser.SimpleExpressionParser.preparse
-import me.anno.studio.Inspectable
+import me.anno.engine.inspector.Inspectable
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.TextInput
 import me.anno.ui.Style

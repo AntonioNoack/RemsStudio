@@ -7,7 +7,6 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.documents.PDFDocument
 import me.anno.remsstudio.objects.geometric.LinePolygon
 import me.anno.remsstudio.objects.text.Chapter
-import me.anno.studio.StudioBase
 
 class RemsVersionFeatures(oldVersion: Int) : VersionFeatures(oldVersion) {
 
@@ -40,7 +39,7 @@ class RemsVersionFeatures(oldVersion: Int) : VersionFeatures(oldVersion) {
             addInstance(config, "Chapter", Chapter())
         }
 
-        config["version"] = StudioBase.instance?.versionNumber ?: 0
+        config["version"] = RemsStudio.versionNumber
 
     }
 

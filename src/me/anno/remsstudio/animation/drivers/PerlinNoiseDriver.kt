@@ -1,16 +1,16 @@
 package me.anno.remsstudio.animation.drivers
 
-import me.anno.animation.Type
+import me.anno.engine.inspector.Inspectable
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.maths.Maths.clamp
 import me.anno.maths.noise.FullNoise
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
-import me.anno.studio.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
+import me.anno.ui.input.NumberType
 import kotlin.math.min
 
 class PerlinNoiseDriver : AnimationDriver() {
@@ -53,10 +53,10 @@ class PerlinNoiseDriver : AnimationDriver() {
         val transform = transforms.first()
         val c = inspected.filterIsInstance<PerlinNoiseDriver>()
         list += transform.vi(
-            inspected, "Octaves", "Levels of Detail", Type.INT_PLUS, octaves, style
+            inspected, "Octaves", "Levels of Detail", NumberType.INT_PLUS, octaves, style
         ) { it, _ -> for (x in c) x.octaves = it }
         list += transform.vi(
-            inspected, "Seed", "Base value for randomness", Type.LONG, seed, style
+            inspected, "Seed", "Base value for randomness", NumberType.LONG, seed, style
         ) { it, _ -> for (x in c) x.seed = it }
         list += transform.vis(
             c.map { transform }, "Falloff", "Changes high-frequency weight", c.map { it.falloff },

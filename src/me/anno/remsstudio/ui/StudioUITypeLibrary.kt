@@ -1,7 +1,6 @@
 package me.anno.remsstudio.ui
 
 import me.anno.config.DefaultConfig
-import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio
@@ -13,11 +12,11 @@ import me.anno.remsstudio.ui.graphs.GraphEditor
 import me.anno.remsstudio.ui.scene.StudioSceneView
 import me.anno.ui.Panel
 import me.anno.ui.base.menu.Menu.askName
-import me.anno.ui.custom.Type
+import me.anno.ui.custom.CustomPanelType
 import me.anno.ui.custom.UITypeLibrary
 import me.anno.ui.editor.files.FileExplorer.Companion.invalidateFileExplorers
 import me.anno.ui.editor.files.FileExplorerOption
-import me.anno.ui.editor.files.toAllowedFilename
+import me.anno.ui.editor.files.FileNames.toAllowedFilename
 
 class StudioUITypeLibrary : UITypeLibrary(typeList) {
 
@@ -35,7 +34,7 @@ class StudioUITypeLibrary : UITypeLibrary(typeList) {
                 { -1 }) {
                 val validName = it.toAllowedFilename()
                 if (validName != null) {
-                    getReference(folder, "${validName}.json").writeText(
+                    folder.getChild("${validName}.json").writeText(
                         Transform()
                             .apply { name = it }
                             .toString())
@@ -61,7 +60,7 @@ class StudioUITypeLibrary : UITypeLibrary(typeList) {
                     { StudioFileExplorer(RemsStudio.project?.scenes, DefaultConfig.style) },
             Dict["Play Controls", "ui.customize.timeControl"] to
                     { TimeControlsPanel(DefaultConfig.style) }
-        ).map { Type(it.first, it.second) }.toMutableList()
+        ).map { CustomPanelType(it.first, it.second) }.toMutableList()
     }
 
 }

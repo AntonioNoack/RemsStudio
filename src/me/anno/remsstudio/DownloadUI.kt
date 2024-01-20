@@ -1,30 +1,28 @@
 package me.anno.remsstudio
 
 import me.anno.Engine
-import me.anno.config.DefaultConfig
+import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.gpu.GFX
-import me.anno.gpu.RenderDoc.disableRenderDoc
 import me.anno.gpu.texture.TextureCache
 import me.anno.installer.Installer
 import me.anno.io.Streams.readText
 import me.anno.io.files.FileReference
-import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.files.InvalidRef
+import me.anno.io.files.Reference.getReference
 import me.anno.io.json.generic.JsonReader
 import me.anno.language.translation.NameDesc
-import me.anno.studio.StudioBase
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.WindowStack
 import me.anno.ui.base.ImagePanel
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.components.AxisAlignment
+import me.anno.ui.base.components.StretchModes
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.menu.Menu
 import me.anno.ui.base.progress.ProgressBarPanel
 import me.anno.ui.base.text.TextPanel
-import me.anno.ui.debug.TestStudio
-import me.anno.ui.editor.files.toAllowedFilename
+import me.anno.ui.editor.files.FileNames.toAllowedFilename
 import me.anno.ui.input.EnumInput
 import me.anno.ui.input.FileInput
 import me.anno.ui.input.URLInput
@@ -178,7 +176,7 @@ object DownloadUI {
         )
         srcInput.alignmentX = AxisAlignment.FILL
 
-        val dstFolder = RemsStudio.project?.scenes ?: StudioBase.workspace
+        val dstFolder = RemsStudio.project?.scenes ?: workspace
         val dstPanel = FileInput(
             "Destination File", style,
             dstFolder.getChild(System.currentTimeMillis().toString(16)),
@@ -205,7 +203,7 @@ object DownloadUI {
             }
         }
         thumbnailPanel.flipY = false
-        thumbnailPanel.stretchMode = ImagePanel.StretchModes.PADDING
+        thumbnailPanel.stretchMode = StretchModes.PADDING
 
         val bestFormat = NameDesc("Best", "best", "")
         val discardFormat = NameDesc("Discard", "", "")
@@ -295,7 +293,7 @@ object DownloadUI {
 
                     val dstName = (data["title"] ?: data["id"] ?: data["filesize"])?.toString()?.toAllowedFilename()
                     if (dstName != null) {
-                        dstPanel.setValue((dstPanel.value.getParent() ?: dstFolder).getChild(dstName), true)
+                        dstPanel.setValue(dstPanel.value.getParent().getChild(dstName), true)
                     }
 
                     val formats = data["formats"] as? List<Any?>

@@ -189,7 +189,7 @@ object GFXx3Dv2 {
     fun draw3DPolygon(
         polygon: Polygon, time: Double,
         stack: Matrix4fArrayList, buffer: Mesh,
-        texture: Texture2D, color: Vector4f,
+        texture: ITexture2D, color: Vector4f,
         inset: Float,
         filtering: TexFiltering, clamping: Clamping
     ) {

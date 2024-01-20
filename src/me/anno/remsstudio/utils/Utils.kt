@@ -1,11 +1,11 @@
 package me.anno.remsstudio.utils
 
-import me.anno.animation.Type
+import me.anno.ui.input.NumberType
 import me.anno.io.utils.StringMap
 import me.anno.remsstudio.animation.AnimatedProperty
 
 object Utils {
-    fun <V> StringMap.getAnimated(key: String, type: Type): AnimatedProperty<V> {
+    fun <V> StringMap.getAnimated(key: String, type: NumberType): AnimatedProperty<V> {
         val v = when (val value = this[key]) {
             is AnimatedProperty<*> -> {
                 return if (value.type == type) {

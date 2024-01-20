@@ -31,12 +31,12 @@ import me.anno.gpu.shader.ShaderLib.createShader
 import me.anno.gpu.shader.ShaderLib.uvList
 import me.anno.gpu.shader.builder.Variable
 import me.anno.gpu.shader.builder.VariableMode
-import me.anno.gpu.shader.effects.GaussianBlur
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.Filtering
 import me.anno.gpu.texture.Texture3D
 import me.anno.gpu.texture.TextureCache.getLUT
+import me.anno.image.utils.GaussianBlur
 import me.anno.maths.Maths.PIf
 import me.anno.remsstudio.RemsStudio.currentCamera
 import me.anno.remsstudio.RemsStudio.gfxSettings
@@ -357,7 +357,7 @@ object Scene {
         val needsLUT = !isFakeColorRendering && lutFile.exists && !lutFile.isDirectory
         val lut = if (needsLUT) getLUT(lutFile, true, 20_000) else null
 
-        if (lut == null && needsLUT && isFinalRendering) throw MissingFrameException(lutFile)
+        if (lut == null && needsLUT && isFinalRendering) throw MissingFrameException(lutFile.absolutePath)
 
         if (buffer is Framebuffer && needsTemporaryBuffer) {
             renderPurely {

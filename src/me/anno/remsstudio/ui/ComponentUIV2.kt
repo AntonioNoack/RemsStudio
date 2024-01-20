@@ -1,6 +1,6 @@
 package me.anno.remsstudio.ui
 
-import me.anno.animation.Type
+import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.blending.BlendMode
 import me.anno.gpu.blending.BlendMode.Companion.blendModes
 import me.anno.io.files.FileReference
@@ -12,7 +12,6 @@ import me.anno.remsstudio.ui.input.ColorInputV2
 import me.anno.remsstudio.ui.input.FloatInputV2
 import me.anno.remsstudio.ui.input.FloatVectorInputV2
 import me.anno.remsstudio.ui.input.IntInputV2
-import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.components.AxisAlignment
@@ -38,7 +37,7 @@ object ComponentUIV2 {
         inspected: List<Inspectable>,
         self: Transform,
         title: String, ttt: String, visibilityKey: String,
-        type: Type?, value: V,
+        type: NumberType?, value: V,
         style: Style, setValue: (value: V, mask: Int) -> Unit
     ): Panel {
         val t = inspected.filterIsInstance<Transform>()
@@ -51,7 +50,7 @@ object ComponentUIV2 {
                 }
                 .setIsSelectedListener { self.show(t, null) }
                 .setTooltip(ttt)
-            is Int -> IntInput(title, visibilityKey, value, type ?: Type.INT, style)
+            is Int -> IntInput(title, visibilityKey, value, type ?: NumberType.INT, style)
                 .setChangeListener {
                     RemsStudio.incrementalChange("Set $title to $it", title) {
                         setValue(it.toInt() as V, -1)
@@ -59,7 +58,7 @@ object ComponentUIV2 {
                 }
                 .setIsSelectedListener { self.show(t, null) }
                 .setTooltip(ttt)
-            is Long -> IntInput(title, visibilityKey, value, type ?: Type.LONG, style)
+            is Long -> IntInput(title, visibilityKey, value, type ?: NumberType.LONG, style)
                 .setChangeListener {
                     RemsStudio.incrementalChange("Set $title to $it", title) {
                         setValue(it as V, -1)
@@ -67,7 +66,7 @@ object ComponentUIV2 {
                 }
                 .setIsSelectedListener { self.show(t, null) }
                 .setTooltip(ttt)
-            is Float -> FloatInput(title, visibilityKey, value, type ?: Type.FLOAT, style)
+            is Float -> FloatInput(title, visibilityKey, value, type ?: NumberType.FLOAT, style)
                 .setChangeListener {
                     RemsStudio.incrementalChange("Set $title to $it", title) {
                         setValue(it.toFloat() as V, -1)
@@ -75,7 +74,7 @@ object ComponentUIV2 {
                 }
                 .setIsSelectedListener { self.show(t, null) }
                 .setTooltip(ttt)
-            is Double -> FloatInput(title, visibilityKey, value, type ?: Type.DOUBLE, style)
+            is Double -> FloatInput(title, visibilityKey, value, type ?: NumberType.DOUBLE, style)
                 .setChangeListener {
                     RemsStudio.incrementalChange("Set $title to $it", title) {
                         setValue(it as V, -1)
@@ -83,7 +82,7 @@ object ComponentUIV2 {
                 }
                 .setIsSelectedListener { self.show(t, null) }
                 .setTooltip(ttt)
-            is Vector2f -> FloatVectorInput(title, visibilityKey, value, type ?: Type.VEC2, style)
+            is Vector2f -> FloatVectorInput(title, visibilityKey, value, type ?: NumberType.VEC2, style)
                 .addChangeListener { x, y, _, _, mask ->
                     RemsStudio.incrementalChange("Set $title to ($x,$y)", title) {
                         setValue(Vector2f(x.toFloat(), y.toFloat()) as V, mask)
@@ -92,8 +91,8 @@ object ComponentUIV2 {
                 .setIsSelectedListener { self.show(t, null) }
                 .setTooltip(ttt)
             is Vector3f ->
-                if (type == Type.COLOR3) {
-                    ColorInput(style, title, visibilityKey, Vector4f(value, 1f), false)
+                if (type == NumberType.COLOR3) {
+                    ColorInput(title, visibilityKey, Vector4f(value, 1f), false, style)
                         .setChangeListener { r, g, b, _, mask ->
                             RemsStudio.incrementalChange("Set $title to ${Vector3f(r, g, b).toHexColor()}", title) {
                                 setValue(Vector3f(r, g, b) as V, mask)
@@ -102,7 +101,7 @@ object ComponentUIV2 {
                         .setIsSelectedListener { self.show(t, null) }
                         .setTooltip(ttt)
                 } else {
-                    FloatVectorInput(title, visibilityKey, value, type ?: Type.VEC3, style)
+                    FloatVectorInput(title, visibilityKey, value, type ?: NumberType.VEC3, style)
                         .addChangeListener { x, y, z, _, mask ->
                             RemsStudio.incrementalChange("Set $title to ($x,$y,$z)", title) {
                                 setValue(Vector3f(x.toFloat(), y.toFloat(), z.toFloat()) as V, mask)
@@ -112,8 +111,8 @@ object ComponentUIV2 {
                         .setTooltip(ttt)
                 }
             is Vector4f -> {
-                if (type == null || type == Type.COLOR) {
-                    ColorInput(style, title, visibilityKey, value, true)
+                if (type == null || type == NumberType.COLOR) {
+                    ColorInput(title, visibilityKey, value, true, style)
                         .setChangeListener { r, g, b, a, mask ->
                             RemsStudio.incrementalChange("Set $title to ${Vector4f(r, g, b, a).toHexColor()}", title) {
                                 setValue(Vector4f(r, g, b, a) as V, mask)
@@ -132,7 +131,7 @@ object ComponentUIV2 {
                         .setTooltip(ttt)
                 }
             }
-            is Quaternionf -> FloatVectorInput(title, visibilityKey, value, type ?: Type.QUATERNION, style)
+            is Quaternionf -> FloatVectorInput(title, visibilityKey, value, type ?: NumberType.QUATERNION, style)
                 .addChangeListener { x, y, z, w, mask ->
                     RemsStudio.incrementalChange(title) {
                         setValue(Quaternionf(x, y, z, w) as V, mask)
@@ -253,7 +252,7 @@ object ComponentUIV2 {
                 .setIsSelectedListener(sl)
                 .setTooltip(ttt)
             is Vector3f ->
-                if (values.type == Type.COLOR3) {
+                if (values.type == NumberType.COLOR3) {
                     ColorInputV2(style, title, visibilityKey, Vector4f(value, 1f), false, values)
                         .setChangeListener { r, g, b, _, _ ->
                             RemsStudio.incrementalChange("Set $title to ${Vector3f(r, g, b).toHexColor()}", title) {
@@ -274,7 +273,7 @@ object ComponentUIV2 {
                         .setTooltip(ttt)
                 }
             is Vector4f -> {
-                if (values.type == Type.COLOR) {
+                if (values.type == NumberType.COLOR) {
                     ColorInputV2(style, title, visibilityKey, value, true, values)
                         .setChangeListener { r, g, b, a, _ ->
                             RemsStudio.incrementalChange("Set $title to ${Vector4f(r, g, b, a).toHexColor()}", title) {
@@ -380,7 +379,7 @@ object ComponentUIV2 {
                     }
                 }
             is Vector3f ->
-                if (sampleValues.type == Type.COLOR3) {
+                if (sampleValues.type == NumberType.COLOR3) {
                     ColorInputV2(style, title, visibilityKey, Vector4f(value, 1f), false, sampleValues)
                         .setChangeListener { r, g, b, _, _ ->
                             RemsStudio.incrementalChange("Set $title to ${Vector3f(r, g, b).toHexColor()}", title) {
@@ -407,7 +406,7 @@ object ComponentUIV2 {
                         }
                 }
             is Vector4f -> {
-                if (sampleValues.type == Type.COLOR) {
+                if (sampleValues.type == NumberType.COLOR) {
                     ColorInputV2(style, title, visibilityKey, value, true, sampleValues)
                         .setChangeListener { r, g, b, a, _ ->
                             RemsStudio.incrementalChange("Set $title to ${Vector4f(r, g, b, a).toHexColor()}", title) {

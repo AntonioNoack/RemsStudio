@@ -2,16 +2,17 @@ package me.anno.remsstudio.ui
 
 import me.anno.config.DefaultStyle
 import me.anno.io.files.FileReference
+import me.anno.io.files.Reference.getReference
 import me.anno.remsstudio.objects.Transform.Companion.toTransform
 import me.anno.remsstudio.ui.MenuUtils.drawTypeInCorner
 import me.anno.remsstudio.ui.sceneTabs.SceneTabs
 import me.anno.ui.Style
 import me.anno.ui.editor.files.FileExplorer
 import me.anno.ui.editor.files.FileExplorerOption
-import me.anno.ui.editor.files.toAllowedFilename
+import me.anno.ui.editor.files.FileNames.toAllowedFilename
 import me.anno.utils.files.Files
 
-class StudioFileExplorer(file: FileReference?, style: Style) : FileExplorer(file, style) {
+class StudioFileExplorer(file: FileReference?, style: Style) : FileExplorer(file, true, style) {
 
     override fun getFolderOptions(): List<FileExplorerOption> {
         return super.getFolderOptions() + listOf(StudioUITypeLibrary.createTransform)
@@ -27,7 +28,7 @@ class StudioFileExplorer(file: FileReference?, style: Style) : FileExplorer(file
             else -> {
                 if (!pasteTransform(data)) {
                     if (data.length < 2048) {
-                        val ref = FileReference.getReference(data)
+                        val ref = getReference(data)
                         if (ref.exists) {
                             switchTo(ref)
                         }// else super.onPaste(x, y, data, type)

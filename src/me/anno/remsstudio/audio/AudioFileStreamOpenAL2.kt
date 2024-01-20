@@ -1,15 +1,16 @@
 package me.anno.remsstudio.audio
 
 import me.anno.animation.LoopingState
+import me.anno.audio.AudioCache.playbackSampleRate
 import me.anno.audio.openal.ALBase
-import me.anno.audio.openal.AudioTasks
+import me.anno.audio.openal.AudioTasks.addAudioTask
+import me.anno.audio.openal.AudioTasks.addNextAudioTask
 import me.anno.audio.openal.SoundBuffer
 import me.anno.audio.openal.SoundSource
+import me.anno.io.MediaMetadata
 import me.anno.io.files.FileReference
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
-import me.anno.video.AudioCreator.Companion.playbackSampleRate
-import me.anno.video.ffmpeg.MediaMetadata
 import org.apache.logging.log4j.LogManager
 import org.lwjgl.openal.AL10.*
 import java.nio.ByteBuffer
@@ -121,7 +122,7 @@ class AudioFileStreamOpenAL2(
             requestNextBuffer(index, alSource.session)
         }
         if (isPlaying) {
-            AudioTasks.addNextTask("wait", 1) {
+            addNextAudioTask("wait", 1) {
                 waitForRequiredBuffers()
                 ALBase.check()
             }
@@ -134,7 +135,7 @@ class AudioFileStreamOpenAL2(
 
         if (!isPlaying) return true
 
-        AudioTasks.addTask("fill", 10) {
+        addAudioTask("fill", 10) {
             if (isPlaying) {
 
                 checkSession()

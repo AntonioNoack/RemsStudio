@@ -1,6 +1,6 @@
 package me.anno.remsstudio.ui.input
 
-import me.anno.io.serialization.NotSerializedProperty
+import me.anno.engine.serialization.NotSerializedProperty
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.project
 import me.anno.remsstudio.animation.AnimatedProperty

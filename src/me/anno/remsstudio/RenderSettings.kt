@@ -1,6 +1,5 @@
 package me.anno.remsstudio
 
-import me.anno.animation.Type
 import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX
 import me.anno.io.base.BaseWriter
@@ -20,7 +19,7 @@ import me.anno.remsstudio.Rendering.renderPart
 import me.anno.remsstudio.Rendering.renderSetPercent
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.ui.scene.StudioSceneView
-import me.anno.studio.Inspectable
+import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
@@ -53,7 +52,7 @@ object RenderSettings : Transform() {
             inspected,
             "Duration (Seconds)",
             "Video length in seconds",
-            Type.FLOAT_PLUS,
+            NumberType.FLOAT_PLUS,
             targetDuration,
             style
         ) { it, _ ->
@@ -63,7 +62,7 @@ object RenderSettings : Transform() {
 
         list += vi(
             inspected, "Relative Frame Size (%)", "For rendering tests, in percent",
-            Type.FLOAT_PERCENT, project.targetSizePercentage, style
+            NumberType.FLOAT_PERCENT, project.targetSizePercentage, style
         ) { it, _ ->
             project.targetSizePercentage = it
             save()
@@ -98,7 +97,7 @@ object RenderSettings : Transform() {
             }
             .setTooltip("The fps of the video, or how many frame are shown per second")
 
-        list += IntInput("Video Quality", "VideoQuality", project.targetVideoQuality, Type.VIDEO_QUALITY_CRF, style)
+        list += IntInput("Video Quality", "VideoQuality", project.targetVideoQuality, NumberType.VIDEO_QUALITY_CRF, style)
             .setChangeListener {
                 project.targetVideoQuality = it.toInt()
                 save()

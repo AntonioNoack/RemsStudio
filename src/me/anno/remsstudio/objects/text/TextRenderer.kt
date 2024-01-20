@@ -266,7 +266,7 @@ object TextRenderer {
         sdf2.draw(startIndex, endIndex) { _, sdf, xOffset ->
 
             val texture = sdf?.texture
-            if (texture != null && texture.isCreated) {
+            if (texture != null && texture.isCreated()) {
 
                 val baseScale =
                     TextMesh.DEFAULT_LINE_HEIGHT / sdfResolution / (exampleLayout.ascent + exampleLayout.descent)

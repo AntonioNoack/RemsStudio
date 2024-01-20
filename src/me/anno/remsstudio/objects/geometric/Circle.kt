@@ -1,7 +1,7 @@
 package me.anno.remsstudio.objects.geometric
 
-import me.anno.animation.Type
 import me.anno.config.DefaultConfig
+import me.anno.engine.inspector.Inspectable
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
@@ -9,10 +9,10 @@ import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
-import me.anno.studio.Inspectable
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
+import me.anno.ui.input.NumberType
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
@@ -20,8 +20,8 @@ import org.joml.Vector4f
 open class Circle(parent: Transform? = null) : GFXTransform(parent) {
 
     val innerRadius = AnimatedProperty.float01()
-    val startDegrees = AnimatedProperty(Type.ANGLE, 0f)
-    val endDegrees = AnimatedProperty(Type.ANGLE, 360f)
+    val startDegrees = AnimatedProperty(NumberType.ANGLE, 0f)
+    val endDegrees = AnimatedProperty(NumberType.ANGLE, 360f)
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         GFXx3Dv2.draw3DCircle(this, time, stack, innerRadius[time], startDegrees[time], endDegrees[time], color)

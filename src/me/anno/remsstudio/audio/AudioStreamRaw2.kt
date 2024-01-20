@@ -11,6 +11,7 @@ import me.anno.audio.streams.AudioStreamRaw.Companion.ffmpegSliceSampleDuration
 import me.anno.audio.streams.StereoShortStream
 import me.anno.cache.CacheData
 import me.anno.cache.CacheSection
+import me.anno.io.MediaMetadata
 import me.anno.io.files.FileReference
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.mix
@@ -20,8 +21,8 @@ import me.anno.utils.ShutdownException
 import me.anno.utils.Sleep.waitUntil
 import me.anno.utils.structures.tuples.ShortPair
 import me.anno.video.ffmpeg.FFMPEGStream.Companion.getAudioSequence
-import me.anno.video.ffmpeg.MediaMetadata
 import org.joml.Vector3f
+import org.lwjgl.openal.AL10
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -83,15 +84,14 @@ class AudioStreamRaw2(
             val sliceTime = sliceIndex * ffmpegSliceSampleDuration
             val soundBuffer = AudioCache2.getEntry(key, timeout, false) {
                 val sequence = getAudioSequence(file, sliceTime, ffmpegSliceSampleDuration, ffmpegSampleRate)
-                waitUntil(true) { sequence.soundBuffer != null || sequence.isEmpty }
-                CacheData(sequence.soundBuffer to sequence.channels)
+                waitUntil(true) { sequence.hasValue }
+                sequence
             } as? CacheData<*> ?: throw ShutdownException()
-            val sv = soundBuffer.value as Pair<*, *>
-            val sb = sv.first as? SoundBuffer
-            lastSoundBuffer = sb
+            val sv = soundBuffer.value as SoundBuffer
+            lastSoundBuffer = sv
             lastSliceIndex = sliceIndex
-            lastChannels = sv.second as Int
-            sb
+            lastChannels = if (sv.format == AL10.AL_FORMAT_MONO16) 1 else 2 // meh...
+            sv
         }
 
         val data = soundBuffer?.data ?: return shortPair.set(0, 0)

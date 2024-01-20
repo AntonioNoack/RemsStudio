@@ -1,22 +1,24 @@
 package me.anno.remsstudio.objects
 
 import me.anno.animation.LoopingState
-import me.anno.animation.Type
 import me.anno.audio.openal.AudioManager
-import me.anno.audio.openal.AudioTasks
+import me.anno.audio.openal.AudioTasks.addAudioTask
 import me.anno.config.DefaultConfig
 import me.anno.ecs.annotations.Range
+import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.drawing.UVProjection
 import me.anno.gpu.texture.Clamping
-import me.anno.gpu.texture.ImageToTexture.Companion.imageTimeout
 import me.anno.gpu.texture.Texture2D
 import me.anno.gpu.texture.TextureCache
 import me.anno.gpu.texture.TextureLib
 import me.anno.gpu.texture.TextureLib.colorShowTexture
+import me.anno.gpu.texture.TextureReader.Companion.imageTimeout
 import me.anno.image.svg.SVGMeshCache
 import me.anno.io.ISaveable
+import me.anno.io.MediaMetadata
+import me.anno.io.MediaMetadata.Companion.getMeta
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
@@ -42,7 +44,6 @@ import me.anno.remsstudio.objects.lists.Element
 import me.anno.remsstudio.objects.lists.SplittableElement
 import me.anno.remsstudio.objects.models.SpeakerModel.drawSpeakers
 import me.anno.remsstudio.objects.modes.VideoType
-import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.SpyPanel
@@ -53,6 +54,7 @@ import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.EnumInput
 import me.anno.ui.input.FloatInput
+import me.anno.ui.input.NumberType
 import me.anno.utils.Clipping
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
@@ -62,16 +64,13 @@ import me.anno.utils.types.Booleans.toInt
 import me.anno.utils.types.Floats.f2
 import me.anno.utils.types.Strings.formatTime2
 import me.anno.utils.types.Strings.getImportType
-import me.anno.video.BlankFrameDetector
 import me.anno.video.ImageSequenceMeta
 import me.anno.video.ImageSequenceMeta.Companion.imageSequenceIdentifier
 import me.anno.video.MissingFrameException
 import me.anno.video.VideoCache.getVideoFrame
 import me.anno.video.VideoCache.getVideoFrameWithoutGenerator
-import me.anno.video.VideoData.Companion.framesPerContainer
-import me.anno.video.ffmpeg.IsFFMPEGOnly.isFFMPEGOnlyExtension
-import me.anno.video.ffmpeg.MediaMetadata
-import me.anno.video.ffmpeg.MediaMetadata.Companion.getMeta
+import me.anno.video.ffmpeg.FrameReader.Companion.isFFMPEGOnlyExtension
+import me.anno.video.formats.gpu.BlankFrameDetector
 import me.anno.video.formats.gpu.GPUFrame
 import org.apache.logging.log4j.LogManager
 import org.joml.Matrix4f
@@ -105,6 +104,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
     Audio(file, parent), SplittableElement {
 
     companion object {
+
+        val framesPerContainer = 128
 
         val editorFPS = intArrayOf(1, 2, 3, 5, 10, 24, 30, 60, 90, 120, 144, 240, 300, 360)
 
@@ -144,7 +145,13 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
     var lastDuration = Double.POSITIVE_INFINITY
 
     var imageSequenceMeta: ImageSequenceMeta? = null
-    val imSeqExampleMeta get() = imageSequenceMeta?.matches?.firstOrNull()?.first?.run { getMeta(this, true) }
+    val imSeqExampleMeta: MediaMetadata?
+        get() = imageSequenceMeta?.matches?.firstOrNull()?.first?.run {
+            getMeta(
+                this,
+                true
+            )
+        }
 
     var type = VideoType.UNKNOWN
 
@@ -308,7 +315,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 val localTime = isLooping[time, duration]
 
                 val frame = TextureCache[meta.getImage(localTime), 5L, true]
-                if (frame == null || !frame.isCreated) onMissingImageOrFrame((localTime * 1000).toInt())
+                if (frame == null || !frame.isCreated()) onMissingImageOrFrame((localTime * 1000).toInt())
                 else {
                     lastW = frame.width
                     lastH = frame.height
@@ -552,9 +559,9 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
             else -> {// some image
                 val tiling = tiling[time]
                 val texture = TextureCache[file, imageTimeout, true]
-                if (texture == null || !texture.isCreated) onMissingImageOrFrame(0)
+                if (texture == null || !texture.isCreated()) onMissingImageOrFrame(0)
                 else {
-                    texture.rotation?.apply(stack)
+                    (texture as? Texture2D)?.rotation?.apply(stack)
                     lastW = texture.width
                     lastH = texture.height
                     draw3DVideo(
@@ -930,7 +937,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 "When a set percentage of pixels change within 1 frame, that frame is removed from the source\n" +
                         "The higher, the more frames are accepted; 0 = disabled\n" +
                         "Cannot handle more than two adjacent blank frames",
-                blankFrameThreshold, Type.FLOAT_03, style
+                blankFrameThreshold, NumberType.FLOAT_03, style
             )
                 .setChangeListener { for (x in c) x.blankFrameThreshold = it.toFloat() }
                 .setIsSelectedListener { show(t, null) })
@@ -959,14 +966,14 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 if (isPaused) {
                     playbackButton.text = getPlaybackTitle(true)
                     if (component == null) {
-                        AudioTasks.addTask("start", 5) {
+                        addAudioTask("start", 5) {
                             val audio2 = Video(file, null)
                             audio2.update() // load type
                             audio2.startPlayback(0.0, 1.0, nullCamera!!)
                             component = audio2.component
                         }
                     } else {
-                        AudioTasks.addTask("stop", 1) {
+                        addAudioTask("stop", 1) {
                             stopPlayback()
                         }
                     }

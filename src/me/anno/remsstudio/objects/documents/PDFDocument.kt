@@ -1,6 +1,6 @@
 package me.anno.remsstudio.objects.documents
 
-import me.anno.animation.Type
+import me.anno.ui.input.NumberType
 import me.anno.cache.instances.PDFCache
 import me.anno.cache.instances.PDFCache.getTexture
 import me.anno.config.DefaultConfig
@@ -23,7 +23,7 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.documents.SiteSelection.parseSites
 import me.anno.remsstudio.objects.lists.Element
 import me.anno.remsstudio.objects.lists.SplittableElement
-import me.anno.studio.Inspectable
+import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -197,11 +197,11 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
         doc += vis(c, "Direction", "Top-Bottom/Left-Right in Degrees", c.map { it.direction }, style)
         doc += vi(
             inspected, "Editor Quality", "Factor for resolution; applied in editor",
-            Type.FLOAT_PLUS, editorQuality, style
+            NumberType.FLOAT_PLUS, editorQuality, style
         ) { it, _ -> for (x in c) x.editorQuality = it }
         doc += vi(
             inspected, "Render Quality", "Factor for resolution; applied when rendering",
-            Type.FLOAT_PLUS, renderQuality, style
+            NumberType.FLOAT_PLUS, renderQuality, style
         ) { it, _ -> for (x in c) x.renderQuality = it }
         doc += vi(
             inspected, "Filtering", "Pixelated look?", "texture.filtering",

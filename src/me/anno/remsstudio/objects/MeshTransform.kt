@@ -6,6 +6,7 @@ import me.anno.ecs.EntityQuery.forAllComponents
 import me.anno.ecs.EntityQuery.hasComponent
 import me.anno.ecs.components.anim.*
 import me.anno.ecs.components.anim.BoneData.uploadJointMatrices
+import me.anno.ecs.components.mesh.Mesh
 import me.anno.ecs.components.mesh.MeshComponentBase
 import me.anno.ecs.prefab.PrefabCache
 import me.anno.engine.ui.render.ECSShaderLib
@@ -30,7 +31,7 @@ import me.anno.mesh.MeshUtils.getScaleFromAABB
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.gpu.GFXx3Dv2
-import me.anno.studio.Inspectable
+import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
@@ -222,7 +223,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             shader.v4f("finalId", clickId)
 
             entity.forAllComponents(MeshComponentBase::class) { comp ->
-                val mesh = comp.getMesh()
+                val mesh = comp.getMesh() as? Mesh
                 if (mesh?.positions != null) {
                     mesh.checkCompleteness()
                     mesh.ensureBuffer()

@@ -2,6 +2,9 @@ package me.anno.remsstudio.ui.editor.cutting
 
 import me.anno.Time.gameTime
 import me.anno.cache.CacheData
+import me.anno.engine.EngineBase.Companion.dragged
+import me.anno.engine.EngineBase.Companion.shiftSlowdown
+import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.input.Input
@@ -27,9 +30,6 @@ import me.anno.remsstudio.objects.Video
 import me.anno.remsstudio.ui.MenuUtils.drawTypeInCorner
 import me.anno.remsstudio.ui.StudioFileImporter.addChildFromFile
 import me.anno.remsstudio.ui.editor.TimelinePanel
-import me.anno.studio.StudioBase
-import me.anno.studio.StudioBase.Companion.shiftSlowdown
-import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.menu.Menu.openMenu
@@ -378,7 +378,7 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
         try {
             val childMaybe = JsonStringReader.read(data, workspace, true).firstOrNull { it is Transform } as? Transform
             val child = childMaybe ?: return super.onPaste(x, y, data, type)
-            val original = (StudioBase.dragged as? Draggable)?.getOriginal() as? Transform
+            val original = (dragged as? Draggable)?.getOriginal() as? Transform
             RemsStudio.largeChange("Pasted Component / Changed Timeline Slot") {
                 if (original != null) {
                     original.timelineSlot.value = timelineSlot

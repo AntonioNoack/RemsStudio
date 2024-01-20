@@ -2,13 +2,13 @@ package me.anno.remsstudio.audio
 
 import me.anno.animation.LoopingState
 import me.anno.audio.streams.AudioFileStream
+import me.anno.io.MediaMetadata
+import me.anno.io.MediaMetadata.Companion.getMeta
 import me.anno.io.files.FileReference
 import me.anno.remsstudio.audio.AudioFXCache2.convert
 import me.anno.remsstudio.audio.effects.Time
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
-import me.anno.video.ffmpeg.MediaMetadata
-import me.anno.video.ffmpeg.MediaMetadata.Companion.getMeta
 
 // only play once, then destroy; it makes things easier
 // (on user input and when finally rendering only)

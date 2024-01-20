@@ -9,7 +9,7 @@ import me.anno.remsstudio.gpu.ShaderLibV2.maxColorForceFields
 import me.anno.remsstudio.gpu.ShaderLibV2.uvForceFieldBuffer
 import me.anno.remsstudio.objects.attractors.EffectColoring
 import me.anno.remsstudio.objects.attractors.EffectMorphing
-import me.anno.studio.Inspectable
+import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -100,26 +100,25 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
             val buffer = uvForceFieldBuffer
             val loc1 = shader["forceFieldUVs"]
             if (loc1 > -1) {
-                buffer.position(0)
+                var bi = 0
                 for (morphing in morphings) {
                     val localTime = morphing.lastLocalTime
                     val position = transformLocally(morphing.position[localTime], time)
-                    buffer.put(position.x * 0.5f + 0.5f)
-                    buffer.put(position.y * 0.5f + 0.5f)
+                    buffer[bi++] = (position.x * 0.5f + 0.5f)
+                    buffer[bi++] = (position.y * 0.5f + 0.5f)
                     if (is3D) {
-                        buffer.put(position.z)
-                        buffer.put(0f)
+                        buffer[bi++] = (position.z)
+                        buffer[bi++] = (0f)
                     } else {
-                        buffer.put(morphing.swirlStrength[localTime])
-                        buffer.put(1f / morphing.swirlPower[localTime])
+                        buffer[bi++] = (morphing.swirlStrength[localTime])
+                        buffer[bi++] = (1f / morphing.swirlPower[localTime])
                     }
                 }
-                buffer.position(0)
                 shader.v4fs(loc1, buffer)
             }
             val loc2 = shader["forceFieldUVData0"]
             if (loc2 > -1) {
-                buffer.position(0)
+                var bi = 0
                 val sx = if (this is Video) 1f / lastW else 1f
                 val sy = if (this is Video) 1f / lastH else 1f
                 for (morphing in morphings) {
@@ -127,22 +126,20 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                     val weight = morphing.lastInfluence
                     val sharpness = morphing.sharpness[localTime]
                     val scale = morphing.scale[localTime]
-                    buffer.put(sqrt(sy / sx) * weight * scale.z / scale.x)
-                    buffer.put(sqrt(sx / sy) * weight * scale.z / scale.y)
-                    buffer.put(10f / (scale.z * weight * weight))
-                    buffer.put(sharpness)
+                    buffer[bi++] = (sqrt(sy / sx) * weight * scale.z / scale.x)
+                    buffer[bi++] = (sqrt(sx / sy) * weight * scale.z / scale.y)
+                    buffer[bi++] = (10f / (scale.z * weight * weight))
+                    buffer[bi++] = (sharpness)
                 }
-                buffer.position(0)
                 shader.v4fs(loc2, buffer)
             }
             val loc3 = shader["forceFieldUVData1"]
             if (loc3 > -1) {
-                buffer.position(0)
-                for (morphing in morphings) {
+                for (bi in morphings.indices) {
+                    val morphing = morphings[bi]
                     val localTime = morphing.lastLocalTime
-                    buffer.put(morphing.chromatic[localTime])
+                    buffer[bi] = (morphing.chromatic[localTime])
                 }
-                buffer.position(0)
                 shader.v1fs(loc3, buffer)
             }
         }

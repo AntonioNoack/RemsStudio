@@ -1,11 +1,11 @@
 package me.anno.remsstudio
 
 import me.anno.config.DefaultConfig
+import me.anno.engine.projects.Projects.getRecentProjects
 import me.anno.extensions.ExtensionLoader
 import me.anno.gpu.GFX
 import me.anno.input.Key
 import me.anno.io.config.ConfigBasics
-import me.anno.io.files.InvalidRef
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio.defaultWindowStack
@@ -24,8 +24,6 @@ import me.anno.remsstudio.ui.editor.cutting.LayerViewContainer
 import me.anno.remsstudio.ui.graphs.GraphEditor
 import me.anno.remsstudio.ui.scene.StudioSceneView
 import me.anno.remsstudio.ui.sceneTabs.SceneTabs
-import me.anno.studio.Projects.getRecentProjects
-import me.anno.studio.StudioBase.Companion.instance
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.WindowStack.Companion.createReloadWindow
@@ -42,7 +40,7 @@ import me.anno.ui.debug.ConsoleOutputPanel.Companion.createConsoleWithStats
 import me.anno.ui.editor.OptionBar
 import me.anno.ui.editor.WelcomeUI
 import me.anno.ui.editor.config.ConfigPanel
-import me.anno.ui.editor.files.toAllowedFilename
+import me.anno.ui.editor.files.FileNames.toAllowedFilename
 import me.anno.utils.files.OpenInBrowser.openInBrowser
 import org.apache.logging.log4j.LogManager
 import java.net.URL
@@ -108,7 +106,7 @@ object RemsStudioUILayouts {
             openMenuByPanels(windowStack, NameDesc("Change Project Language"), listOf(panel))
         }
         options.addAction(projectTitle, Dict["Save", "ui.top.project.save"]) {
-            instance?.save()
+            RemsStudio.save()
             LOGGER.info("Saved the project")
         }
         options.addAction(projectTitle, Dict["Load", "ui.top.project.load"]) {

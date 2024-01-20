@@ -1,12 +1,12 @@
 package me.anno.remsstudio
 
-import me.anno.animation.Type
 import me.anno.config.DefaultConfig.style
+import me.anno.engine.EngineBase.Companion.workspace
+import me.anno.engine.Events.addEvent
 import me.anno.gpu.GFX
 import me.anno.io.Saveable
 import me.anno.io.config.ConfigBasics
 import me.anno.io.files.FileReference
-import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.generic.JsonReader
 import me.anno.io.json.generic.JsonWriter
@@ -27,11 +27,10 @@ import me.anno.remsstudio.ui.scene.StudioSceneView
 import me.anno.remsstudio.ui.sceneTabs.SceneTab
 import me.anno.remsstudio.ui.sceneTabs.SceneTabs
 import me.anno.remsstudio.utils.Utils.getAnimated
-import me.anno.studio.Events.addEvent
-import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.Panel
 import me.anno.ui.custom.CustomContainer
 import me.anno.ui.custom.CustomList
+import me.anno.ui.input.NumberType
 import me.anno.utils.types.Casting.castToFloat
 import me.anno.video.ffmpeg.FFMPEGEncodingBalance
 import me.anno.video.ffmpeg.FFMPEGEncodingType
@@ -42,9 +41,9 @@ import kotlin.math.roundToInt
 // todo option to reset the timeline
 class Project(var name: String, val file: FileReference) : Saveable() {
 
-    val configFile = getReference(file, "config.json")
+    val configFile = file.getChild("config.json")
     val uiFile get() = getUILayoutFile("ui")
-    val tabsFile = getReference(file, "tabs.json")
+    val tabsFile = file.getChild("tabs.json")
 
     val config: StringMap
 
@@ -57,7 +56,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
         config = ConfigBasics.loadConfig(configFile, file, defaultConfig, true)
     }
 
-    val scenes = getReference(file, "Scenes")
+    val scenes = file.getChild("Scenes")
 
     init {
         scenes.mkdirs()
@@ -72,7 +71,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
     fun loadInitialUI() {
 
         fun tabsDefault() {
-            val ref = getReference(scenes, "Root.json")
+            val ref = scenes.getChild("Root.json")
             val tab0 = if (ref.exists) {
                 try {
                     val data = JsonStringReader.read(ref.inputStreamSync(), workspace, true)
@@ -255,7 +254,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
     var targetWidth = config["target.width", 1920]
     var targetHeight = config["target.height", 1080]
     var targetFPS = config["target.fps", 30.0]
-    var targetOutputFile = config["target.output", getReference(file, "output.mp4")]
+    var targetOutputFile = config["target.output", file.getChild("output.mp4")]
     var targetVideoQuality = config["target.quality", 23]
     var targetSamples = config["target.samples", min(8, GFX.maxSamples)]
     var motionBlurSteps = config.getAnimated<Int>("target.motionBlur.steps", MotionBlurType)
@@ -320,8 +319,8 @@ class Project(var name: String, val file: FileReference) : Saveable() {
 
         private val LOGGER = LogManager.getLogger(Project::class)
 
-        val MotionBlurType = Type.INT_PLUS.withDefaultValue(8)
-        val ShutterPercentageType = Type.FLOAT_PLUS.withDefaultValue(1f)
+        val MotionBlurType = NumberType.INT_PLUS.withDefaultValue(8)
+        val ShutterPercentageType = NumberType.FLOAT_PLUS.withDefaultValue(1f)
 
         fun getUILayoutFile(name: String): FileReference {
             return ConfigBasics.getConfigFile("$name.layout.json")

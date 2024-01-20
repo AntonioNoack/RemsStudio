@@ -1,12 +1,13 @@
 package me.anno.remsstudio.objects
 
 import me.anno.animation.LoopingState
-import me.anno.animation.Type
+import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.drawing.GFXx2D.getSize
 import me.anno.gpu.drawing.GFXx2D.getSizeX
 import me.anno.gpu.drawing.GFXx2D.getSizeY
 import me.anno.io.ISaveable
+import me.anno.io.MediaMetadata
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
@@ -21,13 +22,12 @@ import me.anno.remsstudio.audio.AudioFXCache2.getIndex
 import me.anno.remsstudio.audio.AudioFXCache2.getTime
 import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.Time
-import me.anno.studio.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
+import me.anno.ui.input.NumberType
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.video.MissingFrameException
-import me.anno.video.ffmpeg.MediaMetadata
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
@@ -236,7 +236,7 @@ class FourierTransform : Transform() {
         getTime: (Int) -> Time
     ): Pair<FloatArray, FloatArray>? {
         val data = AudioFXCache2.getBuffer0(meta, getKey(getTime), false)
-        if (isFinalRendering && data == null) throw MissingFrameException(file)
+        if (isFinalRendering && data == null) throw MissingFrameException(file.absolutePath)
         if (data == null) return null
         return data.getBuffersOfDomain(Domain.FREQUENCY_DOMAIN)
     }
@@ -347,9 +347,9 @@ class FourierTransform : Transform() {
 
     companion object {
         val sampleRateType =
-            Type(24000, 1, 1024f, false, true, { clamp(it.toString().toDouble().toInt(), 64, 96000) }, { it })
+            NumberType(24000, 1, 1024f, false, true, { clamp(it.toString().toDouble().toInt(), 64, 96000) }, { it })
         val bufferSizeType =
-            Type(512, 1, 512f, false, true, { clamp(it.toString().toDouble().toInt(), 64, 65536) }, { it })
+            NumberType(512, 1, 512f, false, true, { clamp(it.toString().toDouble().toInt(), 64, 65536) }, { it })
     }
 
 }

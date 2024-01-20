@@ -11,7 +11,7 @@ import me.anno.remsstudio.audio.effects.falloff.SquareFalloff
 import me.anno.remsstudio.audio.effects.impl.*
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
-import me.anno.studio.Inspectable
+import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY

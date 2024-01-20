@@ -12,7 +12,7 @@ import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.remsstudio.objects.TextSegmentKey
 import me.anno.remsstudio.objects.text.Text
-import me.anno.studio.Inspectable
+import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory

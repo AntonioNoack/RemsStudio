@@ -1,9 +1,10 @@
 package me.anno.remsstudio
 
+import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.gpu.GFX
 import me.anno.gpu.GFXBase
+import me.anno.io.MediaMetadata.Companion.getMeta
 import me.anno.io.files.FileReference
-import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.files.InvalidRef
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio.motionBlurSteps
@@ -18,7 +19,6 @@ import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.video.FrameTaskV2
 import me.anno.remsstudio.video.videoAudioCreatorV2
-import me.anno.studio.StudioBase
 import me.anno.ui.base.menu.Menu.ask
 import me.anno.ui.base.menu.Menu.msg
 import me.anno.ui.base.progress.ProgressBar
@@ -29,7 +29,6 @@ import me.anno.video.VideoCreator
 import me.anno.video.VideoCreator.Companion.defaultQuality
 import me.anno.video.ffmpeg.FFMPEGEncodingBalance
 import me.anno.video.ffmpeg.FFMPEGEncodingType
-import me.anno.video.ffmpeg.MediaMetadata.Companion.getMeta
 import org.apache.logging.log4j.LogManager
 import kotlin.concurrent.thread
 import kotlin.math.max
@@ -149,7 +148,7 @@ object Rendering {
     }
 
     private fun getTmpFile(file: FileReference) =
-        getReference(file.getParent(), file.nameWithoutExtension + ".tmp." + targetOutputFile.extension)
+        file.getSibling(file.nameWithoutExtension + ".tmp." + targetOutputFile.extension)
 
     fun renderFrame(width: Int, height: Int, time: Double, ask: Boolean, callback: () -> Unit) {
 
@@ -187,7 +186,7 @@ object Rendering {
             NameDesc("Choose source file"),
             allowFiles = true, allowFolders = false,
             allowMultiples = false, toSave = false,
-            startFolder = project?.scenes ?: StudioBase.workspace,
+            startFolder = project?.scenes ?: workspace,
             filters = emptyList() // todo video filter
         ) {
             if (it.size == 1) {
@@ -313,9 +312,9 @@ object Rendering {
         do {
             val file0 = targetOutputFile
             if (targetOutputFile.exists && targetOutputFile.isDirectory) {
-                targetOutputFile = getReference(targetOutputFile, defaultName)
+                targetOutputFile = targetOutputFile.getChild(defaultName)
             } else if (!targetOutputFile.name.contains('.')) {
-                targetOutputFile = getReference(targetOutputFile, defaultExtension)
+                targetOutputFile = targetOutputFile.getSiblingWithExtension(defaultExtension)
             }
         } while (file0 !== targetOutputFile)
         val importType = targetOutputFile.extension.getImportType()
@@ -327,7 +326,7 @@ object Rendering {
         if (importType != targetType) {
             // wrong extension -> place it automatically
             val fileName = targetOutputFile.nameWithoutExtension + defaultExtension
-            return getReference(targetOutputFile.getParent(), fileName)
+            return targetOutputFile.getSibling(fileName)
         }
         return targetOutputFile
     }

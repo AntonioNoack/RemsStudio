@@ -5,18 +5,20 @@ import me.anno.Time.deltaTime
 import me.anno.Time.gameTime
 import me.anno.audio.openal.ALBase
 import me.anno.audio.openal.AudioManager
-import me.anno.audio.openal.AudioTasks
-import me.anno.cache.instances.PDFPlugin
+import me.anno.audio.openal.AudioTasks.addAudioTask
 import me.anno.config.DefaultConfig
 import me.anno.config.DefaultStyle.baseTheme
+import me.anno.engine.EngineBase
+import me.anno.engine.Events.addEvent
+import me.anno.engine.GFXSettings
+import me.anno.engine.OfficialExtensions
 import me.anno.extensions.ExtensionLoader
 import me.anno.gpu.GFX
 import me.anno.gpu.OSWindow
 import me.anno.input.ActionManager
 import me.anno.input.Input.keyUpCtr
-import me.anno.installer.Installer.checkInstall
+import me.anno.installer.Installer
 import me.anno.io.files.FileReference
-import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.language.Language
 import me.anno.language.translation.Dict
 import me.anno.remsstudio.CheckVersion.checkVersion
@@ -30,9 +32,6 @@ import me.anno.remsstudio.objects.text.Text
 import me.anno.remsstudio.ui.StudioFileImporter
 import me.anno.remsstudio.ui.scene.ScenePreview
 import me.anno.remsstudio.ui.sceneTabs.SceneTabs.currentTab
-import me.anno.studio.Events.addEvent
-import me.anno.studio.GFXSettings
-import me.anno.studio.StudioBase
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.components.AxisAlignment
@@ -42,6 +41,12 @@ import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.OS
 import me.anno.utils.hpc.ProcessingQueue
 import kotlin.math.min
+
+// todo new bugs:
+//  audio broken?
+//  grid is black
+// todo improvements:
+//  if playing forward, and time is non-modified, use VideoStream for much better playback performance
 
 // todo bug: when editing a driver, we should see its curve
 // todo bug: there is a webm file, whose video is black, and the audio only plays in the file explorer, not the studio :(
@@ -110,9 +115,9 @@ import kotlin.math.min
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
-object RemsStudio : StudioBase("Rem's Studio", 10301, true), WelcomeUI {
+object RemsStudio : EngineBase("Rem's Studio", 10301, true), WelcomeUI {
 
-    val defaultWindowStack get() = GFX.someWindow!!.windowStack
+    val defaultWindowStack get() = GFX.someWindow.windowStack
     var hideUnusedProperties = false
 
     lateinit var currentCamera: Camera
@@ -148,10 +153,11 @@ object RemsStudio : StudioBase("Rem's Studio", 10301, true), WelcomeUI {
     }
 
     override fun onGameInit() {
-        ExtensionLoader.loadInternally(PDFPlugin::class)
+        OfficialExtensions.register()
+        ExtensionLoader.load()
         gfxSettings = GFXSettings.get(DefaultConfig["editor.gfx", GFXSettings.LOW.id], GFXSettings.LOW)
-        workspace = DefaultConfig["workspace.dir", getReference(OS.documents, configName)]
-        checkInstall()
+        workspace = DefaultConfig["workspace.dir", OS.documents.getChild(configName)]
+        Installer.checkFFMPEGInstall()
         checkVersion()
         AudioManager2.init()
         ShaderLibV2.init()
@@ -186,7 +192,7 @@ object RemsStudio : StudioBase("Rem's Studio", 10301, true), WelcomeUI {
         val project = Project(name.trim(), folder)
         RemsStudio.project = project
         project.open()
-        GFX.someWindow?.title = "Rem's Studio: ${project.name}"
+        GFX.someWindow.title = "Rem's Studio: ${project.name}"
         return Pair(project.name, project.file)
     }
 
@@ -324,7 +330,7 @@ object RemsStudio : StudioBase("Rem's Studio", 10301, true), WelcomeUI {
     }
 
     fun updateAudio() {
-        AudioTasks.addTask("update", 100) {
+        addAudioTask("update", 100) {
             // update the audio player...
             if (isPlaying) {
                 AudioManager.requestUpdate()

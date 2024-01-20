@@ -1,6 +1,6 @@
 package me.anno.remsstudio.objects
 
-import me.anno.animation.Type
+import me.anno.ui.input.NumberType
 import me.anno.config.DefaultConfig
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.GFXState.useFrame
@@ -22,7 +22,7 @@ import me.anno.remsstudio.gpu.TexFiltering
 import me.anno.remsstudio.gpu.TexFiltering.Companion.getFiltering
 import me.anno.remsstudio.objects.text.Text
 import me.anno.remsstudio.ui.StudioFileImporter.addChildFromFile
-import me.anno.studio.Inspectable
+import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -189,7 +189,7 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
         ) { it, _ -> for (x in c) x.file = it }
         link += vi(
             inspected, "Camera Index", "Which camera should be chosen, 0 = none, 1 = first, ...", "",
-            Type.INT_PLUS, cameraIndex, style
+            NumberType.INT_PLUS, cameraIndex, style
         ) { it, _ -> for (x in c) x.cameraIndex = it }
         list += FrameSizeInput(
             "Resolution",

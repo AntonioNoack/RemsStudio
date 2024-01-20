@@ -5,7 +5,7 @@ import me.anno.io.find.PropertyFinder
 import me.anno.remsstudio.RemsStudio.root
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
-import me.anno.studio.Inspectable
+import me.anno.engine.inspector.Inspectable
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.utils.structures.maps.BiMap
 import org.apache.logging.log4j.LogManager

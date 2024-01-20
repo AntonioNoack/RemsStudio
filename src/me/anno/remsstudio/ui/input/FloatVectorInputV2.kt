@@ -1,14 +1,14 @@
 package me.anno.remsstudio.ui.input
 
-import me.anno.animation.Type
+import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.input.Key
 import me.anno.io.json.saveable.JsonStringReader
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.Style
 import me.anno.ui.input.FloatVectorInput
+import me.anno.ui.input.NumberType
 import org.apache.logging.log4j.LogManager
 import org.joml.Quaternionf
 import org.joml.Vector2f
@@ -18,7 +18,7 @@ import org.joml.Vector4f
 class FloatVectorInputV2(
     title: String,
     visibilityKey: String,
-    type: Type,
+    type: NumberType,
     private val owningProperty: AnimatedProperty<*>,
     style: Style
 ) : FloatVectorInput(

@@ -4,7 +4,7 @@ import me.anno.config.DefaultConfig
 import me.anno.language.translation.Dict
 import me.anno.maths.Maths.fract
 import me.anno.remsstudio.objects.Transform
-import me.anno.studio.Inspectable
+import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory

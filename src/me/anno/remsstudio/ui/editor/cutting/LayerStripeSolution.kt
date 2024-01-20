@@ -7,6 +7,7 @@ import me.anno.config.DefaultConfig
 import me.anno.gpu.drawing.DrawGradients.drawRectGradient
 import me.anno.gpu.drawing.DrawRectangles
 import me.anno.gpu.drawing.DrawStriped.drawRectStriped
+import me.anno.io.MediaMetadata
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.max
 import me.anno.maths.Maths.nonNegativeModulo
@@ -18,10 +19,9 @@ import me.anno.remsstudio.objects.Video
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.centralTime
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.dtHalfLength
 import me.anno.remsstudio.ui.editor.cutting.LayerView.Companion.maxLines
+import me.anno.remsstudio.ui.editor.cutting.Status.Companion.drawLoadingStatus
 import me.anno.utils.Color.black
 import me.anno.utils.Color.mixARGB
-import me.anno.video.VideoCache
-import me.anno.video.ffmpeg.MediaMetadata
 import org.joml.Vector4f
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -305,7 +305,7 @@ class LayerStripeSolution(
         }
         val size = DefaultConfig["debug.ui.layerView.showFrameStatus", if (Build.isDebug) 4 else 0]
         if (size > 0) {
-            VideoCache.drawLoadingStatus(x0, y + h - size, x1, y + h, video.file, 0.0, video.blankFrameThreshold, { x ->
+            drawLoadingStatus(x0, y + h - size, x1, y + h, video.file, 0.0, video.blankFrameThreshold, { x ->
                 val timeAtX = getTimeAt(x)
                 clampTime(video.getLocalTimeFromRoot(timeAtX, false), video)
             })

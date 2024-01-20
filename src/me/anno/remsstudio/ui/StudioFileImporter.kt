@@ -1,6 +1,7 @@
 package me.anno.remsstudio.ui
 
 import me.anno.config.DefaultConfig
+import me.anno.engine.Events.addEvent
 import me.anno.io.files.FileReference
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.objects.SoftLink
@@ -11,7 +12,6 @@ import me.anno.remsstudio.objects.documents.PDFDocument
 import me.anno.remsstudio.objects.MeshTransform
 import me.anno.gpu.drawing.UVProjection
 import me.anno.remsstudio.objects.text.Text
-import me.anno.studio.Events.addEvent
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.defaultWindowStack
 import me.anno.remsstudio.Selection.selectTransform

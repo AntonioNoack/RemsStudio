@@ -2,7 +2,7 @@ package me.anno.remsstudio
 
 import me.anno.config.DefaultConfig
 import me.anno.gpu.drawing.UVProjection
-import me.anno.io.files.FileReference.Companion.getReference
+import me.anno.io.files.Reference.getReference
 import me.anno.io.utils.StringMap
 import me.anno.remsstudio.gpu.TexFiltering
 import me.anno.remsstudio.objects.*
@@ -26,7 +26,7 @@ object RemsConfig {
         DefaultConfig.apply {
 
             // I'm not sure about that one ;)
-            this["ffmpeg.path", getReference(OS.downloads, "lib\\ffmpeg\\bin\\ffmpeg.exe")]
+            this["ffmpeg.path", OS.downloads.getChild("lib\\ffmpeg\\bin\\ffmpeg.exe")]
 
             this["lastUsed.fonts.count", 5]
             this["default.video.filtering", TexFiltering.CUBIC]
@@ -61,7 +61,7 @@ object RemsConfig {
         val tick = Clock()
 
         val newInstances: Map<String, Transform> = mapOf(
-            "Mesh" to MeshTransform(getReference(OS.documents, "monkey.obj"), null),
+            "Mesh" to MeshTransform(getReference("res://icon.obj"), null),
             "Array" to GFXArray(),
             "Image / Audio / Video" to Video(),
             "Polygon" to Polygon(null),

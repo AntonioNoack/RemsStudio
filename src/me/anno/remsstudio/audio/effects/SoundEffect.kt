@@ -1,11 +1,11 @@
 package me.anno.remsstudio.audio.effects
 
+import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.io.Saveable
 import me.anno.io.json.saveable.JsonStringReader
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
-import me.anno.studio.Inspectable
-import me.anno.studio.StudioBase.Companion.workspace
+import me.anno.engine.inspector.Inspectable
 
 abstract class SoundEffect(val inputDomain: Domain, val outputDomain: Domain) : Saveable(),
     Inspectable {

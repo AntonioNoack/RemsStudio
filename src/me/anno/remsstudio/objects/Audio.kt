@@ -1,22 +1,22 @@
 package me.anno.remsstudio.objects
 
 import me.anno.animation.LoopingState
-import me.anno.audio.openal.AudioTasks
+import me.anno.audio.openal.AudioTasks.addAudioTask
+import me.anno.engine.inspector.Inspectable
 import me.anno.io.ISaveable
+import me.anno.io.MediaMetadata.Companion.getMeta
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.audio.AudioFileStreamOpenAL2
 import me.anno.remsstudio.audio.effects.SoundPipeline
-import me.anno.studio.Inspectable
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
 import me.anno.utils.structures.ValueWithDefaultFunc
-import me.anno.video.ffmpeg.MediaMetadata.Companion.getMeta
 import org.joml.Matrix4fArrayList
 import org.joml.Vector4f
 
@@ -66,7 +66,7 @@ abstract class Audio(var file: FileReference = InvalidRef, parent: Transform? = 
 
     override fun onDestroy() {
         super.onDestroy()
-        AudioTasks.addTask("stop", 1) { stopPlayback() }
+        addAudioTask("stop", 1) { stopPlayback() }
     }
 
     // we need a flag, whether we draw in editor mode or not -> GFX.isFinalRendering

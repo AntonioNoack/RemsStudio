@@ -1,6 +1,7 @@
 package me.anno.remsstudio.audio.effects.impl
 
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
+import me.anno.engine.Events.addEvent
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.maths.Maths.clamp
@@ -12,18 +13,21 @@ import me.anno.remsstudio.audio.effects.SoundEffect
 import me.anno.remsstudio.audio.effects.Time
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
-import me.anno.studio.Events.addEvent
+import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.FloatInput
-import me.anno.ui.Style
-import me.anno.utils.LOGGER
 import me.anno.video.ffmpeg.FFMPEGStream.Companion.getAudioSequence
+import org.apache.logging.log4j.LogManager
 import kotlin.concurrent.thread
 import kotlin.math.sqrt
 
 class NoiseSuppressionEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
+
+    companion object {
+        private val LOGGER = LogManager.getLogger(NoiseSuppressionEffect::class)
+    }
 
     private val noiseLevel = AnimatedProperty.floatPlus() // maybe should be in dB...
 
@@ -104,7 +108,7 @@ class NoiseSuppressionEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAI
                             val histogram = IntArray(subdivisions)
                             // average values inside buffer
                             val sampleRate = meta.audioSampleRate
-                            val stereoData = getAudioSequence(audio.file, 0.0, duration, sampleRate).soundBuffer?.data
+                            val stereoData = getAudioSequence(audio.file, 0.0, duration, sampleRate).value?.data
                             if (stereoData != null) {
                                 var k0 = 0
                                 for (j in 0 until subdivisions) {
@@ -122,7 +126,7 @@ class NoiseSuppressionEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAI
 
                                 val percentileLevel = histogram[(subdivisions + 3) / 5] / 32767f
                                 addEvent {
-                                    (nlp as FloatInput)
+                                    (nlp.child as FloatInput)
                                         .setValue(percentileLevel, true)
                                 }
 

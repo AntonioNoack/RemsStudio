@@ -7,7 +7,7 @@ import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.inspectable.InspectableAnimProperty
 import me.anno.remsstudio.objects.particles.Particle
 import me.anno.remsstudio.objects.particles.ParticleState
-import me.anno.studio.Inspectable
+import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory

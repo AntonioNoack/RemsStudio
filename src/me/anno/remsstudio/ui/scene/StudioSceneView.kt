@@ -2,6 +2,8 @@ package me.anno.remsstudio.ui.scene
 
 import me.anno.Time.deltaTime
 import me.anno.config.DefaultConfig
+import me.anno.engine.EngineBase.Companion.dragged
+import me.anno.engine.EngineBase.Companion.shiftSlowdown
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.addGPUTask
 import me.anno.gpu.GFXState.renderDefault
@@ -45,8 +47,6 @@ import me.anno.remsstudio.ui.StudioFileImporter.addChildFromFile
 import me.anno.remsstudio.ui.StudioTreeView.Companion.zoomToObject
 import me.anno.remsstudio.ui.editor.ISceneView
 import me.anno.remsstudio.ui.editor.SimplePanel
-import me.anno.studio.StudioBase.Companion.dragged
-import me.anno.studio.StudioBase.Companion.shiftSlowdown
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton

@@ -1,7 +1,7 @@
 package test
 
 import me.anno.utils.OS.videos
-import me.anno.video.ffmpeg.MediaMetadata.Companion.getMeta
+import me.anno.io.MediaMetadata.Companion.getMeta
 
 fun main() {
     // getting stuck when running the engine...

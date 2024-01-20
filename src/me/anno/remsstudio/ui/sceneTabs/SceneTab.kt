@@ -1,11 +1,12 @@
 package me.anno.remsstudio.ui.sceneTabs
 
 import me.anno.config.DefaultConfig
+import me.anno.engine.EngineBase.Companion.dragged
+import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.gpu.GFX
 import me.anno.input.ActionManager
 import me.anno.input.Key
 import me.anno.io.files.FileReference
-import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringReader
 import me.anno.io.json.saveable.JsonStringWriter
@@ -16,8 +17,6 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.ui.scene.SceneTabData
 import me.anno.remsstudio.ui.sceneTabs.SceneTabs.currentTab
 import me.anno.remsstudio.ui.sceneTabs.SceneTabs.open
-import me.anno.studio.StudioBase.Companion.dragged
-import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.base.menu.Menu.ask
 import me.anno.ui.base.menu.Menu.msg
 import me.anno.ui.base.menu.Menu.openMenu
@@ -25,7 +24,7 @@ import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.base.text.TextPanel
 import me.anno.ui.dragging.Draggable
 import me.anno.ui.editor.files.FileExplorer
-import me.anno.ui.editor.files.toAllowedFilename
+import me.anno.ui.editor.files.FileNames.toAllowedFilename
 import me.anno.utils.Color.mixARGB
 import org.apache.logging.log4j.LogManager
 import kotlin.concurrent.thread
@@ -102,7 +101,7 @@ class SceneTab(var file: FileReference, var scene: Transform, history: History?)
         thread(name = "SaveScene") {
             try {
                 synchronized(scene) {
-                    dst.getParent()?.mkdirs()
+                    dst.getParent().mkdirs()
                     JsonStringWriter.save(listOf(scene, history), dst, workspace)
                     file = dst
                     hasChanged = false
@@ -123,7 +122,7 @@ class SceneTab(var file: FileReference, var scene: Transform, history: History?)
             // todo replace /,\?,..
             name = name.toAllowedFilename() ?: ""
             if (name.isEmpty()) {
-                val dst = getReference(project!!.scenes, name)
+                val dst = project!!.scenes.getChild( name)
                 if (dst.exists) {
                     ask(
                         windowStack,

@@ -1,8 +1,8 @@
 package me.anno.remsstudio.objects.particles
 
 import me.anno.Time
-import me.anno.animation.Type
 import me.anno.config.DefaultConfig
+import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
@@ -18,7 +18,6 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.particles.distributions.*
 import me.anno.remsstudio.objects.particles.forces.ForceField
 import me.anno.remsstudio.objects.particles.forces.impl.BetweenParticleGravity
-import me.anno.studio.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.SpyPanel
 import me.anno.ui.base.buttons.TextButton
@@ -30,6 +29,7 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.files.FileExplorerEntry.Companion.drawLoadingCircle
 import me.anno.ui.editor.stacked.Option
 import me.anno.ui.input.BooleanInput
+import me.anno.ui.input.NumberType
 import me.anno.utils.hpc.HeavyProcessing.processBalanced
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
@@ -47,22 +47,22 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
 
     override fun getDocumentationURL(): URL? = URL("https://remsstudio.phychi.com/?s=learn/particle-systems")
 
-    val spawnColor = AnimatedDistribution(Type.COLOR3, listOf(Vector3f(1f), Vector3f(0f), Vector3f(0f)))
-    val spawnPosition = AnimatedDistribution(Type.POSITION, listOf(Vector3f(0f), Vector3f(1f), Vector3f(0f)))
+    val spawnColor = AnimatedDistribution(NumberType.COLOR3, listOf(Vector3f(1f), Vector3f(0f), Vector3f(0f)))
+    val spawnPosition = AnimatedDistribution(NumberType.POSITION, listOf(Vector3f(0f), Vector3f(1f), Vector3f(0f)))
     val spawnVelocity =
-        AnimatedDistribution(GaussianDistribution(), Type.POSITION, listOf(Vector3f(), Vector3f(1f), Vector3f()))
-    val spawnSize = AnimatedDistribution(Type.SCALE, listOf(Vector3f(1f), Vector3f(0f), Vector3f(0f)))
+        AnimatedDistribution(GaussianDistribution(), NumberType.POSITION, listOf(Vector3f(), Vector3f(1f), Vector3f()))
+    val spawnSize = AnimatedDistribution(NumberType.SCALE, listOf(Vector3f(1f), Vector3f(0f), Vector3f(0f)))
     var spawnSize1D = true
 
-    val spawnOpacity = AnimatedDistribution(Type.FLOAT, listOf(1f, 0f))
+    val spawnOpacity = AnimatedDistribution(NumberType.FLOAT, listOf(1f, 0f))
 
-    val spawnMass = AnimatedDistribution(Type.FLOAT, listOf(1f, 0f))
+    val spawnMass = AnimatedDistribution(NumberType.FLOAT, listOf(1f, 0f))
 
-    val spawnRotation = AnimatedDistribution(Type.ROT_YXZ, Vector3f())
-    val spawnRotationVelocity = AnimatedDistribution(Type.ROT_YXZ, Vector3f())
+    val spawnRotation = AnimatedDistribution(NumberType.ROT_YXZ, Vector3f())
+    val spawnRotationVelocity = AnimatedDistribution(NumberType.ROT_YXZ, Vector3f())
 
     val spawnRate = AnimatedProperty.floatPlus(10f)
-    val lifeTime = AnimatedDistribution(Type.FLOAT, 10f)
+    val lifeTime = AnimatedDistribution(NumberType.FLOAT, 10f)
 
     var showChildren = false
     var simulationStepI = ValueWithDefault(0.5)
@@ -373,7 +373,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
         general += vi(
             inspected, "Simulation Step",
             "Larger values are faster, while smaller values are more accurate for forces",
-            Type.DOUBLE, simulationStep, style
+            NumberType.DOUBLE, simulationStep, style
         ) { it, _ ->
             if (it > 1e-9) for (x in c) x.simulationStep = it
             clearCache()

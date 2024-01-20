@@ -15,7 +15,7 @@ import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.attractors.EffectColoring
 import me.anno.remsstudio.objects.attractors.EffectMorphing
-import me.anno.studio.Inspectable
+import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY

@@ -6,16 +6,14 @@ import me.anno.gpu.shader.BaseShader
 import me.anno.gpu.shader.GLSLType
 import me.anno.gpu.shader.ShaderFuncLib
 import me.anno.gpu.shader.ShaderLib
-import me.anno.gpu.shader.ShaderLib.quatRot
 import me.anno.gpu.shader.ShaderLib.v3DMasked
 import me.anno.gpu.shader.ShaderLib.v3DlMasked
 import me.anno.gpu.shader.ShaderLib.y3DMasked
 import me.anno.gpu.shader.builder.Variable
 import me.anno.gpu.shader.builder.VariableMode
-import me.anno.io.files.FileReference.Companion.getReference
+import me.anno.io.files.Reference.getReference
 import me.anno.remsstudio.objects.effects.MaskType
 import me.anno.utils.pooling.ByteBufferPool
-import java.nio.ByteOrder
 import java.nio.FloatBuffer
 import kotlin.math.PI
 
@@ -116,10 +114,7 @@ object ShaderLibV2 {
             "   return sumUVs;\n" +
             "}\n"
 
-    val uvForceFieldBuffer: FloatBuffer = ByteBufferPool
-        .allocateDirect(4 * maxUVForceFields)
-        .order(ByteOrder.nativeOrder())
-        .asFloatBuffer()
+    val uvForceFieldBuffer = FloatArray(maxUVForceFields)
 
     const val hasForceFieldColor = "(forceFieldColorCount > 0)"
     const val hasForceFieldUVs = "(forceFieldUVCount > 0)"
@@ -173,7 +168,7 @@ object ShaderLibV2 {
         .trim().run {
             replace("\r", "")
         }.run {
-            "case $case:\n" + substring(indexOf('\n')+1, lastIndexOf('\n')) + "\nbreak;\n"
+            "case $case:\n" + substring(indexOf('\n') + 1, lastIndexOf('\n')) + "\nbreak;\n"
         }
 
     lateinit var shader3DMasked: BaseShader

@@ -8,7 +8,7 @@ import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.modes.ArraySelectionMode
-import me.anno.studio.Inspectable
+import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory

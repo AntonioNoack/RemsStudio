@@ -3,24 +3,24 @@ package me.anno.remsstudio.cli
 import me.anno.Engine
 import me.anno.Time
 import me.anno.cache.Cache
+import me.anno.engine.CommandLineUtils.parseDouble
+import me.anno.engine.CommandLineUtils.parseFloat
+import me.anno.engine.CommandLineUtils.parseInt
+import me.anno.engine.Events.workEventTasks
 import me.anno.gpu.GFX
 import me.anno.gpu.framebuffer.Frame
 import me.anno.gpu.hidden.HiddenOpenGLContext
 import me.anno.gpu.shader.ShaderLib
 import me.anno.gpu.texture.Texture2D
 import me.anno.gpu.texture.Texture2D.Companion.bindTexture
-import me.anno.installer.Installer.checkInstall
+import me.anno.installer.Installer
 import me.anno.io.config.ConfigBasics
-import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.files.InvalidRef
+import me.anno.io.files.Reference.getReference
 import me.anno.io.json.saveable.JsonStringReader
 import me.anno.remsstudio.*
 import me.anno.remsstudio.gpu.ShaderLibV2
 import me.anno.remsstudio.objects.Transform
-import me.anno.studio.CommandLines.parseDouble
-import me.anno.studio.CommandLines.parseFloat
-import me.anno.studio.CommandLines.parseInt
-import me.anno.studio.Events.workEventTasks
 import me.anno.utils.Sleep.sleepABit
 import me.anno.utils.types.Strings.getImportType
 import me.anno.utils.types.Strings.isBlank2
@@ -106,7 +106,7 @@ object RemsCLI {
 
         val project = if (line.hasOption("project")) {
             Project("Unnamed", getReference(line.getOptionValue("project")))
-        } else Project("Unknown", getReference(ConfigBasics.cacheFolder, "project0").apply { mkdirs() })
+        } else Project("Unknown", ConfigBasics.cacheFolder.getChild("project0").apply { mkdirs() })
         RemsStudio.project = project
 
         project.targetFPS = line.parseDouble("fps", project.targetFPS)
@@ -219,7 +219,7 @@ object RemsCLI {
     fun init() {
         RemsStudio.setupNames()
         RemsConfig.init()
-        checkInstall()
+        Installer.checkFFMPEGInstall()
         // checkVersion() needs to be killed, if the time is long over ;)
     }
 

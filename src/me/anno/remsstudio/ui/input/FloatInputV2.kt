@@ -1,18 +1,18 @@
 package me.anno.remsstudio.ui.input
 
-import me.anno.animation.Type
 import me.anno.input.Key
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.ui.input.components.NumberInputComponentV2
 import me.anno.ui.Style
 import me.anno.ui.input.FloatInput
+import me.anno.ui.input.NumberType
 import me.anno.utils.types.AnyToDouble
 import me.anno.utils.types.AnyToFloat
 import org.joml.*
 
 class FloatInputV2(
     style: Style, title: String, visibilityKey: String,
-    type: Type,
+    type: NumberType,
     private val owningProperty: AnimatedProperty<*>
 ) : FloatInput(
     title, visibilityKey, type, style,

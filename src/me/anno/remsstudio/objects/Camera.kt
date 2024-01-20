@@ -1,7 +1,7 @@
 package me.anno.remsstudio.objects
 
-import me.anno.animation.Type
 import me.anno.config.DefaultConfig
+import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.Perspective.perspective2
 import me.anno.gpu.pipeline.Sorting
@@ -17,11 +17,11 @@ import me.anno.remsstudio.RemsStudio.currentlyDrawnCamera
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.effects.ToneMappers
 import me.anno.remsstudio.objects.models.CameraModel.drawCamera
-import me.anno.studio.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
+import me.anno.ui.input.NumberType
 import me.anno.utils.Color.white4
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.pooling.JomlPools
@@ -401,7 +401,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
 
         // linear and exponential aren't really the correct types...
         // around 0f and 180f should have exponential speed decay
-        val fovType = Type(90f, 1, 1f, true, true, { clamp(castToFloat2(it), 0.001f, 179.999f) }, { it })
+        val fovType = NumberType(90f, 1, 1f, true, true, { clamp(castToFloat2(it), 0.001f, 179.999f) }, { it })
 
         const val DEFAULT_VIGNETTE_STRENGTH = 5f
 

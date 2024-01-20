@@ -1,6 +1,7 @@
 package me.anno.remsstudio.objects.effects
 
 import me.anno.config.DefaultConfig
+import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.GFX
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.GFXState.renderDefault
@@ -10,11 +11,11 @@ import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.framebuffer.Framebuffer
 import me.anno.gpu.framebuffer.IFramebuffer
 import me.anno.gpu.shader.effects.BokehBlur
-import me.anno.gpu.shader.effects.GaussianBlur
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.Filtering
 import me.anno.gpu.texture.Texture2D
+import me.anno.image.utils.GaussianBlur
 import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.Scene
@@ -25,7 +26,6 @@ import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.geometric.Circle
 import me.anno.remsstudio.objects.geometric.Polygon
-import me.anno.studio.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.SpyPanel

@@ -2,19 +2,20 @@ package me.anno.remsstudio
 
 import me.anno.Build
 import me.anno.engine.EngineActions
+import me.anno.engine.EngineBase
+import me.anno.engine.EngineBase.Companion.dragged
+import me.anno.engine.Events.addEvent
 import me.anno.gpu.GFX
 import me.anno.gpu.GFXState
 import me.anno.gpu.debug.DebugGPUStorage
 import me.anno.input.ActionManager
 import me.anno.input.Input
 import me.anno.input.Modifiers
-import me.anno.io.files.FileReference.Companion.getReference
+import me.anno.io.files.Reference.getReference
 import me.anno.io.utils.StringMap
 import me.anno.remsstudio.RemsStudio.hoveredPanel
 import me.anno.remsstudio.objects.modes.TransformVisibility
 import me.anno.remsstudio.ui.editor.TimelinePanel
-import me.anno.studio.Events.addEvent
-import me.anno.studio.StudioBase
 import me.anno.ui.Panel
 import me.anno.ui.WindowStack.Companion.printLayout
 import me.anno.utils.structures.lists.Lists.any2
@@ -96,12 +97,12 @@ object StudioActions {
                 true
             },
             "DragEnd" to {
-                val dragged = StudioBase.dragged
+                val dragged = dragged
                 if (dragged != null) {
 
                     val type = dragged.getContentType()
                     val data = dragged.getContent()
-                    val window = GFX.someWindow!!
+                    val window = GFX.someWindow
 
                     when (type) {
                         "File" -> {
@@ -115,13 +116,13 @@ object StudioActions {
                         }
                     }
 
-                    StudioBase.dragged = null
+                    EngineBase.dragged = null
 
                     true
                 } else false
             },
             "ClearCache" to {
-                StudioBase.instance?.clearAll()
+                RemsStudio.clearAll()
                 true
             },
             "Redo" to {
@@ -160,25 +161,25 @@ object StudioActions {
                 } else false
             },
             "Save" to {
-                StudioBase.instance?.save()
+                RemsStudio.save()
                 true
             },
             "Paste" to {
-                Input.paste(GFX.someWindow!!)
+                Input.paste(GFX.someWindow)
                 true
             },
             "Copy" to {
-                Input.copy(GFX.someWindow!!)
+                Input.copy(GFX.someWindow)
                 true
             },
             "Duplicate" to {
-                val window = GFX.someWindow!!
+                val window = GFX.someWindow
                 Input.copy(window)
                 Input.paste(window)
                 true
             },
             "Cut" to {
-                val window = GFX.someWindow!!
+                val window = GFX.someWindow
                 Input.copy(window)
                 Input.empty(window)
                 true
@@ -188,11 +189,11 @@ object StudioActions {
                 true
             },
             "OpenHistory" to {
-                StudioBase.instance?.openHistory()
+                RemsStudio.openHistory()
                 true
             },
             "SelectAll" to {
-                val ws = GFX.someWindow!!.windowStack
+                val ws = GFX.someWindow.windowStack
                 val inFocus0 = ws.inFocus0
                 inFocus0?.onSelectAll(ws.mouseX, ws.mouseY)
                 true

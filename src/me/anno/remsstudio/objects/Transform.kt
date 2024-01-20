@@ -1,7 +1,8 @@
 package me.anno.remsstudio.objects
 
-import me.anno.animation.Type
 import me.anno.config.DefaultConfig
+import me.anno.engine.EngineBase.Companion.workspace
+import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.GFXState
 import me.anno.gpu.blending.BlendMode
@@ -29,8 +30,6 @@ import me.anno.remsstudio.ui.ComponentUIV2
 import me.anno.remsstudio.ui.IsAnimatedWrapper
 import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.global2Kf
-import me.anno.studio.Inspectable
-import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.components.AxisAlignment
@@ -39,6 +38,7 @@ import me.anno.ui.base.text.LinkPanel
 import me.anno.ui.base.text.UpdatingTextPanel
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.stacked.Option
+import me.anno.ui.input.NumberType
 import me.anno.ui.input.TextInput
 import me.anno.ui.input.TextInputML
 import me.anno.utils.Color.mulARGB
@@ -318,7 +318,7 @@ open class Transform() : Saveable(),
 
         val editorGroup = getGroup("Editor", "", "editor")
         editorGroup += vi(
-            inspected, "Timeline Slot", "< 1 means invisible", Type.INT_PLUS, timelineSlot.value, style
+            inspected, "Timeline Slot", "< 1 means invisible", NumberType.INT_PLUS, timelineSlot.value, style
         ) { it, _ -> for (x in c) x.timelineSlot.value = it }
         // todo warn of invisible elements somehow!...
         editorGroup += vi(
@@ -329,7 +329,7 @@ open class Transform() : Saveable(),
             val psGroup = getGroup("Particle System Child", "", "particles")
             psGroup += vi(
                 inspected, "Weight", "For particle systems",
-                Type.FLOAT_PLUS, weight, style
+                NumberType.FLOAT_PLUS, weight, style
             ) { it, _ ->
                 for (x in c) {
                     x.weight = it
@@ -702,7 +702,7 @@ open class Transform() : Saveable(),
     fun <V> vi(
         inspected: List<Inspectable>,
         title: String, ttt: String, dictPath: String, visibilityKey: String,
-        type: Type?, value: V,
+        type: NumberType?, value: V,
         style: Style, setValue: (value: V, mask: Int) -> Unit
     ): Panel {
         return vi(
@@ -716,13 +716,13 @@ open class Transform() : Saveable(),
     fun <V> vi(
         inspected: List<Inspectable>,
         title: String, ttt: String, dictPath: String, visibilityKey: String,
-        type: Type?, value: ValueWithDefault<V>,
+        type: NumberType?, value: ValueWithDefault<V>,
         style: Style
     ) = vi(inspected, Dict[title, "obj.$dictPath"], Dict[ttt, "obj.$dictPath.desc"], visibilityKey, type, value, style)
 
     fun <V> vis(
         inspected: List<Inspectable>,
-        title: String, ttt: String, dictPath: String, type: Type?, visibilityKey: String,
+        title: String, ttt: String, dictPath: String, type: NumberType?, visibilityKey: String,
         values: List<ValueWithDefault<V>>, style: Style
     ) = vis(
         inspected, Dict[title, "obj.$dictPath"], Dict[ttt, "obj.$dictPath.desc"],
@@ -732,7 +732,7 @@ open class Transform() : Saveable(),
     fun <V> vi(
         inspected: List<Inspectable>,
         title: String, ttt: String, visibilityKey: String,
-        type: Type?, value: ValueWithDefault<V>,
+        type: NumberType?, value: ValueWithDefault<V>,
         style: Style
     ): Panel {
         return vi(inspected, title, ttt, visibilityKey, type, value.value, style) { newValue, mask ->
@@ -745,7 +745,7 @@ open class Transform() : Saveable(),
     fun <V> vi(
         inspected: List<Inspectable>,
         title: String, ttt: String,
-        type: Type?, value: ValueWithDefault<V>,
+        type: NumberType?, value: ValueWithDefault<V>,
         style: Style
     ): Panel {
         return vi(inspected, title, ttt, title, type, value, style)
@@ -753,7 +753,7 @@ open class Transform() : Saveable(),
 
     fun <V> vis(
         inspected: List<Inspectable>,
-        title: String, ttt: String, visibilityKey: String, type: Type?,
+        title: String, ttt: String, visibilityKey: String, type: NumberType?,
         values: List<ValueWithDefault<V>>, style: Style
     ): Panel {
         return vi(inspected, title, ttt, visibilityKey, type, values[0].value, style) { newValue, mask ->
@@ -766,7 +766,7 @@ open class Transform() : Saveable(),
 
     fun <V> vis(
         inspected: List<Inspectable>,
-        title: String, ttt: String, type: Type?,
+        title: String, ttt: String, type: NumberType?,
         values: List<ValueWithDefault<V>>, style: Style
     ): Panel {
         return vis(inspected, title, ttt, title, type, values, style)
@@ -780,7 +780,7 @@ open class Transform() : Saveable(),
     fun <V> vi(
         inspected: List<Inspectable>,
         title: String, ttt: String, visibilityKey: String,
-        type: Type?, value: V,
+        type: NumberType?, value: V,
         style: Style, setValue: (value: V, mask: Int) -> Unit
     ): Panel {
         return ComponentUIV2.vi(inspected, this, title, ttt, visibilityKey, type, value, style, setValue)
@@ -789,7 +789,7 @@ open class Transform() : Saveable(),
     fun <V> vi(
         inspected: List<Inspectable>,
         title: String, ttt: String,
-        type: Type?, value: V,
+        type: NumberType?, value: V,
         style: Style, setValue: (value: V, mask: Int) -> Unit
     ): Panel {
         return ComponentUIV2.vi(inspected, this, title, ttt, title, type, value, style, setValue)
@@ -932,7 +932,7 @@ open class Transform() : Saveable(),
     }
 
     fun checkFinalRendering() {
-        if (isFinalRendering) throw MissingFrameException(this)
+        if (isFinalRendering) throw MissingFrameException(toString())
     }
 
     open fun getAdditionalChildrenOptions(): List<Option> = emptyList()
@@ -965,7 +965,7 @@ open class Transform() : Saveable(),
         const val minAlpha = 0.5f / 255f
         private val LOGGER = LogManager.getLogger(Transform::class)
 
-        val dilationType = Type(1.0, 1, 1f, true, true, ::castToDouble2, ::castToDouble)
+        val dilationType = NumberType(1.0, 1, 1f, true, true, ::castToDouble2, ::castToDouble)
 
     }
 

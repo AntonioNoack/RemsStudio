@@ -2,7 +2,7 @@ package me.anno.remsstudio.ui.graphs
 
 import me.anno.Time
 import me.anno.animation.Interpolation
-import me.anno.animation.Type
+import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.gpu.drawing.DrawCurves
 import me.anno.gpu.drawing.DrawRectangles.drawBorder
 import me.anno.gpu.drawing.DrawRectangles.drawRect
@@ -34,12 +34,12 @@ import me.anno.remsstudio.ui.IsSelectedWrapper
 import me.anno.remsstudio.ui.MenuUtils.askNumber
 import me.anno.remsstudio.ui.MenuUtils.drawTypeInCorner
 import me.anno.remsstudio.ui.editor.TimelinePanel
-import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.ui.Style
 import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.editor.sceneView.Grid.drawSmoothLine
+import me.anno.ui.input.NumberType
 import me.anno.utils.Color.black
 import me.anno.utils.Color.mulAlpha
 import me.anno.utils.Color.toARGB
@@ -278,7 +278,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
         val kfs = property.keyframes
 
         // draw colored stripes to show the color...
-        if (property.type == Type.COLOR || property.type == Type.COLOR3) {
+        if (property.type == NumberType.COLOR || property.type == NumberType.COLOR3) {
             drawColoredStripes(x0, x1, y0, y1, property)
         }
 
@@ -396,7 +396,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
                 val x = getXAt(tGlobal).roundToInt() - halfWidth
                 if (x < x1 || x + width >= x0) {// visible
                     val colorVector =
-                        if (property.type == Type.COLOR3)
+                        if (property.type == NumberType.COLOR3)
                             Vector4f(kf.value as Vector3f, 1f)
                         else kf.value as Vector4f
                     val color = colorVector.toARGB()

@@ -2,7 +2,6 @@ package me.anno.remsstudio.animation
 
 import me.anno.Time
 import me.anno.animation.Interpolation
-import me.anno.animation.Type
 import me.anno.gpu.GFX.glThread
 import me.anno.io.ISaveable
 import me.anno.io.Saveable
@@ -14,6 +13,7 @@ import me.anno.remsstudio.animation.AnimationMaths.mulAdd
 import me.anno.remsstudio.animation.Keyframe.Companion.getWeights
 import me.anno.remsstudio.animation.drivers.AnimationDriver
 import me.anno.remsstudio.utils.WrongClassType
+import me.anno.ui.input.NumberType
 import me.anno.utils.Color.black3
 import me.anno.utils.structures.lists.UnsafeArrayList
 import me.anno.utils.types.AnyToDouble.getDouble
@@ -23,62 +23,62 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-class AnimatedProperty<V>(var type: Type, var defaultValue: V) : Saveable() {
+class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable() {
 
     @Suppress("UNCHECKED_CAST")
-    constructor(type: Type) : this(type, type.defaultValue as V)
+    constructor(type: NumberType) : this(type, type.defaultValue as V)
 
-    constructor() : this(Type.ANY)
+    constructor() : this(NumberType.ANY)
 
     companion object {
 
         private val LOGGER = LogManager.getLogger(AnimatedProperty::class)
 
-        fun any() = AnimatedProperty<Any>(Type.ANY)
-        fun int() = AnimatedProperty<Int>(Type.INT)
-        fun int(defaultValue: Int) = AnimatedProperty(Type.INT, defaultValue)
-        fun intPlus() = AnimatedProperty<Int>(Type.INT_PLUS)
-        fun intPlus(defaultValue: Int) = AnimatedProperty(Type.INT_PLUS, defaultValue)
-        fun long() = AnimatedProperty<Long>(Type.LONG)
-        fun float() = AnimatedProperty<Float>(Type.FLOAT)
-        fun float(defaultValue: Float) = AnimatedProperty(Type.FLOAT, defaultValue)
-        fun floatPlus() = AnimatedProperty<Float>(Type.FLOAT_PLUS)
-        fun floatPlus(defaultValue: Float) = AnimatedProperty(Type.FLOAT_PLUS, defaultValue)
-        fun floatPlusExp() = AnimatedProperty<Float>(Type.FLOAT_PLUS_EXP)
-        fun floatPlusExp(defaultValue: Float) = AnimatedProperty(Type.FLOAT_PLUS_EXP, defaultValue)
-        fun float01() = AnimatedProperty<Float>(Type.FLOAT_01)
-        fun float01(defaultValue: Float) = AnimatedProperty(Type.FLOAT_01, defaultValue)
-        fun float01exp(defaultValue: Float) = AnimatedProperty(Type.FLOAT_01_EXP, defaultValue)
-        fun floatPercent() = AnimatedProperty<Float>(Type.FLOAT_PERCENT)
-        fun double() = AnimatedProperty<Double>(Type.DOUBLE)
-        fun double(defaultValue: Double) = AnimatedProperty(Type.DOUBLE, defaultValue)
-        fun vec2() = AnimatedProperty<Vector2f>(Type.VEC2)
-        fun vec2(defaultValue: Vector2f) = AnimatedProperty(Type.VEC2, defaultValue)
-        fun vec3() = AnimatedProperty(Type.VEC3, black3)
+        fun any() = AnimatedProperty<Any>(NumberType.ANY)
+        fun int() = AnimatedProperty<Int>(NumberType.INT)
+        fun int(defaultValue: Int) = AnimatedProperty(NumberType.INT, defaultValue)
+        fun intPlus() = AnimatedProperty<Int>(NumberType.INT_PLUS)
+        fun intPlus(defaultValue: Int) = AnimatedProperty(NumberType.INT_PLUS, defaultValue)
+        fun long() = AnimatedProperty<Long>(NumberType.LONG)
+        fun float() = AnimatedProperty<Float>(NumberType.FLOAT)
+        fun float(defaultValue: Float) = AnimatedProperty(NumberType.FLOAT, defaultValue)
+        fun floatPlus() = AnimatedProperty<Float>(NumberType.FLOAT_PLUS)
+        fun floatPlus(defaultValue: Float) = AnimatedProperty(NumberType.FLOAT_PLUS, defaultValue)
+        fun floatPlusExp() = AnimatedProperty<Float>(NumberType.FLOAT_PLUS_EXP)
+        fun floatPlusExp(defaultValue: Float) = AnimatedProperty(NumberType.FLOAT_PLUS_EXP, defaultValue)
+        fun float01() = AnimatedProperty<Float>(NumberType.FLOAT_01)
+        fun float01(defaultValue: Float) = AnimatedProperty(NumberType.FLOAT_01, defaultValue)
+        fun float01exp(defaultValue: Float) = AnimatedProperty(NumberType.FLOAT_01_EXP, defaultValue)
+        fun floatPercent() = AnimatedProperty<Float>(NumberType.FLOAT_PERCENT)
+        fun double() = AnimatedProperty<Double>(NumberType.DOUBLE)
+        fun double(defaultValue: Double) = AnimatedProperty(NumberType.DOUBLE, defaultValue)
+        fun vec2() = AnimatedProperty<Vector2f>(NumberType.VEC2)
+        fun vec2(defaultValue: Vector2f) = AnimatedProperty(NumberType.VEC2, defaultValue)
+        fun vec3() = AnimatedProperty(NumberType.VEC3, black3)
         fun dir3() = vec3(Vector3f(0f, 1f, 0f))
-        fun vec3(defaultValue: Vector3f) = AnimatedProperty(Type.VEC3, defaultValue)
-        fun vec4() = AnimatedProperty<Vector4f>(Type.VEC4)
-        fun vec4(defaultValue: Vector4f) = AnimatedProperty(Type.VEC4, defaultValue)
-        fun pos() = AnimatedProperty<Vector3f>(Type.POSITION)
-        fun pos(defaultValue: Vector3f) = AnimatedProperty(Type.POSITION, defaultValue)
-        fun pos2D() = AnimatedProperty<Vector2f>(Type.POSITION_2D)
-        fun rotYXZ() = AnimatedProperty<Vector3f>(Type.ROT_YXZ)
-        fun rotY() = AnimatedProperty<Float>(Type.ROT_Y)
-        fun rotXZ() = AnimatedProperty<Vector2f>(Type.ROT_XZ)
-        fun scale() = AnimatedProperty<Vector3f>(Type.SCALE)
-        fun scale(defaultValue: Vector3f) = AnimatedProperty(Type.SCALE, defaultValue)
-        fun color() = AnimatedProperty<Vector4f>(Type.COLOR)
-        fun color(defaultValue: Vector4f) = AnimatedProperty(Type.COLOR, defaultValue)
-        fun color3() = AnimatedProperty<Vector3f>(Type.COLOR3)
-        fun color3(defaultValue: Vector3f) = AnimatedProperty(Type.COLOR3, defaultValue)
-        fun quat() = AnimatedProperty<Quaternionf>(Type.QUATERNION)
-        fun skew() = AnimatedProperty<Vector2f>(Type.SKEW_2D)
-        fun tiling() = AnimatedProperty<Vector4f>(Type.TILING)
+        fun vec3(defaultValue: Vector3f) = AnimatedProperty(NumberType.VEC3, defaultValue)
+        fun vec4() = AnimatedProperty<Vector4f>(NumberType.VEC4)
+        fun vec4(defaultValue: Vector4f) = AnimatedProperty(NumberType.VEC4, defaultValue)
+        fun pos() = AnimatedProperty<Vector3f>(NumberType.POSITION)
+        fun pos(defaultValue: Vector3f) = AnimatedProperty(NumberType.POSITION, defaultValue)
+        fun pos2D() = AnimatedProperty<Vector2f>(NumberType.POSITION_2D)
+        fun rotYXZ() = AnimatedProperty<Vector3f>(NumberType.ROT_YXZ)
+        fun rotY() = AnimatedProperty<Float>(NumberType.ROT_Y)
+        fun rotXZ() = AnimatedProperty<Vector2f>(NumberType.ROT_XZ)
+        fun scale() = AnimatedProperty<Vector3f>(NumberType.SCALE)
+        fun scale(defaultValue: Vector3f) = AnimatedProperty(NumberType.SCALE, defaultValue)
+        fun color() = AnimatedProperty<Vector4f>(NumberType.COLOR)
+        fun color(defaultValue: Vector4f) = AnimatedProperty(NumberType.COLOR, defaultValue)
+        fun color3() = AnimatedProperty<Vector3f>(NumberType.COLOR3)
+        fun color3(defaultValue: Vector3f) = AnimatedProperty(NumberType.COLOR3, defaultValue)
+        fun quat() = AnimatedProperty<Quaternionf>(NumberType.QUATERNION)
+        fun skew() = AnimatedProperty<Vector2f>(NumberType.SKEW_2D)
+        fun tiling() = AnimatedProperty<Vector4f>(NumberType.TILING)
 
-        fun string() = AnimatedProperty(Type.STRING, "")
-        fun alignment() = AnimatedProperty(Type.ALIGNMENT, 0f)
+        fun string() = AnimatedProperty(NumberType.STRING, "")
+        fun alignment() = AnimatedProperty(NumberType.ALIGNMENT, 0f)
 
-        // fun <V> set() = AnimatedProperty(Type.ANY, emptySet<V>())
+        // fun <V> set() = AnimatedProperty(NumberType.ANY, emptySet<V>())
 
     }
 

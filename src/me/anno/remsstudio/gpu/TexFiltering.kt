@@ -25,13 +25,13 @@ enum class TexFiltering(private val baseIsNearest: Boolean, val id: Int, val nam
     companion object {
         fun DefaultConfig.getFiltering(key: String, default: TexFiltering): TexFiltering {
             return when (val value = this[key]) {
-                is Boolean -> if (value) TexFiltering.NEAREST else TexFiltering.LINEAR
+                is Boolean -> if (value) NEAREST else LINEAR
                 is Int -> default.find(value)
                 is String -> {
                     when (value.lowercase(Locale.ENGLISH)) {
-                        "true", "t", "nearest" -> TexFiltering.NEAREST
-                        "false", "f", "linear" -> TexFiltering.LINEAR
-                        "cubic", "bicubic" -> TexFiltering.CUBIC
+                        "true", "t", "nearest" -> NEAREST
+                        "false", "f", "linear" -> LINEAR
+                        "cubic", "bicubic" -> CUBIC
                         else -> default
                     }
                 }

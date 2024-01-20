@@ -1,6 +1,5 @@
 package me.anno.remsstudio.objects.particles.distributions
 
-import me.anno.animation.Type
 import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
@@ -9,6 +8,7 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.inspectable.InspectableVector
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
+import me.anno.ui.input.NumberType
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
 import org.joml.Vector2f
@@ -18,7 +18,7 @@ import java.util.*
 
 class AnimatedDistribution(
     distribution: Distribution = ConstantDistribution(),
-    val type: Type,
+    val type: NumberType,
     val defaultValues: List<Any>
 ) : Saveable() {
 
@@ -29,9 +29,9 @@ class AnimatedDistribution(
             distributionI.value = value
         }
 
-    constructor() : this(Type.ANY, 0f)
-    constructor(type: Type, defaultValue: Any) : this(ConstantDistribution(), type, listOf(defaultValue))
-    constructor(type: Type, defaultValues: List<Any>) : this(ConstantDistribution(), type, defaultValues)
+    constructor() : this(NumberType.ANY, 0f)
+    constructor(type: NumberType, defaultValue: Any) : this(ConstantDistribution(), type, listOf(defaultValue))
+    constructor(type: NumberType, defaultValues: List<Any>) : this(ConstantDistribution(), type, defaultValues)
 
     val channels = ArrayList<AnimatedProperty<*>>()
     lateinit var properties: List<InspectableVector>
@@ -51,8 +51,8 @@ class AnimatedDistribution(
             val properties = ins.properties
             for (index in properties.indices) {
                 val property = properties[index]
-                if (property.pType == InspectableVector.PType.ROTATION) channels[index].type = Type.ROT_YXZ
-                if (property.pType == InspectableVector.PType.SCALE) channels[index].type = Type.SCALE
+                if (property.pType == InspectableVector.PType.ROTATION) channels[index].type = NumberType.ROT_YXZ
+                if (property.pType == InspectableVector.PType.SCALE) channels[index].type = NumberType.SCALE
             }
         }
         val properties = properties

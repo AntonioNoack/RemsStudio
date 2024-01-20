@@ -1,7 +1,7 @@
 package me.anno.remsstudio.audio.effects.impl
 
 import audacity.soundtouch.TimeDomainStretch
-import me.anno.animation.Type
+import me.anno.ui.input.NumberType
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
 import me.anno.io.base.BaseWriter
 import me.anno.maths.Maths.clamp
@@ -21,7 +21,7 @@ class PitchEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
     companion object {
         val maxPitch = 20f
         val minPitch = 1f / maxPitch
-        val pitchType = Type(1f, 1, 1f, false, true,
+        val pitchType = NumberType(1f, 1, 1f, false, true,
             { clamp(castToFloat2(it), minPitch, maxPitch) },
             { it is Float }
         )

@@ -18,7 +18,7 @@ import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.gpu.GFXx3Dv2.draw3DPolygon
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
-import me.anno.studio.Inspectable
+import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -51,7 +51,9 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val inset = clamp(starNess[time], 0f, 1f)
         val image = TextureCache[texture, 5000, true]
-        if (image == null && texture.hasValidName() && GFX.isFinalRendering) throw MissingFrameException(texture)
+        if (image == null && texture.hasValidName() && GFX.isFinalRendering) {
+            throw MissingFrameException(texture.toString())
+        }
         val texture = image ?: whiteTexture
         val count = vertexCount[time]//.roundToInt()
         if (inset == 1f && count % 2 == 0) return// invisible

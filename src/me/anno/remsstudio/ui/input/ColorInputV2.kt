@@ -10,7 +10,7 @@ import org.joml.Vector4f
 class ColorInputV2(
     style: Style, title: String, visibilityKey: String,
     oldValue: Vector4f, withAlpha: Boolean, val property: AnimatedProperty<*>
-) : ColorInput(style, title, visibilityKey, oldValue, withAlpha, ColorChooserV2(style, withAlpha, property)) {
+) : ColorInput(title, visibilityKey, oldValue, withAlpha, style, ColorChooserV2(style, withAlpha, property)) {
 
     override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
         if (RemsStudio.hideUnusedProperties) {

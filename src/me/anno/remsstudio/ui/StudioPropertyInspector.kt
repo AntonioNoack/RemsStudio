@@ -2,7 +2,7 @@ package me.anno.remsstudio.ui
 
 import me.anno.config.DefaultStyle
 import me.anno.remsstudio.ui.MenuUtils.drawTypeInCorner
-import me.anno.studio.Inspectable
+import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.editor.PropertyInspector
 

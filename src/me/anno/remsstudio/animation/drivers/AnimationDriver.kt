@@ -1,6 +1,6 @@
 package me.anno.remsstudio.animation.drivers
 
-import me.anno.animation.Type
+import me.anno.engine.inspector.Inspectable
 import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
@@ -11,7 +11,6 @@ import me.anno.remsstudio.Selection.selectProperty
 import me.anno.remsstudio.Selection.selectedTransforms
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
-import me.anno.studio.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.WindowStack
 import me.anno.ui.base.groups.PanelListY
@@ -19,6 +18,7 @@ import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.SettingCategory
+import me.anno.ui.input.NumberType
 import org.joml.Vector2d
 import org.joml.Vector3d
 import org.joml.Vector4d
@@ -76,7 +76,7 @@ abstract class AnimationDriver : Saveable(), Inspectable {
         )
         list += transform.vi(
             inspected, "Frequency", "How fast it's changing", "driver.frequency",
-            Type.DOUBLE, frequency, style
+            NumberType.DOUBLE, frequency, style
         ) { it, _ -> frequency = it }
     }
 

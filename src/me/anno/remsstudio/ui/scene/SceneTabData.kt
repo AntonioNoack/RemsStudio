@@ -1,5 +1,6 @@
 package me.anno.remsstudio.ui.scene
 
+import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
@@ -9,7 +10,6 @@ import me.anno.io.json.saveable.JsonStringReader
 import me.anno.remsstudio.history.History
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.ui.sceneTabs.SceneTab
-import me.anno.studio.StudioBase.Companion.workspace
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.structures.lists.Lists.firstInstanceOrNull
 

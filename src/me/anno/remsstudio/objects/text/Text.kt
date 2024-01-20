@@ -1,8 +1,8 @@
 package me.anno.remsstudio.objects.text
 
-import me.anno.animation.Type
 import me.anno.cache.CacheData
 import me.anno.config.DefaultConfig
+import me.anno.engine.inspector.Inspectable
 import me.anno.fonts.FontManager
 import me.anno.fonts.FontManager.TextCache
 import me.anno.fonts.PartResult
@@ -21,13 +21,13 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.lists.Element
 import me.anno.remsstudio.objects.lists.SplittableElement
 import me.anno.remsstudio.objects.modes.TextRenderMode
-import me.anno.studio.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.Font
 import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.SettingCategory
+import me.anno.ui.input.NumberType
 import me.anno.utils.strings.StringHelper.smallCaps
 import me.anno.utils.structures.tuples.Quad
 import org.joml.Matrix4fArrayList
@@ -44,8 +44,8 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
 
         val DEFAULT_FONT_HEIGHT = 32
 
-        val tabSpaceType = Type.FLOAT_PLUS.withDefaultValue(4f)
-        val lineBreakType = Type.FLOAT_PLUS.withDefaultValue(0f)
+        val tabSpaceType = NumberType.FLOAT_PLUS.withDefaultValue(4f)
+        val lineBreakType = NumberType.FLOAT_PLUS.withDefaultValue(0f)
 
         val textMeshTimeout = 5000L
 
@@ -76,7 +76,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
     val outlineColor1 = AnimatedProperty.color(Vector4f(0f))
     val outlineColor2 = AnimatedProperty.color(Vector4f(0f))
     val outlineWidths = AnimatedProperty.vec4(Vector4f(0f, 1f, 1f, 1f))
-    val outlineSmoothness = AnimatedProperty(Type.VEC4_PLUS, Vector4f(0f))
+    val outlineSmoothness = AnimatedProperty(NumberType.VEC4_PLUS, Vector4f(0f))
     var outlineDepth = AnimatedProperty.float()
 
     val shadowColor = AnimatedProperty.color(Vector4f(0f))

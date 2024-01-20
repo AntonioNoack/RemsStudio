@@ -1,9 +1,9 @@
 package me.anno.remsstudio.animation
 
 import me.anno.animation.Interpolation
-import me.anno.animation.Type
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
+import me.anno.ui.input.NumberType
 import me.anno.utils.types.AnyToFloat
 import org.joml.*
 
@@ -62,7 +62,7 @@ class Keyframe<V>(var time: Double, var value: V, var interpolation: Interpolati
     }
 
     @Suppress("useless_cast")
-    fun setValue(index: Int, v: Float, type: Type) {
+    fun setValue(index: Int, v: Float, type: NumberType) {
         val tmp: Any= type.clamp(
             when (val value = value) {
                 is Int -> v.toInt()

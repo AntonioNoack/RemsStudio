@@ -1,8 +1,11 @@
 package me.anno.remsstudio.animation
 
-import me.anno.animation.Type
+import me.anno.ui.input.NumberType
 import me.anno.utils.strings.StringMixer
-import org.joml.*
+import org.joml.Quaternionf
+import org.joml.Vector2f
+import org.joml.Vector3f
+import org.joml.Vector4f
 import kotlin.math.roundToInt
 
 object AnimationMaths {
@@ -75,23 +78,23 @@ object AnimationMaths {
     /**
      * a * (1-f) + f * b
      * */
-    fun mix(a: Any?, b: Any?, f: Double, type: Type): Any {
+    fun mix(a: Any?, b: Any?, f: Double, type: NumberType): Any {
         val g = 1.0 - f
         return when (type) {
-            Type.INT,
-            Type.INT_PLUS -> ((a as Int) * g + f * (b as Int)).roundToInt()
-            Type.LONG -> ((a as Long) * g + f * (b as Long)).toLong()
-            Type.FLOAT,
-            Type.FLOAT_01, Type.FLOAT_01_EXP,
-            Type.FLOAT_PLUS -> ((a as Float) * g + f * (b as Float)).toFloat()
-            Type.DOUBLE -> (a as Double) * g + f * (b as Double)
-            Type.SKEW_2D -> (a as Vector2f).lerp(b as Vector2f, f.toFloat(), Vector2f())
-            Type.POSITION,
-            Type.ROT_YXZ,
-            Type.SCALE -> (a as Vector3f).lerp(b as Vector3f, f.toFloat(), Vector3f())
-            Type.COLOR, Type.TILING -> (a as Vector4f).lerp(b as Vector4f, f.toFloat(), Vector4f())
-            Type.QUATERNION -> (a as Quaternionf).slerp(b as Quaternionf, f.toFloat())
-            Type.STRING -> StringMixer.mix(a.toString(), b.toString(), f)
+            NumberType.INT,
+            NumberType.INT_PLUS -> ((a as Int) * g + f * (b as Int)).roundToInt()
+            NumberType.LONG -> ((a as Long) * g + f * (b as Long)).toLong()
+            NumberType.FLOAT,
+            NumberType.FLOAT_01, NumberType.FLOAT_01_EXP,
+            NumberType.FLOAT_PLUS -> ((a as Float) * g + f * (b as Float)).toFloat()
+            NumberType.DOUBLE -> (a as Double) * g + f * (b as Double)
+            NumberType.SKEW_2D -> (a as Vector2f).lerp(b as Vector2f, f.toFloat(), Vector2f())
+            NumberType.POSITION,
+            NumberType.ROT_YXZ,
+            NumberType.SCALE -> (a as Vector3f).lerp(b as Vector3f, f.toFloat(), Vector3f())
+            NumberType.COLOR, NumberType.TILING -> (a as Vector4f).lerp(b as Vector4f, f.toFloat(), Vector4f())
+            NumberType.QUATERNION -> (a as Quaternionf).slerp(b as Quaternionf, f.toFloat())
+            NumberType.STRING -> StringMixer.mix(a.toString(), b.toString(), f)
             else -> throw RuntimeException("don't know how to linearly interpolate $a and $b")
         }
     }
