@@ -17,6 +17,7 @@ import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringReader
 import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.language.translation.Dict
+import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.max
 import me.anno.remsstudio.RemsStudio
@@ -469,7 +470,7 @@ open class Transform() : Saveable(),
         }
 
         if (doBlending) {
-            GFXState.blendMode.use(blendMode) {
+            GFXState.blendMode.use(if (blendMode == NO_BLENDING) null else blendMode) {
                 onDraw(stack, time, color)
                 drawChildren(stack, time, color, parentColor)
             }
@@ -942,6 +943,8 @@ open class Transform() : Saveable(),
     open fun getRelativeSize() = Vector3f(1f)
 
     companion object {
+
+        val NO_BLENDING = BlendMode(NameDesc("No Blending", "", "gpu.blendMode.none"), "None")
 
         fun drawUICircle(stack: Matrix4fArrayList, scale: Float = 0.02f, inner: Float = 0.7f, color: Vector4f) {
             // draw a small symbol to indicate pivot

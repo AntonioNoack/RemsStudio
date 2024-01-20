@@ -9,8 +9,10 @@ import me.anno.ecs.components.anim.BoneData.uploadJointMatrices
 import me.anno.ecs.components.mesh.Mesh
 import me.anno.ecs.components.mesh.MeshComponentBase
 import me.anno.ecs.prefab.PrefabCache
+import me.anno.engine.inspector.Inspectable
 import me.anno.engine.ui.render.ECSShaderLib
 import me.anno.engine.ui.render.Renderers.previewRenderer
+import me.anno.gpu.DitherMode
 import me.anno.gpu.GFX
 import me.anno.gpu.GFXState
 import me.anno.gpu.pipeline.Pipeline
@@ -31,7 +33,6 @@ import me.anno.mesh.MeshUtils.getScaleFromAABB
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.gpu.GFXx3Dv2
-import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
@@ -69,17 +70,22 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         val file = file
         val data = PrefabCache[file]?.getSampleInstance()
         if (data is Entity) {
-            if (GFXState.currentRenderer != Renderer.idRenderer && GFXState.currentRenderer != Renderer.randomIdRenderer) {
-                GFXState.useFrame(previewRenderer) {
+            val ditherMode =
+                if (GFXState.blendMode.currentValue == null) DitherMode.DITHER2X2
+                else DitherMode.DRAW_EVERYTHING
+            GFXState.ditherMode.use(ditherMode) {
+                if (GFXState.currentRenderer != Renderer.idRenderer && GFXState.currentRenderer != Renderer.randomIdRenderer) {
+                    GFXState.useFrame(previewRenderer) {
+                        GFXState.animated.use(true) {
+                            lastWarning = null
+                            lastAnimations = draw(data, stack, time, color)
+                        }
+                    }
+                } else {
                     GFXState.animated.use(true) {
                         lastWarning = null
                         lastAnimations = draw(data, stack, time, color)
                     }
-                }
-            } else {
-                GFXState.animated.use(true) {
-                    lastWarning = null
-                    lastAnimations = draw(data, stack, time, color)
                 }
             }
         } else {
@@ -218,8 +224,6 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             }
 
             shader.v1f("worldScale", 1f) // correct?
-            // todo tint is not working (needed for blending in for example)
-            shader.v4f("tint", color)
             shader.v4f("finalId", clickId)
 
             entity.forAllComponents(MeshComponentBase::class) { comp ->
@@ -233,6 +237,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                         val material = Pipeline.getMaterial(materialOverrides, materials, index)
                         shader.v1i("hasVertexColors", if (material.enableVertexColors) mesh.hasVertexColors else 0)
                         material.bind(shader)
+                        shader.v4f("diffuseBase", material.diffuseBase * color)
                         animTexture?.bindTrulyNearest(shader, "animTexture")
                         mesh.draw(shader, index)
                     }

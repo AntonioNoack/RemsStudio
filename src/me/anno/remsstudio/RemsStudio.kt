@@ -42,8 +42,6 @@ import me.anno.utils.OS
 import me.anno.utils.hpc.ProcessingQueue
 import kotlin.math.min
 
-// todo new bugs:
-//  grid is black
 // todo improvements:
 //  if playing forward, and time is non-modified, use VideoStream for much better playback performance
 

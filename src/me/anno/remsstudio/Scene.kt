@@ -318,13 +318,15 @@ object Scene {
                         stack.next { nullCamera?.draw(stack, time, white) }
                     }
 
+                    stack.next { scene.draw(stack, time, white) }
+
                     if (!isFakeColorRendering && !isFinalRendering && sceneView != null) {
-                        blendMode.use(BlendMode.ADD) {
-                            drawGrid(cameraTransform, sceneView)
+                        depthMask.use(false) {
+                            blendMode.use(BlendMode.ADD) {
+                                drawGrid(cameraTransform, sceneView)
+                            }
                         }
                     }
-
-                    stack.next { scene.draw(stack, time, white) }
 
                     GFX.check()
 
