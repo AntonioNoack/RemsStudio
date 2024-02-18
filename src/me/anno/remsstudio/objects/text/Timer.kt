@@ -23,7 +23,7 @@ class Timer(parent: Transform? = null) : Text("", parent) {
 
     // todo extra start value in a date format?
 
-    override fun getDocumentationURL() = URL("https://remsstudio.phychi.com/?s=learn/timer")
+    override fun getDocumentationURL() = "https://remsstudio.phychi.com/?s=learn/timer"
 
     var format = "hh:mm:ss.s2"
 

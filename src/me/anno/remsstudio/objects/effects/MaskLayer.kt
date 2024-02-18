@@ -37,7 +37,7 @@ import java.net.URL
 
 open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
 
-    override fun getDocumentationURL(): URL? = URL("https://remsstudio.phychi.com/?s=learn/masks")
+    override fun getDocumentationURL() = "https://remsstudio.phychi.com/?s=learn/masks"
 
     val samples get() = if (useExperimentalMSAA && mayUseMSAA) 8 else 1
 

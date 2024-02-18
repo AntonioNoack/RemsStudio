@@ -38,7 +38,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
     override val className get() = "LinePolygon"
     override val defaultDisplayName get() = "Line"
 
-    override fun getDocumentationURL() = URL("https://remsstudio.phychi.com/?s=learn/lines")
+    override fun getDocumentationURL() = "https://remsstudio.phychi.com/?s=learn/lines"
 
     val segmentStart = AnimatedProperty.float(0f)
     val segmentLength = AnimatedProperty.float(1f)

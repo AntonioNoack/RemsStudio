@@ -58,7 +58,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
         this.text.set(text)
     }
 
-    override fun getDocumentationURL(): URL? = URL("https://remsstudio.phychi.com/?s=learn/text")
+    override fun getDocumentationURL() = "https://remsstudio.phychi.com/?s=learn/text"
 
     val backgroundColor = AnimatedProperty.color()
 

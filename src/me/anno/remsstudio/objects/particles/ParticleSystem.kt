@@ -44,7 +44,7 @@ import kotlin.math.min
 
 open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
 
-    override fun getDocumentationURL(): URL? = URL("https://remsstudio.phychi.com/?s=learn/particle-systems")
+    override fun getDocumentationURL() = "https://remsstudio.phychi.com/?s=learn/particle-systems"
 
     val spawnColor = AnimatedDistribution(NumberType.COLOR3, listOf(Vector3f(1f), Vector3f(0f), Vector3f(0f)))
     val spawnPosition = AnimatedDistribution(NumberType.POSITION, listOf(Vector3f(0f), Vector3f(1f), Vector3f(0f)))

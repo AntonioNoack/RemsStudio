@@ -132,7 +132,7 @@ open class Transform() : Saveable(),
     // todo display warnings, if applicable
     var lastWarning: String? = null
 
-    open fun getDocumentationURL(): URL? = null
+    open fun getDocumentationURL(): String? = null
 
     open fun isVisible(localTime: Double) = true
 

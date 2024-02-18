@@ -157,9 +157,9 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
     @Range(0.0, 3.0)
     var blankFrameThreshold = 0f
 
-    override fun getDocumentationURL(): URL? = when (type) {
-        VideoType.IMAGE -> URL("https://remsstudio.phychi.com/?s=learn/images")
-        VideoType.VIDEO, VideoType.IMAGE_SEQUENCE -> URL("https://remsstudio.phychi.com/?s=learn/videos")
+    override fun getDocumentationURL(): String? = when (type) {
+        VideoType.IMAGE -> "https://remsstudio.phychi.com/?s=learn/images"
+        VideoType.VIDEO, VideoType.IMAGE_SEQUENCE -> "https://remsstudio.phychi.com/?s=learn/videos"
         else -> null
     }
 
