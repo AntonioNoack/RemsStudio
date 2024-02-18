@@ -3,12 +3,12 @@ package me.anno.remsstudio.objects.geometric
 import me.anno.cache.CacheSection
 import me.anno.config.DefaultConfig
 import me.anno.ecs.components.mesh.Mesh
+import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.GFX
 import me.anno.gpu.texture.Clamping
-import me.anno.remsstudio.gpu.TexFiltering
 import me.anno.gpu.texture.TextureCache
 import me.anno.gpu.texture.TextureLib.whiteTexture
-import me.anno.io.ISaveable
+import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
@@ -16,9 +16,9 @@ import me.anno.language.translation.Dict
 import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.gpu.GFXx3Dv2.draw3DPolygon
+import me.anno.remsstudio.gpu.TexFiltering
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
-import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -138,40 +138,15 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
         writer.writeFile("texture", texture)
     }
 
-    override fun readString(name: String, value: String) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
-            "texture" -> texture = value.toGlobalFile()
-            else -> super.readString(name, value)
-        }
-    }
-
-    override fun readFile(name: String, value: FileReference) {
-        when (name) {
-            "texture" -> texture = value
-            else -> super.readFile(name, value)
-        }
-    }
-
-    override fun readObject(name: String, value: ISaveable?) {
-        when (name) {
+            "texture" -> texture = (value as? String)?.toGlobalFile() ?: (value as? FileReference) ?: InvalidRef
             "vertexCount" -> vertexCount.copyFrom(value)
             "inset" -> starNess.copyFrom(value)
-            else -> super.readObject(name, value)
-        }
-    }
-
-    override fun readInt(name: String, value: Int) {
-        when (name) {
-            "filtering" -> filtering = filtering.find(value)
-            else -> super.readInt(name, value)
-        }
-    }
-
-    override fun readBoolean(name: String, value: Boolean) {
-        when (name) {
-            "autoAlign" -> autoAlign = value
-            "is3D" -> is3D = value
-            else -> super.readBoolean(name, value)
+            "filtering" -> filtering = filtering.find(value as? Int ?: return)
+            "autoAlign" -> autoAlign = value == true
+            "is3D" -> is3D = value == true
+            else -> super.setProperty(name, value)
         }
     }
 

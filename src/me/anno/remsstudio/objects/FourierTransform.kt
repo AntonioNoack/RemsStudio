@@ -6,7 +6,6 @@ import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.drawing.GFXx2D.getSize
 import me.anno.gpu.drawing.GFXx2D.getSizeX
 import me.anno.gpu.drawing.GFXx2D.getSizeY
-import me.anno.io.ISaveable
 import me.anno.io.MediaMetadata
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
@@ -305,7 +304,7 @@ class FourierTransform : Transform() {
         writer.writeObject(this, "scaLog", scaLog)
     }
 
-    override fun readObject(name: String, value: ISaveable?) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
             "posLin" -> posLin.copyFrom(value)
             "posLog" -> posLog.copyFrom(value)
@@ -314,31 +313,12 @@ class FourierTransform : Transform() {
             "scaOff" -> scaOff.copyFrom(value)
             "scaLin" -> scaLin.copyFrom(value)
             "scaLog" -> scaLog.copyFrom(value)
-            else -> super.readObject(name, value)
-        }
-    }
-
-    override fun readString(name: String, value: String) {
-        when (name) {
-            "file" -> file = value.toGlobalFile()
-            else -> super.readString(name, value)
-        }
-    }
-
-    override fun readFile(name: String, value: FileReference) {
-        when (name) {
-            "file" -> file = value
-            else -> super.readFile(name, value)
-        }
-    }
-
-    override fun readInt(name: String, value: Int) {
-        when (name) {
-            "sampleRate" -> sampleRate = max(64, value)
-            "bufferSize" -> bufferSize = max(64, value)
-            "minBufferIndex" -> minBufferIndex = value
-            "maxBufferIndex" -> maxBufferIndex = value
-            else -> super.readInt(name, value)
+            "file" -> file = (value as? String)?.toGlobalFile() ?: (value as? FileReference) ?: InvalidRef
+            "sampleRate" -> sampleRate = max(64, value as? Int ?: return)
+            "bufferSize" -> bufferSize = max(64, value as? Int ?: return)
+            "minBufferIndex" -> minBufferIndex = value as? Int ?: return
+            "maxBufferIndex" -> maxBufferIndex = value as? Int ?: return
+            else -> super.setProperty(name, value)
         }
     }
 

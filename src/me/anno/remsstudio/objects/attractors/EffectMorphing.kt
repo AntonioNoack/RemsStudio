@@ -1,12 +1,11 @@
 package me.anno.remsstudio.objects.attractors
 
 import me.anno.config.DefaultConfig
-import me.anno.io.ISaveable
+import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
-import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -34,11 +33,13 @@ class EffectMorphing : Transform() {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<EffectMorphing>()
         val fx = getGroup("Effect", "", "effects")
-        fx += vis(c, "Strength", "The effective scale",
+        fx += vis(
+            c, "Strength", "The effective scale",
             c.map { it.zooming }, style
         )
         // like https://www.youtube.com/watch?v=QbwgQSwMSGM, at 6:27
-        fx += vis(c, "Chromatic Aberration", "Separates the effect for R/G/B channels; only works for video/images.",
+        fx += vis(
+            c, "Chromatic Aberration", "Separates the effect for R/G/B channels; only works for video/images.",
             c.map { it.chromatic }, style
         )
         fx += vis(
@@ -49,7 +50,8 @@ class EffectMorphing : Transform() {
             c, "Swirl Power", "How badly it swirls; 1 ~ wobble, 20 ~ swirls (at 1 Swirl Strength)",
             c.map { it.swirlPower }, style
         )
-        fx += vis(c, "Sharpness", "How sharp the lens effect is",
+        fx += vis(
+            c, "Sharpness", "How sharp the lens effect is",
             c.map { it.sharpness }, style
         )
     }
@@ -63,14 +65,14 @@ class EffectMorphing : Transform() {
         writer.writeObject(this, "sharpness", sharpness)
     }
 
-    override fun readObject(name: String, value: ISaveable?) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
             "influence" -> zooming.copyFrom(value)
             "sharpness" -> sharpness.copyFrom(value)
             "chromatic" -> chromatic.copyFrom(value)
             "swirl" -> swirlStrength.copyFrom(value)
             "swirlPower" -> swirlPower.copyFrom(value)
-            else -> super.readObject(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 

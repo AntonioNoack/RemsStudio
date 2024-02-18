@@ -1,7 +1,6 @@
 package me.anno.remsstudio.animation.drivers
 
 import me.anno.engine.inspector.Inspectable
-import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.maths.Maths.clamp
 import me.anno.maths.noise.FullNoise
@@ -71,24 +70,12 @@ class PerlinNoiseDriver : AnimationDriver() {
         writer.writeObject(this, "falloff", falloff)
     }
 
-    override fun readInt(name: String, value: Int) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
-            "octaves" -> octaves = clamp(value, 0, MAX_OCTAVES)
-            else -> super.readInt(name, value)
-        }
-    }
-
-    override fun readLong(name: String, value: Long) {
-        when (name) {
-            "seed" -> seed = value
-            else -> super.readLong(name, value)
-        }
-    }
-
-    override fun readObject(name: String, value: ISaveable?) {
-        when (name) {
+            "octaves" -> octaves = clamp(value as? Int ?: return, 0, MAX_OCTAVES)
+            "seed" -> seed = value as? Long ?: return
             "falloff" -> falloff.copyFrom(value)
-            else -> super.readObject(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 

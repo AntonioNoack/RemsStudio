@@ -156,9 +156,10 @@ object Scene {
         )
 
         lutShader = createShader(
-            "lut", coordsUVVertexShader, uvList, "" +
-                    "uniform sampler2D tex;\n" +
-                    "uniform sampler3D lut;\n" +
+            "lut", listOf(), coordsUVVertexShader, uvList, listOf(
+                Variable(GLSLType.S2D, "tex"),
+                Variable(GLSLType.S3D, "lut"),
+            ), "" +
                     randomGLSL +
                     "void main(){" +
                     "   vec4 c0 = texture(tex, uv);\n" +
@@ -168,15 +169,16 @@ object Scene {
         )
 
         addBloomShader = createShader(
-            "addBloom", coordsUVVertexShader, uvList, "" +
-                    "uniform sampler2D original, blurred;\n" +
-                    "uniform float intensity;\n" +
+            "addBloom", listOf(), coordsUVVertexShader, uvList, listOf(
+                Variable(GLSLType.S2D, "original"),
+                Variable(GLSLType.S2D, "blurred"),
+                Variable(GLSLType.V1F, "intensity")
+            ), "" +
                     "void main(){" +
                     "   gl_FragColor = texture(original, uv) + intensity * texture(blurred, uv);\n" +
                     "   gl_FragColor.a = clamp(gl_FragColor.a, 0.0, 1.0);\n" +
                     "}", listOf("original", "blurred")
         )
-
 
         isInited = true
     }

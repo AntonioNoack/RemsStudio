@@ -27,30 +27,6 @@ class Timer(parent: Transform? = null) : Text("", parent) {
 
     var format = "hh:mm:ss.s2"
 
-    /*override fun splitSegments(text: String): PartResult? {
-        if(text.isEmpty()) return null
-        var index = 0
-        var startIndex = 0
-        var partResult: PartResult? = null
-        fun add(pr: PartResult){
-            partResult =
-                if(partResult == null) pr
-                else partResult!! + pr
-        }
-        while(index < text.length){
-            when(text[index]){
-                in '0' .. '9' -> {
-                    if(index > startIndex) add(super.splitSegments(text.substring(startIndex, index))!!)
-                    add(super.splitSegments(text[index].toString())!!)
-                    startIndex = index+1
-                }
-            }
-            index++
-        }
-        if(index > startIndex) add(super.splitSegments(text.substring(startIndex, index))!!)
-        return partResult!!
-    }*/
-
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
         val fract = fract(time)

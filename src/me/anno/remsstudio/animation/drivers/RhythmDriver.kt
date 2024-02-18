@@ -3,12 +3,10 @@ package me.anno.remsstudio.animation.drivers
 import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.audio.pattern.PatternRecorderCore
-import me.anno.remsstudio.ui.input.FloatInputV2
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.input.FloatInput
-import me.anno.ui.Style
 
 class RhythmDriver : AnimationDriver() {
 
@@ -38,11 +36,11 @@ class RhythmDriver : AnimationDriver() {
         writer.writeDoubleArray("timestamps", timestamps)
     }
 
-    override fun readDoubleArray(name: String, values: DoubleArray) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
-            "rhythm" -> rhythm = values
-            "timestamps" -> timestamps = values
-            else -> super.readDoubleArray(name, values)
+            "rhythm" -> rhythm = value as? DoubleArray ?: return
+            "timestamps" -> timestamps = value as? DoubleArray ?: return
+            else -> super.setProperty(name, value)
         }
     }
 

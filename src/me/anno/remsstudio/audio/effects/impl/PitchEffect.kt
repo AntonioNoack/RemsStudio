@@ -1,7 +1,6 @@
 package me.anno.remsstudio.audio.effects.impl
 
 import audacity.soundtouch.TimeDomainStretch
-import me.anno.ui.input.NumberType
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
 import me.anno.io.base.BaseWriter
 import me.anno.maths.Maths.clamp
@@ -13,6 +12,7 @@ import me.anno.remsstudio.objects.Camera
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
+import me.anno.ui.input.NumberType
 import me.anno.utils.types.Casting.castToFloat2
 import kotlin.math.abs
 
@@ -113,17 +113,11 @@ class PitchEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
         writer.writeFloat("pitch", pitch)
     }
 
-    override fun readBoolean(name: String, value: Boolean) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
-            "inverseSpeed" -> inverseSpeed = value
-            else -> super.readBoolean(name, value)
-        }
-    }
-
-    override fun readFloat(name: String, value: Float) {
-        when (name) {
-            "pitch" -> pitch = value
-            else -> super.readFloat(name, value)
+            "inverseSpeed" -> inverseSpeed = value == true
+            "pitch" -> pitch = value as? Float ?: return
+            else -> super.setProperty(name, value)
         }
     }
 

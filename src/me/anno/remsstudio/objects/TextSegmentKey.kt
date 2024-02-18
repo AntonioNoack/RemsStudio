@@ -1,10 +1,10 @@
 package me.anno.remsstudio.objects
 
-import me.anno.fonts.AWTFont
+import me.anno.fonts.TextGenerator
 
 @Suppress("unused")
 data class TextSegmentKey(
-    val font: AWTFont,
+    val font: TextGenerator,
     val isBold: Boolean, val isItalic: Boolean,
     val text: CharSequence, val charSpacing: Float
 ) {
@@ -19,8 +19,7 @@ data class TextSegmentKey(
     }
 
     private fun generateHashCode(): Int {
-        var result = font.name.hashCode()
-        result = 31 * result + font.size.hashCode()
+        var result = font.hashCode()
         result = 31 * result + isBold.hashCode()
         result = 31 * result + isItalic.hashCode()
         result = 31 * result + text.hashCode()
@@ -34,8 +33,7 @@ data class TextSegmentKey(
 
         if (_hashCode != other._hashCode) return false
         val font2 = other.font
-        if (font.name != font2.name) return false
-        if (font.size != font2.size) return false
+        if (font != font2) return false
         if (isBold != other.isBold) return false
         if (isItalic != other.isItalic) return false
         if (text != other.text) return false

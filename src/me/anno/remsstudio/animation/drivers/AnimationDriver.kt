@@ -1,7 +1,6 @@
 package me.anno.remsstudio.animation.drivers
 
 import me.anno.engine.inspector.Inspectable
-import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
@@ -90,17 +89,11 @@ abstract class AnimationDriver : Saveable(), Inspectable {
         writer.writeObject(this, "amplitude", amplitude)
     }
 
-    override fun readObject(name: String, value: ISaveable?) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
             "amplitude" -> amplitude.copyFrom(value)
-            else -> super.readObject(name, value)
-        }
-    }
-
-    override fun readDouble(name: String, value: Double) {
-        when (name) {
-            "frequency" -> frequency = value
-            else -> super.readDouble(name, value)
+            "frequency" -> frequency = value as? Double ?: return
+            else -> super.setProperty(name, value)
         }
     }
 

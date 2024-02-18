@@ -2,7 +2,6 @@ package me.anno.remsstudio.objects.geometric
 
 import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
-import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
 import me.anno.remsstudio.animation.AnimatedProperty
@@ -52,12 +51,12 @@ open class Circle(parent: Transform? = null) : GFXTransform(parent) {
         writer.writeObject(this, "endDegrees", endDegrees)
     }
 
-    override fun readObject(name: String, value: ISaveable?) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
             "innerRadius" -> innerRadius.copyFrom(value)
             "startDegrees" -> startDegrees.copyFrom(value)
             "endDegrees" -> endDegrees.copyFrom(value)
-            else -> super.readObject(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 

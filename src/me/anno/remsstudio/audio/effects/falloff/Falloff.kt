@@ -1,6 +1,5 @@
 package me.anno.remsstudio.audio.effects.falloff
 
-import me.anno.ui.input.NumberType
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
 import me.anno.io.base.BaseWriter
 import me.anno.maths.Maths.mix
@@ -13,6 +12,7 @@ import me.anno.remsstudio.objects.Camera
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
+import me.anno.ui.input.NumberType
 import org.joml.Vector3f
 
 abstract class Falloff : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
@@ -56,10 +56,10 @@ abstract class Falloff : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
         writer.writeFloat("halfDistance", halfDistance)
     }
 
-    override fun readFloat(name: String, value: Float) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
-            "halfDistance" -> halfDistance = value
-            else -> super.readFloat(name, value)
+            "halfDistance" -> halfDistance = value as? Float ?: return
+            else -> super.setProperty(name, value)
         }
     }
 

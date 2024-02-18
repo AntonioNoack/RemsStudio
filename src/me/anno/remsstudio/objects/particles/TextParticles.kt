@@ -6,13 +6,13 @@ import me.anno.fonts.FontManager.TextCache
 import me.anno.fonts.PartResult
 import me.anno.fonts.mesh.TextMesh
 import me.anno.fonts.mesh.TextMeshGroup
-import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.remsstudio.objects.TextSegmentKey
 import me.anno.remsstudio.objects.text.Text
 import me.anno.engine.inspector.Inspectable
+import me.anno.fonts.AWTFont
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -69,7 +69,7 @@ class TextParticles : ParticleSystem() {
             val keys = dataValue.second as List<TextSegmentKey>
             val lineSegmentsWithStyle = dataValue.first as PartResult
 
-            val font2 = FontManager.getFont(font)
+            val font2 = FontManager.getFont(font) as AWTFont
             val exampleLayout = font2.exampleLayout
             val scaleX = TextMesh.DEFAULT_LINE_HEIGHT / (exampleLayout.ascent + exampleLayout.descent)
             val scaleY = 1f / (exampleLayout.ascent + exampleLayout.descent)
@@ -134,53 +134,15 @@ class TextParticles : ParticleSystem() {
 
     override fun getSystemState() = super.getSystemState() to JsonStringWriter.toText(text, InvalidRef)
 
-    override fun readObject(name: String, value: ISaveable?) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
-            "text", "textAlignment",
-            "blockAlignmentX", "blockAlignmentY",
-            "shadowOffset", "shadowColor", "shadowSmoothness",
-            "relativeLineSpacing",
-            "outlineColor0", "outlineColor1", "outlineColor2",
-            "outlineWidths", "outlineDepth", "outlineSmoothness",
-            "startCursor", "endCursor",
-            "attractorBaseColor" ->
-                text.readObject(name, value)
-
-            else -> super.readObject(name, value)
-        }
-    }
-
-    override fun readInt(name: String, value: Int) {
-        when (name) {
-            "textAlignment", "blockAlignmentX", "blockAlignmentY",
-            "renderingMode" ->
-                text.readInt(name, value)
-
-            else -> super.readInt(name, value)
-        }
-    }
-
-    override fun readBoolean(name: String, value: Boolean) {
-        when (name) {
-            "isItalic", "isBold", "roundSDFCorners", "smallCaps" ->
-                text.readBoolean(name, value)
-
-            else -> super.readBoolean(name, value)
-        }
-    }
-
-    override fun readString(name: String, value: String) {
-        when (name) {
-            "text", "font" -> text.readString(name, value)
-            else -> super.readString(name, value)
-        }
-    }
-
-    override fun readFloat(name: String, value: Float) {
-        when (name) {
-            "relativeTabSize", "relativeCharSpacing", "lineBreakWidth" ->
-                text.readFloat(name, value)
-            else -> super.readFloat(name, value)
+            "text", "textAlignment", "blockAlignmentX", "blockAlignmentY",
+            "shadowOffset", "shadowColor", "shadowSmoothness", "relativeLineSpacing",
+            "outlineColor0", "outlineColor1", "outlineColor2", "outlineWidths", "outlineDepth", "outlineSmoothness",
+            "startCursor", "endCursor", "attractorBaseColor", "isItalic", "isBold", "roundSDFCorners", "smallCaps",
+            "renderingMode", "font", "relativeTabSize", "relativeCharSpacing", "lineBreakWidth" ->
+                text.setProperty(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 

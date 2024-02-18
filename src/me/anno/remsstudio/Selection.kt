@@ -1,6 +1,6 @@
 package me.anno.remsstudio
 
-import me.anno.io.ISaveable
+import me.anno.io.Saveable
 import me.anno.io.find.PropertyFinder
 import me.anno.remsstudio.RemsStudio.root
 import me.anno.remsstudio.animation.AnimatedProperty
@@ -42,7 +42,7 @@ object Selection {
         needsUpdate = true
     }
 
-    fun selectProperty(property: List<ISaveable?>) {
+    fun selectProperty(property: List<Saveable?>) {
         if (selectedProperties == property) {
             select(selectedTransforms, null)
         } else select(selectedTransforms, property)
@@ -56,11 +56,11 @@ object Selection {
         select(if (transform != null) listOf(transform) else emptyList(), null)
     }
 
-    fun select(transform: Transform, property: ISaveable?) {
+    fun select(transform: Transform, property: Saveable?) {
         select(listOf(transform), if (property != null) listOf(property) else null)
     }
 
-    fun select(transforms0: List<Transform>, properties0: List<ISaveable?>?) {
+    fun select(transforms0: List<Transform>, properties0: List<Saveable?>?) {
 
         if (same(transforms0, selectedTransforms) && same(properties0, selectedProperties)) return
         val transforms = transforms0.map { transform ->

@@ -16,7 +16,6 @@ import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.Filtering
 import me.anno.gpu.texture.Texture2D
 import me.anno.image.utils.GaussianBlur
-import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.Scene
 import me.anno.remsstudio.Scene.mayUseMSAA
@@ -154,19 +153,13 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
         writer.writeObject(this, "transitionSmoothness", transitionSmoothness)
     }
 
-    override fun readBoolean(name: String, value: Boolean) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
-            "showMask" -> showMask = value
-            "showMasked" -> showMasked = value
-            "isFullscreen" -> isFullscreen = value
-            "isInverted" -> isInverted = value
-            "useMSAA" -> useExperimentalMSAA = value
-            else -> super.readBoolean(name, value)
-        }
-    }
-
-    override fun readObject(name: String, value: ISaveable?) {
-        when (name) {
+            "showMask" -> showMask = value == true
+            "showMasked" -> showMasked = value == true
+            "isFullscreen" -> isFullscreen = value == true
+            "isInverted" -> isInverted = value == true
+            "useMSAA" -> useExperimentalMSAA = value == true
             "useMaskColor" -> useMaskColor.copyFrom(value)
             "blurThreshold" -> blurThreshold.copyFrom(value)
             "pixelSize" -> effectSize.copyFrom(value)
@@ -176,7 +169,8 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
             "greenScreenSpillValue" -> greenScreenSpillValue.copyFrom(value)
             "transitionProgress" -> transitionProgress.copyFrom(value)
             "transitionSmoothness" -> transitionSmoothness.copyFrom(value)
-            else -> super.readObject(name, value)
+            "type" -> type = MaskType.entries.firstOrNull { it.id == value } ?: type
+            else -> super.setProperty(name, value)
         }
     }
 
@@ -404,13 +398,6 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
             transition.isVisible = type == MaskType.TRANSITION
         }
 
-    }
-
-    override fun readInt(name: String, value: Int) {
-        when (name) {
-            "type" -> type = MaskType.entries.firstOrNull { it.id == value } ?: type
-            else -> super.readInt(name, value)
-        }
     }
 
     override val defaultDisplayName get() = "Mask Layer"

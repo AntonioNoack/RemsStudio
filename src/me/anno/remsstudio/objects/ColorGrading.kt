@@ -5,6 +5,7 @@ import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.SettingCategory
+import me.anno.utils.Color.withAlpha
 
 object ColorGrading {
 
@@ -29,7 +30,7 @@ object ColorGrading {
                         "3. control the power\n" +
                         "4. (de)saturate", style
             ).apply {
-                textColor = textColor and 0x77ffffff
+                textColor = textColor.withAlpha(0.5f)
                 focusTextColor = textColor
             })
         )

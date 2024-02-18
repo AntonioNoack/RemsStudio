@@ -1,11 +1,10 @@
 package me.anno.remsstudio.objects.particles.forces.impl
 
-import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
-import me.anno.remsstudio.objects.inspectable.InspectableAnimProperty
-import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.remsstudio.objects.particles.forces.types.RelativeForceField
 import me.anno.maths.Maths.pow
+import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.objects.inspectable.InspectableAnimProperty
+import me.anno.remsstudio.objects.particles.forces.types.RelativeForceField
 import org.joml.Vector3f
 
 class GravityField : RelativeForceField(
@@ -32,13 +31,13 @@ class GravityField : RelativeForceField(
 
     override fun save(writer: BaseWriter) {
         super.save(writer)
-        writer.writeObject(this,"exponent", exponent)
+        writer.writeObject(this, "exponent", exponent)
     }
 
-    override fun readObject(name: String, value: ISaveable?) {
-        when(name){
+    override fun setProperty(name: String, value: Any?) {
+        when (name) {
             "exponent" -> exponent.copyFrom(value)
-            else -> super.readObject(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 

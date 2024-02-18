@@ -26,11 +26,11 @@ import me.anno.ui.editor.files.FileNames.toAllowedFilename
 import me.anno.ui.input.EnumInput
 import me.anno.ui.input.FileInput
 import me.anno.ui.input.URLInput
+import me.anno.utils.BetterProcessBuilder
 import me.anno.utils.Color.black
 import me.anno.utils.Color.withAlpha
 import me.anno.utils.OS
 import me.anno.utils.files.Files.formatFileSize
-import me.anno.utils.process.BetterProcessBuilder
 import me.anno.utils.types.Floats.f2
 import me.anno.utils.types.Strings.formatTime
 import me.anno.video.ffmpeg.FFMPEG.ffmpegPath
@@ -250,13 +250,13 @@ object DownloadUI {
             stateUI.text = "Requesting Metadata"
             stateUI.textColor = tc.withAlpha(0.5f)
 
+            val args = listOf(executable.absolutePath, "-j", path)
+
             val builder = BetterProcessBuilder("python", 3, false)
-                .add(executable.absolutePath)
-                .add("-j")
-                .add(path)
+                .addAll(args)
 
             val process = builder.start()
-            thread(name = "cmd(${builder.args}):error") {
+            thread(name = "cmd($args):error") {
                 process.errorStream.use {
                     val reader = it.bufferedReader()
                     while (!Engine.shutdown) {
@@ -269,7 +269,7 @@ object DownloadUI {
                 }
             }
 
-            thread(name = "cmd(${builder.args}):input") {
+            thread(name = "cmd($args):input") {
                 process.inputStream.use { input ->
                     val txt = input.readText()
                     if (iter != iteration) return@use
@@ -401,14 +401,18 @@ object DownloadUI {
             // extension will get added by tool automatically
             Menu.close(srcInput)
             LOGGER.info("Downloading $srcURL to $dstFile")
-            val builder = BetterProcessBuilder("python", 5, false)
-                .add(executable.absolutePath)
-                // define output path
-                .add("-o").add(dstFile.absolutePath)
-                // don't download whole playlists
-                .add("--no-playlist")
-                .addIf("--extract-audio", videoFormatUI.value == discardFormat)
-                .addAllIf(
+            val args = ArrayList<String>()
+            args.add(executable.absolutePath)
+            // define output path
+            args.add("-o")
+            args.add(dstFile.absolutePath)
+            // don't download whole playlists
+            args.add("--no-playlist")
+            if (videoFormatUI.value == discardFormat) {
+                args.add("--extract-audio")
+            }
+            if (customFormat) {
+                args.addAll(
                     listOf(
                         "-f", if (videoFormatUI.value == audioFormatUI.value ||
                             audioFormatUI.value == discardFormat
@@ -425,15 +429,18 @@ object DownloadUI {
                         },
                         // choose output format by chosen video format
                         "--merge-output-format", outputFormats[videoFormatUI.value.desc] ?: "mp4"
-                    ), customFormat
+                    )
                 )
-                // link ffmpeg for the program, it needs it for some file types like streams
-                .add("--ffmpeg-location").add(ffmpegPath.absolutePath)
-                // define input url
-                .add(srcURL.absolutePath)
+            }
+            // link ffmpeg for the program, it needs it for some file types like streams
+            args.add("--ffmpeg-location")
+            args.add(ffmpegPath.absolutePath)
+            // define input url
+            args.add(srcURL.absolutePath)
+            val builder = BetterProcessBuilder("python", args.size, false).addAll(args)
             val process = builder.start()
-            val progress = GFX.someWindow!!.addProgressBar("Download", "%", 100.0)
-            thread(name = "cmd(${builder.args}):error") {
+            val progress = GFX.someWindow.addProgressBar("Download", "%", 100.0)
+            thread(name = "cmd($args):error") {
                 val reader = process.errorStream.bufferedReader()
                 while (!Engine.shutdown) {
                     val line = reader.readLine() ?: break
@@ -444,7 +451,7 @@ object DownloadUI {
                 }
                 reader.close()
             }
-            thread(name = "cmd(${builder.args}):input") {
+            thread(name = "cmd($args):input") {
                 // while downloading library, show progress bar
                 // [download]  87.1% of  228.51MiB at    5.75MiB/s ETA 00:05
                 // todo it would be nice if we could show the actual data size

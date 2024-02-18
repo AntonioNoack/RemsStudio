@@ -8,7 +8,6 @@ import me.anno.gpu.GFXState
 import me.anno.gpu.blending.BlendMode
 import me.anno.gpu.drawing.GFXx3D
 import me.anno.gpu.shader.renderer.Renderer
-import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.base.InvalidFormatException
@@ -540,64 +539,33 @@ open class Transform() : Saveable(),
         writer.writeInt("visibility", visibility.id, false)
     }
 
-    override fun readBoolean(name: String, value: Boolean) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
-            "collapsed" -> isCollapsed = value
-            else -> super.readBoolean(name, value)
-        }
-    }
-
-    override fun readInt(name: String, value: Int) {
-        when (name) {
-            "timelineSlot" -> timelineSlot.value = value
-            "visibility" -> visibility = TransformVisibility[value]
-            else -> super.readInt(name, value)
-        }
-    }
-
-    override fun readLong(name: String, value: Long) {
-        when (name) {
+            "collapsed" -> isCollapsed = value == true
+            "timelineSlot" -> timelineSlot.value = value as? Int ?: return
+            "visibility" -> visibility = TransformVisibility[value as? Int ?: return]
             "uuid" -> Unit// hide the warning
-            else -> super.readLong(name, value)
-        }
-    }
-
-    override fun readFloat(name: String, value: Float) {
-        when (name) {
-            "weight" -> weight = value
-            else -> super.readFloat(name, value)
-        }
-    }
-
-    override fun readDouble(name: String, value: Double) {
-        when (name) {
-            "timeDilation" -> timeDilation.value = value
-            "timeOffset" -> timeOffset.value = value
-            "fadeIn" -> if (value >= 0.0) fadeIn.set(value.toFloat())
-            "fadeOut" -> if (value >= 0.0) fadeOut.set(value.toFloat())
-            else -> super.readDouble(name, value)
-        }
-    }
-
-    override fun readString(name: String, value: String) {
-        when (name) {
-            "name" -> this.name = value ?: ""
-            "comment" -> comment = value ?: ""
-            "tags" -> tags = value ?: ""
-            "blendMode" -> blendMode = BlendMode[value ?: ""]
-            else -> super.readString(name, value)
-        }
-    }
-
-    override fun readObjectArray(name: String, values: Array<ISaveable?>) {
-        when (name) {
-            "children" -> values.filterIsInstance<Transform>().forEach(::addChild)
-            else -> super.readObjectArray(name, values)
-        }
-    }
-
-    override fun readObject(name: String, value: ISaveable?) {
-        when (name) {
+            "weight" -> weight = value as? Float ?: return
+            "timeDilation" -> timeDilation.value = value as? Double ?: return
+            "timeOffset" -> timeOffset.value = value as? Double ?: return
+            "fadeIn" -> {
+                if (value is Double && value >= 0.0) fadeIn.set(value.toFloat())
+                else fadeIn.copyFrom(value)
+            }
+            "fadeOut" -> {
+                if (value is Double && value >= 0.0) fadeOut.set(value.toFloat())
+                else fadeOut.copyFrom(value)
+            }
+            "name" -> this.name = value as? String ?: ""
+            "comment" -> comment = value as? String ?: ""
+            "tags" -> tags = value as? String ?: ""
+            "blendMode" -> blendMode = BlendMode[value as? String ?: ""]
+            "children" -> {
+                when (value) {
+                    is Array<*> -> value.filterIsInstance<Transform>().forEach(::addChild)
+                    is Transform -> addChild(value)
+                }
+            }
             "parent" -> {
                 if (value is Transform) {
                     try {
@@ -605,11 +573,6 @@ open class Transform() : Saveable(),
                     } catch (e: RuntimeException) {
                         LOGGER.warn(e.message.toString())
                     }
-                }
-            }
-            "children" -> {
-                if (value is Transform) {
-                    addChild(value)
                 }
             }
             "position" -> position.copyFrom(value)
@@ -620,9 +583,7 @@ open class Transform() : Saveable(),
             "timeAnimated" -> timeAnimated.copyFrom(value)
             "color" -> color.copyFrom(value)
             "colorMultiplier" -> colorMultiplier.copyFrom(value)
-            "fadeIn" -> fadeIn.copyFrom(value)
-            "fadeOut" -> fadeOut.copyFrom(value)
-            else -> super.readObject(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 

@@ -1,16 +1,15 @@
 package me.anno.remsstudio.audio.effects.impl
 
+import me.anno.io.base.BaseWriter
+import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.SoundEffect
 import me.anno.remsstudio.audio.effects.Time
-import me.anno.io.ISaveable
-import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
-import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
 import java.util.*
 import kotlin.math.log2
 import kotlin.math.min
@@ -39,11 +38,11 @@ class EchoEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
         writer.writeObject(this, "offset", offset)
     }
 
-    override fun readObject(name: String, value: ISaveable?) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
             "falloff" -> falloff.copyFrom(value)
             "offset" -> offset.copyFrom(value)
-            else -> super.readObject(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 
@@ -97,7 +96,7 @@ class EchoEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
                         lastIndex = thisIndex
                     }
                     var i3 = i2 % bufferSize
-                    if(i3 < 0) i3 += bufferSize
+                    if (i3 < 0) i3 += bufferSize
                     dataDst[i] += multiplier * lastSrc[i3]
                 }
             }

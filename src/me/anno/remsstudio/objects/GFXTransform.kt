@@ -1,7 +1,7 @@
 package me.anno.remsstudio.objects
 
+import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.shader.Shader
-import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.gpu.ShaderLibV2.colorForceFieldBuffer
@@ -9,12 +9,10 @@ import me.anno.remsstudio.gpu.ShaderLibV2.maxColorForceFields
 import me.anno.remsstudio.gpu.ShaderLibV2.uvForceFieldBuffer
 import me.anno.remsstudio.objects.attractors.EffectColoring
 import me.anno.remsstudio.objects.attractors.EffectMorphing
-import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.utils.structures.lists.Lists.none2
-import me.anno.utils.types.Floats.put3
 import org.joml.Vector3f
 import org.joml.Vector4f
 import kotlin.math.abs
@@ -36,10 +34,10 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
         writer.writeObject(this, "attractorBaseColor", attractorBaseColor)
     }
 
-    override fun readObject(name: String, value: ISaveable?) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
             "attractorBaseColor" -> attractorBaseColor.copyFrom(value)
-            else -> super.readObject(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 
@@ -190,8 +188,7 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                 val localTime = attractor.lastLocalTime
                 val position = transformLocally(attractor.position[localTime], time)
                 val weight = attractor.lastInfluence
-                buffer.put3(position)
-                buffer.put(weight)
+                buffer.put(position.x).put(position.y).put(position.z).put(weight)
             }
             buffer.position(0)
             shader.v4fs("forceFieldPositionsNWeights", buffer)

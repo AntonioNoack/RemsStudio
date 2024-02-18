@@ -1,10 +1,10 @@
 package me.anno.remsstudio.objects.geometric
 
+import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.GFXx3D
 import me.anno.gpu.drawing.UVProjection
 import me.anno.gpu.shader.Shader
-import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.maths.Maths
 import me.anno.maths.Maths.clamp
@@ -15,7 +15,6 @@ import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.attractors.EffectColoring
 import me.anno.remsstudio.objects.attractors.EffectMorphing
-import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
@@ -57,14 +56,14 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
         writer.writeObject(this, "isClosed", isClosed)
     }
 
-    override fun readObject(name: String, value: ISaveable?) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
             "startOffset", "segmentStart" -> segmentStart.copyFrom(value)
             "endOffset", "segmentLength" -> segmentLength.copyFrom(value)
             "lineStrength" -> lineStrength.copyFrom(value)
             "fadingOnEnd" -> fadingOnEnd.copyFrom(value)
             "isClosed" -> isClosed.copyFrom(value)
-            else -> super.readObject(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 

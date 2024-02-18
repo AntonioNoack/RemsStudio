@@ -1,9 +1,7 @@
 package me.anno.remsstudio.ui
 
 import me.anno.config.DefaultConfig
-import me.anno.config.DefaultConfig.style
 import me.anno.config.DefaultStyle
-import me.anno.gpu.drawing.DrawTexts.getTextSizeX
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.io.utils.StringMap
@@ -20,20 +18,16 @@ import me.anno.remsstudio.objects.Transform.Companion.toTransform
 import me.anno.remsstudio.objects.effects.MaskLayer
 import me.anno.remsstudio.ui.MenuUtils.drawTypeInCorner
 import me.anno.ui.Style
-import me.anno.ui.base.Font
 import me.anno.ui.base.menu.Menu
 import me.anno.ui.base.menu.MenuOption
-import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.treeView.TreeView
 import me.anno.utils.Color.black
 import me.anno.utils.Color.toARGB
-import me.anno.utils.strings.StringHelper.camelCaseToTitle
-import me.anno.utils.types.Strings.joinChars
+import me.anno.utils.types.Strings.camelCaseToTitle
 import org.apache.logging.log4j.LogManager
 import org.joml.Vector3f
 import org.joml.Vector4f
 import java.util.*
-import kotlin.streams.toList
 
 class StudioTreeView(style: Style) :
     TreeView<Transform>(StudioFileImporter, true, style) {
@@ -162,9 +156,10 @@ class StudioTreeView(style: Style) :
             val cameraToWorld = camera.parent?.getGlobalTransform(time)
             val objectToWorld = obj.getGlobalTransform(time)
             val objectWorldPosition = objectToWorld.transformPosition(Vector3f(0f, 0f, 0f))
+
             @Suppress("IfThenToElvis")
             val objectCameraPosition = if (cameraToWorld == null) objectWorldPosition else
-                    cameraToWorld.invert().transformPosition(objectWorldPosition)
+                cameraToWorld.invert().transformPosition(objectWorldPosition)
             LOGGER.info(objectCameraPosition)
             // apply this movement
             RemsStudio.largeChange("Move Camera to Object") {

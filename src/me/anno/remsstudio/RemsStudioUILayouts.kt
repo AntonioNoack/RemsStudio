@@ -41,9 +41,9 @@ import me.anno.ui.editor.OptionBar
 import me.anno.ui.editor.WelcomeUI
 import me.anno.ui.editor.config.ConfigPanel
 import me.anno.ui.editor.files.FileNames.toAllowedFilename
-import me.anno.utils.files.OpenInBrowser.openInBrowser
+import me.anno.utils.files.OpenFileExternally.openInBrowser
+import me.anno.utils.files.OpenFileExternally.openInExplorer
 import org.apache.logging.log4j.LogManager
-import java.net.URL
 
 object RemsStudioUILayouts {
 
@@ -95,7 +95,7 @@ object RemsStudioUILayouts {
         }
 
         options.addAction(configTitle, Dict["Open Config Folder", "ui.top.config.openFolder"]) {
-            ConfigBasics.configFolder.openInExplorer()
+            openInExplorer(ConfigBasics.configFolder)
         }
 
         /**
@@ -204,7 +204,7 @@ object RemsStudioUILayouts {
          * Help
          * */
         options.addAction(helpTitle, "Tutorials") {
-            URL("https://remsstudio.phychi.com/?s=learn").openInBrowser()
+            openInBrowser("https://remsstudio.phychi.com/?s=learn")
         }
         options.addAction(helpTitle, "Version: $versionName") {}
         options.addAction(helpTitle, "About") {

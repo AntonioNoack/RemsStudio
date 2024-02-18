@@ -5,7 +5,7 @@ import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.Perspective.perspective2
 import me.anno.gpu.pipeline.Sorting
-import me.anno.io.ISaveable
+import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
@@ -310,16 +310,10 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         writer.writeObject(this, "backgroundColor", backgroundColor)
     }
 
-    override fun readBoolean(name: String, value: Boolean) {
-        when (name) {
-            "onlyShowTarget" -> onlyShowTarget = value
-            "useDepth" -> useDepth = value
-            else -> super.readBoolean(name, value)
-        }
-    }
-
-    override fun readObject(name: String, value: ISaveable?) {
-        when (name) {
+    override fun setProperty(name: String, value: Any?) {
+        when(name){
+            "onlyShowTarget" -> onlyShowTarget = value == true
+            "useDepth" -> useDepth = value == true
             "orbitRadius" -> orbitRadius.copyFrom(value)
             "nearZ" -> nearZ.copyFrom(value)
             "farZ" -> farZ.copyFrom(value)
@@ -340,28 +334,9 @@ class Camera(parent: Transform? = null) : Transform(parent) {
             "cgSlope" -> cgSlope.copyFrom(value)
             "cgPower" -> cgPower.copyFrom(value)
             "backgroundColor" -> backgroundColor.copyFrom(value)
-            else -> super.readObject(name, value)
-        }
-    }
-
-    override fun readString(name: String, value: String) {
-        when (name) {
-            "lut" -> lut = value.toGlobalFile()
-            else -> super.readString(name, value)
-        }
-    }
-
-    override fun readFile(name: String, value: FileReference) {
-        when (name) {
-            "lut" -> lut = value
-            else -> super.readFile(name, value)
-        }
-    }
-
-    override fun readInt(name: String, value: Int) {
-        when (name) {
+            "lut" -> lut = (value as? String)?.toGlobalFile() ?: (value as? FileReference) ?: InvalidRef
             "toneMapping" -> toneMapping = ToneMappers.entries.firstOrNull { it.id == value } ?: toneMapping
-            else -> super.readInt(name, value)
+            else ->super.setProperty(name, value)
         }
     }
 

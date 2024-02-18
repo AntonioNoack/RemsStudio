@@ -1,6 +1,5 @@
 package me.anno.remsstudio.history
 
-import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.RemsStudio
@@ -15,6 +14,7 @@ import me.anno.remsstudio.ui.sceneTabs.SceneTabs
 import me.anno.ui.Panel
 import me.anno.ui.base.groups.PanelGroup
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
+import me.anno.utils.types.AnyToInt
 
 class HistoryState() : Saveable() {
 
@@ -128,58 +128,20 @@ class HistoryState() : Saveable() {
         writer.writeDouble("editorTime", editorTime)
     }
 
-    override fun readString(name: String, value: String) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
-            "title" -> title = value
-            else -> super.readString(name, value)
-        }
-    }
-
-    override fun readDouble(name: String, value: Double) {
-        when (name) {
-            "editorTime" -> editorTime = value
-            else -> super.readDouble(name, value)
-        }
-    }
-
-    override fun readInt(name: String, value: Int) {
-        when (name) {
-            "selectedUUID" -> selectedUUIDs = listOf(value)
-            else -> super.readInt(name, value)
-        }
-    }
-
-    override fun readLong(name: String, value: Long) {
-        when (name) {
-            "selectedUUID" -> selectedUUIDs = listOf(value.toInt())
-            else -> super.readLong(name, value)
-        }
-    }
-
-    override fun readIntArray(name: String, values: IntArray) {
-        when (name) {
-            "usedCameras" -> usedCameras = values
-            "selectedUUIDs" -> selectedUUIDs = values.toList()
-            else -> super.readIntArray(name, values)
-        }
-    }
-
-    override fun readLongArray(name: String, values: LongArray) {
-        when (name) {
-            "usedCameras" -> usedCameras = values.map { it.toInt() }.toIntArray()
-            else -> super.readLongArray(name, values)
-        }
-    }
-
-    override fun readObject(name: String, value: ISaveable?) {
-        when (name) {
+            "title" -> title = value as? String ?: return
+            "editorTime" -> editorTime = value as? Double ?: return
+            "selectedUUID" -> selectedUUIDs = listOf(AnyToInt.getInt(value, 0))
+            "usedCameras" -> usedCameras =
+                value as? IntArray ?: (value as? LongArray)?.map { it.toInt() }?.toIntArray() ?: return
+            "selectedUUIDs" -> selectedUUIDs = (value as? IntArray)?.toList() ?: return
             "root" -> root = value as? Transform ?: return
-            else -> super.readObject(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 
     override val className get() = "HistoryState"
-
     override val approxSize get() = 1_000_000_000
 
     override fun isDefaultValue() = false

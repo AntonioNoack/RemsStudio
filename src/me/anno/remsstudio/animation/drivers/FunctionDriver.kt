@@ -44,13 +44,13 @@ class FunctionDriver : AnimationDriver() {
         writer.writeString("formula", formula)
     }
 
-    override fun readString(name: String, value: String) {
-        when (name) {
+    override fun setProperty(name: String, value: Any?) {
+        when(name){
             "formula" -> {
-                formula = value
+                formula = value as? String ?: return
                 updateFormula()
             }
-            else -> super.readString(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 

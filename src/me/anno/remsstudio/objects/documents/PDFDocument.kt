@@ -10,7 +10,7 @@ import me.anno.gpu.GFX.viewportWidth
 import me.anno.gpu.drawing.UVProjection
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.TextureLib.colorShowTexture
-import me.anno.io.ISaveable
+import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
@@ -220,41 +220,16 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
         writer.writeMaybe(this, "filtering", filtering)
     }
 
-    override fun readFloat(name: String, value: Float) {
-        when (name) {
-            "editorQuality" -> editorQuality = value
-            "renderQuality" -> renderQuality = value
-            else -> super.readFloat(name, value)
-        }
-    }
-
-    override fun readInt(name: String, value: Int) {
-        when (name) {
-            "filtering" -> filtering.value = filtering.value.find(value)
-            else -> super.readInt(name, value)
-        }
-    }
-
-    override fun readString(name: String, value: String) {
-        when (name) {
-            "file" -> file = value.toGlobalFile()
-            "selectedSites" -> selectedSites = value
-            else -> super.readString(name, value)
-        }
-    }
-
-    override fun readFile(name: String, value: FileReference) {
-        when (name) {
-            "file" -> file = value
-            else -> super.readFile(name, value)
-        }
-    }
-
-    override fun readObject(name: String, value: ISaveable?) {
-        when (name) {
+    override fun setProperty(name: String, value: Any?) {
+        when(name){
+            "editorQuality" -> editorQuality = value as? Float ?: return
+            "renderQuality" -> renderQuality = value as? Float ?: return
+            "filtering" -> filtering.value = filtering.value.find(value as? Int ?: return)
+            "file" -> file = (value as? String)?.toGlobalFile() ?: (value as? FileReference) ?: InvalidRef
+            "selectedSites" -> selectedSites = value as? String ?: return
             "padding" -> padding.copyFrom(value)
             "direction" -> direction.copyFrom(value)
-            else -> super.readObject(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 

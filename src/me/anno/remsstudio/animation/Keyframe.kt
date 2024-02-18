@@ -28,37 +28,20 @@ class Keyframe<V>(var time: Double, var value: V, var interpolation: Interpolati
         writer.writeInt("mode", interpolation.id)
     }
 
-    override fun readInt(name: String, value: Int) {
-        when (name) {
-            "mode" -> interpolation = Interpolation.getType(value)
-            else -> super.readInt(name, value)
-        }
-    }
-
-    fun setValueUnsafe(value: Any?) {
-        @Suppress("unchecked_cast")
-        this.value = value as V
-    }
-
-    fun getChannelAsFloat(index: Int): Float {
-        return AnyToFloat.getFloat(value!!, index, 0f)
-    }
-
-    override fun readDouble(name: String, value: Double) {
-        when (name) {
-            "time" -> time = value
-            else -> super.readDouble(name, value)
-        }
-    }
-
-    override fun readSomething(name: String, value: Any?) {
-        when (name) {
+    override fun setProperty(name: String, value: Any?) {
+        when(name){
+            "mode" -> interpolation = Interpolation.getType(value as? Int ?: return)
+            "time" -> time = value as? Double ?: return
             "value" -> {
                 @Suppress("unchecked_cast")
                 this.value = value as V
             }
-            else -> super.readSomething(name, value)
+            else -> super.setProperty(name, value)
         }
+    }
+
+    fun getChannelAsFloat(index: Int): Float {
+        return AnyToFloat.getFloat(value!!, index, 0f)
     }
 
     @Suppress("useless_cast")

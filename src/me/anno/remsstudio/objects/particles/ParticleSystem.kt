@@ -4,7 +4,6 @@ import me.anno.Time
 import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.GFX.isFinalRendering
-import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringWriter
@@ -416,14 +415,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
         writer.writeObject(this, "spawnSize", spawnSize)
     }
 
-    override fun readDouble(name: String, value: Double) {
-        when (name) {
-            "simulationStep" -> simulationStep = max(1e-9, value)
-            else -> super.readDouble(name, value)
-        }
-    }
-
-    override fun readObject(name: String, value: ISaveable?) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
             "spawnPosition" -> spawnPosition.copyFrom(value)
             "spawnVelocity" -> spawnVelocity.copyFrom(value)
@@ -434,10 +426,8 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
             "spawnColor" -> spawnColor.copyFrom(value)
             "spawnOpacity" -> spawnOpacity.copyFrom(value)
             "spawnSize" -> spawnSize.copyFrom(value)
-            else -> {
-                super.readObject(name, value)
-                return
-            }
+            "simulationStep" -> simulationStep = max(1e-9, value as? Double ?: return)
+            else -> super.setProperty(name, value)
         }
         clearCache()
     }

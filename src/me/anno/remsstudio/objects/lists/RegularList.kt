@@ -1,14 +1,13 @@
 package me.anno.remsstudio.objects.lists
 
 import me.anno.config.DefaultConfig
-import me.anno.io.ISaveable
+import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.modes.ArraySelectionMode
-import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -60,23 +59,19 @@ class RegularList(parent: Transform? = null) : GFXTransform(parent) {
         writer.writeObject(this, "selectionSeed", selectionSeed)
     }
 
-    override fun readObject(name: String, value: ISaveable?) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
             "instanceCount" -> instanceCount.copyFrom(value)
             "perChildTranslation" -> perChildTranslation.copyFrom(value)
             "perChildRotation" -> perChildRotation.copyFrom(value)
             "perChildScale" -> perChildScale.copyFrom(value)
             "perChildSkew" -> perChildSkew.copyFrom(value)
-            "perChildDelay" -> perChildDelay.copyFrom(value)
+            "perChildDelay" -> {
+                if (value is Double) perChildDelay.set(value)
+                else perChildDelay.copyFrom(value)
+            }
             "selectionSeed" -> selectionSeed.copyFrom(value)
-            else -> super.readObject(name, value)
-        }
-    }
-
-    override fun readDouble(name: String, value: Double) {
-        when (name) {
-            "perChildDelay" -> perChildDelay.set(value)
-            else -> super.readDouble(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 

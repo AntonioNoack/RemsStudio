@@ -20,7 +20,6 @@ import me.anno.gpu.shader.Shader
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.texture.ITexture2D
 import me.anno.gpu.texture.TextureLib.whiteTexture
-import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
@@ -327,32 +326,13 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         writer.writeBoolean("centerMesh", centerMesh, true)
     }
 
-    override fun readBoolean(name: String, value: Boolean) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
-            "normalizeScale" -> normalizeScale = value
-            "centerMesh" -> centerMesh = value
-            else -> super.readBoolean(name, value)
-        }
-    }
-
-    override fun readObject(name: String, value: ISaveable?) {
-        when (name) {
+            "normalizeScale" -> normalizeScale = value == true
+            "centerMesh" -> centerMesh = value == true
             "animation" -> animation.copyFrom(value)
-            else -> super.readObject(name, value)
-        }
-    }
-
-    override fun readString(name: String, value: String) {
-        when (name) {
-            "file" -> file = value.toGlobalFile()
-            else -> super.readString(name, value)
-        }
-    }
-
-    override fun readFile(name: String, value: FileReference) {
-        when (name) {
-            "file" -> file = value
-            else -> super.readFile(name, value)
+            "file" -> file = (value as? String)?.toGlobalFile() ?: (value as? FileReference) ?: InvalidRef
+            else -> super.setProperty(name, value)
         }
     }
 

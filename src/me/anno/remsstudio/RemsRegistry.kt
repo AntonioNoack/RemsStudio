@@ -1,7 +1,7 @@
 package me.anno.remsstudio
 
 import me.anno.engine.ECSRegistry
-import me.anno.io.ISaveable.Companion.registerCustomClass
+import me.anno.io.Saveable.Companion.registerCustomClass
 import me.anno.io.SaveableArray
 import me.anno.io.utils.StringMap
 import me.anno.remsstudio.animation.AnimatedProperty

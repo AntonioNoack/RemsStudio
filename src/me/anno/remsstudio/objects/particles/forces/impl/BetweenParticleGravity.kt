@@ -1,6 +1,6 @@
 package me.anno.remsstudio.objects.particles.forces.impl
 
-import me.anno.io.ISaveable
+import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.particles.forces.ForceField
@@ -55,10 +55,10 @@ class BetweenParticleGravity : ForceField(
         writer.writeObject(this, "exponent", exponent)
     }
 
-    override fun readObject(name: String, value: ISaveable?) {
-        when (name) {
+    override fun setProperty(name: String, value: Any?) {
+        when(name){
             "exponent" -> exponent.copyFrom(value)
-            else -> super.readObject(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 

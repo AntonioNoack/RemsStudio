@@ -3,7 +3,6 @@ package me.anno.remsstudio.objects
 import me.anno.animation.LoopingState
 import me.anno.audio.openal.AudioTasks.addAudioTask
 import me.anno.engine.inspector.Inspectable
-import me.anno.io.ISaveable
 import me.anno.io.MediaMetadata.Companion.getMeta
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
@@ -108,32 +107,14 @@ abstract class Audio(var file: FileReference = InvalidRef, parent: Transform? = 
         writer.writeMaybe(this, "isLooping", isLooping)
     }
 
-    override fun readInt(name: String, value: Int) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
-            "isLooping" -> isLooping.value = LoopingState.getState(value)
-            else -> super.readInt(name, value)
-        }
-    }
-
-    override fun readObject(name: String, value: ISaveable?) {
-        when (name) {
+            "isLooping" -> isLooping.value = LoopingState.getState(value as? Int ?: return)
             "amplitude" -> amplitude.copyFrom(value)
             "effects" -> pipeline = value as? SoundPipeline ?: return
-            else -> super.readObject(name, value)
-        }
-    }
-
-    override fun readString(name: String, value: String) {
-        when (name) {
-            "src", "file", "path" -> file = value.toGlobalFile()
-            else -> super.readString(name, value)
-        }
-    }
-
-    override fun readFile(name: String, value: FileReference) {
-        when (name) {
-            "src", "file", "path" -> file = value
-            else -> super.readFile(name, value)
+            "src", "file", "path" -> file =
+                (value as? String)?.toGlobalFile() ?: (value as? FileReference) ?: InvalidRef
+            else -> super.setProperty(name, value)
         }
     }
 

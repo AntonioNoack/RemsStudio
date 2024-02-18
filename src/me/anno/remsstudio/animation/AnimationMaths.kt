@@ -1,7 +1,7 @@
 package me.anno.remsstudio.animation
 
 import me.anno.ui.input.NumberType
-import me.anno.utils.strings.StringMixer
+import me.anno.remsstudio.utils.StringMixer
 import org.joml.Quaternionf
 import org.joml.Vector2f
 import org.joml.Vector3f

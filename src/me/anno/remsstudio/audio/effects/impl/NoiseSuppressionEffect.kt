@@ -2,7 +2,6 @@ package me.anno.remsstudio.audio.effects.impl
 
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
 import me.anno.engine.Events.addEvent
-import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.min
@@ -142,9 +141,11 @@ class NoiseSuppressionEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAI
         writer.writeObject(this, "noiseLevel", noiseLevel)
     }
 
-    override fun readObject(name: String, value: ISaveable?) {
-        if (name == "noiseLevel") noiseLevel.copyFrom(value)
-        else super.readObject(name, value)
+    override fun setProperty(name: String, value: Any?) {
+        when (name) {
+            "noiseLevel" -> noiseLevel.copyFrom(value)
+            else -> super.setProperty(name, value)
+        }
     }
 
     override val displayName get() = "Noise Suppression"

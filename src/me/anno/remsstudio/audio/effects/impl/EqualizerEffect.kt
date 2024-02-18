@@ -1,7 +1,6 @@
 package me.anno.remsstudio.audio.effects.impl
 
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
-import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.mix
@@ -57,15 +56,16 @@ class EqualizerEffect : SoundEffect(Domain.FREQUENCY_DOMAIN, Domain.FREQUENCY_DO
         writer.writeObjectArray(this, "sliders", sliders)
     }
 
-    override fun readObjectArray(name: String, values: Array<ISaveable?>) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
             "sliders" -> {
+                val values = value as? Array<*> ?: return
                 for (index in values.indices) {
-                    val iSaveable = values[index]
-                    sliders.getOrNull(index)?.copyFrom(iSaveable)
+                    val vi = values[index]
+                    sliders.getOrNull(index)?.copyFrom(vi)
                 }
             }
-            else -> super.readObjectArray(name, values)
+            else -> super.setProperty(name, value)
         }
     }
 

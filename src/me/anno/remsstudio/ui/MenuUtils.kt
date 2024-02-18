@@ -1,9 +1,9 @@
 package me.anno.remsstudio.ui
 
 import me.anno.config.DefaultConfig
+import me.anno.engine.Events.addEvent
 import me.anno.gpu.drawing.DrawTexts
 import me.anno.language.translation.NameDesc
-import me.anno.studio.Events.addEvent
 import me.anno.ui.Panel
 import me.anno.ui.Window
 import me.anno.ui.WindowStack
@@ -14,7 +14,6 @@ import me.anno.ui.base.menu.Menu
 import me.anno.ui.input.FloatInput
 import me.anno.utils.Color
 import me.anno.utils.Color.withAlpha
-import kotlin.concurrent.thread
 
 object MenuUtils {
 
@@ -73,12 +72,9 @@ object MenuUtils {
         buttons += submit
 
         val window = Menu.openMenuByPanels(windowStack, x, y, title, listOf(panel, buttons))!!
-        thread {
+        addEvent(20) {
             // must be delayed, so the original press is not placed into it
-            Thread.sleep(20)
-            addEvent {
-                panel.inputPanel.requestFocus()
-            }
+            panel.inputPanel.requestFocus()
         }
         return window
 

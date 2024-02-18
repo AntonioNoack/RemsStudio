@@ -1,15 +1,14 @@
 package me.anno.remsstudio.objects.attractors
 
 import me.anno.config.DefaultConfig
-import me.anno.io.ISaveable
+import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
-import me.anno.engine.inspector.Inspectable
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
-import me.anno.ui.Style
 import org.joml.Vector4f
 
 class EffectColoring : Transform() {
@@ -45,12 +44,11 @@ class EffectColoring : Transform() {
         writer.writeObject(this, "sharpness", sharpness)
     }
 
-    override fun readObject(name: String, value: ISaveable?) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
             "influence" -> influence.copyFrom(value)
             "sharpness" -> sharpness.copyFrom(value)
-            else -> super.readObject(name, value)
+            else -> super.setProperty(name, value)
         }
     }
-
 }

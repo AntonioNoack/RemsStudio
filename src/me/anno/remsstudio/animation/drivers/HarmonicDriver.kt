@@ -61,13 +61,13 @@ class HarmonicDriver : AnimationDriver() {
         writer.writeString("harmonics", harmonicsFormula)
     }
 
-    override fun readString(name: String, value: String) {
-        when (name) {
+    override fun setProperty(name: String, value: Any?) {
+        when(name){
             "harmonics" -> {
-                harmonicsFormula = value
+                harmonicsFormula = value as? String ?: return
                 updateHarmonics()
             }
-            else -> super.readString(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 

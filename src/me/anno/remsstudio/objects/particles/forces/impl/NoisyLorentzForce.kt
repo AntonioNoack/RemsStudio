@@ -1,13 +1,12 @@
 package me.anno.remsstudio.objects.particles.forces.impl
 
-import me.anno.io.ISaveable
+import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
 import me.anno.maths.noise.FullNoise
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.inspectable.InspectableAnimProperty
 import me.anno.remsstudio.objects.particles.Particle
 import me.anno.remsstudio.objects.particles.ParticleState
-import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -85,17 +84,11 @@ class NoisyLorentzForce : PerParticleForce(
         writer.writeObject(this, "fieldScale", fieldScale)
     }
 
-    override fun readObject(name: String, value: ISaveable?) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
             "fieldScale" -> fieldScale.copyFrom(value)
-            else -> super.readObject(name, value)
-        }
-    }
-
-    override fun readLong(name: String, value: Long) {
-        when (name) {
-            "seed" -> seed = initRandomizers(value)
-            else -> super.readLong(name, value)
+            "seed" -> seed = initRandomizers(value as? Long ?: return)
+            else -> super.setProperty(name, value)
         }
     }
 

@@ -1,7 +1,6 @@
 package me.anno.remsstudio.audio.effects
 
 import me.anno.Engine
-import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.RemsStudio
@@ -111,15 +110,14 @@ class SoundPipeline() : Saveable(), Inspectable {
         }
     }
 
-    override fun readObject(name: String, value: ISaveable?) {
-        when (name) {
+    override fun setProperty(name: String, value: Any?) {
+        when(name){
             "stage" -> {
                 if (value is SoundEffect) {
                     effects.add(value)
                 }
             }
-
-            else -> super.readObject(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 

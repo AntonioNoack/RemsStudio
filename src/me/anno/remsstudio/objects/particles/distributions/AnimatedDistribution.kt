@@ -1,6 +1,5 @@
 package me.anno.remsstudio.objects.particles.distributions
 
-import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.animation.AnimatedProperty
@@ -151,12 +150,7 @@ class AnimatedDistribution(
         }
     }
 
-    fun setChannel(index: Int, channel: AnimatedProperty<*>) {
-        while (channels.size <= index) channels += createChannel(channels.size)
-        channels[index].copyFrom(channel)
-    }
-
-    override fun readObject(name: String, value: ISaveable?) {
+    override fun setProperty(name: String, value: Any?) {
         update()
         when (name) {
             "distribution" -> distribution = value as? Distribution ?: return
@@ -168,8 +162,13 @@ class AnimatedDistribution(
             "channel[5]" -> setChannel(5, value as? AnimatedProperty<*> ?: return)
             "channel[6]" -> setChannel(6, value as? AnimatedProperty<*> ?: return)
             "channel[7]" -> setChannel(7, value as? AnimatedProperty<*> ?: return)
-            else -> super.readObject(name, value)
+            else -> super.setProperty(name, value)
         }
+    }
+
+    fun setChannel(index: Int, channel: AnimatedProperty<*>) {
+        while (channels.size <= index) channels += createChannel(channels.size)
+        channels[index].copyFrom(channel)
     }
 
     override val approxSize get() = 35

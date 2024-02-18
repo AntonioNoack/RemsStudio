@@ -5,10 +5,12 @@ import me.anno.gpu.GFXState.useFrame
 import me.anno.gpu.framebuffer.DepthBufferType
 import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.framebuffer.IFramebuffer
-import me.anno.gpu.shader.renderer.Renderer
+import me.anno.gpu.shader.GLSLType
 import me.anno.gpu.shader.ShaderLib.coordsUVVertexShader
 import me.anno.gpu.shader.ShaderLib.createShader
 import me.anno.gpu.shader.ShaderLib.uvList
+import me.anno.gpu.shader.builder.Variable
+import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.Filtering
 import me.anno.gpu.texture.Texture2D
@@ -77,10 +79,13 @@ object OpticalFlow {
 
     val flowShader = lazy {
         createShader(
-            "flow", coordsUVVertexShader, uvList, "" +
-                    "uniform sampler2D tex0, tex1;\n" +
-                    "uniform vec2 scale, offset;\n" +
-                    "uniform float lambda;\n" +
+            "flow", listOf(), coordsUVVertexShader, uvList, listOf(
+                Variable(GLSLType.S2D, "tex0"),
+                Variable(GLSLType.S2D, "tex1"),
+                Variable(GLSLType.V2F, "scale"),
+                Variable(GLSLType.V2F, "offset"),
+                Variable(GLSLType.V1F, "lambda"),
+            ), "" +
                     "vec4 getColorCoded(float x, float y, vec2 scale) {\n" +
                     "   vec2 xOut = vec2(max(x,0.),max(-x,0.))*scale.x;\n" +
                     "   vec2 yOut = vec2(max(y,0.),max(-y,0.))*scale.y;\n" +
@@ -119,13 +124,16 @@ object OpticalFlow {
 
     val blurShader = lazy {
         createShader(
-            "blur", coordsUVVertexShader, uvList, "" +
-                    "uniform sampler2D tex;\n" +
-                    "uniform vec2 texOffset;\n" +
-                    "\n" +
-                    "uniform float blurSize;\n" +
-                    "uniform float horizontalPass;// 0 or 1 to indicate vertical or horizontal pass\n" +
-                    "uniform float sigma;// The sigma value for the gaussian function: higher value means more blur\n" +
+            "blur", listOf(), coordsUVVertexShader, uvList, listOf(
+                Variable(GLSLType.S2D, "tex"),
+                Variable(GLSLType.V2F, "texOffset"),
+                Variable(GLSLType.V1F, "blurSize"),
+                Variable(GLSLType.V1F, "horizontalPass"),// 0 or 1 to indicate vertical or horizontal pass
+                Variable(
+                    GLSLType.V1F,
+                    "sigma"
+                ), // The sigma value for the gaussian function: higher value means more blur
+            ), "" +
                     "// A good value for 9x9 is around 3 to 5\n" +
                     "// A good value for 7x7 is around 2.5 to 4\n" +
                     "// A good value for 5x5 is around 2 to 3.5\n" +
@@ -179,9 +187,11 @@ object OpticalFlow {
 
     val repositionShader = lazy {
         createShader(
-            "reposition", coordsUVVertexShader, uvList, "" +
-                    "uniform vec2 amt;\n" +
-                    "uniform sampler2D tex0, tex1;\n" +
+            "reposition", listOf(), coordsUVVertexShader, uvList, listOf(
+                Variable(GLSLType.V2F, "amt"),
+                Variable(GLSLType.S2D, "tex0"),
+                Variable(GLSLType.S2D, "tex1")
+            ), "" +
                     "vec2 get2DOff(sampler2D tex, vec2 coord) {\n" +
                     "   vec4 col = texture(tex, coord);\n" +
                     "   if (col.w > 0.95) col.z = -col.z;\n" +

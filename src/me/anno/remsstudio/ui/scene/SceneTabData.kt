@@ -1,7 +1,6 @@
 package me.anno.remsstudio.ui.scene
 
 import me.anno.engine.EngineBase.Companion.workspace
-import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
@@ -45,25 +44,12 @@ class SceneTabData() : Saveable() {
         }
     }
 
-    override fun readString(name: String, value: String) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
-            "file" -> file = value.toGlobalFile() ?: InvalidRef
-            else -> super.readString(name, value)
-        }
-    }
-
-    override fun readFile(name: String, value: FileReference) {
-        when (name) {
-            "file" -> file = value
-            else -> super.readFile(name, value)
-        }
-    }
-
-    override fun readObject(name: String, value: ISaveable?) {
-        when (name) {
+            "file" -> file = (value as? String)?.toGlobalFile() ?: value as? FileReference ?: InvalidRef
             "transform" -> transform = value as? Transform
             "history" -> history = value as? History
-            else -> super.readObject(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 

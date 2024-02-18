@@ -1,7 +1,7 @@
 package me.anno.remsstudio.objects
 
-import me.anno.ui.input.NumberType
 import me.anno.config.DefaultConfig
+import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.GFXState.useFrame
 import me.anno.gpu.drawing.UVProjection
@@ -9,7 +9,6 @@ import me.anno.gpu.framebuffer.DepthBufferType
 import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.texture.Clamping
-import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
@@ -22,12 +21,12 @@ import me.anno.remsstudio.gpu.TexFiltering
 import me.anno.remsstudio.gpu.TexFiltering.Companion.getFiltering
 import me.anno.remsstudio.objects.text.Text
 import me.anno.remsstudio.ui.StudioFileImporter.addChildFromFile
-import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.editor.frames.FrameSizeInput
+import me.anno.ui.input.NumberType
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
@@ -234,42 +233,17 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
         writer.writeMaybe(this, "uvProjection", uvProjection)
     }
 
-    override fun readObject(name: String, value: ISaveable?) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
             "resolution" -> resolution.copyFrom(value)
             "tiling" -> tiling.copyFrom(value)
-            else -> super.readObject(name, value)
-        }
-    }
-
-    override fun readBoolean(name: String, value: Boolean) {
-        when (name) {
-            "renderToTexture" -> renderToTexture = value
-            else -> super.readBoolean(name, value)
-        }
-    }
-
-    override fun readInt(name: String, value: Int) {
-        when (name) {
-            "cameraIndex" -> cameraIndex = value
-            "filtering" -> filtering.value = filtering.value.find(value)
+            "renderToTexture" -> renderToTexture = value == true
+            "cameraIndex" -> cameraIndex = value as? Int ?: return
+            "filtering" -> filtering.value = filtering.value.find(value as? Int ?: return)
             "clamping" -> clampMode.value = Clamping.values().firstOrNull { it.id == value } ?: return
             "uvProjection" -> uvProjection.value = UVProjection.values().firstOrNull { it.id == value } ?: return
-            else -> super.readInt(name, value)
-        }
-    }
-
-    override fun readString(name: String, value: String) {
-        when (name) {
-            "file" -> file = value.toGlobalFile()
-            else -> super.readString(name, value)
-        }
-    }
-
-    override fun readFile(name: String, value: FileReference) {
-        when (name) {
-            "file" -> file = value
-            else -> super.readFile(name, value)
+            "file" -> file = (value as? String)?.toGlobalFile() ?: (value as? FileReference) ?: InvalidRef
+            else -> super.setProperty(name, value)
         }
     }
 
@@ -280,5 +254,4 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
     companion object {
         const val maxDepth = 5
     }
-
 }

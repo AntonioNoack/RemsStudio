@@ -1,14 +1,13 @@
 package me.anno.remsstudio.objects.particles.forces.impl
 
-import me.anno.io.ISaveable
 import me.anno.io.base.BaseWriter
 import me.anno.maths.Maths.pow
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.remsstudio.objects.particles.forces.ForceField
 import me.anno.remsstudio.objects.inspectable.InspectableAnimProperty
 import me.anno.remsstudio.objects.models.ArrowModel.arrowLineModel
 import me.anno.remsstudio.objects.particles.Particle
 import me.anno.remsstudio.objects.particles.ParticleState
+import me.anno.remsstudio.objects.particles.forces.ForceField
 import me.anno.ui.editor.sceneView.Grid
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
@@ -48,10 +47,10 @@ class TornadoField : ForceField(
         writer.writeObject(this, "exponent", exponent)
     }
 
-    override fun readObject(name: String, value: ISaveable?) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
             "exponent" -> exponent.copyFrom(value)
-            else -> super.readObject(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 

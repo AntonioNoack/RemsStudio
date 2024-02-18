@@ -1,5 +1,6 @@
 package me.anno.remsstudio.objects.text
 
+import me.anno.fonts.AWTFont
 import me.anno.fonts.FontManager
 import me.anno.fonts.PartResult
 import me.anno.fonts.mesh.TextMesh
@@ -40,7 +41,7 @@ object TextRenderer {
 
         val (lineSegmentsWithStyle, keys) = element.getSegments(text)
 
-        val font2 = FontManager.getFont(element.font)
+        val font2 = FontManager.getFont(element.font) as AWTFont
         val exampleLayout = font2.exampleLayout
         val scaleX = TextMesh.DEFAULT_LINE_HEIGHT / (exampleLayout.ascent + exampleLayout.descent)
         val scaleY = 1f / (exampleLayout.ascent + exampleLayout.descent)

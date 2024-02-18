@@ -178,7 +178,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
                         "SceneView", "StudioSceneView" -> StudioSceneView(style)
                         "PropertyInspector" -> StudioPropertyInspector({ Selection.selectedInspectables }, style)
                         "TimeControlsPanel" -> TimeControlsPanel(style)
-                        else -> library.getType(type)?.constructor?.invoke()
+                        else -> library.getType(type)?.generator?.invoke()
                     }
                     if (obj == null) {
                         notFound += type

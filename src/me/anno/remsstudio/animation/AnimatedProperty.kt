@@ -3,7 +3,6 @@ package me.anno.remsstudio.animation
 import me.anno.Time
 import me.anno.animation.Interpolation
 import me.anno.gpu.GFX.glThread
-import me.anno.io.ISaveable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.maths.Maths.clamp
@@ -353,39 +352,14 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
         }
     }
 
-    override fun readSomething(name: String, value: Any?) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
             "keyframe0", "v" -> addKeyframe(0.0, value ?: return)
-            else -> super.readSomething(name, value)
-        }
-    }
-
-    override fun readBoolean(name: String, value: Boolean) {
-        when (name) {
-            "isAnimated" -> isAnimated = value
-            else -> super.readBoolean(name, value)
-        }
-    }
-
-    override fun readObjectArray(name: String, values: Array<ISaveable?>) {
-        when (name) {
-            "keyframes", "vs" -> {
-                for (value in values.filterIsInstance<Keyframe<*>>()) {
-                    val castValue = type.acceptOrNull(value.value!!)
-                    if (castValue != null) {
-                        @Suppress("UNCHECKED_CAST")
-                        addKeyframe(value.time, clamp(castValue as V) as Any, 0.0)?.apply {
-                            interpolation = value.interpolation
-                        }
-                    } else LOGGER.warn("Dropped keyframe!, incompatible type ${value.value} for $type")
-                }
-            }
-            else -> super.readObjectArray(name, values)
-        }
-    }
-
-    override fun readObject(name: String, value: ISaveable?) {
-        when (name) {
+            "isAnimated" -> isAnimated = value == true
+            "driver0" -> setDriver(0, value as? AnimationDriver ?: return)
+            "driver1" -> setDriver(1, value as? AnimationDriver ?: return)
+            "driver2" -> setDriver(2, value as? AnimationDriver ?: return)
+            "driver3" -> setDriver(3, value as? AnimationDriver ?: return)
             "keyframes", "vs" -> {
                 if (value is Keyframe<*>) {
                     val castValue = type.acceptOrNull(value.value!!)
@@ -395,17 +369,23 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
                             interpolation = value.interpolation
                         }
                     } else LOGGER.warn("Dropped keyframe!, incompatible type ${value.value} for $type")
-                } else WrongClassType.warn("keyframe", value)
+                } else if (value is Array<*>) {
+                    for (vi in value.filterIsInstance<Keyframe<*>>()) {
+                        val castValue = type.acceptOrNull(vi.value!!)
+                        if (castValue != null) {
+                            @Suppress("UNCHECKED_CAST")
+                            addKeyframe(vi.time, clamp(castValue as V) as Any, 0.0)?.apply {
+                                interpolation = vi.interpolation
+                            }
+                        } else LOGGER.warn("Dropped keyframe!, incompatible type ${vi.value} for $type")
+                    }
+                } else WrongClassType.warn("keyframe", value as? Saveable)
             }
-            "driver0" -> setDriver(0, value)
-            "driver1" -> setDriver(1, value)
-            "driver2" -> setDriver(2, value)
-            "driver3" -> setDriver(3, value)
-            else -> super.readObject(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 
-    fun setDriver(index: Int, value: ISaveable?) {
+    fun setDriver(index: Int, value: Saveable?) {
         if (index >= drivers.size) {
             LOGGER.warn("Driver$index out of bounds for ${type.components}/${drivers.size}/$type")
             return

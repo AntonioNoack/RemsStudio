@@ -1,10 +1,10 @@
 package me.anno.remsstudio.objects.text
 
-import me.anno.input.Input.setClipboardContent
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.engine.inspector.Inspectable
+import me.anno.input.Clipboard.setClipboardContent
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption

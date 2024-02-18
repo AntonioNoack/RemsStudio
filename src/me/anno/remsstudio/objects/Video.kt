@@ -16,7 +16,6 @@ import me.anno.gpu.texture.TextureLib
 import me.anno.gpu.texture.TextureLib.colorShowTexture
 import me.anno.gpu.texture.TextureReader.Companion.imageTimeout
 import me.anno.image.svg.SVGMeshCache
-import me.anno.io.ISaveable
 import me.anno.io.MediaMetadata
 import me.anno.io.MediaMetadata.Companion.getMeta
 import me.anno.io.base.BaseWriter
@@ -1020,33 +1019,21 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         writer.writeBoolean("stayVisibleAtEnd", stayVisibleAtEnd)
     }
 
-    override fun readBoolean(name: String, value: Boolean) {
+    override fun setProperty(name: String, value: Any?) {
         when (name) {
-            "stayVisibleAtEnd" -> stayVisibleAtEnd = value
-            else -> super.readBoolean(name, value)
-        }
-    }
-
-    override fun readObject(name: String, value: ISaveable?) {
-        when (name) {
+            "stayVisibleAtEnd" -> stayVisibleAtEnd = value == true
             "tiling" -> tiling.copyFrom(value)
             "cgSaturation" -> cgSaturation.copyFrom(value)
             "cgOffset", "cgOffsetAdd" -> cgOffsetAdd.copyFrom(value)
             "cgOffsetSub" -> cgOffsetSub.copyFrom(value)
             "cgSlope" -> cgSlope.copyFrom(value)
             "cgPower" -> cgPower.copyFrom(value)
-            else -> super.readObject(name, value)
-        }
-    }
-
-    override fun readInt(name: String, value: Int) {
-        when (name) {
-            "videoScale" -> videoScale.value = value
-            "filtering" -> filtering.value = filtering.value.find(value)
+            "videoScale" -> videoScale.value = value as? Int ?: return
+            "filtering" -> filtering.value = filtering.value.find(value as? Int ?: return)
             "clamping" -> clampMode.value = Clamping.values().firstOrNull { it.id == value } ?: return
             "uvProjection" -> uvProjection.value = UVProjection.values().firstOrNull { it.id == value } ?: return
-            "editorVideoFPS" -> editorVideoFPS.value = clamp(value, 1, 1000)
-            else -> super.readInt(name, value)
+            "editorVideoFPS" -> editorVideoFPS.value = clamp(value as? Int ?: return, 1, 1000)
+            else -> super.setProperty(name, value)
         }
     }
 
