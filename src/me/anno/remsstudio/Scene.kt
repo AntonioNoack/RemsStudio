@@ -26,6 +26,7 @@ import me.anno.gpu.shader.ShaderFuncLib.randomGLSL
 import me.anno.gpu.shader.ShaderFuncLib.reinhardToneMapping
 import me.anno.gpu.shader.ShaderFuncLib.uchimuraToneMapping
 import me.anno.gpu.shader.ShaderLib.brightness
+import me.anno.gpu.shader.ShaderLib.coordsList
 import me.anno.gpu.shader.ShaderLib.coordsUVVertexShader
 import me.anno.gpu.shader.ShaderLib.createShader
 import me.anno.gpu.shader.ShaderLib.uvList
@@ -156,7 +157,7 @@ object Scene {
         )
 
         lutShader = createShader(
-            "lut", listOf(), coordsUVVertexShader, uvList, listOf(
+            "lut", coordsList, coordsUVVertexShader, uvList, listOf(
                 Variable(GLSLType.S2D, "tex"),
                 Variable(GLSLType.S3D, "lut"),
             ), "" +
@@ -169,7 +170,7 @@ object Scene {
         )
 
         addBloomShader = createShader(
-            "addBloom", listOf(), coordsUVVertexShader, uvList, listOf(
+            "addBloom", coordsList, coordsUVVertexShader, uvList, listOf(
                 Variable(GLSLType.S2D, "original"),
                 Variable(GLSLType.S2D, "blurred"),
                 Variable(GLSLType.V1F, "intensity")

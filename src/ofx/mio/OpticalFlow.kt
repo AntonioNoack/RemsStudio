@@ -6,6 +6,7 @@ import me.anno.gpu.framebuffer.DepthBufferType
 import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.framebuffer.IFramebuffer
 import me.anno.gpu.shader.GLSLType
+import me.anno.gpu.shader.ShaderLib.coordsList
 import me.anno.gpu.shader.ShaderLib.coordsUVVertexShader
 import me.anno.gpu.shader.ShaderLib.createShader
 import me.anno.gpu.shader.ShaderLib.uvList
@@ -79,7 +80,7 @@ object OpticalFlow {
 
     val flowShader = lazy {
         createShader(
-            "flow", listOf(), coordsUVVertexShader, uvList, listOf(
+            "flow", coordsList, coordsUVVertexShader, uvList, listOf(
                 Variable(GLSLType.S2D, "tex0"),
                 Variable(GLSLType.S2D, "tex1"),
                 Variable(GLSLType.V2F, "scale"),
@@ -124,15 +125,13 @@ object OpticalFlow {
 
     val blurShader = lazy {
         createShader(
-            "blur", listOf(), coordsUVVertexShader, uvList, listOf(
+            "blur", coordsList, coordsUVVertexShader, uvList, listOf(
                 Variable(GLSLType.S2D, "tex"),
                 Variable(GLSLType.V2F, "texOffset"),
                 Variable(GLSLType.V1F, "blurSize"),
                 Variable(GLSLType.V1F, "horizontalPass"),// 0 or 1 to indicate vertical or horizontal pass
-                Variable(
-                    GLSLType.V1F,
-                    "sigma"
-                ), // The sigma value for the gaussian function: higher value means more blur
+                // The sigma value for the gaussian function: higher value means more blur
+                Variable(GLSLType.V1F, "sigma"),
             ), "" +
                     "// A good value for 9x9 is around 3 to 5\n" +
                     "// A good value for 7x7 is around 2.5 to 4\n" +
@@ -187,7 +186,7 @@ object OpticalFlow {
 
     val repositionShader = lazy {
         createShader(
-            "reposition", listOf(), coordsUVVertexShader, uvList, listOf(
+            "reposition", coordsList, coordsUVVertexShader, uvList, listOf(
                 Variable(GLSLType.V2F, "amt"),
                 Variable(GLSLType.S2D, "tex0"),
                 Variable(GLSLType.S2D, "tex1")
