@@ -3,12 +3,10 @@ package me.anno.remsstudio.ui.sceneTabs
 import me.anno.config.DefaultConfig
 import me.anno.engine.EngineBase.Companion.dragged
 import me.anno.engine.Events.addEvent
-import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.language.translation.Dict
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.ui.StudioFileImporter.addChildFromFile
-import me.anno.remsstudio.ui.scene.SceneTabData
 import me.anno.ui.base.groups.PanelList
 import me.anno.ui.base.scrolling.ScrollPanelX
 import me.anno.ui.editor.files.FileContentImporter
@@ -94,11 +92,4 @@ object SceneTabs : ScrollPanelX(DefaultConfig.style) {
     fun closeAll() {
         panelChildren.clear()
     }
-
-    fun saveTabs(writer: BaseWriter) {
-        for (it in sceneTabs) {
-            writer.add(SceneTabData(it))
-        }
-    }
-
 }

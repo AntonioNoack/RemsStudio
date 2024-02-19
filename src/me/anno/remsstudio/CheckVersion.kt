@@ -103,5 +103,4 @@ object CheckVersion {
     }
 
     private val LOGGER = LogManager.getLogger(CheckVersion::class)
-
 }

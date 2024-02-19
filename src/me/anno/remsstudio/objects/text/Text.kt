@@ -387,5 +387,4 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
             else -> 0
         }
     }
-
 }

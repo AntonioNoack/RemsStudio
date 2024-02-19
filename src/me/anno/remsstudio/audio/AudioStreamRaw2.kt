@@ -143,7 +143,6 @@ class AudioStreamRaw2(
         val left1 = leftDirGlobal.dot(dirGlobal) * 0.48f + 0.52f
         val right1 = rightDirGlobal.dot(dirGlobal) * 0.48f + 0.52f
         return t0.set(left1 * amplitude, right1 * amplitude)
-
     }
 
     override fun getBuffer(
@@ -215,22 +214,15 @@ class AudioStreamRaw2(
                 index1 = ffmpegSampleRate * local1
 
                 if (transfer0.isZero() && transfer1.isZero()) {
-
                     // there is no audio here -> skip this interval
                     sampleIndex += updateInterval - 1
                     continue
-
                 } else {
-
                     indexI = index0
                     fraction = deltaFraction
-
                 }
-
             } else {
-
                 fraction += deltaFraction
-
             }
 
             val indexJ = mix(index0, index1, fraction)
@@ -250,11 +242,7 @@ class AudioStreamRaw2(
             rightBuffer[sampleIndex] = transfer0.getRight(l0, r0, approxFraction, transfer1).toInt().toShort()
 
             indexI = indexJ
-
         }
-
         return leftBuffer to rightBuffer
-
     }
-
 }

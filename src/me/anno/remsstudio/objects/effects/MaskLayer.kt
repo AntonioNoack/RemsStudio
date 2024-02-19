@@ -427,5 +427,4 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
             return maskLayer
         }
     }
-
 }

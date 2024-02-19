@@ -2,7 +2,6 @@ package test
 
 import me.anno.animation.Interpolation
 import me.anno.io.csv.CSVReader
-import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.remsstudio.RemsRegistry
@@ -17,12 +16,12 @@ fun main() {
     // todo the lines are awkward...
     // todo why is it so laggy, when moving something?
 
-    val folder = getReference(OS.home, "OneDrive\\Dokumente\\tsunami_lab")
+    val folder = OS.home.getChild( "OneDrive\\Dokumente\\tsunami_lab")
     // solution_<timeStep>.csv
     val filePrefix = "solution_"
     val fileExtension = "csv"
     val timeScale = 10.0 // = 10 timeSteps per second
-    val files = folder.listChildren()!!
+    val files = folder.listChildren()
         .filter { it.name.startsWith(filePrefix) && it.extension == fileExtension }
     val data = files.associate {
         val timeStep = it.nameWithoutExtension.substring(filePrefix.length).toDouble() / timeScale

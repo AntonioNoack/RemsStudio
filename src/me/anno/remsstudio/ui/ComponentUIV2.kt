@@ -471,5 +471,4 @@ object ComponentUIV2 {
         wrapper.alignmentX = AxisAlignment.FILL
         return wrapper
     }
-
 }

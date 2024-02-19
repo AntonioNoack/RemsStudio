@@ -3,9 +3,11 @@ package test
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.animation.AnimationIntegral.findIntegralX
 import me.anno.remsstudio.animation.AnimationIntegral.getIntegral
-import me.anno.utils.LOGGER
+import org.apache.logging.log4j.LogManager
 
 fun main() {
+
+    val logger = LogManager.getLogger("TestIntegral")
 
     val line = AnimatedProperty.float()
     line.isAnimated = true
@@ -14,7 +16,7 @@ fun main() {
 
     for (i in 0 until 11) {
         val time = i / 10.0
-        LOGGER.info(line.getIntegral(time, false))
+        logger.info(line.getIntegral(time, false))
     }
 
     val ap = AnimatedProperty.float()
@@ -25,7 +27,7 @@ fun main() {
     for (i in 1..50) {
         val target = i.toDouble()
         val time = ap.findIntegralX(0.0, 10.0, target)
-        LOGGER.info("$target: $time")
+        logger.info("$target: $time")
     }
 
 }

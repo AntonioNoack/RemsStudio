@@ -19,9 +19,7 @@ import me.anno.ui.editor.files.FileExplorerOption
 import me.anno.ui.editor.files.FileNames.toAllowedFilename
 
 class StudioUITypeLibrary : UITypeLibrary(typeList) {
-
     companion object {
-
         val createTransform = FileExplorerOption(
             NameDesc("Create Component", "Create a new folder component", "ui.newComponent")
         ) { p, folders ->
@@ -62,5 +60,4 @@ class StudioUITypeLibrary : UITypeLibrary(typeList) {
                     { TimeControlsPanel(DefaultConfig.style) }
         ).map { CustomPanelType(it.first, it.second) }.toMutableList()
     }
-
 }

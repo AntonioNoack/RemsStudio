@@ -89,5 +89,4 @@ object MenuUtils {
             AxisAlignment.MAX, AxisAlignment.MAX
         )
     }
-
 }

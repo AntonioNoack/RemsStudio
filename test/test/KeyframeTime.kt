@@ -4,9 +4,11 @@ import me.anno.animation.Interpolation
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringReader
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.utils.LOGGER
+import org.apache.logging.log4j.LogManager
 
 fun main() {
+
+    val logger = LogManager.getLogger("KeyframeTime")
 
     val prop = AnimatedProperty.float()
     prop.isAnimated = true
@@ -21,7 +23,7 @@ fun main() {
     val fromString = JsonStringReader.read(asString, InvalidRef, false)
         .filterIsInstance<AnimatedProperty<*>>().first()
 
-    LOGGER.info(asString)
-    LOGGER.info(fromString)
+    logger.info(asString)
+    logger.info(fromString)
 
 }

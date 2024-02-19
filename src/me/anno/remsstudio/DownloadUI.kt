@@ -481,5 +481,4 @@ object DownloadUI {
     fun openUI(style: Style, windowStack: WindowStack) {
         Menu.openMenuByPanels(windowStack, NameDesc("Download Media (yt-dlp)"), createUI(style))
     }
-
 }

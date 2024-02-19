@@ -220,5 +220,4 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
             shader.v1i("forceFieldUVCount", 0)
         }
     }
-
 }

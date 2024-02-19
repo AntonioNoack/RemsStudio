@@ -2,7 +2,6 @@ package test
 
 import me.anno.io.binary.BinaryReader
 import me.anno.io.binary.BinaryWriter
-import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.remsstudio.objects.Camera
@@ -52,7 +51,7 @@ fun main() {
     // load all files into the cache
     candidates.forEach { it.save(BinaryWriter(DataOutputStream(ByteArrayOutputStream()))) }
 
-    val file = getReference(OS.desktop, "raw.bin")
+    val file = OS.desktop.getChild("raw.bin")
 
     // binary
     val bin0 = System.nanoTime()

@@ -331,5 +331,4 @@ class FourierTransform : Transform() {
         val bufferSizeType =
             NumberType(512, 1, 512f, false, true, { clamp(it.toString().toDouble().toInt(), 64, 65536) }, { it })
     }
-
 }

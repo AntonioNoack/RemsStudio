@@ -290,5 +290,4 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
             LogManager.disableLogger("GlyphRenderer")
         }
     }
-
 }

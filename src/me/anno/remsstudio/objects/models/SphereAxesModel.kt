@@ -9,9 +9,7 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 object SphereAxesModel {
-
     val sphereAxesModels = Array(5) { lazy { createLineModel(it) } }
-
     private fun createLineModel(sides0: Int): Mesh {
 
         val sideCount = pow(2f, sides0 + 3f).toInt()
@@ -57,6 +55,5 @@ object SphereAxesModel {
         buffer.positions = positions
         buffer.drawMode = DrawMode.LINES
         return buffer
-
     }
 }

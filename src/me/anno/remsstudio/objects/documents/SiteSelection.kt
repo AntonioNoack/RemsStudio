@@ -5,7 +5,6 @@ import me.anno.cache.CacheSection
 import me.anno.utils.types.Strings.isBlank2
 
 object SiteSelection : CacheSection("SiteSelection") {
-
     fun parseSites(sites: String): List<IntRange> {
         if (sites.isBlank2()) return listOf(0 until maxSite)
         val cacheData = getEntry(sites, timeout, false) {
@@ -33,7 +32,6 @@ object SiteSelection : CacheSection("SiteSelection") {
         return cacheData.value as List<IntRange>
     }
 
-    private val timeout = 1000L
-    private val maxSite = 100_000_000
-
+    private const val timeout = 1000L
+    private const val maxSite = 100_000_000
 }

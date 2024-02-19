@@ -239,5 +239,4 @@ class StudioTreeView(style: Style) :
     }
 
     override val className get() = "StudioTreeView"
-
 }

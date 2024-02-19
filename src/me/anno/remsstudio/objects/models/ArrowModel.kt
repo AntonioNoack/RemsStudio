@@ -19,7 +19,7 @@ object ArrowModel {
     private val arrowBottom = Vector2f(center, -arrow)
     private val front = Vector2f(+1f, 0f)
 
-    val arrowModel = createModel()
+    val arrowModel by lazy { createModel() }
     val arrowLineModel = createLineModel()
 
     private fun createModel(): Mesh {
@@ -84,5 +84,4 @@ object ArrowModel {
         return buffer
 
     }
-
 }

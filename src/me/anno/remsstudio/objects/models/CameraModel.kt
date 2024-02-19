@@ -94,6 +94,4 @@ object CameraModel {
         this.positions = positions
         drawMode = DrawMode.LINES
     }
-
-
 }

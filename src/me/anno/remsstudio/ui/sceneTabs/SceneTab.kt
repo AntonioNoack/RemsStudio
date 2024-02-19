@@ -173,5 +173,4 @@ class SceneTab(var file: FileReference, var scene: Transform, history: History?)
     override fun onPaste(x: Float, y: Float, data: String, type: String) {
         SceneTabs.onPaste(x, y, data, type)
     }
-
 }

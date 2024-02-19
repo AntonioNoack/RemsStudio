@@ -8,7 +8,6 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.utils.Color.withAlpha
 
 object ColorGrading {
-
     fun createInspector(
         c: List<Transform>,
         cgPower: List<AnimatedProperty<*>>,
@@ -63,7 +62,5 @@ object ColorGrading {
         group.addChild(img(offset1))
         group.addChild(img(offset2))
         group.addChild(img(sat))
-
     }
-
 }

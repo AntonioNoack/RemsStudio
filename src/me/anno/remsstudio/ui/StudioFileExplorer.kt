@@ -61,5 +61,4 @@ class StudioFileExplorer(file: FileReference?, style: Style) : FileExplorer(file
     }
 
     override val className get() = "StudioFileExplorer"
-
 }

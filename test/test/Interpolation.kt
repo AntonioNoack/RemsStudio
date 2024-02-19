@@ -6,10 +6,12 @@ import me.anno.io.json.saveable.JsonStringReader
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.animation.Keyframe
 import me.anno.remsstudio.objects.text.Text
-import me.anno.utils.LOGGER
+import org.apache.logging.log4j.LogManager
 import org.joml.Vector4f
 
 fun main() {
+
+    val logger = LogManager.getLogger("Interpolation")
 
     registerCustomClass(Text())
     registerCustomClass(Keyframe<Int>())
@@ -30,7 +32,7 @@ fun main() {
     for (i in 0 until steps) {
         val f = i * 1.0 / steps
         val v = animation.getValueAt(f) as Vector4f
-        LOGGER.info("$f: $v")
+        logger.info("$f: $v")
     }
 
 }

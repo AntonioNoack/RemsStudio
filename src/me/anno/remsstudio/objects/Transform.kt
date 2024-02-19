@@ -932,5 +932,4 @@ open class Transform() : Saveable(),
         val dilationType = NumberType(1.0, 1, 1f, true, true, ::castToDouble2, ::castToDouble)
 
     }
-
 }

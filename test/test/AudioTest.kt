@@ -1,7 +1,6 @@
 package test
 
 import me.anno.remsstudio.audio.AudioFXCache2
-import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.remsstudio.objects.FourierTransform
 import me.anno.utils.OS
 import org.apache.logging.log4j.LogManager
@@ -17,7 +16,7 @@ fun main() {
     val cache = AudioFXCache2
     val fourier = FourierTransform()
 
-    fourier.file = getReference(OS.downloads, "Aitana 11 Raizones.mp4")
+    fourier.file = OS.downloads.getChild( "Aitana 11 Raizones.mp4")
     val meta = fourier.forcedMeta!!
 
     val keyIndices = 1..3

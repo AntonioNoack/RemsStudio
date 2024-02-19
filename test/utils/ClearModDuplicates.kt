@@ -1,7 +1,6 @@
 package utils
 
 import me.anno.io.files.FileReference
-import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.utils.OS.documents
 import me.anno.utils.types.Strings.addPrefix
 import java.util.zip.ZipEntry
@@ -9,7 +8,7 @@ import java.util.zip.ZipOutputStream
 
 fun main() {
 
-    val folder = getReference(documents, "IdeaProjects\\RemsStudio\\out\\artifacts\\Mod")
+    val folder = documents.getChild("IdeaProjects\\RemsStudio\\out\\artifacts\\Mod")
     val src = folder.getChild("RemsStudio.jar")
 
     val dst = folder.getChild("RemsStudio-clear.jar")
@@ -39,7 +38,7 @@ fun main() {
     fun add(file: FileReference, path: String) {
         if (path !in blacklist) {
             if (file.isDirectory) {
-                for (child in file.listChildren() ?: emptyList()) {
+                for (child in file.listChildren()) {
                     add(child, addPrefix(path, "/", child.name))
                 }
             } else {
@@ -49,7 +48,7 @@ fun main() {
             }
         }
     }
-    for (file in src.listChildren()!!) {
+    for (file in src.listChildren()) {
         add(file, file.name)
     }
     zos.close()

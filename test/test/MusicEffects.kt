@@ -1,20 +1,22 @@
 package test
 
+import me.anno.maths.Maths.pow
 import me.anno.remsstudio.audio.AudioFXCache2
 import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.Time
 import me.anno.remsstudio.audio.effects.impl.EqualizerEffect
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Video
-import me.anno.utils.LOGGER
-import me.anno.maths.Maths.pow
 import me.anno.utils.OS
+import org.apache.logging.log4j.LogManager
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
 // todo test, how effects influence the looks and sound of waveforms
 
 fun main() {
+
+    val logger = LogManager.getLogger("MusicEffects")
 
     val file = OS.downloads.getChild("Aitana 11 Raizones.mp4")
     if (!file.exists) throw RuntimeException("Missing file!")
@@ -38,7 +40,7 @@ fun main() {
 
     fun print(data: FloatArray) {
         val size = 16
-        LOGGER.info(
+        logger.info(
             "${
                 (0 until size).joinToString {
                     data[1024 - size + it].roundToInt().toString()
@@ -50,7 +52,7 @@ fun main() {
     print(func)
 
     val result = AudioFXCache2.getBuffer(audio, camera, bufferSize, Domain.TIME_DOMAIN, false) {
-        Time( time * it)
+        Time(time * it)
     }
     print(result)
 

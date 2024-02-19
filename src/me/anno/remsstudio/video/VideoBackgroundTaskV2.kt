@@ -36,5 +36,4 @@ class VideoBackgroundTaskV2(
             true, renderer, null
         )
     }
-
 }

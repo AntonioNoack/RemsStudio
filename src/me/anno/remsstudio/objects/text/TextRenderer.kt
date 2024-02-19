@@ -359,8 +359,5 @@ object TextRenderer {
                 GFXx3Dv2.draw3DTextWithOffset(buffer, offset)
             }
         }
-
     }
-
-
 }

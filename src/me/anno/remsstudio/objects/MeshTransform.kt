@@ -341,8 +341,6 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
     // and the mesh support was very limited before anyway -> we shouldn't worry too much,
     // because we don't have users at the moment anyway
     override val className get() = "MeshTransform"
-
     override val defaultDisplayName get() = Dict["Mesh", "obj.mesh"]
     override val symbol get() = DefaultConfig["ui.symbol.mesh", "\uD83D\uDC69"]
-
 }

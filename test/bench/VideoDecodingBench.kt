@@ -1,13 +1,13 @@
 package bench
 
-import me.anno.video.VideoCache
 import me.anno.io.files.FileReference
-import me.anno.io.files.FileReference.Companion.getReference
 import me.anno.remsstudio.objects.Video
-import me.anno.utils.LOGGER
 import me.anno.utils.OS
 import me.anno.utils.Sleep
+import me.anno.video.VideoCache
+import org.apache.logging.log4j.LogManager
 
+private val LOGGER = LogManager.getLogger("VideoDecodingBench")
 fun main() {
 
     // create a graph of how long it takes to decode 1 .. 1024 frames of a video file
@@ -18,7 +18,7 @@ fun main() {
     // val folderExternal = File("E:\\Videos\\")
     val folderInternal = OS.documents
 
-    val file = getReference(folderInternal, "Large World.mp4")
+    val file = folderInternal.getChild("Large World.mp4")
     val meta = Video(file).forcedMeta!!
     val frameCount = meta.videoFrameCount
     val fps = meta.videoFPS
@@ -44,7 +44,7 @@ fun decode(file: FileReference, start: Int, end: Int, fps: Double) {
     val bufferLength = end - start
     val bufferIndex = index / bufferLength
     while (true) {
-        val frame = VideoCache.getFrame(file, 1, index, bufferIndex, bufferLength, fps, 1, async = false, false)
+        val frame = VideoCache.getVideoFrame(file, 1, index, bufferIndex, bufferLength, fps, 1, async = false, false)
         if (frame != null) break
         Sleep.sleepShortly(true)
     }

@@ -122,5 +122,4 @@ abstract class Audio(var file: FileReference = InvalidRef, parent: Transform? = 
         super.onReadingEnded()
         needsUpdate = true
     }
-
 }

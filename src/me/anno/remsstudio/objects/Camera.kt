@@ -381,5 +381,4 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         const val DEFAULT_VIGNETTE_STRENGTH = 5f
 
     }
-
 }

@@ -87,5 +87,4 @@ object SpeakerModel {
             Grid.drawLineMesh(stack, color, speakerModel)
         }
     }
-
 }

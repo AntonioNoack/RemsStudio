@@ -75,5 +75,4 @@ class EffectMorphing : Transform() {
             else -> super.setProperty(name, value)
         }
     }
-
 }

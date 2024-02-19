@@ -210,5 +210,4 @@ object StudioFileImporter : FileContentImporter<Transform>() {
     }
 
     private val LOGGER = LogManager.getLogger(StudioFileImporter::class)
-
 }
