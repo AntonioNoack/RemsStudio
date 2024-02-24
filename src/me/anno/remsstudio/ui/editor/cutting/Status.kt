@@ -47,16 +47,11 @@ enum class Status(val color: Int) {
                 frame == null -> BUFFER_LOADING
                 frame.isDestroyed -> DESTROYED
                 frame.isCreated -> {
-                    if (BlankFrameDetector.isBlankFrame2(
-                            file,
-                            scale,
-                            frameIndex,
-                            bufferLength,
-                            fps,
-                            blankFrameThreshold
+                    if (BlankFrameDetector.isBlankFrame(
+                            file, scale, frameIndex, bufferLength,
+                            fps, blankFrameThreshold
                         )
-                    )
-                        BLANK else READY
+                    ) BLANK else READY
                 }
                 else -> WAIT_FOR_GPU_UPLOAD
             }

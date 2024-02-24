@@ -11,13 +11,12 @@ import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.TextInputML
 import me.anno.ui.Style
-import me.anno.utils.structures.lists.CountingList
 
 class FunctionDriver : AnimationDriver() {
 
     // make them animated? no xD
     var formula = "sin(time*360)"
-    var formulaParts: CountingList? = preparse(formula)
+    var formulaParts: ArrayList<Any>? = preparse(formula)
 
     override fun createInspector(
         inspected: List<Inspectable>,
@@ -57,7 +56,7 @@ class FunctionDriver : AnimationDriver() {
     override fun getValue0(time: Double, keyframeValue: Double, index: Int): Double {
         val formulaParts = formulaParts ?: return 0.0
         return parseDouble(
-            CountingList(formulaParts), mapOf(
+            ArrayList(formulaParts), mapOf(
                 "t" to time, "time" to time,
                 "v" to keyframeValue, "value" to keyframeValue
             )

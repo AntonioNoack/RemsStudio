@@ -23,7 +23,7 @@ import me.anno.gpu.texture.TextureLib.whiteTexture
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
-import me.anno.io.files.thumbs.ThumbsExt
+import me.anno.image.thumbs.ThumbsExt
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.fract

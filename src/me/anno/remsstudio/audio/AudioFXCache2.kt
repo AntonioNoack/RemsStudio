@@ -29,6 +29,7 @@ import kotlin.math.floor
 import kotlin.math.min
 import kotlin.math.roundToLong
 
+@Suppress("MemberVisibilityCanBePrivate")
 object AudioFXCache2 : CacheSection("AudioFX-RS") {
 
     // limit the number of requests for performance,

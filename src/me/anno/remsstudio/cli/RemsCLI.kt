@@ -3,9 +3,6 @@ package me.anno.remsstudio.cli
 import me.anno.Engine
 import me.anno.Time
 import me.anno.cache.Cache
-import me.anno.engine.CommandLineUtils.parseDouble
-import me.anno.engine.CommandLineUtils.parseFloat
-import me.anno.engine.CommandLineUtils.parseInt
 import me.anno.engine.Events.workEventTasks
 import me.anno.gpu.GFX
 import me.anno.gpu.framebuffer.Frame
@@ -21,6 +18,9 @@ import me.anno.io.json.saveable.JsonStringReader
 import me.anno.remsstudio.*
 import me.anno.remsstudio.gpu.ShaderLibV2
 import me.anno.remsstudio.objects.Transform
+import me.anno.utils.CommandLineUtils.parseDouble
+import me.anno.utils.CommandLineUtils.parseFloat
+import me.anno.utils.CommandLineUtils.parseInt
 import me.anno.utils.Sleep.sleepABit
 import me.anno.utils.types.Strings.getImportType
 import me.anno.utils.types.Strings.isBlank2

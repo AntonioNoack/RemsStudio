@@ -94,7 +94,7 @@ object Rendering {
         val duration = RemsStudio.targetDuration
         val tmpFile = getTmpFile(targetOutputFile)
         val fps = RemsStudio.targetFPS
-        val totalFrameCount = max(1, (fps * duration).toLong() + 1)
+        val totalFrameCount = max(1, (fps * duration).toInt() + 1)
         val sampleRate = max(1, RemsStudio.targetSampleRate)
         val samples = RemsStudio.targetSamples
         val project = project
@@ -114,7 +114,7 @@ object Rendering {
             if (audioSources.isEmpty()) targetOutputFile else tmpFile
         )
 
-        val progress = GFX.someWindow?.addProgressBar(
+        val progress = GFX.someWindow.addProgressBar(
             object : ProgressBar(
                 "Rendering", "Frames",
                 totalFrameCount.toDouble()

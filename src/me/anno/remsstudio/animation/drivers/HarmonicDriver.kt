@@ -11,7 +11,6 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.TextInput
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
-import me.anno.utils.structures.lists.CountingList
 import kotlin.math.PI
 import kotlin.math.sin
 
@@ -49,7 +48,7 @@ class HarmonicDriver : AnimationDriver() {
         for (i in 0 until maxHarmonics) {
             val n = i + 1.0
             harmonics[i] = parseDouble(
-                CountingList(prepared), mapOf(
+                ArrayList(prepared), mapOf(
                     "n" to n, "i" to n
                 )
             )?.toFloat() ?: harmonics[i]
