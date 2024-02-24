@@ -344,6 +344,7 @@ object ComponentUIV2 {
                         }
                     }
                 }
+                .setResetListener { sampleValues.defaultValue.toString() }
             is Long -> IntInputV2(title, visibilityKey, sampleValues, time, style)
                 .setChangeListener {
                     RemsStudio.incrementalChange("Set $title to $it", title) {
@@ -352,6 +353,7 @@ object ComponentUIV2 {
                         }
                     }
                 }
+                .setResetListener { sampleValues.defaultValue.toString() }
             is Float -> FloatInputV2(title, visibilityKey, sampleValues, time, style)
                 .setChangeListener {
                     RemsStudio.incrementalChange("Set $title to $it", title) {
@@ -361,6 +363,7 @@ object ComponentUIV2 {
                         }
                     }
                 }
+                .setResetListener { sampleValues.defaultValue.toString() }
             is Double -> FloatInputV2(title, visibilityKey, sampleValues, time, style)
                 .setChangeListener {
                     RemsStudio.incrementalChange("Set $title to $it", title) {
@@ -369,6 +372,7 @@ object ComponentUIV2 {
                         }
                     }
                 }
+                .setResetListener { sampleValues.defaultValue.toString() }
             is Vector2f -> FloatVectorInputV2(title, visibilityKey, sampleValues, time, style)
                 .addChangeListener { x, y, _, _, _ ->
                     RemsStudio.incrementalChange("Set $title to ($x,$y)", title) {
@@ -441,6 +445,8 @@ object ComponentUIV2 {
                         }
                     }
                 }
+                // todo reset listener for text
+                // .setResetListener { sampleValues.defaultValue.toString() }
             is Quaternionf -> FloatVectorInputV2(title, visibilityKey, sampleValues, time, style)
                 .addChangeListener { x, y, z, w, _ ->
                     RemsStudio.incrementalChange("Set $title to ($x,$y,$z,$w)", title) {

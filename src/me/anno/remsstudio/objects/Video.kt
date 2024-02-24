@@ -191,7 +191,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
     val cgOffsetSub = AnimatedProperty.color3(Vector3f())
     val cgSlope = AnimatedProperty.color(Vector4f(1f, 1f, 1f, 1f))
     val cgPower = AnimatedProperty.color(Vector4f(1f, 1f, 1f, 1f))
-    val cgSaturation = AnimatedProperty.float(1f) // only allow +? only 01?
+    val cgSaturation = AnimatedProperty.float(1f)
 
     var lastW = 16
     var lastH = 9

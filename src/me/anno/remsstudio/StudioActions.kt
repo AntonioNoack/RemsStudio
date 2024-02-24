@@ -1,6 +1,7 @@
 package me.anno.remsstudio
 
 import me.anno.Build
+import me.anno.Time
 import me.anno.engine.EngineActions
 import me.anno.engine.EngineBase
 import me.anno.engine.EngineBase.Companion.dragged
@@ -21,6 +22,7 @@ import me.anno.ui.WindowStack.Companion.printLayout
 import me.anno.utils.structures.lists.Lists.any2
 import kotlin.math.round
 
+@Suppress("MemberVisibilityCanBePrivate")
 object StudioActions {
 
     fun nextFrame() {
@@ -33,19 +35,24 @@ object StudioActions {
         RemsStudio.updateAudio()
     }
 
-    fun setEditorTimeDilation(dilation: Double, respectKeys: Boolean = true): Boolean {
-        val isInKeyInput = respectKeys && GFX.windows.any2 { w ->
-            w.windowStack.inFocus.any2 { p ->
-                p.anyInHierarchy { pi -> pi is Panel && pi.isKeyInput() }
-            }
+    private var lastTimeDilationChange = 0L
+    fun setEditorTimeDilation(dilation: Double): Boolean {
+        val currentTime = Time.lastTimeNanos
+        if (currentTime == lastTimeDilationChange) {
+            return false
         }
-        return if (dilation == RemsStudio.editorTimeDilation || isInKeyInput) false
-        else {
-            /*for (w in GFX.windows) {
-                for (panel in w.windowStack.inFocus) {
-                    panel.printLayout(0)
+        if (GFX.windows.any2 { w ->
+                w.windowStack.inFocus.any2 { p ->
+                    p.anyInHierarchy { pi ->
+                        pi is Panel && pi.isKeyInput()
+                    }
                 }
-            }*/
+            }) {
+            return false
+        }
+        return if (dilation == RemsStudio.editorTimeDilation) false
+        else {
+            lastTimeDilationChange = currentTime
             RemsStudio.editorTimeDilation = dilation
             RemsStudio.updateAudio()
             true
@@ -70,7 +77,7 @@ object StudioActions {
             "PlaySlow" to { setEditorTimeDilation(0.2) },
             "PlayReversed" to { setEditorTimeDilation(-1.0) },
             "PlayReversedSlow" to { setEditorTimeDilation(-0.2) },
-            "ToggleFullscreen" to { GFX.someWindow?.toggleFullscreen(); true },
+            "ToggleFullscreen" to { GFX.someWindow.toggleFullscreen(); true },
             "PrintLayout" to { printLayout();true },
             "NextFrame" to {
                 nextFrame()

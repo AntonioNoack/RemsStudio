@@ -59,7 +59,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
     val cgOffsetSub = AnimatedProperty.color3(Vector3f())
     val cgSlope = AnimatedProperty.color(white4)
     val cgPower = AnimatedProperty.color(white4)
-    val cgSaturation = AnimatedProperty.float(1f) // only allow +? only 01?
+    val cgSaturation = AnimatedProperty.float(1f)
 
     val bloomSize = AnimatedProperty.floatPlus(0.05f)
     val bloomIntensity = AnimatedProperty.floatPlus(0f)
