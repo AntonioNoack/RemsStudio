@@ -34,6 +34,7 @@ import kotlin.concurrent.thread
 import kotlin.math.max
 import kotlin.math.roundToInt
 
+@Suppress("MemberVisibilityCanBePrivate")
 object Rendering {
 
     var isRendering = false
@@ -136,7 +137,7 @@ object Rendering {
             // todo sometimes the "pipe fails", and that is reported as a green bar -> needs to be red (cancelled)
             //  this happens after something has been cancelled :/ -> FFMPEG not closed down?
             isRendering = false
-            progress?.finish()
+            progress.finish()
             callback()
             tmpFile.invalidate()
             targetOutputFile.invalidate()
@@ -215,7 +216,7 @@ object Rendering {
         LOGGER.info("Found ${audioSources.size} audio sources")
 
         // todo progress bar didn't show up :/, why?
-        val progress = GFX.someWindow?.addProgressBar(object :
+        val progress = GFX.someWindow.addProgressBar(object :
             ProgressBar("Audio Override", "Samples", duration * sampleRate) {
             override fun formatProgress(): String {
                 return "$name: ${progress.toLong()} / ${total.toLong()} $unit"
@@ -224,7 +225,7 @@ object Rendering {
         AudioCreatorV2(scene, findCamera(scene), audioSources, duration, sampleRate, progress).apply {
             onFinished = {
                 isRendering = false
-                progress?.finish()
+                progress.finish()
                 callback()
                 targetOutputFile.invalidate()
             }
@@ -264,11 +265,11 @@ object Rendering {
             }
         }
 
-        val progress = GFX.someWindow?.addProgressBar(createProgressBar())
+        val progress = GFX.someWindow.addProgressBar(createProgressBar())
         AudioCreatorV2(scene, findCamera(scene), audioSources, duration, sampleRate, progress).apply {
             onFinished = {
                 isRendering = false
-                progress?.finish()
+                progress.finish()
                 callback()
                 targetOutputFile.invalidate()
             }
@@ -280,7 +281,7 @@ object Rendering {
     }
 
     private fun onAlreadyRendering() {
-        val windowStack = GFX.someWindow?.windowStack ?: return
+        val windowStack = GFX.someWindow.windowStack
         msg(
             windowStack, NameDesc(
                 "Rendering already in progress!",
@@ -291,7 +292,7 @@ object Rendering {
     }
 
     private fun askOverridingIsAllowed(targetOutputFile: FileReference, callback: () -> Unit) {
-        val windowStack = GFX.someWindow!!.windowStack
+        val windowStack = GFX.someWindow.windowStack
         ask(windowStack, NameDesc("Override %1?").with("%1", targetOutputFile.name), callback)
     }
 

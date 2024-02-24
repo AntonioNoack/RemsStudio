@@ -265,7 +265,7 @@ object Scene {
         // (for low-performance devices)
         var needsTemporaryBuffer = !isFakeColorRendering
         if (needsTemporaryBuffer) {
-            val window = GFX.someWindow!!
+            val window = GFX.someWindow
             needsTemporaryBuffer = // issues are resolved: clipping was missing maybe...
                 flipY ||
                         samples > 1 ||

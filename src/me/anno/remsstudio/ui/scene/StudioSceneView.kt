@@ -264,7 +264,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
 
         val x00 = x + dx
         val y00 = y + dy
-        val window = window ?: GFX.someWindow!!.windowStack.first()
+        val window = window ?: GFX.someWindow.windowStack.first()
         val wx = min(stableSize.stableWidth, window.width - x00)
         val wy = min(stableSize.stableHeight, window.height - y00)
         val rw = min(wx, width - 2 * bt)

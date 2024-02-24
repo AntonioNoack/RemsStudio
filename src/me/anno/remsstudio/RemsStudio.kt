@@ -245,8 +245,8 @@ object RemsStudio : EngineBase("Rem's Studio", 10301, true), WelcomeUI {
     val targetTransparency get() = project?.targetTransparency ?: false
     val targetSampleRate get(): Int = project?.targetSampleRate ?: 48000
     val targetFPS get(): Double = project?.targetFPS ?: 60.0
-    val targetWidth get(): Int = project?.targetWidth ?: GFX.someWindow!!.width
-    val targetHeight get(): Int = project?.targetHeight ?: GFX.someWindow!!.height
+    val targetWidth get(): Int = project?.targetWidth ?: GFX.someWindow.width
+    val targetHeight get(): Int = project?.targetHeight ?: GFX.someWindow.height
     val targetOutputFile get(): FileReference = project!!.targetOutputFile
     val motionBlurSteps get(): AnimatedProperty<Int> = project!!.motionBlurSteps
     val targetSamples get(): Int = project?.targetSamples ?: min(GFX.maxSamples, 8)

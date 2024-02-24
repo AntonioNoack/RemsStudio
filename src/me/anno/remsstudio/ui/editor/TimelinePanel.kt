@@ -130,14 +130,14 @@ open class TimelinePanel(style: Style) : Panel(style) {
             // centralTime = max(centralTime, dtHalfLength)
         }
 
-        val movementSpeed get() = 0.05f * sqrt(GFX.someWindow!!.width * GFX.someWindow!!.height.toFloat())
+        val movementSpeed get() = 0.05f * sqrt(GFX.someWindow.width * GFX.someWindow.height.toFloat())
 
         /**
          * when changing a property, what should be the dt for snapping
          * */
         val keyframeSnappingDt
             get(): Double {
-                return if (RemsStudio.editorTimeDilation == 0.0) 10f * dtHalfLength / GFX.someWindow!!.width
+                return if (RemsStudio.editorTimeDilation == 0.0) 10f * dtHalfLength / GFX.someWindow.width
                 else 1e-6
             }
 

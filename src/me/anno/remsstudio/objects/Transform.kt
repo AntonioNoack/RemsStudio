@@ -308,8 +308,8 @@ open class Transform() : Saveable(),
 
         val ufd = usesFadingDifferently()
         if (ufd || getStartTime().isFinite()) {
-            timeGroup += vis(c, "Fade In", "Transparency at the start", c.map { it.fadeIn }, style)
-            timeGroup += vis(c, "Fade Out", "Transparency at the end", c.map { it.fadeOut }, style)
+            timeGroup += vis(c, "Fade In", "Transparency at the start, in seconds", c.map { it.fadeIn }, style)
+            timeGroup += vis(c, "Fade Out", "Transparency at the end, in seconds", c.map { it.fadeOut }, style)
         }
 
         val editorGroup = getGroup("Editor", "", "editor")

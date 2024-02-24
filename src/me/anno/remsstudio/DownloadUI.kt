@@ -379,7 +379,7 @@ object DownloadUI {
         button.addLeftClickListener {
 
             if (videoFormatUI.value == discardFormat && audioFormatUI.value == discardFormat) {
-                Menu.msg(GFX.someWindow!!.windowStack, NameDesc("Discard everything?"))
+                Menu.msg(GFX.someWindow.windowStack, NameDesc("Discard everything?"))
                 return@addLeftClickListener
             }
 

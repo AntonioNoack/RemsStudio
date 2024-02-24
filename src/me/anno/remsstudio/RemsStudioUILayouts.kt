@@ -131,7 +131,7 @@ object RemsStudioUILayouts {
         /**
          * Rendering
          * */
-        val callback: () -> Unit = { GFX.someWindow?.requestAttentionMaybe() }
+        val callback: () -> Unit = { GFX.someWindow.requestAttentionMaybe() }
         options.addAction(renderTitle, Dict["Settings", "ui.top.render.settings"]) { selectTransform(RenderSettings) }
         options.addAction(renderTitle, Dict["Set%", "ui.top.render.topPercent"]) { renderSetPercent(true, callback) }
         options.addAction(renderTitle, Dict["Full", "ui.top.render.full"]) { renderPart(1, true, callback) }

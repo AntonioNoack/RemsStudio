@@ -15,8 +15,8 @@ import me.anno.utils.Color
 class TimeControlsPanel(style: Style) : PanelListX(style) {
 
     private fun setEditorTimeDilation(speed: Double) {
-        RemsStudio.editorTimeDilation = if (RemsStudio.editorTimeDilation != speed) speed else 0.0
-        RemsStudio.updateAudio()
+        val speed1 = if (RemsStudio.editorTimeDilation == speed) 0.0 else speed
+        StudioActions.setEditorTimeDilation(speed1, true)
     }
 
     init {

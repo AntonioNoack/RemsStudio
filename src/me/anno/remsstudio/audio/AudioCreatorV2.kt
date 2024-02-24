@@ -13,7 +13,7 @@ open class AudioCreatorV2(
     val audioSources: List<Audio>,
     durationSeconds: Double,
     sampleRate: Int,
-    val progress: ProgressBar?
+    val progress: ProgressBar
 ) : AudioCreator(durationSeconds, sampleRate) {
 
     override fun hasStreams(): Boolean {
@@ -25,8 +25,8 @@ open class AudioCreatorV2(
     }
 
     override fun onStreaming(bufferIndex: Long, streamIndex: Int) {
-        progress?.progress = (bufferSize * bufferIndex).toDouble()
-        isCancelled = progress?.isCancelled ?: false
+        progress.progress = (bufferSize * bufferIndex).toDouble()
+        isCancelled = progress.isCancelled
     }
 
 }

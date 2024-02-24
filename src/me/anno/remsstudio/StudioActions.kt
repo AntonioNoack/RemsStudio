@@ -20,10 +20,13 @@ import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.ui.Panel
 import me.anno.ui.WindowStack.Companion.printLayout
 import me.anno.utils.structures.lists.Lists.any2
+import org.apache.logging.log4j.LogManager
 import kotlin.math.round
 
 @Suppress("MemberVisibilityCanBePrivate")
 object StudioActions {
+
+    private val LOGGER = LogManager.getLogger(StudioActions::class)
 
     fun nextFrame() {
         RemsStudio.editorTime = (round(RemsStudio.editorTime * RemsStudio.targetFPS) + 1) / RemsStudio.targetFPS
@@ -35,23 +38,25 @@ object StudioActions {
         RemsStudio.updateAudio()
     }
 
-    private var lastTimeDilationChange = 0L
-    fun setEditorTimeDilation(dilation: Double): Boolean {
-        val currentTime = Time.lastTimeNanos
-        if (currentTime == lastTimeDilationChange) {
-            return false
-        }
-        if (GFX.windows.any2 { w ->
-                w.windowStack.inFocus.any2 { p ->
-                    p.anyInHierarchy { pi ->
-                        pi is Panel && pi.isKeyInput()
-                    }
+    private fun isInputInFocus(): Boolean {
+        return GFX.windows.any2 { w ->
+            w.windowStack.inFocus.any2 { p ->
+                p.anyInHierarchy { pi ->
+                    pi is Panel && pi.isKeyInput()
                 }
-            }) {
+            }
+        }
+    }
+
+    private var lastTimeDilationChange = 0L
+    fun setEditorTimeDilation(dilation: Double, allowKeys: Boolean = false): Boolean {
+        val currentTime = Time.lastTimeNanos
+        if (currentTime == lastTimeDilationChange || (!allowKeys && isInputInFocus())) {
             return false
         }
         return if (dilation == RemsStudio.editorTimeDilation) false
         else {
+            LOGGER.info("Set dilation to $dilation")
             lastTimeDilationChange = currentTime
             RemsStudio.editorTimeDilation = dilation
             RemsStudio.updateAudio()
