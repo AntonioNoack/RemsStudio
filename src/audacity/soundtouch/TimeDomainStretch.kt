@@ -6,7 +6,7 @@ import kotlin.math.max
 import kotlin.math.sqrt
 
 /**
- * Class that does the time-stretch (tempo change) effect for the processed sound.
+ * Class, that does the time-stretch (tempo change) effect for the processed sound.
  * stretches auto while keeping the pitch
  * src: https://github.com/audacity/audacity/blob/cce2c7b8830a7bb651d225863b792d23f336323f/lib-src/soundtouch/source/SoundTouch/TDStretch.cpp
  * */

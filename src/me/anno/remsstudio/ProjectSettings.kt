@@ -7,6 +7,7 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
+import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.EnumInput
 
@@ -23,7 +24,7 @@ object ProjectSettings : Transform() {
     }
 
     fun createSpellcheckingPanel(style: Style): Panel {
-        val project = project!!
+        val project = project ?: return TextPanel("Project missing :/", style)
         val name = NameDesc("Language", "For Spellchecking", "")
         val values = Language.values()
         return EnumInput(name, project.language.naming, values.map { it.naming }, style)

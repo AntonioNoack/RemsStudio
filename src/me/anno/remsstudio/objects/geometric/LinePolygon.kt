@@ -45,7 +45,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
     val lineStrength = AnimatedProperty.floatPlus(1f)
     var fadingOnEnd = AnimatedProperty.floatPlus(0.1f)
 
-    var isClosed = AnimatedProperty.float01()
+    var isClosed = AnimatedProperty.float01(0f)
 
     override fun save(writer: BaseWriter) {
         super.save(writer)

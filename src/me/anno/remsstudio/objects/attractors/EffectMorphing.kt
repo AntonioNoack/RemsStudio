@@ -15,8 +15,8 @@ class EffectMorphing : Transform() {
     var lastInfluence = 0f
 
     val zooming = AnimatedProperty.float(1f)
-    val chromatic = AnimatedProperty.float()
-    val swirlStrength = AnimatedProperty.float()
+    val chromatic = AnimatedProperty.float(0f)
+    val swirlStrength = AnimatedProperty.float(0f)
     val swirlPower = AnimatedProperty.float(1f)
     val sharpness = AnimatedProperty.float(20f)
 

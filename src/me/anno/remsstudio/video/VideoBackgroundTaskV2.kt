@@ -17,7 +17,7 @@ class VideoBackgroundTaskV2(
     val camera: Camera,
     val motionBlurSteps: AnimatedProperty<Int>,
     val shutterPercentage: AnimatedProperty<Float>,
-    val progressBar: ProgressBar?
+    val progressBar: ProgressBar
 ) : VideoBackgroundTask(video, samples) {
 
     override fun getMotionBlurSteps(time: Double): Int {
@@ -29,8 +29,8 @@ class VideoBackgroundTaskV2(
     }
 
     override fun renderScene(time: Double, flipY: Boolean, renderer: Renderer) {
-        isCancelled = progressBar?.isCancelled ?: false
-        progressBar?.progress = min(time * creator.fps, progressBar!!.total * 0.999999)
+        isCancelled = progressBar.isCancelled
+        progressBar.progress = min(time * creator.fps, progressBar.total * 0.999999)
         Scene.draw(
             camera, scene, 0, 0, creator.width, creator.height, time,
             true, renderer, null

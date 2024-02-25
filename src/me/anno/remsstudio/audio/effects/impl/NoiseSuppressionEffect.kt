@@ -22,13 +22,14 @@ import org.apache.logging.log4j.LogManager
 import kotlin.concurrent.thread
 import kotlin.math.sqrt
 
+@Suppress("MemberVisibilityCanBePrivate")
 class NoiseSuppressionEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
 
     companion object {
         private val LOGGER = LogManager.getLogger(NoiseSuppressionEffect::class)
     }
 
-    private val noiseLevel = AnimatedProperty.floatPlus() // maybe should be in dB...
+    val noiseLevel = AnimatedProperty.floatPlus(0f) // maybe should be in dB...
 
     override fun getStateAsImmutableKey(source: Audio, destination: Camera, time0: Time, time1: Time): Any {
         return noiseLevel.toString()

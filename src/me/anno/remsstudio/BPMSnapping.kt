@@ -18,8 +18,7 @@ object BPMSnapping : Transform() {
         style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-
-        val project = RemsStudio.project!!
+        val project = RemsStudio.project ?: return
         list += TextPanel(
             "Snaps times of keyframes to every nth-repetition of your set BPM.\n" +
                     "Setting 0 disables snapping.",

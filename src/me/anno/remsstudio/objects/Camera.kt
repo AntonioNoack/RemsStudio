@@ -5,7 +5,6 @@ import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.Perspective.perspective2
 import me.anno.gpu.pipeline.Sorting
-import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
@@ -22,7 +21,6 @@ import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.NumberType
-import me.anno.utils.Color.white4
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.pooling.JomlPools
 import me.anno.utils.types.Casting.castToFloat2
@@ -44,21 +42,21 @@ class Camera(parent: Transform? = null) : Transform(parent) {
     val nearZ = AnimatedProperty.floatPlus(0.001f)
     val farZ = AnimatedProperty.floatPlus(1000f)
     val fovYDegrees = AnimatedProperty(fovType, 90f)
-    val chromaticAberration = AnimatedProperty.floatPlus()
-    val chromaticOffset = AnimatedProperty.vec2()
-    val chromaticAngle = AnimatedProperty.float()
-    val distortion = AnimatedProperty.vec3()
-    val distortionOffset = AnimatedProperty.vec2()
-    val orthographicness = AnimatedProperty.float01()
-    val vignetteStrength = AnimatedProperty.floatPlus()
+    val chromaticAberration = AnimatedProperty.floatPlus(0f)
+    val chromaticOffset = AnimatedProperty.vec2(Vector2f(0f))
+    val chromaticAngle = AnimatedProperty.float(0f)
+    val distortion = AnimatedProperty.vec3(Vector3f(0f))
+    val distortionOffset = AnimatedProperty.vec2(Vector2f(0f))
+    val orthographicness = AnimatedProperty.float01(0f)
+    val vignetteStrength = AnimatedProperty.floatPlus(0f)
     val vignetteColor = AnimatedProperty.color3(Vector3f(0f, 0f, 0f))
 
     val orbitRadius = AnimatedProperty.floatPlus(1f)
 
     val cgOffsetAdd = AnimatedProperty.color3(Vector3f())
     val cgOffsetSub = AnimatedProperty.color3(Vector3f())
-    val cgSlope = AnimatedProperty.color(white4)
-    val cgPower = AnimatedProperty.color(white4)
+    val cgSlope = AnimatedProperty.color(Vector4f(1f))
+    val cgPower = AnimatedProperty.color(Vector4f(1f))
     val cgSaturation = AnimatedProperty.float(1f)
 
     val bloomSize = AnimatedProperty.floatPlus(0.05f)
@@ -311,7 +309,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
     }
 
     override fun setProperty(name: String, value: Any?) {
-        when(name){
+        when (name) {
             "onlyShowTarget" -> onlyShowTarget = value == true
             "useDepth" -> useDepth = value == true
             "orbitRadius" -> orbitRadius.copyFrom(value)
@@ -336,7 +334,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
             "backgroundColor" -> backgroundColor.copyFrom(value)
             "lut" -> lut = (value as? String)?.toGlobalFile() ?: (value as? FileReference) ?: InvalidRef
             "toneMapping" -> toneMapping = ToneMappers.entries.firstOrNull { it.id == value } ?: toneMapping
-            else ->super.setProperty(name, value)
+            else -> super.setProperty(name, value)
         }
     }
 

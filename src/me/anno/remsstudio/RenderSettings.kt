@@ -1,6 +1,7 @@
 package me.anno.remsstudio
 
 import me.anno.config.DefaultConfig
+import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.GFX
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.NameDesc
@@ -19,7 +20,6 @@ import me.anno.remsstudio.Rendering.renderPart
 import me.anno.remsstudio.Rendering.renderSetPercent
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.ui.scene.StudioSceneView
-import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
@@ -45,7 +45,7 @@ object RenderSettings : Transform() {
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
 
-        val project = project!!
+        val project = project ?: throw IllegalStateException("Missing project")
         list += TextPanel(defaultDisplayName, style)
             .apply { focusTextColor = textColor }
         list += vi(
@@ -97,7 +97,13 @@ object RenderSettings : Transform() {
             }
             .setTooltip("The fps of the video, or how many frame are shown per second")
 
-        list += IntInput("Video Quality", "VideoQuality", project.targetVideoQuality, NumberType.VIDEO_QUALITY_CRF, style)
+        list += IntInput(
+            "Video Quality",
+            "VideoQuality",
+            project.targetVideoQuality,
+            NumberType.VIDEO_QUALITY_CRF,
+            style
+        )
             .setChangeListener {
                 project.targetVideoQuality = it.toInt()
                 save()

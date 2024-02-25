@@ -95,8 +95,8 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
             super.getVisualState(),
             if ((isHovered && mouseKeysDown.isNotEmpty()) || isPlaying) visualStateCtr++
             else if (isHovered) {
-                val window = window!!
-                getTransformAt(window.mouseX, window.mouseY)
+                val window = window
+                if (window != null) getTransformAt(window.mouseX, window.mouseY) else null
             } else null
         )
 

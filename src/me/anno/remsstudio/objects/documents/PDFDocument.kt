@@ -53,7 +53,7 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
 
     var selectedSites = ""
 
-    var padding = AnimatedProperty.float()
+    var padding = AnimatedProperty.float(0f)
 
     var direction = AnimatedProperty.rotY()
 

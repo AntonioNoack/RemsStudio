@@ -34,7 +34,7 @@ class RegularList(parent: Transform? = null) : GFXTransform(parent) {
     val perChildRotation = AnimatedProperty.rotYXZ()
     val perChildScale = AnimatedProperty.scale()
     val perChildSkew = AnimatedProperty.skew()
-    var perChildDelay = AnimatedProperty.double()
+    var perChildDelay = AnimatedProperty.double(0.0)
 
     // val perChildTimeDilation = FloatArray(MAX_ARRAY_DIMENSION) // useful?, power vs linear
 
@@ -43,7 +43,7 @@ class RegularList(parent: Transform? = null) : GFXTransform(parent) {
     override val symbol get() = DefaultConfig["ui.symbol.array", "[[["]
 
     val instanceCount = AnimatedProperty.intPlus(10)
-    var selectionSeed = AnimatedProperty.long()
+    var selectionSeed = AnimatedProperty.long(0)
     var selectionMode = ArraySelectionMode.ROUND_ROBIN
 
     override fun acceptsWeight(): Boolean = true

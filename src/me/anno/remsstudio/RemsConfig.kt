@@ -19,6 +19,7 @@ import me.anno.utils.Clock
 import me.anno.utils.OS
 import org.joml.Vector3f
 
+@Suppress("MemberVisibilityCanBePrivate")
 object RemsConfig {
 
     fun init() {

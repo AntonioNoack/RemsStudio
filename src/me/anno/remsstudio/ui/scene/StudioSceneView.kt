@@ -67,15 +67,11 @@ import kotlin.math.tan
 
 // todo disable ui circles via some check-button at the top bar
 
-// todo control click -> fullscreen view of this element?
-
-// todo right click on input to get context menu, e.g. to reset
-
 // todo key controls like in Blender:
-// start command with s/g/...
-// then specify axis if needed
-// then say the number + change axis
-// then press enter to apply the change
+//  start command with s/g/...
+//  then specify axis if needed
+//  then say the number + change axis
+//  then press enter to apply the change
 
 @Suppress("MemberVisibilityCanBePrivate")
 open class StudioSceneView(style: Style) : PanelList(null, style.getChild("sceneView")), ISceneView {
@@ -408,19 +404,20 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
 
         // todo rotate/move our camera or the selected object?
         val size = -20f * shiftSlowdown / window!!.height
+        val touches = touches.values.toList()
         when (touches.size) {
             2 -> {
-                val first = touches[0]!!
+                val first = touches[0]
                 if (contains(first.x, first.y)) {
                     // this gesture started on this view -> this is our gesture
                     // rotating is the hardest on a touchpad, because we need to click right
                     // -> rotation
                     // axes: angle, zoom,
-                    val dx = touches.values.sumOf { (it.x - it.lastX).toDouble() }.toFloat() * size * 0.5f
-                    val dy = touches.values.sumOf { (it.y - it.lastY).toDouble() }.toFloat() * size * 0.5f
+                    val dx = touches.sumOf { (it.x - it.lastX).toDouble() }.toFloat() * size * 0.5f
+                    val dy = touches.sumOf { (it.y - it.lastY).toDouble() }.toFloat() * size * 0.5f
 
-                    val t0 = touches[0]!!
-                    val t1 = touches[1]!!
+                    val t0 = touches[0]
+                    val t1 = touches[1]
 
                     val d1 = length(t1.x - t0.x, t1.y - t0.y)
                     val d0 = length(t1.lastX - t0.lastX, t1.lastY - t0.lastY)
@@ -448,7 +445,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     } else {
                         // move camera? completely ignore, what is selected
                     }
-                    touches.forEach { it.value.update() }
+                    touches.forEach { it.update() }
                     invalidateDrawing()
                 }
             }
@@ -456,14 +453,14 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             3 -> {
                 // very slow..., but we can move around with a single finger, so it shouldn't matter...
                 // move the camera around
-                val first = touches.values.first()
+                val first = touches.first()
                 val speed = 10f / 3f
                 if (contains(first.x, first.y)) {
-                    val dx = speed * touches.values.sumOf { (it.x - it.lastX).toDouble() }.toFloat() * size
-                    val dy = speed * touches.values.sumOf { (it.y - it.lastY).toDouble() }.toFloat() * size
+                    val dx = speed * touches.sumOf { (it.x - it.lastX).toDouble() }.toFloat() * size
+                    val dy = speed * touches.sumOf { (it.y - it.lastY).toDouble() }.toFloat() * size
                     moveSelected(camera, dx, dy)
                     for (touch in touches) {
-                        touch.value.update()
+                        touch.update()
                     }
                     invalidateDrawing()
                 }
@@ -671,7 +668,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             return
         }
         // move the camera
-        val window = window!!
+        val window = window ?: return
         val turnSpeed = DefaultConfig["ui.editor.turnSpeed", -400f] * shiftSlowdown / max(window.width, window.height)
         val dx0 = dx * turnSpeed
         val dy0 = dy * turnSpeed

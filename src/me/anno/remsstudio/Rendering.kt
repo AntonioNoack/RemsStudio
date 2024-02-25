@@ -52,7 +52,7 @@ object Rendering {
     }
 
     fun renderSetPercent(ask: Boolean, callback: () -> Unit) {
-        val project = project!!
+        val project = project ?: throw IllegalStateException("Missing project")
         renderVideo(
             max(div, (project.targetWidth * project.targetSizePercentage / 100).roundToInt()),
             max(div, (project.targetHeight * project.targetSizePercentage / 100).roundToInt()),

@@ -122,7 +122,8 @@ class SceneTab(var file: FileReference, var scene: Transform, history: History?)
             // todo replace /,\?,..
             name = name.toAllowedFilename() ?: ""
             if (name.isEmpty()) {
-                val dst = project!!.scenes.getChild( name)
+                val project = project ?: throw IllegalStateException("Missing project")
+                val dst = project.scenes.getChild( name)
                 if (dst.exists) {
                     ask(
                         windowStack,

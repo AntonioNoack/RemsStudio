@@ -54,8 +54,8 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
      * nice effects can be created with values outside of [0,1], so while [0,1] is the valid range,
      * numbers outside [0,1] give artists more control
      * */
-    private val useMaskColor = AnimatedProperty.float()
-    private val blurThreshold = AnimatedProperty.float()
+    private val useMaskColor = AnimatedProperty.float(0f)
+    private val blurThreshold = AnimatedProperty.float(0f)
     private val effectOffset = AnimatedProperty.pos2D()
 
     // transition mask???... idk... when would you try to blur between stuff, and can't do it on a normal transform object?

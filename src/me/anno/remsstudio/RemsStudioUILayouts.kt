@@ -221,7 +221,7 @@ object RemsStudioUILayouts {
         ui += SceneTabs
         ui += SpacerPanel(0, 1, style)
 
-        val project = project!!
+        val project = project ?: throw IllegalStateException("Missing project")
         if (loadUI) project.loadInitialUI()
 
         ui += project.mainUI

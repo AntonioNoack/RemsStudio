@@ -9,7 +9,7 @@ fun main() {
 
     val logger = LogManager.getLogger("TestIntegral")
 
-    val line = AnimatedProperty.float()
+    val line = AnimatedProperty.float(0f)
     line.isAnimated = true
     line.addKeyframe(0.0, 1f)
     line.addKeyframe(1.0, 2f)
@@ -19,7 +19,7 @@ fun main() {
         logger.info(line.getIntegral(time, false))
     }
 
-    val ap = AnimatedProperty.float()
+    val ap = AnimatedProperty.float(0f)
     ap.isAnimated = true
     ap.addKeyframe(0.0, 0.0)
     ap.addKeyframe(10.0, 10.0)

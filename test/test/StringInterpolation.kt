@@ -38,7 +38,7 @@ fun test(a: String, b: String, c: String, d: String, t: Double, expected: String
 
 fun test(a: Double, b: Double, c: Double, d: Double, t: Double, expected: Double){
     val logger = LogManager.getLogger("StringTest")
-    val p = AnimatedProperty.double()
+    val p = AnimatedProperty.double(0.0)
     p.isAnimated = true
     val int = Interpolation.LINEAR_BOUNDED
     p.addKeyframe(0.0, a)?.interpolation = int

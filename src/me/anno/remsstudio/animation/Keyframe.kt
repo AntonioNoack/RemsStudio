@@ -41,7 +41,7 @@ class Keyframe<V>(var time: Double, var value: V, var interpolation: Interpolati
     }
 
     fun getChannelAsFloat(index: Int): Float {
-        return AnyToFloat.getFloat(value!!, index, 0f)
+        return AnyToFloat.getFloat(value, index, 0f)
     }
 
     @Suppress("useless_cast")

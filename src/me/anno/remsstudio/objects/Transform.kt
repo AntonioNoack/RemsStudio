@@ -93,8 +93,8 @@ open class Transform() : Saveable(),
     var rotationYXZ = AnimatedProperty.rotYXZ()
 
     var skew = AnimatedProperty.skew()
-    var alignWithCamera = AnimatedProperty.float01()
-    var color = AnimatedProperty.color()
+    var alignWithCamera = AnimatedProperty.float01(0f)
+    var color = AnimatedProperty.color(Vector4f(1f))
     var colorMultiplier = AnimatedProperty.floatPlus(1f)
 
     val fadeIn = AnimatedProperty.floatPlus(0.1f)
@@ -108,7 +108,7 @@ open class Transform() : Saveable(),
     var timeOffset = ValueWithDefault(0.0)
     var timeDilation = ValueWithDefault(1.0)
 
-    var timeAnimated = AnimatedProperty.double()
+    var timeAnimated = AnimatedProperty.double(0.0)
 
     // update this value before drawing everything
     override var indexInParent = 0

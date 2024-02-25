@@ -46,7 +46,7 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
 
     var is3D = false
     var vertexCount = AnimatedProperty.intPlus(5)
-    var starNess = AnimatedProperty.float01()
+    var starNess = AnimatedProperty.float01(0f)
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val inset = clamp(starNess[time], 0f, 1f)

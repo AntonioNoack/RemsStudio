@@ -1,11 +1,11 @@
 package me.anno.remsstudio
 
+import me.anno.engine.inspector.Inspectable
 import me.anno.io.Saveable
 import me.anno.io.find.PropertyFinder
 import me.anno.remsstudio.RemsStudio.root
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
-import me.anno.engine.inspector.Inspectable
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.utils.structures.maps.BiMap
 import org.apache.logging.log4j.LogManager
@@ -170,10 +170,11 @@ object Selection {
     private const val specialIdOffset = 1_000_000_000
     private val specialIds = BiMap<Transform, Int>(32)
     private fun getSpecialUUID(t: Transform): Int {
-        if (t in specialIds) return specialIds[t]!!
-        val id = specialIds.size + specialIdOffset
-        specialIds[t] = id
-        return id
+        val givenId = specialIds[t]
+        if (givenId != null) return givenId
+        val newId = specialIds.size + specialIdOffset
+        specialIds[t] = newId
+        return newId
     }
 
 }

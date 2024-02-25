@@ -18,7 +18,7 @@ import org.joml.Vector4f
 
 open class Circle(parent: Transform? = null) : GFXTransform(parent) {
 
-    val innerRadius = AnimatedProperty.float01()
+    val innerRadius = AnimatedProperty.float01(0f)
     val startDegrees = AnimatedProperty(NumberType.ANGLE, 0f)
     val endDegrees = AnimatedProperty(NumberType.ANGLE, 360f)
 

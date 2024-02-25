@@ -10,7 +10,7 @@ fun main() {
 
     val logger = LogManager.getLogger("KeyframeTime")
 
-    val prop = AnimatedProperty.float()
+    val prop = AnimatedProperty.float(0f)
     prop.isAnimated = true
     prop.addKeyframe(1.0, 1f)
     prop.addKeyframe(2.0, 2f)

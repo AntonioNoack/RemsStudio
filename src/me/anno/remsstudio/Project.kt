@@ -31,7 +31,9 @@ import me.anno.ui.Panel
 import me.anno.ui.custom.CustomContainer
 import me.anno.ui.custom.CustomList
 import me.anno.ui.input.NumberType
+import me.anno.utils.types.AnyToFloat
 import me.anno.utils.types.Casting.castToFloat
+import me.anno.utils.types.Casting.castToFloat2
 import me.anno.video.ffmpeg.FFMPEGEncodingBalance
 import me.anno.video.ffmpeg.FFMPEGEncodingType
 import org.apache.logging.log4j.LogManager
@@ -184,7 +186,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
                         notFound += type
                         return null
                     }
-                    val weight = castToFloat(arr[1]!!) ?: 1f
+                    val weight = AnyToFloat.getFloat(arr[1], 1f)
                     if (obj is CustomList) {
                         for (i in 2 until arr.size) {
                             obj.add(load(arr[i] as? List<*>) ?: continue)

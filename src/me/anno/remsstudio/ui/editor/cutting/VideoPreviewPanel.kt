@@ -28,7 +28,7 @@ class VideoPreviewPanel(
 
     override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
         val meta = video.meta ?: return
-        val window = window!!
+        val window = window ?: return
         val time = getTime(window.mouseX)
         val frame = video.getFrameAtLocalTime(time, width1, meta)
         if (frame != null) {

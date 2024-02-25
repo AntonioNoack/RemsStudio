@@ -46,7 +46,7 @@ object SceneTabs : ScrollPanelX(DefaultConfig.style) {
     override fun onPaste(x: Float, y: Float, data: String, type: String) {
         when (type) {
             "SceneTab" -> {
-                val tab = dragged!!.getOriginal() as SceneTab
+                val tab = dragged?.getOriginal() as? SceneTab ?: return
                 if (!tab.contains(x, y)) {
                     val oldIndex = tab.indexInParent
                     val newIndex = panelChildren.map { it.x + it.width / 2 }.count { it < x }

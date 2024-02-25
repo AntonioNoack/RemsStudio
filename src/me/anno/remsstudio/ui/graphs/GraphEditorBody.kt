@@ -290,11 +290,11 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
                 val alpha = if (i.isChannelActive(activeChannels)) 0.3f else 0.1f
                 valueColors[i] = valueColors[i].withAlpha(alpha)
             }
-            var v0 = property[global2Kf(getTimeAt(x0 + 0f))]!!
+            var v0 = property[global2Kf(getTimeAt(x0 + 0f))]
             for (x in x0 until x1) {
                 val xf0 = x.toFloat()
                 val xf1 = xf0 + 1f
-                val v1 = property[global2Kf(getTimeAt(xf1))]!!
+                val v1 = property[global2Kf(getTimeAt(xf1))]
                 for (i in 0 until channelCount) {
                     val vy0 = getYAt(getFloat(v0, i, 0f)).toFloat()
                     val vy1 = getYAt(getFloat(v1, i, 0f)).toFloat()
@@ -314,7 +314,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
             }
             DrawCurves.lineBatch.finish(batch)
         } else {
-            val value = property.defaultValue!!
+            val value = property.defaultValue
             for (i in 0 until channelCount) {
                 val y = getYAt(getFloat(value, i, 0f)).toFloat()
                 drawSmoothLine(
@@ -683,7 +683,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
             val time = global2Kf(getTimeAt(x))
             RemsStudio.largeChange("Created keyframe at ${time}s") {
                 selectedProperty.isAnimated = true
-                selectedProperty.addKeyframe(time, selectedProperty[time]!!, keyframeSnappingDt)
+                selectedProperty.addKeyframe(time, selectedProperty[time], keyframeSnappingDt)
                 selectedProperty.checkIsAnimated()
             }
         } else LOGGER.info("Please select a property first!")
@@ -708,7 +708,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
             if (parsedKeyframes.isNotEmpty()) {
                 RemsStudio.largeChange("Pasted Keyframes") {
                     for (kf in parsedKeyframes) {
-                        val castValue = targetType.acceptOrNull(kf.value!!)
+                        val castValue = targetType.acceptOrNull(kf.value)
                         if (castValue != null) {
                             target.addKeyframe(kf.time + time0, castValue)
                         } else LOGGER.warn("$targetType doesn't accept ${kf.value}")

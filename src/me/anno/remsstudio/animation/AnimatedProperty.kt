@@ -22,6 +22,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
+@Suppress("MemberVisibilityCanBePrivate")
 class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable() {
 
     @Suppress("UNCHECKED_CAST")
@@ -34,43 +35,26 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
         private val LOGGER = LogManager.getLogger(AnimatedProperty::class)
 
         fun any() = AnimatedProperty<Any>(NumberType.ANY)
-        fun int() = AnimatedProperty<Int>(NumberType.INT)
         fun int(defaultValue: Int) = AnimatedProperty(NumberType.INT, defaultValue)
-        fun intPlus() = AnimatedProperty<Int>(NumberType.INT_PLUS)
         fun intPlus(defaultValue: Int) = AnimatedProperty(NumberType.INT_PLUS, defaultValue)
-        fun long() = AnimatedProperty<Long>(NumberType.LONG)
-        fun float() = AnimatedProperty<Float>(NumberType.FLOAT)
+        fun long(defaultValue: Long) = AnimatedProperty(NumberType.LONG, defaultValue)
         fun float(defaultValue: Float) = AnimatedProperty(NumberType.FLOAT, defaultValue)
-        fun floatPlus() = AnimatedProperty<Float>(NumberType.FLOAT_PLUS)
         fun floatPlus(defaultValue: Float) = AnimatedProperty(NumberType.FLOAT_PLUS, defaultValue)
-        fun floatPlusExp() = AnimatedProperty<Float>(NumberType.FLOAT_PLUS_EXP)
-        fun floatPlusExp(defaultValue: Float) = AnimatedProperty(NumberType.FLOAT_PLUS_EXP, defaultValue)
-        fun float01() = AnimatedProperty<Float>(NumberType.FLOAT_01)
         fun float01(defaultValue: Float) = AnimatedProperty(NumberType.FLOAT_01, defaultValue)
         fun float01exp(defaultValue: Float) = AnimatedProperty(NumberType.FLOAT_01_EXP, defaultValue)
-        fun floatPercent() = AnimatedProperty<Float>(NumberType.FLOAT_PERCENT)
-        fun double() = AnimatedProperty<Double>(NumberType.DOUBLE)
         fun double(defaultValue: Double) = AnimatedProperty(NumberType.DOUBLE, defaultValue)
-        fun vec2() = AnimatedProperty<Vector2f>(NumberType.VEC2)
         fun vec2(defaultValue: Vector2f) = AnimatedProperty(NumberType.VEC2, defaultValue)
-        fun vec3() = AnimatedProperty(NumberType.VEC3, black3)
-        fun dir3() = vec3(Vector3f(0f, 1f, 0f))
         fun vec3(defaultValue: Vector3f) = AnimatedProperty(NumberType.VEC3, defaultValue)
-        fun vec4() = AnimatedProperty<Vector4f>(NumberType.VEC4)
         fun vec4(defaultValue: Vector4f) = AnimatedProperty(NumberType.VEC4, defaultValue)
         fun pos() = AnimatedProperty<Vector3f>(NumberType.POSITION)
         fun pos(defaultValue: Vector3f) = AnimatedProperty(NumberType.POSITION, defaultValue)
         fun pos2D() = AnimatedProperty<Vector2f>(NumberType.POSITION_2D)
         fun rotYXZ() = AnimatedProperty<Vector3f>(NumberType.ROT_YXZ)
         fun rotY() = AnimatedProperty<Float>(NumberType.ROT_Y)
-        fun rotXZ() = AnimatedProperty<Vector2f>(NumberType.ROT_XZ)
         fun scale() = AnimatedProperty<Vector3f>(NumberType.SCALE)
         fun scale(defaultValue: Vector3f) = AnimatedProperty(NumberType.SCALE, defaultValue)
-        fun color() = AnimatedProperty<Vector4f>(NumberType.COLOR)
         fun color(defaultValue: Vector4f) = AnimatedProperty(NumberType.COLOR, defaultValue)
-        fun color3() = AnimatedProperty<Vector3f>(NumberType.COLOR3)
         fun color3(defaultValue: Vector3f) = AnimatedProperty(NumberType.COLOR3, defaultValue)
-        fun quat() = AnimatedProperty<Quaternionf>(NumberType.QUATERNION)
         fun skew() = AnimatedProperty<Vector2f>(NumberType.SKEW_2D)
         fun tiling() = AnimatedProperty<Vector4f>(NumberType.TILING)
 
@@ -89,7 +73,7 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
 
     fun ensureCorrectType(v: Any?): V {
         @Suppress("UNCHECKED_CAST")
-        return type.acceptOrNull(v!!) as V ?: throw RuntimeException("got $v for $type")
+        return type.acceptOrNull(v) as V ?: throw RuntimeException("got $v for $type")
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -111,7 +95,7 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
     fun addKeyframe(time: Double, value: Any) =
         addKeyframe(time, value, 0.001)
 
-    fun addKeyframe(time: Double, value: Any, equalityDt: Double): Keyframe<V>? {
+    fun addKeyframe(time: Double, value: Any?, equalityDt: Double): Keyframe<V>? {
         val value2 = type.acceptOrNull(value)
         return if (value2 != null) {
             @Suppress("UNCHECKED_CAST")
@@ -198,6 +182,7 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
     fun getAnimatedValue(time: Double, dst: V? = null): V {
         synchronized(this) {
             val size = keyframes.size
+            @Suppress("UNCHECKED_CAST")
             return when {
                 size == 0 -> return when (val v = defaultValue) {
                     is Vector2f -> AnimationMaths.v2(dst).set(v) as V
@@ -250,7 +235,7 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
         }
     }
 
-    operator fun get(time: Double, dst: V? = null) = getValueAt(time, dst)
+    operator fun get(time: Double, dst: V? = null): V = getValueAt(time, dst)
 
     fun getValueAt(time: Double, dst: Any? = null): V {
         val hasDrivers = drivers.any { it != null }
@@ -362,7 +347,7 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
             "driver3" -> setDriver(3, value as? AnimationDriver ?: return)
             "keyframes", "vs" -> {
                 if (value is Keyframe<*>) {
-                    val castValue = type.acceptOrNull(value.value!!)
+                    val castValue = type.acceptOrNull(value.value)
                     if (castValue != null) {
                         @Suppress("UNCHECKED_CAST")
                         addKeyframe(value.time, clamp(castValue as V) as Any, 0.0)?.apply {
@@ -371,7 +356,7 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
                     } else LOGGER.warn("Dropped keyframe!, incompatible type ${value.value} for $type")
                 } else if (value is Array<*>) {
                     for (vi in value.filterIsInstance<Keyframe<*>>()) {
-                        val castValue = type.acceptOrNull(vi.value!!)
+                        val castValue = type.acceptOrNull(vi.value)
                         if (castValue != null) {
                             @Suppress("UNCHECKED_CAST")
                             addKeyframe(vi.time, clamp(castValue as V) as Any, 0.0)?.apply {

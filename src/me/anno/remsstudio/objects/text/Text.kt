@@ -60,7 +60,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
 
     override fun getDocumentationURL() = "https://remsstudio.phychi.com/?s=learn/text"
 
-    val backgroundColor = AnimatedProperty.color()
+    val backgroundColor = AnimatedProperty.color(Vector4f(0f))
 
     var text = AnimatedProperty.string()
 
@@ -71,12 +71,12 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
     var blockAlignmentX = AnimatedProperty.alignment()
     var blockAlignmentY = AnimatedProperty.alignment()
 
-    val outlineColor0 = AnimatedProperty.color()
+    val outlineColor0 = AnimatedProperty.color(Vector4f(0f))
     val outlineColor1 = AnimatedProperty.color(Vector4f(0f))
     val outlineColor2 = AnimatedProperty.color(Vector4f(0f))
     val outlineWidths = AnimatedProperty.vec4(Vector4f(0f, 1f, 1f, 1f))
     val outlineSmoothness = AnimatedProperty(NumberType.VEC4_PLUS, Vector4f(0f))
-    var outlineDepth = AnimatedProperty.float()
+    var outlineDepth = AnimatedProperty.float(0f)
 
     val shadowColor = AnimatedProperty.color(Vector4f(0f))
     val shadowOffset = AnimatedProperty.pos(Vector3f(0f, 0f, -0.1f))
