@@ -3,7 +3,6 @@ package me.anno.remsstudio.objects.text
 import me.anno.cache.CacheData
 import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
-import me.anno.fonts.AWTFont
 import me.anno.fonts.Font
 import me.anno.fonts.FontManager
 import me.anno.fonts.FontManager.TextCache
@@ -12,6 +11,7 @@ import me.anno.fonts.mesh.TextMesh.Companion.DEFAULT_LINE_HEIGHT
 import me.anno.fonts.mesh.TextMeshGroup
 import me.anno.fonts.signeddistfields.TextSDFGroup
 import me.anno.io.base.BaseWriter
+import me.anno.jvm.fonts.AWTFont
 import me.anno.language.translation.Dict
 import me.anno.maths.Maths.mix
 import me.anno.remsstudio.animation.AnimatedProperty
@@ -27,12 +27,10 @@ import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.NumberType
-import me.anno.utils.structures.tuples.Quad
 import me.anno.utils.types.Strings.smallCaps
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
-import java.net.URL
 import kotlin.streams.toList
 
 // todo background "color" in the shape of a plane? for selections and such
@@ -134,16 +132,32 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
         return awtFont.splitParts(text2, font.size, relativeTabSize, relativeCharSpacing, absoluteLineBreakWidth, -1f)
     }
 
+    data class VisState(
+        val rm: TextRenderMode,
+        val rsdf: Boolean,
+        val cs: Float,
+        val text: String,
+        val font: Font,
+        val sc: Boolean,
+        val lbw: Float,
+        val rts: Float
+    )
+
     fun getVisualState(text: String): Any =
-        Quad(
+        VisState(
             renderingMode, roundSDFCorners, charSpacing,
-            Quad(text, font, smallCaps, Pair(lineBreakWidth, relativeTabSize))
+            text, font, smallCaps, lineBreakWidth, relativeTabSize
         )
 
     private val shallLoadAsync get() = !forceVariableBuffer
     fun getTextMesh(key: TextSegmentKey): TextMeshGroup? {
         return TextCache.getEntry(key, textMeshTimeout, shallLoadAsync) { keyInstance ->
-            TextMeshGroup((keyInstance.font as AWTFont).font, keyInstance.text, keyInstance.charSpacing, forceVariableBuffer)
+            TextMeshGroup(
+                (keyInstance.font as AWTFont).font,
+                keyInstance.text,
+                keyInstance.charSpacing,
+                forceVariableBuffer
+            )
         } as? TextMeshGroup
     }
 

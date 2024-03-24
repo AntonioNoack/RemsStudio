@@ -91,7 +91,7 @@ class AudioStreamRaw2(
             val sv = soundBuffer.value as SoundBuffer
             lastSoundBuffer = sv
             lastSliceIndex = sliceIndex
-            lastChannels = if (sv.format == AL10.AL_FORMAT_MONO16) 1 else 2 // meh...
+            lastChannels = if (sv.isStereo) 2 else 1
             sv
         }
 

@@ -5,14 +5,13 @@ import me.anno.fonts.FontManager
 import me.anno.fonts.FontManager.TextCache
 import me.anno.fonts.PartResult
 import me.anno.fonts.mesh.TextMesh
-import me.anno.fonts.mesh.TextMeshGroup
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.remsstudio.objects.TextSegmentKey
 import me.anno.remsstudio.objects.text.Text
 import me.anno.engine.inspector.Inspectable
-import me.anno.fonts.AWTFont
+import me.anno.jvm.fonts.AWTFont
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -105,7 +104,7 @@ class TextParticles : ParticleSystem() {
                     val lineDeltaY = dy + part.yPos * scaleY * lineOffset
 
                     val key = keys[partIndex]
-                    val textMesh = getTextMesh(key)!! as TextMeshGroup
+                    val textMesh = getTextMesh(key)!!
 
                     val di = index - startIndex
                     val xOffset = (textMesh.offsets[di] + textMesh.offsets[di + 1]).toFloat() * 0.5f

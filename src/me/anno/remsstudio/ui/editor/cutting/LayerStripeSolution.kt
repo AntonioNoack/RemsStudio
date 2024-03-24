@@ -11,7 +11,7 @@ import me.anno.io.MediaMetadata
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.max
 import me.anno.maths.Maths.nonNegativeModulo
-import me.anno.remsstudio.RemsStudio.nullCamera
+import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.audio.AudioFXCache2
 import me.anno.remsstudio.audio.AudioFXCache2.SPLITS
 import me.anno.remsstudio.objects.Transform
@@ -181,8 +181,7 @@ class LayerStripeSolution(
                     // todo get auto levels for pixels, which equal ranges of audio frames -> min, max, avg?, with weight?
                     val identifier = audio.toString()
 
-                    // todo get used camera instead of nullCamera
-                    val camera = nullCamera!!
+                    val camera = RemsStudio.currentCamera
 
                     val color = if (hasVideo) 0xaa777777.toInt() else 0xff777777.toInt()
                     val mix = 0.5f
@@ -270,9 +269,6 @@ class LayerStripeSolution(
 
     private fun getCenterX(x0: Int, frameOffset: Int, frameWidth: Int) =
         x0 - nonNegativeModulo(x0 - frameOffset, frameWidth) + frameWidth / 2
-
-    // todo bug: it's invisible, if video is not loaded
-    // todo bug: when clicked, it changes the frames shortly
 
     private fun drawVideo(
         x0: Int, x1: Int, y: Int, h: Int,

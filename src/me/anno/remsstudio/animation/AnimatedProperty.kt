@@ -13,7 +13,6 @@ import me.anno.remsstudio.animation.Keyframe.Companion.getWeights
 import me.anno.remsstudio.animation.drivers.AnimationDriver
 import me.anno.remsstudio.utils.WrongClassType
 import me.anno.ui.input.NumberType
-import me.anno.utils.Color.black3
 import me.anno.utils.structures.lists.UnsafeArrayList
 import me.anno.utils.types.AnyToDouble.getDouble
 import org.apache.logging.log4j.LogManager
@@ -57,12 +56,8 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
         fun color3(defaultValue: Vector3f) = AnimatedProperty(NumberType.COLOR3, defaultValue)
         fun skew() = AnimatedProperty<Vector2f>(NumberType.SKEW_2D)
         fun tiling() = AnimatedProperty<Vector4f>(NumberType.TILING)
-
         fun string() = AnimatedProperty(NumberType.STRING, "")
         fun alignment() = AnimatedProperty(NumberType.ALIGNMENT, 0f)
-
-        // fun <V> set() = AnimatedProperty(NumberType.ANY, emptySet<V>())
-
     }
 
     val drivers = arrayOfNulls<AnimationDriver>(type.components)

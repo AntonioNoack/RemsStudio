@@ -10,15 +10,16 @@ import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
 import me.anno.io.files.Reference.getReference
 import me.anno.io.json.generic.JsonReader
+import me.anno.jvm.utils.BetterProcessBuilder
 import me.anno.language.translation.NameDesc
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.WindowStack
-import me.anno.ui.base.ImagePanel
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.components.StretchModes
 import me.anno.ui.base.groups.PanelListY
+import me.anno.ui.base.image.ImagePanel
 import me.anno.ui.base.menu.Menu
 import me.anno.ui.base.progress.ProgressBarPanel
 import me.anno.ui.base.text.TextPanel
@@ -26,7 +27,6 @@ import me.anno.ui.editor.files.FileNames.toAllowedFilename
 import me.anno.ui.input.EnumInput
 import me.anno.ui.input.FileInput
 import me.anno.ui.input.URLInput
-import me.anno.utils.BetterProcessBuilder
 import me.anno.utils.Color.black
 import me.anno.utils.Color.withAlpha
 import me.anno.utils.OS

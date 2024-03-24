@@ -1,12 +1,11 @@
 package me.anno.remsstudio.objects.text
 
-import me.anno.fonts.AWTFont
 import me.anno.fonts.FontManager
 import me.anno.fonts.PartResult
 import me.anno.fonts.mesh.TextMesh
 import me.anno.fonts.signeddistfields.algorithm.SignedDistanceField
 import me.anno.gpu.GFX
-import me.anno.gpu.drawing.GFXx3D
+import me.anno.jvm.fonts.AWTFont
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.remsstudio.objects.TextSegmentKey

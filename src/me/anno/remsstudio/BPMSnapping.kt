@@ -8,6 +8,9 @@ import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.SettingCategory
 
+/**
+ * settings UI for beats-per-minute snapping
+ * */
 object BPMSnapping : Transform() {
 
     override val defaultDisplayName get() = "Render Settings"

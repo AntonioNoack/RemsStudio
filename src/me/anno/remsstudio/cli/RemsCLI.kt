@@ -15,12 +15,12 @@ import me.anno.io.config.ConfigBasics
 import me.anno.io.files.InvalidRef
 import me.anno.io.files.Reference.getReference
 import me.anno.io.json.saveable.JsonStringReader
+import me.anno.jvm.utils.CommandLineUtils.parseDouble
+import me.anno.jvm.utils.CommandLineUtils.parseFloat
+import me.anno.jvm.utils.CommandLineUtils.parseInt
 import me.anno.remsstudio.*
 import me.anno.remsstudio.gpu.ShaderLibV2
 import me.anno.remsstudio.objects.Transform
-import me.anno.utils.CommandLineUtils.parseDouble
-import me.anno.utils.CommandLineUtils.parseFloat
-import me.anno.utils.CommandLineUtils.parseInt
 import me.anno.utils.Sleep.sleepABit
 import me.anno.utils.types.Strings.getImportType
 import me.anno.utils.types.Strings.isBlank2

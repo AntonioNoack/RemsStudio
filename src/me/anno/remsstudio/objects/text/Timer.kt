@@ -11,7 +11,6 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.TextInputML
 import org.joml.Matrix4fArrayList
 import org.joml.Vector4f
-import java.net.URL
 import java.util.*
 import kotlin.math.floor
 
@@ -20,8 +19,6 @@ class Timer(parent: Transform? = null) : Text("", parent) {
     init {
         forceVariableBuffer = true
     } // saves buffer creation
-
-    // todo extra start value in a date format?
 
     override fun getDocumentationURL() = "https://remsstudio.phychi.com/?s=learn/timer"
 
@@ -66,17 +63,17 @@ class Timer(parent: Transform? = null) : Text("", parent) {
                 .replace("ZD", s0.toString(10))
                 .replace("ZH", s0.toString(16))
                 .replace("Z", s0.toString())
-                .replace("ss", s.f2())
-                .replace("mm", m.f2())
-                .replace("hh", h.f2())
-                .replace("dd", d.f2())
+                .replace("ss", s.formatTwoDigits())
+                .replace("mm", m.formatTwoDigits())
+                .replace("hh", h.formatTwoDigits())
+                .replace("dd", d.formatTwoDigits())
         )
 
         super.onDraw(stack, time, color)
 
     }
 
-    fun Long.f2() = if (this < 10) "0$this" else this.toString()
+    private fun Long.formatTwoDigits() = if (this < 10) "0$this" else this.toString()
 
     override fun createInspector(
         inspected: List<Inspectable>,

@@ -32,7 +32,7 @@ import java.util.*
 class StudioTreeView(style: Style) :
     TreeView<Transform>(StudioFileImporter, true, style) {
 
-    override fun listSources(): List<Transform> {
+    override fun listRoots(): List<Transform> {
         val nc = nullCamera
         return if (nc == null) listOf(RemsStudio.root)
         else listOf(nc, RemsStudio.root)

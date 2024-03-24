@@ -47,14 +47,10 @@ object RenderSettings : Transform() {
 
         val project = project ?: throw IllegalStateException("Missing project")
         list += TextPanel(defaultDisplayName, style)
-            .apply { focusTextColor = textColor }
+            .apply { focusTextColor = textColor } // disable focus-color
         list += vi(
-            inspected,
-            "Duration (Seconds)",
-            "Video length in seconds",
-            NumberType.FLOAT_PLUS,
-            targetDuration,
-            style
+            inspected, "Duration (Seconds)", "Video length in seconds",
+            NumberType.FLOAT_PLUS, targetDuration, style
         ) { it, _ ->
             project.targetDuration = it
             save()
@@ -85,9 +81,7 @@ object RenderSettings : Transform() {
         if (project.targetFPS !in framesRates) framesRates.add(0, project.targetFPS)
 
         list += EnumInput(
-            "Frame Rate (Hz)",
-            true,
-            project.targetFPS.toString(),
+            "Frame Rate (Hz)", true, project.targetFPS.toString(),
             framesRates.map { NameDesc(it.toString()) },
             style
         )
@@ -98,11 +92,8 @@ object RenderSettings : Transform() {
             .setTooltip("The fps of the video, or how many frame are shown per second")
 
         list += IntInput(
-            "Video Quality",
-            "VideoQuality",
-            project.targetVideoQuality,
-            NumberType.VIDEO_QUALITY_CRF,
-            style
+            "Video Quality", "VideoQuality",
+            project.targetVideoQuality, NumberType.VIDEO_QUALITY_CRF, style
         )
             .setChangeListener {
                 project.targetVideoQuality = it.toInt()
@@ -123,10 +114,8 @@ object RenderSettings : Transform() {
         list += mbs
 
         list += BooleanInput(
-            "Render Transparency",
-            "Only supported by webm at the moment.",
-            project.targetTransparency,
-            false, style
+            "Render Transparency", "Only supported by webm at the moment.",
+            project.targetTransparency, false, style
         ).setChangeListener {
             project.targetTransparency = it
             save()
@@ -135,7 +124,7 @@ object RenderSettings : Transform() {
         val samples = EnumInput(
             NameDesc(
                 "GPU Samples",
-                "Smoothes edges. 1 = default. Support depends on GPU.", ""
+                "Smooths edges. 1 = default. Support depends on GPU.", ""
             ),
             NameDesc("MSAA ${project.targetSamples}x"),
             listOf(1, 2, 4, 8, 16, 32, 64, 128).map {
