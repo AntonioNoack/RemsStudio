@@ -329,7 +329,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
         }
 
         fun getUIFiles(): List<FileReference> {
-            return (ConfigBasics.configFolder.listChildren() ?: emptyList())
+            return ConfigBasics.configFolder.listChildren()
                 .filter { it.name.endsWith(".layout.json") }
         }
     }

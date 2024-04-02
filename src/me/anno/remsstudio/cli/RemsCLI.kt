@@ -6,15 +6,16 @@ import me.anno.cache.Cache
 import me.anno.engine.Events.workEventTasks
 import me.anno.gpu.GFX
 import me.anno.gpu.framebuffer.Frame
-import me.anno.gpu.hidden.HiddenOpenGLContext
 import me.anno.gpu.shader.ShaderLib
 import me.anno.gpu.texture.Texture2D
 import me.anno.gpu.texture.Texture2D.Companion.bindTexture
 import me.anno.installer.Installer
 import me.anno.io.config.ConfigBasics
+import me.anno.io.files.FileRootRef
 import me.anno.io.files.InvalidRef
 import me.anno.io.files.Reference.getReference
 import me.anno.io.json.saveable.JsonStringReader
+import me.anno.jvm.HiddenOpenGLContext
 import me.anno.jvm.utils.CommandLineUtils.parseDouble
 import me.anno.jvm.utils.CommandLineUtils.parseFloat
 import me.anno.jvm.utils.CommandLineUtils.parseInt
@@ -77,10 +78,10 @@ object RemsCLI {
         } else return error("Input needs to be defined")
 
         // find project above scene source
-        var project0 = getReference(sceneSourceFile).getParent() ?: InvalidRef
+        var project0 = getReference(sceneSourceFile).getParent()
         var project1 = project0
-        while (true) {
-            project1 = project1.getParent() ?: break
+        while (project1 != InvalidRef && project1 != FileRootRef) {
+            project1 = project1.getParent()
             if (project1.getChild("config.json").exists &&
                 project1.getChild("tabs.json").exists
             ) {

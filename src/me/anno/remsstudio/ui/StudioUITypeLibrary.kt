@@ -56,7 +56,7 @@ class StudioUITypeLibrary : UITypeLibrary(typeList) {
                     { GraphEditor(DefaultConfig.style) },
             Dict["Files", "ui.customize.fileExplorer"] to
                     { StudioFileExplorer(RemsStudio.project?.scenes, DefaultConfig.style) },
-            Dict["Play Controls", "ui.customize.timeControl"] to
+            Dict["Time Control", "ui.customize.timeControl"] to
                     { TimeControlsPanel(DefaultConfig.style) }
         ).map { CustomPanelType(it.first, it.second) }.toMutableList()
     }

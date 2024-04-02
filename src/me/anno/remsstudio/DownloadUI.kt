@@ -93,7 +93,7 @@ object DownloadUI {
             progress.progressBar.name = "Unpacking"
 
             dstFile.tryMkdirs()
-            for (child in dstFile.listChildren() ?: emptyList()) {
+            for (child in dstFile.listChildren()) {
                 if (child != tmpZip) { // zip has to be kept ofc
                     child.deleteRecursively()
                 }

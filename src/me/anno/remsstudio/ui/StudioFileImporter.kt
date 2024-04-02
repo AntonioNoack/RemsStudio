@@ -57,7 +57,7 @@ object StudioFileImporter : FileContentImporter<Transform>() {
                 SoftLinkMode.CREATE_LINK -> {
                     val transform = SoftLink(file)
                     RemsStudio.largeChange("Added ${transform.name} to ${file.name}") {
-                        var name2 = "${file.getParent()?.getParent()?.name}/${file.getParent()?.name}/${file.name}"
+                        var name2 = "${file.getParent().getParent().name}/${file.getParent().name}/${file.name}"
                         name2 = name2.replace("/Scenes/Root", "/")
                         name2 = name2.replace("/Scenes/", "/")
                         if (name2.endsWith(".json")) name2 = name2.substring(0, name2.length - 5)

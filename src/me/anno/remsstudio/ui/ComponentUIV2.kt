@@ -148,7 +148,7 @@ object ComponentUIV2 {
                 .setIsSelectedListener { self.show(t, null) }
                 .setTooltip(ttt)
             is FileReference -> FileInput(title, style, value, emptyList())
-                .setChangeListener {
+                .addChangeListener {
                     RemsStudio.incrementalChange("Set $title to \"$it\"", title) {
                         setValue(it as V, -1)
                     }

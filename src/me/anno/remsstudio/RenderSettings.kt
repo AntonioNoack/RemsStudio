@@ -195,7 +195,7 @@ object RenderSettings : Transform() {
         }
 
         updateFileInputColor()
-        fileInput.setChangeListener { file ->
+        fileInput.addChangeListener { file ->
             project.targetOutputFile = file
             updateFileInputColor()
             save()

@@ -244,8 +244,8 @@ object RemsStudioUILayouts {
         val library = StudioUITypeLibrary()
 
         val topLeft = CustomList(true, style)
-        topLeft += CustomContainer(StudioTreeView(style), library, style)
-        topLeft += CustomContainer(StudioFileExplorer(project?.scenes, style), library, style)
+        topLeft.add(CustomContainer(StudioTreeView(style), library, style))
+        topLeft.add(CustomContainer(StudioFileExplorer(project?.scenes, style), library, style))
         topHalf.add(CustomContainer(topLeft, library, style), 0.5f)
 
         topHalf.add(CustomContainer(StudioSceneView(style), library, style), 2f)

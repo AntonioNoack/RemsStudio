@@ -22,9 +22,10 @@ class TimeControlsPanel(style: Style) : PanelListX(style) {
     init {
         val showButton = TextButton("Show Time Controls", style)
         val bg = showButton.backgroundColor
+        backgroundColor = Color.mixARGB(backgroundColor, bg, 0.3f)
         fun space(): Panel {
             return SpacerPanel(1, 1, style).apply {
-                backgroundColor = Color.mixARGB(backgroundColor, bg, 0.3f)
+                makeBackgroundTransparent()
                 weight = 1f
             }
         }
@@ -62,7 +63,7 @@ class TimeControlsPanel(style: Style) : PanelListX(style) {
     private val fontColor = style.getColor("textColor", DefaultStyle.fontGray)
     override fun drawBackground(x0: Int, y0: Int, x1: Int, y1: Int, dx: Int, dy: Int) {
         super.drawBackground(x0, y0, x1, y1, dx, dy)
-        drawTypeInCorner("Play Controls", fontColor)
+        drawTypeInCorner("Time Control", fontColor)
     }
 
     override val className: String
