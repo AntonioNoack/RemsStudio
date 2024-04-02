@@ -38,7 +38,6 @@ import org.apache.logging.log4j.LogManager
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-// todo option to reset the timeline
 @Suppress("MemberVisibilityCanBePrivate")
 class Project(var name: String, val file: FileReference) : Saveable() {
 

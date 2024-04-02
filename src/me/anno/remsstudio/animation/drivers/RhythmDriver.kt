@@ -18,12 +18,19 @@ class RhythmDriver : AnimationDriver() {
         list: PanelListY, style: Style,
         getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
     ) {
-        // todo register changes in history
         super.createInspector(list, style, getGroup)
         list += TextPanel("Rhythm (record while listening to target music)", style)
-        list += PatternRecorderCore.create(rhythm) { rhythm = it }
+        list += PatternRecorderCore.create(rhythm) {
+            RemsStudio.incrementalChange("Rhythm") {
+                rhythm = it
+            }
+        }
         list += TextPanel("Timestamps (record while watching timelapse)", style)
-        list += PatternRecorderCore.create(timestamps) { timestamps = it }
+        list += PatternRecorderCore.create(timestamps) {
+            RemsStudio.incrementalChange("Timestamps") {
+                timestamps = it
+            }
+        }
     }
 
     override fun getValue0(time: Double, keyframeValue: Double, index: Int): Double {

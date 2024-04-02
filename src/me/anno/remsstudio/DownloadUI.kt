@@ -16,11 +16,11 @@ import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.WindowStack
 import me.anno.ui.base.buttons.TextButton
-import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.components.StretchModes
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.image.ImagePanel
 import me.anno.ui.base.menu.Menu
+import me.anno.ui.base.progress.ProgressBar
 import me.anno.ui.base.progress.ProgressBarPanel
 import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.files.FileNames.toAllowedFilename
@@ -33,11 +33,13 @@ import me.anno.utils.OS
 import me.anno.utils.files.Files.formatFileSize
 import me.anno.utils.types.Floats.f2
 import me.anno.utils.types.Strings.formatTime
+import me.anno.utils.types.Strings.isBlank2
 import me.anno.video.ffmpeg.FFMPEG.ffmpegPath
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
 import org.apache.logging.log4j.LogManager
 import java.io.IOException
 import kotlin.concurrent.thread
+import kotlin.math.min
 import kotlin.math.round
 
 /**
@@ -170,11 +172,10 @@ object DownloadUI {
         val ui = PanelListY(style)
         for (p in ensureInstall(style)) ui.add(p)
 
-        val srcInput = URLInput(
+        val srcInput = URLInput( // todo somehow not taking up all space :/
             "Paste your link here", style, InvalidRef,
             emptyList(), false
         )
-        srcInput.alignmentX = AxisAlignment.FILL
 
         val dstFolder = RemsStudio.project?.scenes ?: workspace
         val dstPanel = FileInput(
@@ -182,11 +183,9 @@ object DownloadUI {
             dstFolder.getChild(System.currentTimeMillis().toString(16)),
             emptyList(), false
         )
-        dstPanel.alignmentX = AxisAlignment.FILL
 
         val infoPanel = TextPanel("", style)
         infoPanel.isVisible = false
-        infoPanel.alignmentX = AxisAlignment.FILL
 
         var thumbnailSource: FileReference = InvalidRef
         val thumbnailHeight = 240
@@ -373,9 +372,6 @@ object DownloadUI {
         ui.add(dstPanel)
 
         val button = TextButton("Start Download", false, style)
-        // todo why is this alignment not working?
-        button.alignmentX = AxisAlignment.FILL
-        button.weight = 1f
         button.addLeftClickListener {
 
             if (videoFormatUI.value == discardFormat && audioFormatUI.value == discardFormat) {
@@ -439,38 +435,45 @@ object DownloadUI {
             args.add(srcURL.absolutePath)
             val builder = BetterProcessBuilder("python", args.size, false).addAll(args)
             val process = builder.start()
-            val progress = GFX.someWindow.addProgressBar("Download", "%", 100.0)
+            var progressLine = ""
+            val progress = GFX.someWindow.addProgressBar(
+                object : ProgressBar("Download", "%", 100.0) {
+                    override fun formatProgress(): String = progressLine
+                })
             thread(name = "cmd($args):error") {
                 val reader = process.errorStream.bufferedReader()
                 while (!Engine.shutdown) {
                     val line = reader.readLine() ?: break
-                    if (line.isNotEmpty()) {
-                        if ("ERROR" in line) progress.cancel(true)
-                        LOGGER.warn(line)
-                    }
+                    if (line.isBlank2()) continue
+                    progressLine = line
+                    LOGGER.warn(line)
                 }
                 reader.close()
             }
             thread(name = "cmd($args):input") {
-                // while downloading library, show progress bar
+                // show progress bar while downloading
                 // [download]  87.1% of  228.51MiB at    5.75MiB/s ETA 00:05
-                // todo it would be nice if we could show the actual data size
                 val reader = process.inputStream.bufferedReader()
+                var done = false
                 while (!Engine.shutdown) {
                     val line = reader.readLine() ?: break
-                    if (line.startsWith("[download]")) {
-                        val i1 = line.indexOf('%')
-                        if (i1 > 0) {
-                            val i0 = line.lastIndexOf(' ', i1 - 1)
-                            val percentage = line.substring(i0 + 1, i1).toDoubleOrNull()
-                            if (percentage != null) progress.progress = percentage
+                    if (line.isBlank2()) continue
+                    val prefix = "[download]"
+                    val i1 = line.indexOf('%')
+                    if (line.startsWith(prefix) && i1 > 0) {
+                        progressLine = line.substring(prefix.length).trim()
+                        val i0 = line.lastIndexOf(' ', i1 - 1)
+                        val percentage = line.substring(i0 + 1, i1).toDoubleOrNull()
+                        if (percentage != null) {
+                            done = percentage >= 100.0
+                            progress.progress = min(percentage, 99.9)
                         }
-                    }
+                    } else progressLine = line
                     if (line.isNotEmpty()) {
                         LOGGER.info(line)
                     }
                 }
-                progress.finish(true)
+                progress.finish(done)
                 reader.close()
             }
         }

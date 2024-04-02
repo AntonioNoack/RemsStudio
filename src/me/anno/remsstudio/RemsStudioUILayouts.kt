@@ -53,8 +53,6 @@ object RemsStudioUILayouts {
 
     fun createEditorUI(welcomeUI: WelcomeUI, loadUI: Boolean = true) {
 
-        // todo Alt + Letter = pseudo-click on menu
-
         val style = DefaultConfig.style
         val ui = PanelListY(style)
         val options = OptionBar(style)
@@ -125,8 +123,6 @@ object RemsStudioUILayouts {
         // todo overview to show plugins & mods
         // todo marketplace for plugins & mods?
         // ...
-
-        // todo shortcuts, which can be set for all actions??...
 
         /**
          * Rendering
@@ -263,5 +259,4 @@ object RemsStudioUILayouts {
         return customUI
 
     }
-
 }
