@@ -41,6 +41,7 @@ import kotlin.math.sqrt
 
 // todo write a wiki entry about this
 
+@Suppress("MemberVisibilityCanBePrivate")
 class FourierTransform : Transform() {
 
     val meta get() = MediaMetadata.getMeta(file, true)
@@ -66,7 +67,7 @@ class FourierTransform : Transform() {
     var enableHalfBuffers = true
 
     // support audio effects stack? no, the user can go the extra step of rendering it,
-    // it they need something that specific; if I get many requests for it, I can implement it later
+    // if they need something that specific; if I get many requests for it, I can implement it later
     var file: FileReference = InvalidRef
 
     // todo we need references
@@ -219,7 +220,7 @@ class FourierTransform : Transform() {
 
     fun getKey(sampleIndex0: Long, half: Boolean): AudioFXCache2.PipelineKey {
         val fraction = if (half) 0.5 else 0.0
-        return getKey { Time(AudioFXCache2.getTime(sampleIndex0 + it, fraction, bufferSize, sampleRate)) }
+        return getKey { Time(getTime(sampleIndex0 + it, fraction, bufferSize, sampleRate)) }
     }
 
     fun getKey(getTime: (Int) -> Time): AudioFXCache2.PipelineKey {

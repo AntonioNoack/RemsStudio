@@ -18,6 +18,7 @@ import org.joml.Vector4f
 import kotlin.math.abs
 import kotlin.math.sqrt
 
+@Suppress("MemberVisibilityCanBePrivate")
 abstract class GFXTransform(parent: Transform?) : Transform(parent) {
 
     init {

@@ -16,6 +16,7 @@ import org.joml.Vector3f
 import org.joml.Vector4f
 import java.util.*
 
+@Suppress("MemberVisibilityCanBePrivate")
 class GFXArray(parent: Transform? = null) : GFXTransform(parent) {
 
     val perChildTranslation = AnimatedProperty.pos()

@@ -112,6 +112,7 @@ import kotlin.math.min
 
 // todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
+@Suppress("MemberVisibilityCanBePrivate")
 object RemsStudio : EngineBase("Rem's Studio", 10301, true), WelcomeUI {
 
     val defaultWindowStack get() = GFX.someWindow.windowStack

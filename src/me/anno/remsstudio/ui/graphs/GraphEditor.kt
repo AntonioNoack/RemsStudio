@@ -13,6 +13,7 @@ import me.anno.ui.base.text.TextPanel
 import me.anno.ui.input.components.Checkbox
 import me.anno.utils.Color.black
 
+@Suppress("MemberVisibilityCanBePrivate")
 class GraphEditor(style: Style) : PanelListY(style) {
 
     val controls = ScrollPanelX(style)
@@ -23,6 +24,7 @@ class GraphEditor(style: Style) : PanelListY(style) {
     class MaskCheckbox(private val maskColor: Int, val index: Int, size: Int, style: Style) :
         Checkbox(true, true, size, style) {
         override fun getColor(): Int = maskColor
+        @Suppress("UNUSED_PARAMETER")
         override var isVisible: Boolean
             get() {
                 // hide them, when a channel isn't available

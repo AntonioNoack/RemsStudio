@@ -1,7 +1,6 @@
 package me.anno.remsstudio.ui.scene
 
 import me.anno.Time.deltaTime
-import me.anno.Time.gameTime
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.maths.Maths.clamp01
@@ -21,6 +20,7 @@ import org.joml.Vector3f
 import java.util.*
 import kotlin.math.atan2
 
+@Suppress("MemberVisibilityCanBePrivate")
 class ScenePreview(style: Style) : PanelList(null, style.getChild("sceneView")), ISceneView {
 
     init {
@@ -36,14 +36,6 @@ class ScenePreview(style: Style) : PanelList(null, style.getChild("sceneView")),
 
     override val usesFPBuffers: Boolean get() = false
     override val isLocked2D get() = (System.currentTimeMillis() % 30000) > 25000
-
-    // switch between manual control and autopilot for time :)
-    // -> do this by disabling controls when playing, excepts when it's the inspector camera (?)
-    var lastW = 0
-    var lastH = 0
-    var lastSizeUpdate = gameTime
-    var goodW = 0
-    var goodH = 0
 
     val random = Random()
 

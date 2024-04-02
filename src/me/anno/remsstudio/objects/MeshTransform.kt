@@ -43,6 +43,7 @@ import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.pooling.JomlPools
 import org.joml.*
 
+@Suppress("MemberVisibilityCanBePrivate")
 class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(parent) {
 
     // todo lerp animations
@@ -290,8 +291,8 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         ) { it, _ -> for (x in c) x.centerMesh = it }
 
         // the list of available animations depends on the model
-        // but still, it's like an enum: only a certain set of animations is available
-        // and the user wouldn't know perfectly which
+        // but still, it's like an enum: only a certain set of animations is available,
+        // and the user wouldn't know perfectly, which
         val map = HashMap<Map<String, Animation>?, Panel>()
         list += UpdatingContainer(100, {
             val animations = lastAnimations

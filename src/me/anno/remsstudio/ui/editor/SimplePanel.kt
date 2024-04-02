@@ -1,7 +1,6 @@
 package me.anno.remsstudio.ui.editor
 
 import me.anno.ui.Panel
-import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
@@ -9,6 +8,7 @@ import kotlin.math.min
  * simple controls;
  * legacy, should be replaced with real panel soon
  * */
+@Suppress("MemberVisibilityCanBePrivate")
 class SimplePanel(
     val drawable: Panel,
     // -1 .. 0 .. 1
@@ -53,38 +53,11 @@ class SimplePanel(
         // hide if half/a third the size is not enough
         // todo avoid recalculation
         drawable.setPosSize(px, py, sizeX, sizeY)
-        if (hideModeX.shallDraw(abs(deltaX + sizeX / 2), w) &&
-            hideModeY.shallDraw(abs(deltaY + sizeY / 2), h)
-        ) {
-            drawable.draw(
-                max(x0, px), max(y0, py),
-                min(x1, px + sizeX), min(y1, py + sizeY)
-            )
-        }
+        drawable.draw(
+            max(x0, px), max(y0, py),
+            min(x1, px + sizeX), min(y1, py + sizeY)
+        )
     }
 
     fun contains(x: Int, y: Int) = x - px in 0 until sizeX && y - py in 0 until sizeY
-
-    enum class HideMode {
-
-        HALF {
-            override fun shallDraw(relX: Int, w: Int) = relX * 2 < w
-        },
-
-        THIRD {
-            override fun shallDraw(relX: Int, w: Int) = relX * 3 < w
-        },
-
-        NEVER {
-            override fun shallDraw(relX: Int, w: Int) = true
-        };
-
-        abstract fun shallDraw(relX: Int, w: Int): Boolean
-    }
-
-    companion object {
-        val hideModeX = HideMode.NEVER
-        val hideModeY = HideMode.NEVER
-    }
-
 }

@@ -10,6 +10,7 @@ import me.anno.video.VideoBackgroundTask
 import me.anno.video.VideoCreator
 import kotlin.math.min
 
+@Suppress("MemberVisibilityCanBePrivate")
 class VideoBackgroundTaskV2(
     video: VideoCreator,
     samples: Int,

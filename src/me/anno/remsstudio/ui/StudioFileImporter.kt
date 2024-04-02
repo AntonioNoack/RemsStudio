@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager
 import org.joml.Vector3f
 import kotlin.concurrent.thread
 
+@Suppress("MemberVisibilityCanBePrivate")
 object StudioFileImporter : FileContentImporter<Transform>() {
 
     override fun setName(element: Transform, name: String) {
@@ -156,13 +157,13 @@ object StudioFileImporter : FileContentImporter<Transform>() {
                 }
             }
             "HTML" -> {
-                // parse html? maybe, but html and css are complicated
-                // rather use screenshots or svg...
+                // parse HTML? maybe, but HTML and CSS are complicated
+                // rather use screenshots or SVG...
                 // integrated browser?
                 LOGGER.warn("todo html")
             }
             "Markdeep", "Markdown" -> {
-                // execute markdeep script or interpret markdown to convert it to html? no
+                // execute markdeep script or interpret markdown to convert it to HTML? no
                 // I see few use-cases
                 LOGGER.warn("todo markdeep")
             }
@@ -181,7 +182,6 @@ object StudioFileImporter : FileContentImporter<Transform>() {
     fun addText(name: String, parent: Transform?, text: String, doSelect: Boolean, callback: (Transform) -> Unit) {
         // important ;)
         // should maybe be done sometimes in object as well ;)
-        RuntimeException("Trying to read as text").printStackTrace()
         if (text.length > 500) {
             addEvent {
                 ask(
@@ -197,14 +197,14 @@ object StudioFileImporter : FileContentImporter<Transform>() {
                     }
                 }
             }
-            return
-        }
-        addEvent {
-            RemsStudio.largeChange("Imported Text") {
-                val textNode = Text(text, parent)
-                textNode.name = name
-                if (doSelect) selectTransform(textNode)
-                callback(textNode)
+        } else {
+            addEvent {
+                RemsStudio.largeChange("Imported Text") {
+                    val textNode = Text(text, parent)
+                    textNode.name = name
+                    if (doSelect) selectTransform(textNode)
+                    callback(textNode)
+                }
             }
         }
     }

@@ -12,6 +12,7 @@ import me.anno.ui.input.NumberInput
 import me.anno.ui.input.components.NumberInputComponent
 import me.anno.utils.types.AnyToDouble
 
+@Suppress("MemberVisibilityCanBePrivate")
 class NumberInputComponentV2(
     private val owningProperty: AnimatedProperty<*>,
     visibilityKey: String,

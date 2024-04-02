@@ -30,7 +30,7 @@ class LayerViewGradient(
 
     // must be saved, so the gradient difference doesn't grow
     // if it's not saved, small errors can accumulate and become large
-    // (I had this issue, and at first didn't know, where it's coming from)
+    // (I had this issue, and at first didn't know where it's coming from)
     private var firstC1 = c1
     private var firstX1 = x1
 

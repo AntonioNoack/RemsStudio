@@ -32,8 +32,6 @@ import me.anno.ui.custom.CustomContainer
 import me.anno.ui.custom.CustomList
 import me.anno.ui.input.NumberType
 import me.anno.utils.types.AnyToFloat
-import me.anno.utils.types.Casting.castToFloat
-import me.anno.utils.types.Casting.castToFloat2
 import me.anno.video.ffmpeg.FFMPEGEncodingBalance
 import me.anno.video.ffmpeg.FFMPEGEncodingType
 import org.apache.logging.log4j.LogManager
@@ -41,6 +39,7 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 // todo option to reset the timeline
+@Suppress("MemberVisibilityCanBePrivate")
 class Project(var name: String, val file: FileReference) : Saveable() {
 
     val configFile = file.getChild("config.json")

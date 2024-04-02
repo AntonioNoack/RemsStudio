@@ -28,6 +28,7 @@ import me.anno.utils.types.Casting.castToFloat2
 import me.anno.utils.types.Floats.toRadians
 import org.joml.*
 
+@Suppress("MemberVisibilityCanBePrivate")
 class Camera(parent: Transform? = null) : Transform(parent) {
 
     // kind of done allow cameras to be merged

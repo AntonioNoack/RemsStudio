@@ -42,6 +42,7 @@ import me.anno.video.VideoCache
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
+@Suppress("MemberVisibilityCanBePrivate")
 class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
 
     // todo display name?
@@ -234,11 +235,6 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
         }
         return bestTransform
     }
-
-    // done hold / move up/down / move sideways
-    // done right click cut
-    // done move start/end times
-    // done highlight the hovered panel?
 
     override fun onKeyDown(x: Float, y: Float, key: Key) {
         if (key == Key.BUTTON_LEFT) {

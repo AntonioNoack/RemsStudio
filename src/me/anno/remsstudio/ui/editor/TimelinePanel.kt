@@ -42,6 +42,7 @@ import kotlin.math.sqrt
 
 // todo subpixel adjusted lines, only if subpixel rendering affects x-axis
 
+@Suppress("MemberVisibilityCanBePrivate")
 open class TimelinePanel(style: Style) : Panel(style) {
 
     data class VisState(val dt: Double, val ct: Double, val et: Double, val td: Double)

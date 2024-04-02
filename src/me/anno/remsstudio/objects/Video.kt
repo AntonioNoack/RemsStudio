@@ -76,7 +76,6 @@ import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
-import java.net.URL
 import kotlin.math.*
 
 // game, where everything is explicitly rendered on 5-10 cubemaps first? lol
@@ -99,6 +98,7 @@ import kotlin.math.*
 /**
  * Images, Cubemaps, Videos, Audios, joint into one
  * */
+@Suppress("MemberVisibilityCanBePrivate")
 class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
     Audio(file, parent), SplittableElement {
 
@@ -274,7 +274,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         val closestDistance = min(unmapZ(zRange.first), unmapZ(zRange.second))
 
         // calculate the zoom level based on the distance
-        val pixelZoom = GFX.viewportHeight * 1f / (closestDistance * h) // e.g. 0.1 for a window far away
+        val pixelZoom = GFX.viewportHeight * 1f / (closestDistance * h) // e.g., 0.1 for a window far away
         val availableRedundancy = 1f / pixelZoom // 0.1 zoom means that we only need every 10th pixel
 
         return max(1, availableRedundancy.toInt())
@@ -579,7 +579,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         val minT = min(lTime0, lTime1)
         val maxT = max(lTime0, lTime1)
 
-        when (val type = type) {
+        when (type) {
             VideoType.VIDEO -> {
 
                 val meta = meta
@@ -666,10 +666,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                     lastTexture = texture
                 }
             }
-            VideoType.AUDIO -> {
-            }
-            VideoType.UNKNOWN -> {}
-            else -> throw RuntimeException("Todo implement resource loading for $type")
+            VideoType.AUDIO, VideoType.UNKNOWN -> {}
         }
 
         if (needsImageUpdate) {
@@ -741,8 +738,6 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 VideoType.IMAGE -> {
                     // todo check if the image is valid...
                 }
-                // it was a critical bug, oh
-                else -> Unit
             }
         }
     }
@@ -780,7 +775,6 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                     drawSpeakers(stack, Vector4f(color), is3D, amplitude[time])
                 }
                 VideoType.UNKNOWN -> {}
-                else -> throw RuntimeException("$type needs visualization") // for the future
             }
 
         } else {

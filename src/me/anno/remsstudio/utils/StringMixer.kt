@@ -7,8 +7,8 @@ import me.anno.maths.Maths.max
 import me.anno.utils.types.Strings.joinChars0
 import kotlin.math.roundToInt
 import kotlin.random.Random
-import kotlin.streams.toList
 
+@Suppress("MemberVisibilityCanBePrivate")
 object StringMixer {
 
     fun mixLength(aLength: Int, bLength: Int, f: Double, max: Int): Int {

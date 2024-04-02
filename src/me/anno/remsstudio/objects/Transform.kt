@@ -56,9 +56,9 @@ import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
-import java.net.URL
 import java.util.concurrent.atomic.AtomicInteger
 
+@Suppress("MemberVisibilityCanBePrivate")
 open class Transform() : Saveable(),
     Inspectable, Hierarchical<Transform> {
 

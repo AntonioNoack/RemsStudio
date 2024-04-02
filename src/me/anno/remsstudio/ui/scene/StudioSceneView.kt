@@ -759,7 +759,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
 
             "Cam8" -> rotateCamera(Vector3f(-15f, 0f, 0f)) // up
             "Cam2" -> rotateCamera(Vector3f(+15f, 0f, 0f)) // down
-            "Cam9" -> rotateCamera(Vector3f(0f, 180f, 0f)) // look at back; rotate by 90 degrees on y axis
+            "Cam9" -> rotateCamera(Vector3f(0f, 180f, 0f)) // look at back; rotate by 90 degrees on y-axis
             "MoveLeft" -> this.inputDx--
             "MoveRight" -> this.inputDx++
             "MoveUp" -> this.inputDy++
@@ -857,7 +857,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                 invalidateDrawing()
             }
             // file -> paste object from file?
-            // paste that object 1m in front of the camera?
+            // paste that object one meter in front of the camera?
             else -> super.onPaste(x, y, data, type)
         }
     }

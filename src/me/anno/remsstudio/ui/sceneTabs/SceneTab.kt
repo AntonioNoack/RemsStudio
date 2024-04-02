@@ -29,6 +29,7 @@ import me.anno.utils.Color.mixARGB
 import org.apache.logging.log4j.LogManager
 import kotlin.concurrent.thread
 
+@Suppress("MemberVisibilityCanBePrivate")
 class SceneTab(var file: FileReference, var scene: Transform, history: History?) : TextPanel("", DefaultConfig.style) {
 
     companion object {

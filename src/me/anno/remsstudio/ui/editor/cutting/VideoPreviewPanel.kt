@@ -7,6 +7,7 @@ import me.anno.ui.Style
 import org.joml.Vector4f
 
 // todo why is this flickering, when moving the mouse???...
+@Suppress("MemberVisibilityCanBePrivate")
 class VideoPreviewPanel(
     val video: Video,
     val height1: Int, style: Style,

@@ -37,6 +37,7 @@ import org.joml.Vector2f
 import org.joml.Vector4f
 import kotlin.math.roundToInt
 
+@Suppress("MemberVisibilityCanBePrivate")
 class SoftLink(var file: FileReference) : GFXTransform(null) {
 
     constructor() : this(InvalidRef)

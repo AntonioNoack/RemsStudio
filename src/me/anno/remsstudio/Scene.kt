@@ -60,6 +60,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+@Suppress("MemberVisibilityCanBePrivate")
 object Scene {
 
     var nearZ = 0.001f
@@ -206,7 +207,7 @@ object Scene {
         get() = if (isFinalRendering) DefaultConfig["rendering.useMSAA", true]
         else DefaultConfig["ui.editor.useMSAA", gfxSettings.data["ui.editor.useMSAA", true]]
 
-    // rendering must be done in sync with the rendering thread (OpenGL limitation) anyways, so one object is enough
+    // rendering must be done in sync with the rendering thread (OpenGL limitation) anyway, so one object is enough
     val stack = Matrix4fArrayList()
     fun draw(
         camera: Camera, scene: Transform,
@@ -396,7 +397,7 @@ object Scene {
 
         /**
          * apply the LUT for sepia looks, cold looks, general color correction, ...
-         * uses the Unreal Engine "format" of an 256x16 image (or 1024x32)
+         * uses the Unreal Engine "format" of a 256x16 image (or 1024x32)
          * */
         val lutShader = lutShader.value
         lutShader.use()

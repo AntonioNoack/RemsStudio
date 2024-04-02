@@ -14,6 +14,7 @@ import me.anno.utils.structures.lists.Lists.getOrPrevious
 import org.apache.logging.log4j.LogManager
 
 // may there only be once instance? yes
+@Suppress("MemberVisibilityCanBePrivate")
 object SceneTabs : ScrollPanelX(DefaultConfig.style) {
 
     private val LOGGER = LogManager.getLogger(SceneTabs::class)

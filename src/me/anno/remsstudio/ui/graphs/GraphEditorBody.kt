@@ -54,6 +54,7 @@ import kotlin.math.*
 
 // todo list all animated properties of this object (abbreviated)
 
+@Suppress("MemberVisibilityCanBePrivate")
 class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(style.getChild("deep")) {
 
     var draggedKeyframe: Keyframe<*>? = null

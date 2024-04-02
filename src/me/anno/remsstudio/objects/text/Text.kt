@@ -35,6 +35,7 @@ import kotlin.streams.toList
 
 // todo background "color" in the shape of a plane? for selections and such
 
+@Suppress("MemberVisibilityCanBePrivate")
 open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableElement {
 
     companion object {
@@ -100,7 +101,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
     var relativeCharSpacing = 0f
     var relativeTabSize = 4f
 
-    var font = Font("Verdana", DEFAULT_FONT_HEIGHT, false, false)
+    var font = Font("Verdana", DEFAULT_FONT_HEIGHT, isBold = false, isItalic = false)
     var smallCaps = false
     val charSpacing get() = font.size * relativeCharSpacing
     var forceVariableBuffer = false

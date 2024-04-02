@@ -10,6 +10,7 @@ import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.utils.structures.maps.BiMap
 import org.apache.logging.log4j.LogManager
 
+@Suppress("MemberVisibilityCanBePrivate")
 object Selection {
 
     // todo make it possible to select multiple stuff

@@ -43,7 +43,7 @@ object Rendering {
             field = value
         }
 
-    val div = 4
+    const val minimumDivider = 4
 
     private val LOGGER = LogManager.getLogger(Rendering::class)
 
@@ -54,8 +54,8 @@ object Rendering {
     fun renderSetPercent(ask: Boolean, callback: () -> Unit) {
         val project = project ?: throw IllegalStateException("Missing project")
         renderVideo(
-            max(div, (project.targetWidth * project.targetSizePercentage / 100).roundToInt()),
-            max(div, (project.targetHeight * project.targetSizePercentage / 100).roundToInt()),
+            max(minimumDivider, (project.targetWidth * project.targetSizePercentage / 100).roundToInt()),
+            max(minimumDivider, (project.targetHeight * project.targetSizePercentage / 100).roundToInt()),
             ask, callback
         )
     }
@@ -70,8 +70,8 @@ object Rendering {
 
     fun renderVideo(width: Int, height: Int, ask: Boolean, callback: () -> Unit) {
 
-        val divW = width % div
-        val divH = height % div
+        val divW = width % minimumDivider
+        val divH = height % minimumDivider
         if (divW != 0 || divH != 0) return renderVideo(
             width - divW,
             height - divH,

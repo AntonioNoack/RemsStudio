@@ -10,6 +10,7 @@ import me.anno.video.VideoFramesKey
 import me.anno.video.VideoSlice
 import me.anno.video.formats.gpu.BlankFrameDetector
 
+@Suppress("MemberVisibilityCanBePrivate")
 enum class Status(val color: Int) {
     FULL_SCALE_READY(0x24ff2c or black),
     READY(0xbbe961 or black),

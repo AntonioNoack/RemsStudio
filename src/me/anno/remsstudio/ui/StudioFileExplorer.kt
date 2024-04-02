@@ -12,6 +12,7 @@ import me.anno.ui.editor.files.FileExplorerOption
 import me.anno.ui.editor.files.FileNames.toAllowedFilename
 import me.anno.utils.files.Files
 
+@Suppress("MemberVisibilityCanBePrivate")
 class StudioFileExplorer(file: FileReference?, style: Style) : FileExplorer(file, true, style) {
 
     override fun getFolderOptions(): List<FileExplorerOption> {
