@@ -22,6 +22,7 @@ import org.joml.Vector2d
 import org.joml.Vector3d
 import org.joml.Vector4d
 
+@Suppress("MemberVisibilityCanBePrivate")
 abstract class AnimationDriver : Saveable(), Inspectable {
 
     var frequency = 1.0

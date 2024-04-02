@@ -1,16 +1,15 @@
 package me.anno.remsstudio.objects.documents
 
-import me.anno.ui.input.NumberType
 import me.anno.cache.instances.PDFCache
 import me.anno.cache.instances.PDFCache.getTexture
 import me.anno.config.DefaultConfig
+import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.GFX.viewportHeight
 import me.anno.gpu.GFX.viewportWidth
 import me.anno.gpu.drawing.UVProjection
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.TextureLib.colorShowTexture
-import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
@@ -23,10 +22,10 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.documents.SiteSelection.parseSites
 import me.anno.remsstudio.objects.lists.Element
 import me.anno.remsstudio.objects.lists.SplittableElement
-import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
+import me.anno.ui.input.NumberType
 import me.anno.utils.Clipping
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
@@ -47,6 +46,7 @@ import kotlin.math.*
 // todo re-project UV textures onto stuff to animate an image exploding (gets UVs from first frame, then just is a particle system or sth else)
 // todo interpolation between lists and sets? could be interesting :)
 
+@Suppress("MemberVisibilityCanBePrivate")
 open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransform(parent), SplittableElement {
 
     constructor() : this(InvalidRef, null)
@@ -221,7 +221,7 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
     }
 
     override fun setProperty(name: String, value: Any?) {
-        when(name){
+        when (name) {
             "editorQuality" -> editorQuality = value as? Float ?: return
             "renderQuality" -> renderQuality = value as? Float ?: return
             "filtering" -> filtering.value = filtering.value.find(value as? Int ?: return)

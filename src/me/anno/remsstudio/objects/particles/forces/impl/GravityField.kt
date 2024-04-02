@@ -7,6 +7,7 @@ import me.anno.remsstudio.objects.inspectable.InspectableAnimProperty
 import me.anno.remsstudio.objects.particles.forces.types.RelativeForceField
 import org.joml.Vector3f
 
+@Suppress("MemberVisibilityCanBePrivate")
 class GravityField : RelativeForceField(
     "Central Gravity",
     "Gravity towards a single point", "centralGravity"

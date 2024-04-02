@@ -15,6 +15,7 @@ import org.joml.Vector3f
 import org.joml.Vector4f
 import java.util.*
 
+@Suppress("MemberVisibilityCanBePrivate")
 class AnimatedDistribution(
     distribution: Distribution = ConstantDistribution(),
     val type: NumberType,

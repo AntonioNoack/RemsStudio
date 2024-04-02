@@ -13,6 +13,7 @@ import me.anno.ui.base.text.TextPanel
 import me.anno.ui.input.components.Checkbox
 import me.anno.utils.Color.black
 
+@OptIn(ExperimentalStdlibApi::class)
 @Suppress("MemberVisibilityCanBePrivate")
 class GraphEditor(style: Style) : PanelListY(style) {
 
@@ -61,7 +62,7 @@ class GraphEditor(style: Style) : PanelListY(style) {
         cc += SpacerPanel(4, 1, style)
         // todo enum input, but change the state automatically based on the selected keyframes
         cc += TextPanel("Interpolation: ", style)
-        for (type in Interpolation.values()) {
+        for (type in Interpolation.entries) {
             cc += TextButton(type.symbol, true, style).apply {
                 padding.left = 2
                 padding.right = 2

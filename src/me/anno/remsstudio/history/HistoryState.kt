@@ -16,6 +16,7 @@ import me.anno.ui.base.groups.PanelGroup
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.utils.types.AnyToInt
 
+@Suppress("MemberVisibilityCanBePrivate")
 class HistoryState() : Saveable() {
 
     constructor(title: String, code: Any) : this() {

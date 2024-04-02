@@ -23,7 +23,6 @@ import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
-import java.net.URL
 import kotlin.math.floor
 
 /**
@@ -31,6 +30,7 @@ import kotlin.math.floor
  * creates an outline shape, which can be animated
  * like https://youtu.be/ToTWaZtGOj8?t=87 (1:27, Linus Tech Tips, Upload date Apr 28, 2021)
  * */
+@Suppress("MemberVisibilityCanBePrivate")
 class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
 
     // todo if closed, modulo positions make sense, so a line could swirl around multiple times

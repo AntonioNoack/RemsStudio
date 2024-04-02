@@ -35,6 +35,7 @@ import org.lwjgl.BufferUtils
 import java.nio.FloatBuffer
 import kotlin.math.min
 
+@Suppress("MemberVisibilityCanBePrivate")
 object GFXx3Dv2 {
 
     fun defineAdvancedGraphicalFeatures(shader: Shader, transform: Transform?, time: Double, is3D: Boolean) {

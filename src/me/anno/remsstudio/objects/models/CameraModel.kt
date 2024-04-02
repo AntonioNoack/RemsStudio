@@ -2,7 +2,6 @@ package me.anno.remsstudio.objects.models
 
 import me.anno.ecs.components.mesh.Mesh
 import me.anno.gpu.buffer.DrawMode
-import me.anno.gpu.shader.ShaderLib
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.gpu.ShaderLibV2
 import me.anno.utils.types.Floats.toRadians

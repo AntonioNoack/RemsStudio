@@ -14,6 +14,7 @@ import java.util.*
 import kotlin.math.log2
 import kotlin.math.min
 
+@Suppress("MemberVisibilityCanBePrivate")
 class EchoEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
 
     var offset = AnimatedProperty.floatPlus(0.1f) // seconds
@@ -50,7 +51,6 @@ class EchoEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
 
         private const val maxEchoes = 64
         private val randomizedOffsets: FloatArray
-        private const val maxBuffers = 128
         private const val minRelativeAmplitude = 0.0001f
 
         init {

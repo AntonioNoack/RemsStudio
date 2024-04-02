@@ -10,7 +10,6 @@ import me.anno.audio.streams.AudioStreamRaw.Companion.averageSamples
 import me.anno.audio.streams.AudioStreamRaw.Companion.ffmpegSliceSampleDuration
 import me.anno.audio.streams.StereoShortStream
 import me.anno.cache.AsyncCacheData
-import me.anno.cache.CacheData
 import me.anno.cache.CacheSection
 import me.anno.io.MediaMetadata
 import me.anno.io.files.FileReference
@@ -18,16 +17,15 @@ import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.mix
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Transform
-import me.anno.utils.ShutdownException
 import me.anno.utils.Sleep.waitUntil
 import me.anno.utils.structures.tuples.ShortPair
 import me.anno.video.ffmpeg.FFMPEGStream.Companion.getAudioSequence
 import org.joml.Vector3f
-import org.lwjgl.openal.AL10
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
+@Suppress("MemberVisibilityCanBePrivate")
 class AudioStreamRaw2(
     val file: FileReference,
     val repeat: LoopingState,

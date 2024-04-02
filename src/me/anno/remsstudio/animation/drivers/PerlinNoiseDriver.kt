@@ -12,6 +12,7 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.NumberType
 import kotlin.math.min
 
+@Suppress("MemberVisibilityCanBePrivate")
 class PerlinNoiseDriver : AnimationDriver() {
 
     var falloff = AnimatedProperty.float01(0.5f)

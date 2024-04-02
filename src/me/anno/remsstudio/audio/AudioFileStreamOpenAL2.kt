@@ -25,6 +25,7 @@ import kotlin.math.max
 // done? to fix "AL lib: (EE) ALCwasapiPlayback_mixerProc: Failed to get padding: 0x88890004"
 // we fixed sth like that
 
+@Suppress("MemberVisibilityCanBePrivate")
 class AudioFileStreamOpenAL2(
     file: FileReference,
     repeat: LoopingState,

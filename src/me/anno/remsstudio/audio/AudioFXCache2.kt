@@ -294,13 +294,6 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
     fun getBuffer(
         source: Audio, destination: Camera,
         bufferSize: Int,
-        async: Boolean,
-        getTime: (i: Int) -> Time
-    ) = getBuffer(source, destination, getKey(source, destination, bufferSize, getTime), async)
-
-    fun getBuffer(
-        source: Audio, destination: Camera,
-        bufferSize: Int,
         domain: Domain,
         async: Boolean,
         getTime: (i: Int) -> Time

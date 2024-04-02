@@ -14,6 +14,7 @@ import org.joml.Vector3f
 import org.joml.Vector4f
 import java.util.*
 
+@Suppress("MemberVisibilityCanBePrivate")
 class NoisyLorentzForce : PerParticleForce(
     "Noisy Lorentz Force",
     "Circular motion by velocity, randomized by location", "lorentz.noisy"

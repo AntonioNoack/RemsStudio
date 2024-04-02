@@ -11,6 +11,7 @@ import me.anno.ui.base.menu.MenuOption
 import org.apache.logging.log4j.LogManager
 import kotlin.math.max
 
+@Suppress("MemberVisibilityCanBePrivate")
 class History : Saveable() {
 
     var currentState: HistoryState? = null

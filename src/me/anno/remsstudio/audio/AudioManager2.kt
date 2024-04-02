@@ -10,6 +10,7 @@ import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Transform
 import kotlin.math.abs
 
+@Suppress("MemberVisibilityCanBePrivate")
 object AudioManager2 {
 
     val camera by lazy { RemsStudio.nullCamera!! }

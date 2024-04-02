@@ -7,8 +7,7 @@ import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
 import me.anno.engine.inspector.Inspectable
 
-abstract class SoundEffect(val inputDomain: Domain, val outputDomain: Domain) : Saveable(),
-    Inspectable {
+abstract class SoundEffect(val inputDomain: Domain, val outputDomain: Domain) : Saveable(), Inspectable {
 
     // for the inspector
     lateinit var audio: Audio

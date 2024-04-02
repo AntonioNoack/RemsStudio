@@ -14,6 +14,7 @@ import me.anno.ui.base.groups.PanelListY
 import kotlin.math.PI
 import kotlin.math.sin
 
+@Suppress("MemberVisibilityCanBePrivate")
 class HarmonicDriver : AnimationDriver() {
 
     // use drivers to generate sound? rather not xD
@@ -83,7 +84,7 @@ class HarmonicDriver : AnimationDriver() {
     override fun getDisplayName() = Dict["Harmonics h(n)", "driver.harmonic"]
 
     companion object {
-        // could support more, but is useless anyways xD
+        // could support more, but is useless anyway xD
         val maxHarmonics get() = DefaultConfig["driver.harmonics.max", 32]
     }
 

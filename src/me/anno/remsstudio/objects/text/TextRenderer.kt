@@ -24,6 +24,7 @@ import java.awt.font.TextLayout
 import kotlin.math.max
 import kotlin.math.min
 
+@Suppress("MemberVisibilityCanBePrivate")
 object TextRenderer {
 
     fun draw(

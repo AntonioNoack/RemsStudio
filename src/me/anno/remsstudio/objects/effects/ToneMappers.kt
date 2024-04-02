@@ -2,6 +2,7 @@ package me.anno.remsstudio.objects.effects
 
 import me.anno.language.translation.NameDesc
 
+@Suppress("unused")
 enum class ToneMappers(val id: Int,
                        val naming: NameDesc,
                        val glslFuncName: String){

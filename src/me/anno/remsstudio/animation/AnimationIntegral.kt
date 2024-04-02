@@ -10,7 +10,7 @@ object AnimationIntegral {
      * */
     fun <N : Number> AnimatedProperty<N>.findIntegralX(t0: Double, t1: Double, target: Double = 1.0, accuracy: Double = 1e-6): Double {
         val allowNegativeValues = false
-        val int0 = getIntegral<N>(t0, allowNegativeValues)
+        val int0 = getIntegral(t0, allowNegativeValues)
         // bisection
         var min = t0
         var max = t1
@@ -19,7 +19,7 @@ object AnimationIntegral {
         for (i in 0 until maxIterations) {
             if (max - min > accuracy) {
                 val middle = (max + min) * 0.5
-                val intI = getIntegral<N>(middle, allowNegativeValues) - int0
+                val intI = getIntegral(middle, allowNegativeValues) - int0
                 if (intI < target) {// right side
                     min = middle
                 } else {// left side
@@ -31,8 +31,8 @@ object AnimationIntegral {
     }
 
     fun <N : Number> AnimatedProperty<N>.getIntegral(t0: Double, t1: Double, allowNegativeValues: Boolean): Double {
-        val int0 = getIntegral<N>(t0, allowNegativeValues)
-        val int1 = getIntegral<N>(t1, allowNegativeValues)
+        val int0 = getIntegral(t0, allowNegativeValues)
+        val int1 = getIntegral(t1, allowNegativeValues)
         return int1 - int0
     }
 

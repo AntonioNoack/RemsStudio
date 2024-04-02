@@ -31,6 +31,7 @@ import org.apache.logging.log4j.LogManager
 import org.lwjgl.opengl.GL11C
 import java.util.*
 
+@Suppress("MemberVisibilityCanBePrivate")
 object RemsCLI {
 
     @JvmStatic

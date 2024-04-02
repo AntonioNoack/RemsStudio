@@ -7,6 +7,7 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.ui.base.progress.ProgressBar
 import me.anno.video.AudioCreator
 
+@Suppress("MemberVisibilityCanBePrivate")
 open class AudioCreatorV2(
     val scene: Transform,
     val camera: Camera,

@@ -27,6 +27,7 @@ import kotlin.math.min
  *  - and then cut or synchronize (speed-change) the points :3
  * https://www.youtube.com/watch?v=sff_2WMOLrs&t=1212s
  * */
+@Suppress("MemberVisibilityCanBePrivate")
 class PatternRecorderCore(val tp: TextInput) : Panel(style) {
 
     val times = ArrayList<Double>()

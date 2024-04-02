@@ -14,6 +14,7 @@ import org.joml.Vector4f
 import kotlin.math.max
 import kotlin.math.min
 
+@Suppress("MemberVisibilityCanBePrivate")
 class Particle(
     var type: Transform,
     val birthTime: Double,

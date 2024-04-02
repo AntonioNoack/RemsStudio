@@ -8,7 +8,6 @@ import me.anno.gpu.GFX
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.TextureCache
 import me.anno.gpu.texture.TextureLib.whiteTexture
-import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
@@ -28,11 +27,11 @@ import me.anno.video.MissingFrameException
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
-import java.net.URL
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+@Suppress("MemberVisibilityCanBePrivate")
 open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
 
     // todo round edges?

@@ -16,6 +16,7 @@ import me.anno.ui.input.NumberType
 import me.anno.utils.types.Casting.castToFloat2
 import kotlin.math.abs
 
+@Suppress("MemberVisibilityCanBePrivate")
 class PitchEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
 
     companion object {

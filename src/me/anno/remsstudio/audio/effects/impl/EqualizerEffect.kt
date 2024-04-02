@@ -18,6 +18,7 @@ import me.anno.utils.hpc.HeavyProcessing.processBalanced
 import kotlin.math.abs
 import kotlin.math.log2
 
+@Suppress("MemberVisibilityCanBePrivate")
 class EqualizerEffect : SoundEffect(Domain.FREQUENCY_DOMAIN, Domain.FREQUENCY_DOMAIN) {
 
     override fun createInspector(

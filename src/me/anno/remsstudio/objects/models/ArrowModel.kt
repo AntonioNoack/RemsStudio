@@ -19,40 +19,7 @@ object ArrowModel {
     private val arrowBottom = Vector2f(center, -arrow)
     private val front = Vector2f(+1f, 0f)
 
-    val arrowModel by lazy { createModel() }
     val arrowLineModel = createLineModel()
-
-    private fun createModel(): Mesh {
-
-        val triangleCount = 6
-        val vertexCount = triangleCount * 3
-        val positions = FloatArray(vertexCount * 3)
-
-        var i = 0
-        fun add(a: Vector2f) {
-            positions[i++] = a.x
-            positions[i++] = a.y
-            positions[i++] = 0f
-        }
-
-        fun addTriangle(a: Vector2f, b: Vector2f, c: Vector2f) {
-            // from both sides
-            add(a)
-            add(b)
-            add(c)
-            add(a)
-            add(c)
-            add(b)
-        }
-
-        addTriangle(leftTop, centerBottom, centerTop)
-        addTriangle(leftBottom, leftTop, centerBottom)
-        addTriangle(arrowTop, arrowBottom, front)
-
-        val buffer = Mesh()
-        buffer.positions = positions
-        return buffer
-    }
 
     private fun createLineModel(): Mesh {
 

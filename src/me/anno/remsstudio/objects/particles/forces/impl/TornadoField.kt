@@ -15,6 +15,7 @@ import org.joml.Vector4f
 import kotlin.math.cos
 import kotlin.math.sin
 
+@Suppress("MemberVisibilityCanBePrivate")
 class TornadoField : ForceField(
     "Tornado",
     "Circular motion around center", "tornado"

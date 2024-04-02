@@ -1,9 +1,6 @@
 package me.anno.remsstudio.objects.particles.distributions
 
 import me.anno.language.translation.NameDesc
-import me.anno.ui.editor.sceneView.Grid
-import org.joml.Matrix4fArrayList
-import org.joml.Vector3f
 import org.joml.Vector4f
 
 class ConstantDistribution(center: Vector4f) :

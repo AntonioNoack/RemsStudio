@@ -14,7 +14,6 @@ class ExponentialFalloff() : Falloff() {
 
     override val displayName get() = "Exponential Falloff"
     override val description get() = "Sound falloff ~ 0.5 ^ distance"
-
     override val className get() = "ExponentialFalloffEffect"
 
 }

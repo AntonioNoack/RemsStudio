@@ -15,6 +15,6 @@ enum class TransformVisibility(val id: Int, val naming: NameDesc){
     };
     abstract val isVisible: Boolean
     companion object {
-        operator fun get(id: Int) = values().firstOrNull { id == it.id } ?: VISIBLE
+        operator fun get(id: Int) = entries.firstOrNull { id == it.id } ?: VISIBLE
     }
 }

@@ -8,6 +8,7 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
+@Suppress("MemberVisibilityCanBePrivate")
 abstract class CenterSizeDistribution(
     nameDesc: NameDesc,
     center: Vector4f,
@@ -81,9 +82,9 @@ abstract class CenterSizeDistribution(
     }
 
     companion object {
-        val POSITION_INDEX = 0
-        val SCALE_INDEX = 1
-        val ROTATION_INDEX = 2
+        const val POSITION_INDEX = 0
+        const val SCALE_INDEX = 1
+        const val ROTATION_INDEX = 2
     }
 
 }

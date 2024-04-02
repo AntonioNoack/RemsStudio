@@ -12,6 +12,7 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.TextInputML
 import me.anno.ui.Style
 
+@Suppress("MemberVisibilityCanBePrivate")
 class FunctionDriver : AnimationDriver() {
 
     // make them animated? no xD

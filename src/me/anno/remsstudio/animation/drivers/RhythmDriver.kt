@@ -8,6 +8,7 @@ import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.SettingCategory
 
+@Suppress("MemberVisibilityCanBePrivate")
 class RhythmDriver : AnimationDriver() {
 
     var rhythm: DoubleArray = DoubleArray(0)

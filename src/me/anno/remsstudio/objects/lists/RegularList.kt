@@ -28,6 +28,7 @@ import java.util.*
 
 // todo re-project UV textures onto stuff to animate an image exploding (gets UVs from first frame, then just is a particle system or sth else)
 
+@Suppress("MemberVisibilityCanBePrivate")
 class RegularList(parent: Transform? = null) : GFXTransform(parent) {
 
     val perChildTranslation = AnimatedProperty.pos()

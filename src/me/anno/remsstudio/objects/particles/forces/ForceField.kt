@@ -24,6 +24,7 @@ import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.floor
 
+@Suppress("MemberVisibilityCanBePrivate")
 abstract class ForceField(val displayName: String, val descriptionI: String) : Transform() {
 
     constructor(displayName: String, description: String, dictSubPath: String) :

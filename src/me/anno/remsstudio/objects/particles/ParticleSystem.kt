@@ -36,12 +36,12 @@ import me.anno.video.MissingFrameException
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
-import java.net.URL
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
+@Suppress("MemberVisibilityCanBePrivate")
 open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
 
     override fun getDocumentationURL() = "https://remsstudio.phychi.com/?s=learn/particle-systems"
@@ -471,7 +471,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
         LOGGER.info("${timeSum/timeCtr}ms")*/
         // 0.3-0.5 ms -> could be improved
         // -> improved it to ~ 0.056 ms by avoiding a full copy
-        // could be improved to 0.045 ms (~20%) by using a binary writer
+        // could be improved to 0.045 ms (~20%) by using a binary writer,
         // but it's less well readable -> use the more expensive version;
         // the gain is just too small for the costs
         return builder.toString()

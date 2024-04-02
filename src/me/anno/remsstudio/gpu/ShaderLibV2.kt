@@ -17,6 +17,7 @@ import me.anno.utils.pooling.ByteBufferPool
 import java.nio.FloatBuffer
 import kotlin.math.PI
 
+@Suppress("MemberVisibilityCanBePrivate")
 object ShaderLibV2 {
 
     val v3DlPolygon = listOf(

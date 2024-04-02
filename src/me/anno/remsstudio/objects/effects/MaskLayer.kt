@@ -33,8 +33,8 @@ import me.anno.ui.editor.SettingCategory
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector4f
-import java.net.URL
 
+@Suppress("MemberVisibilityCanBePrivate")
 open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
 
     override fun getDocumentationURL() = "https://remsstudio.phychi.com/?s=learn/masks"

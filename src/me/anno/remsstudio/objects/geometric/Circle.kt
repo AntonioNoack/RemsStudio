@@ -16,6 +16,7 @@ import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
 
+@Suppress("MemberVisibilityCanBePrivate")
 open class Circle(parent: Transform? = null) : GFXTransform(parent) {
 
     val innerRadius = AnimatedProperty.float01(0f)
