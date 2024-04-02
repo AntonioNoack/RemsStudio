@@ -9,6 +9,7 @@ import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
 import me.anno.language.translation.Dict
+import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.pow
 import me.anno.remsstudio.RemsStudio
@@ -225,12 +226,14 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         ) { it, _ -> for (x in c) x.onlyShowTarget = it }
 
         val ops = getGroup("Operations", "Actions", "operations")
-        ops += TextButton("Reset Transform", "If accidentally moved", "obj.camera.resetTransform", false, style)
-            .addLeftClickListener {
-                RemsStudio.largeChange("Reset Camera Transform") {
-                    for (x in c) x.resetTransform(false)
-                }
+        ops += TextButton(
+            NameDesc("Reset Transform", "If accidentally moved", "obj.camera.resetTransform"),
+            false, style
+        ).addLeftClickListener {
+            RemsStudio.largeChange("Reset Camera Transform") {
+                for (x in c) x.resetTransform(false)
             }
+        }
     }
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {

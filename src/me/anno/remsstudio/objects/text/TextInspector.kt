@@ -1,12 +1,13 @@
 package me.anno.remsstudio.objects.text
 
+import me.anno.engine.inspector.Inspectable
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.ui.IsAnimatedWrapper
 import me.anno.remsstudio.ui.IsSelectedWrapper
-import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
@@ -140,9 +141,12 @@ fun Text.createInspectorWithoutSuperImpl(
 
     // val ops = getGroup("Operations", "", "operations")
     list += TextButton(
-        "Create Shadow",
-        "This creates a new text object under ourself, where some properties are synced automatically. This allows for higher customizability.\n\n" +
-                "If you want everything to be synced, use the shadow properties at the bottom of this inspector.",
+        NameDesc(
+            "Create Shadow",
+            "This creates a new text object under ourself, where some properties are synced automatically. This allows for higher customizability.\n\n" +
+                    "If you want everything to be synced, use the shadow properties at the bottom of this inspector.",
+            ""
+        ),
         false,
         style
     ).addLeftClickListener {

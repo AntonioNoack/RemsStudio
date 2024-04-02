@@ -23,6 +23,7 @@ import me.anno.input.Input.isShiftDown
 import me.anno.input.Key
 import me.anno.input.Touch.Companion.touches
 import me.anno.io.files.FileReference
+import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.length
 import me.anno.maths.Maths.pow
@@ -109,8 +110,10 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
 
     init {
         val is2DPanel = TextButton(
-            if (isLocked2D) "2D" else "3D", "Lock the camera; use control to keep the angle",
-            "ui.sceneView.3dSwitch", true, style
+            NameDesc(
+                if (isLocked2D) "2D" else "3D", "Lock the camera; use control to keep the angle",
+                "ui.sceneView.3dSwitch"
+            ), true, style
         )
         is2DPanel.instantTextLoading = true
         controls += SimplePanel(
@@ -131,7 +134,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         }
         fun add(i: Int, mode: SceneDragMode) {
             controls += SimplePanel(
-                object : TextButton(mode.displayName, mode.description, true, style) {
+                object : TextButton(NameDesc(mode.displayName, mode.description, ""), true, style) {
                     override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
                         draw(x0, y0, x1, y1, isHovered, isPressed || mode == this@StudioSceneView.mode)
                     }
@@ -149,8 +152,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         add(2, SceneDragMode.SCALE)
         controls += SimplePanel(
             TextButton(
-                "\uD83D\uDCF7",
-                "Take a screenshot", "ui.sceneView.takeScreenshot",
+                NameDesc("\uD83D\uDCF7", "Take a screenshot", "ui.sceneView.takeScreenshot"),
                 true, style
             ),
             true, true,
