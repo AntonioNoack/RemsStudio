@@ -1,6 +1,7 @@
 package me.anno.remsstudio.animation.drivers
 
 import me.anno.io.base.BaseWriter
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.audio.pattern.PatternRecorderCore
 import me.anno.ui.Style
@@ -16,7 +17,7 @@ class RhythmDriver : AnimationDriver() {
 
     override fun createInspector(
         list: PanelListY, style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(list, style, getGroup)
         list += TextPanel("Rhythm (record while listening to target music)", style)

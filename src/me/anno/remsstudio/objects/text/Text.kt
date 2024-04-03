@@ -13,6 +13,7 @@ import me.anno.fonts.signeddistfields.TextSDFGroup
 import me.anno.io.base.BaseWriter
 import me.anno.jvm.fonts.AWTFont
 import me.anno.language.translation.Dict
+import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.mix
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.GFXTransform
@@ -302,20 +303,16 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
     }
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
         createInspectorWithoutSuper(inspected, list, style, getGroup)
     }
 
     fun createInspectorWithoutSuper(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) = createInspectorWithoutSuperImpl(inspected, list, style, getGroup)
 
     fun getSelfWithShadows() = getShadows() + this

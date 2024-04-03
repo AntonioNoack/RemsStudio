@@ -349,7 +349,7 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
                             interpolation = value.interpolation
                         }
                     } else LOGGER.warn("Dropped keyframe!, incompatible type ${value.value} for $type")
-                } else if (value is Array<*>) {
+                } else if (value is List<*>) {
                     for (vi in value.filterIsInstance<Keyframe<*>>()) {
                         val castValue = type.acceptOrNull(vi.value)
                         if (castValue != null) {

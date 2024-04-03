@@ -39,10 +39,8 @@ object RenderSettings : Transform() {
     override val defaultDisplayName get() = "Render Settings"
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
 
         val project = project ?: throw IllegalStateException("Missing project")

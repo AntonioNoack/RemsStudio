@@ -20,10 +20,8 @@ import org.joml.Vector3f
 import org.joml.Vector4f
 
 fun Text.createInspectorWithoutSuperImpl(
-    inspected: List<Inspectable>,
-    list: PanelListY,
-    style: Style,
-    getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+    inspected: List<Inspectable>, list: PanelListY, style: Style,
+    getGroup: (NameDesc) -> SettingCategory
 ) {
 
     // todo propagate all changes to shadows
@@ -43,7 +41,7 @@ fun Text.createInspectorWithoutSuperImpl(
         }
     }
 
-    val fontGroup = getGroup("Font", "In what style text is rendered.", "font")
+    val fontGroup = getGroup(NameDesc("Font", "In what style text is rendered.", "obj.font"))
     fontGroup += createFontInput(font.name, style) {
         RemsStudio.largeChange("Change Font to '$it'") {
             for (x in c) for (e in x.getSelfWithShadows()) {
@@ -88,7 +86,7 @@ fun Text.createInspectorWithoutSuperImpl(
         invalidate()
     }.setIsSelectedListener { show(t, null) }
 
-    val alignGroup = getGroup("Alignment", "", "alignment")
+    val alignGroup = getGroup(NameDesc("Alignment", "", "obj.alignment"))
     fun align(title: String, ttt: String, value: List<AnimatedProperty<*>>) {
         alignGroup += vis(c, title, ttt, "", value, style)
     }
@@ -106,7 +104,7 @@ fun Text.createInspectorWithoutSuperImpl(
         "This sets the alignment of the whole text block.",
         c.map { it.blockAlignmentY })//, false)// { self, it -> self.blockAlignmentY = it }
 
-    val spaceGroup = getGroup("Spacing", "", "spacing")
+    val spaceGroup = getGroup(NameDesc("Spacing", "", "obj.spacing"))
     // make this element separable from the parent???
     spaceGroup += vi(
         inspected, "Character Spacing",
@@ -168,7 +166,7 @@ fun Text.createInspectorWithoutSuperImpl(
         }
     }
 
-    val rpgEffects = getGroup("RPG Effects", "This effect is for fading in/out letters one by one.", "rpg-effects")
+    val rpgEffects = getGroup(NameDesc("RPG Effects", "This effect is for fading in/out letters one by one.", "obj.rpg-effects"))
     rpgEffects += vis(
         c, "Start Cursor", "The first character index to be drawn", c.map { it.startCursor },
         style
@@ -178,7 +176,7 @@ fun Text.createInspectorWithoutSuperImpl(
         style
     )
 
-    val outline = getGroup("Outline", "", "outline")
+    val outline = getGroup(NameDesc("Outline", "", "obj.outline"))
     outline.setTooltip("Needs Rendering Mode = SDF or Merged SDF")
     outline += vi(
         inspected, "Rendering Mode",
@@ -223,7 +221,7 @@ fun Text.createInspectorWithoutSuperImpl(
         invalidate()
     }
 
-    val shadows = getGroup("Shadow", "Built-in Shadow", "shadow")
+    val shadows = getGroup(NameDesc("Shadow", "Built-in Shadow", "obj.shadow"))
     shadows += vis(c, "Color", "", "shadow.color", c.map { it.shadowColor }, style)
     shadows += vis(c, "Offset", "", "shadow.offset", c.map { it.shadowOffset }, style)
     shadows += vis(c, "Smoothness", "", "shadow.smoothness", c.map { it.shadowSmoothness }, style)

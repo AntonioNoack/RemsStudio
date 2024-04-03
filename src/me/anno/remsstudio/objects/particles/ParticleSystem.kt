@@ -295,10 +295,8 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
     var selectedDistribution: AnimatedDistribution = spawnPosition
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
 
         super.createInspector(inspected, list, style, getGroup)
@@ -308,7 +306,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
         fun vi(c: List<ParticleSystem>, name: String, description: String, properties: List<AnimatedDistribution>) {
             val property = properties.first()
             fun getName() = "$name: ${property.distribution.className.split("Distribution").first()}"
-            val group = getGroup(getName(), description, "$viCtr")
+            val group = getGroup(NameDesc(getName(), description, "$viCtr"))
             group.addChild(SpyPanel(style) {
                 if (group.isAnyChildInFocus) {
                     var needsUpdate = false
@@ -359,7 +357,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
         vt("opacity", "Opacity", "Initial particle opacity (1-transparency)", c.map { it.spawnOpacity })
         vt("size", "Size", "Initial particle size", c.map { it.spawnSize })
 
-        val general = getGroup("Particle System", "", "particles")
+        val general = getGroup(NameDesc("Particle System", "", "obj.particles"))
 
         general += vis(
             c,

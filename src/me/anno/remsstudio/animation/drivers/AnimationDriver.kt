@@ -63,11 +63,8 @@ abstract class AnimationDriver : Saveable(), Inspectable {
     override fun isDefaultValue() = false
 
     open fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        transforms: List<Transform>,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, transforms: List<Transform>, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         val transform = transforms[0]
         list += transform.vis(
@@ -102,16 +99,13 @@ abstract class AnimationDriver : Saveable(), Inspectable {
 
     // requires, that an object is selected
     override fun createInspector(
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) = createInspector(listOf(this), list, style, getGroup)
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         list += TextPanel(Dict["Driver Inspector", "driver.inspector.title"], style)
         val t = selectedTransforms

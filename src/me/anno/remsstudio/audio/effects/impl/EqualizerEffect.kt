@@ -1,7 +1,9 @@
 package me.anno.remsstudio.audio.effects.impl
 
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
+import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
+import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.mix
 import me.anno.maths.Maths.pow
@@ -22,9 +24,8 @@ import kotlin.math.log2
 class EqualizerEffect : SoundEffect(Domain.FREQUENCY_DOMAIN, Domain.FREQUENCY_DOMAIN) {
 
     override fun createInspector(
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (nameDesc: NameDesc) -> SettingCategory
     ) {
         // todo better equalizer view...
         for (index in frequencies) {
@@ -54,13 +55,13 @@ class EqualizerEffect : SoundEffect(Domain.FREQUENCY_DOMAIN, Domain.FREQUENCY_DO
 
     override fun save(writer: BaseWriter) {
         super.save(writer)
-        writer.writeObjectArray(this, "sliders", sliders)
+        writer.writeObjectList(this, "sliders", sliders.toList())
     }
 
     override fun setProperty(name: String, value: Any?) {
         when (name) {
             "sliders" -> {
-                val values = value as? Array<*> ?: return
+                val values = value as? List<*> ?: return
                 for (index in values.indices) {
                     val vi = values[index]
                     sliders.getOrNull(index)?.copyFrom(vi)

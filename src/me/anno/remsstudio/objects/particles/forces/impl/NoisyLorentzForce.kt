@@ -2,6 +2,7 @@ package me.anno.remsstudio.objects.particles.forces.impl
 
 import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
+import me.anno.language.translation.NameDesc
 import me.anno.maths.noise.FullNoise
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.inspectable.InspectableAnimProperty
@@ -67,13 +68,11 @@ class NoisyLorentzForce : PerParticleForce(
     }
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
-        getGroup("Force Field", "", "forces") +=
+        getGroup(NameDesc("Force Field", "", "obj.forces")) +=
             vi(inspected, "Seed", "For the random component", null, seed, style) { it, _ ->
                 for (x in inspected) if (x is NoisyLorentzForce) x.seed = it
             }

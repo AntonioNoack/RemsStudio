@@ -1,6 +1,7 @@
 package me.anno.remsstudio.audio.effects.impl
 
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.SoundEffect
 import me.anno.remsstudio.audio.effects.Time
@@ -56,9 +57,8 @@ class AmplitudeEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
     }
 
     override fun createInspector(
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         list += SpacerPanel(0, 0, style) // nothing, but it must not be empty, soo...
     }

@@ -13,6 +13,7 @@ import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
 import me.anno.language.translation.Dict
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Scene
 import me.anno.remsstudio.animation.AnimatedProperty
@@ -175,15 +176,13 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
     }
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
         val t = inspected.filterIsInstance<Transform>()
         val c = inspected.filterIsInstance<SoftLink>()
-        val link = getGroup("Link Data", "", "softLink")
+        val link = getGroup(NameDesc("Link Data", "", "obj.softLink"))
         link += vi(
             inspected, "File", "Where the data is to be loaded from", "", null, file, style
         ) { it, _ -> for (x in c) x.file = it }

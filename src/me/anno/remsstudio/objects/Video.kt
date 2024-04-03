@@ -785,10 +785,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
     }
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
 
         super.createInspector(inspected, list, style, getGroup)
@@ -815,7 +813,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
             return panel
         }
 
-        val infoGroup = getGroup("Info", "File information", "info")
+        val infoGroup = getGroup(NameDesc("Info", "File information", "obj.info"))
         infoGroup += UpdatingTextPanel(250, style) { "Type: ${type.name}" }
         infoGroup += UpdatingTextPanel(250, style) {
             if (type == VideoType.IMAGE) null
@@ -842,7 +840,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
             for (x in c) x.file = newFile
         }
 
-        val uvMap = getGroup("Texture", "", "uvs")
+        val uvMap = getGroup(NameDesc("Texture", "", "obj.uvs"))
         uvMap += img(
             vis(
                 c, "Tiling", "(tile count x, tile count y, offset x, offset y)", c.map { it.tiling },
@@ -879,7 +877,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
             }*/
         }
 
-        val time = getGroup("Time", "", "time")
+        val time = getGroup(NameDesc("Time", "", "obj.time"))
         time += vi(
             inspected, "Looping Type", "Whether to repeat the song/video", "video.loopingType",
             "video.loopingType",
@@ -898,8 +896,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
             invalidateTimeline()
         }
 
-        val editor = getGroup("Editor", "", "editor")
-        fun quality() = getGroup("Quality", "", "quality")
+        val editor = getGroup(NameDesc("Editor", "", "obj.editor"))
+        fun quality() = getGroup(NameDesc("Quality", "", "obj.quality"))
 
         // quality; if controlled automatically, then editor; else quality
         val videoScales = videoScaleNames.entries.sortedBy { it.value }
@@ -942,7 +940,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
             getGroup, style
         )
 
-        val audio = getGroup("Audio", "", "audio")
+        val audio = getGroup(NameDesc("Audio", "", "obj.audio"))
         audio += aud(vis(c, "Amplitude", "How loud it is", "audio.amplitude", c.map { it.amplitude }, style))
         audio += aud(vi(inspected, "Is 3D Sound", "Sound becomes directional", "audio.3d", null, is3D, style) { it, _ ->
             for (x in c) x.is3D = it

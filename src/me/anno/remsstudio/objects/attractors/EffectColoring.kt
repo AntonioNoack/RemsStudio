@@ -4,6 +4,7 @@ import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
 import me.anno.ui.Style
@@ -29,11 +30,11 @@ class EffectColoring : Transform() {
         inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<EffectColoring>()
-        val fx = getGroup("Effect", "", "effect")
+        val fx = getGroup(NameDesc("Effect", "", "obj.effect"))
         fx += vis(c, "Strength", "How much this color shall be used", c.map { it.influence }, style)
         fx += vis(c, "Sharpness", "How sharp the circle is", c.map { it.sharpness }, style)
     }

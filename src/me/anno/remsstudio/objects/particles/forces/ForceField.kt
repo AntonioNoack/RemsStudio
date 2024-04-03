@@ -1,23 +1,24 @@
 package me.anno.remsstudio.objects.particles.forces
 
 import me.anno.config.DefaultConfig
+import me.anno.engine.inspector.Inspectable
 import me.anno.language.translation.Dict
+import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.objects.particles.forces.impl.*
 import me.anno.remsstudio.objects.inspectable.InspectableAnimProperty
 import me.anno.remsstudio.objects.models.ArrowModel
 import me.anno.remsstudio.objects.particles.Particle
 import me.anno.remsstudio.objects.particles.ParticleState
 import me.anno.remsstudio.objects.particles.ParticleSystem
-import me.anno.engine.inspector.Inspectable
+import me.anno.remsstudio.objects.particles.forces.impl.*
+import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelList
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.sceneView.Grid
 import me.anno.ui.editor.stacked.Option
-import me.anno.ui.Style
 import me.anno.utils.types.Floats.toRadians
 import org.joml.*
 import kotlin.math.abs
@@ -50,13 +51,14 @@ abstract class ForceField(val displayName: String, val descriptionI: String) : T
     )
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
-        createInspector(inspected.filterIsInstance<ForceField>(), getGroup("Force Field", "", "forces").content, style)
+        createInspector(
+            inspected.filterIsInstance<ForceField>(),
+            getGroup(NameDesc("Force Field", "", "obj.forces")).content, style
+        )
     }
 
     fun createInspector(inspected: List<ForceField>, list: PanelList, style: Style) {
@@ -154,9 +156,7 @@ abstract class ForceField(val displayName: String, val descriptionI: String) : T
 
         fun option(generator: () -> ForceField): Option {
             val sample = generator()
-            return Option(sample.displayName, sample.description) {
-                generator()
-            }
+            return Option(NameDesc(sample.displayName, sample.description, ""), generator)
         }
 
         fun getForceFields() = listOf(

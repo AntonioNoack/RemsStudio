@@ -82,16 +82,14 @@ class Camera(parent: Transform? = null) : Transform(parent) {
     fun orthographicFOV(fov: Float, offset: Float) = fov / (1f + offset)
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
 
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<Camera>()
 
-        val transform = getGroup("Transform", "", "transform")
+        val transform = getGroup(NameDesc("Transform", "", "obj.transform"))
         transform += vis(
             c, "Orbit Radius", "Orbiting Distance", "camera.orbitDis",
             "camera.orbitDis", c.map { it.orbitRadius },
@@ -99,7 +97,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         )
 
 
-        val cam = getGroup("Projection", "How rays of light are mapped to the screen", "projection")
+        val cam = getGroup(NameDesc("Projection", "How rays of light are mapped to the screen", "obj.projection"))
         cam += vis(
             c, "FOV", "Field Of View, in degrees, vertical", "camera.fov",
             "camera.fov", c.map { it.fovYDegrees },
@@ -112,7 +110,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         )
 
 
-        val depth = getGroup("Depth", "Z-axis related settings; from camera perspective", "depth")
+        val depth = getGroup(NameDesc("Depth", "Z-axis related settings; from camera perspective", "obj.depth"))
         depth += vis(
             c, "Near Z", "Closest Visible Distance", "camera.depth.near",
             "camera.depth.near", c.map { it.nearZ },
@@ -133,7 +131,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         ) { order = it }*/
 
 
-        val chroma = getGroup("Chromatic Aberration", "Effect occurring in cheap lenses", "chroma")
+        val chroma = getGroup(NameDesc("Chromatic Aberration", "Effect occurring in cheap lenses", "obj.chroma"))
         chroma += vis(
             c, "Strength", "How large the effect is", "camera.chromaStrength",
             "camera.chromaStrength", c.map { it.chromaticAberration },
@@ -150,7 +148,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         )
 
 
-        val dist = getGroup("Distortion", "Transforms the image", "distortion")
+        val dist = getGroup(NameDesc("Distortion", "Transforms the image", "obj.distortion"))
         dist += vis(
             c, "Distortion", "Params: R², R⁴, Scale", c.map { it.distortion },
             style
@@ -161,7 +159,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         )
 
 
-        val vignette = getGroup("Vignette", "Darkens/colors the border", "vignette")
+        val vignette = getGroup(NameDesc("Vignette", "Darkens/colors the border", "obj.vignette"))
         vignette += vis(
             c, "Vignette Color", "Color of border", "vignette.color",
             "vignette.color", c.map { it.vignetteColor },
@@ -174,7 +172,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         )
 
 
-        val bloom = getGroup("Bloom", "Adds a light halo around bright objects", "bloom")
+        val bloom = getGroup(NameDesc("Bloom", "Adds a light halo around bright objects", "obj.bloom"))
         bloom += vis(
             c, "Intensity", "Brightness of effect, 0 = off", "bloom.intensity",
             "bloom.intensity", c.map { it.bloomIntensity },
@@ -192,7 +190,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         )
 
 
-        val color = getGroup("Color", "Tint and Tonemapping", "color")
+        val color = getGroup(NameDesc("Color", "Tint and Tonemapping", "obj.color"))
         color += vis(
             c,
             "Background Color",
@@ -219,14 +217,14 @@ class Camera(parent: Transform? = null) : Transform(parent) {
             c.map { it.cgOffsetSub }, { it }, getGroup, style
         )
 
-        val editor = getGroup("Editor", "Settings, which only effect editing", "editor")
+        val editor = getGroup(NameDesc("Editor", "Settings, which only effect editing", "obj.editor"))
         editor += vi(
             inspected, "Only Show Target",
             "Forces the viewport to have the correct aspect ratio",
             null, onlyShowTarget, style
         ) { it, _ -> for (x in c) x.onlyShowTarget = it }
 
-        val ops = getGroup("Operations", "Actions", "operations")
+        val ops = getGroup(NameDesc("Operations", "Actions", "obj.operations"))
         ops += TextButton(
             NameDesc("Reset Transform", "If accidentally moved", "obj.camera.resetTransform"),
             false, style

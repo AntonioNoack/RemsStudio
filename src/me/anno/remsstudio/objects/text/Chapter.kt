@@ -71,10 +71,8 @@ class Chapter(parent: Transform?) : GFXTransform(parent) {
     }
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
         list += UpdatingTextPanel(500, style) { "Start time: ${createTimestamp(getChapterTime().roundToInt())}" }

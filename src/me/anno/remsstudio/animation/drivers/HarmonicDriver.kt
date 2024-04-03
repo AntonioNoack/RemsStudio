@@ -7,6 +7,7 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.parser.SimpleExpressionParser.parseDouble
 import me.anno.parser.SimpleExpressionParser.preparse
 import me.anno.engine.inspector.Inspectable
+import me.anno.language.translation.NameDesc
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.TextInput
 import me.anno.ui.Style
@@ -29,11 +30,8 @@ class HarmonicDriver : AnimationDriver() {
     }
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        transforms: List<Transform>,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, transforms: List<Transform>, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, transforms, style, getGroup)
         val name = getDisplayName()

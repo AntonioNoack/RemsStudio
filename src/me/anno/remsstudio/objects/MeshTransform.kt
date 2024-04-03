@@ -268,10 +268,8 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
 
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
 
         super.createInspector(inspected, list, style, getGroup)

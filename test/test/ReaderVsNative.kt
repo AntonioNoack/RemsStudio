@@ -19,7 +19,7 @@ fun test() {
     // val readerFile = File.createTempFile("RemsStudio", ".tmp")
     val readerText = measure("Reader-create") {
        JsonStringWriter(InvalidRef).apply {
-            writeStringArray("strings", (0 until lines).map { genName() }.toTypedArray())
+            writeStringList("strings", (0 until lines).map { genName() })
         }.toString()
     }
     // readerFile.writeText(readerText)

@@ -4,6 +4,7 @@ import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.remsstudio.objects.GFXTransform
@@ -32,14 +33,12 @@ open class Circle(parent: Transform? = null) : GFXTransform(parent) {
     }
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<Circle>()
-        val geo = getGroup("Geometry", "", "geometry")
+        val geo = getGroup(NameDesc("Geometry", "", "obj.geometry"))
         geo += vis(c, "Inner Radius", "Relative size of hole in the middle", c.map { it.innerRadius }, style)
         geo += vis(c, "Start Degrees", "To cut a piece out of the circle", c.map { it.startDegrees }, style)
         geo += vis(c, "End Degrees", "To cut a piece out of the circle", c.map { it.endDegrees }, style)

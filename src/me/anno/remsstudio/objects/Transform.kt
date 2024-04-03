@@ -222,10 +222,8 @@ open class Transform() : Saveable(),
     open fun usesFadingDifferently() = false
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (nameDesc: NameDesc) -> SettingCategory
     ) {
 
         val c = inspected.filterIsInstance<Transform>()
@@ -264,7 +262,7 @@ open class Transform() : Saveable(),
             .setTooltip("For Search | Not implemented yet")
 
         // transforms
-        val transform = getGroup("Transform", "Translation Scale, Rotation, Skewing", "transform")
+        val transform = getGroup(NameDesc("Transform", "Translation Scale, Rotation, Skewing", "obj.transform"))
         transform += vis(c, "Position", "Location of this object", c.map { it.position }, style)
         transform += vis(c, "Scale", "Makes it bigger/smaller", c.map { it.scale }, style)
         transform += vis(c, "Rotation", "Pitch,Yaw,Roll", c.map { it.rotationYXZ }, style)
@@ -278,7 +276,7 @@ open class Transform() : Saveable(),
         )
 
         // color
-        val colorGroup = getGroup("Color", "", "color")
+        val colorGroup = getGroup(NameDesc("Color", "", "obj.color"))
         colorGroup += vis(c, "Color", "Tint, applied to this & children", c.map { it.color }, style)
         colorGroup += vis(
             c, "Color Multiplier", "To make things brighter than usually possible", c.map { it.colorMultiplier },
@@ -292,7 +290,7 @@ open class Transform() : Saveable(),
         ) { it, _ -> for (x in c) x.blendMode = it }
 
         // time
-        val timeGroup = getGroup("Time", "", "time")
+        val timeGroup = getGroup(NameDesc("Time", "", "obj.time"))
         timeGroup += vis(
             inspected, "Start Time", "Delay the animation", null,
             c.map { it.timeOffset }, style
@@ -312,7 +310,7 @@ open class Transform() : Saveable(),
             timeGroup += vis(c, "Fade Out", "Transparency at the end, in seconds", c.map { it.fadeOut }, style)
         }
 
-        val editorGroup = getGroup("Editor", "", "editor")
+        val editorGroup = getGroup(NameDesc("Editor", "", "obj.editor"))
         editorGroup += vi(
             inspected, "Timeline Slot", "< 1 means invisible", NumberType.INT_PLUS, timelineSlot.value, style
         ) { it, _ -> for (x in c) x.timelineSlot.value = it }
@@ -322,7 +320,7 @@ open class Transform() : Saveable(),
         ) { it, _ -> for (x in c) x.visibility = it }
 
         if (parent?.acceptsWeight() == true) {
-            val psGroup = getGroup("Particle System Child", "", "particles")
+            val psGroup = getGroup(NameDesc("Particle System Child", "", "obj.particles"))
             psGroup += vi(
                 inspected, "Weight", "For particle systems",
                 NumberType.FLOAT_PLUS, weight, style
@@ -337,11 +335,7 @@ open class Transform() : Saveable(),
         }
     }
 
-    override fun createInspector(
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
-    ) {
+    override fun createInspector(list: PanelListY, style: Style, getGroup: (nameDesc: NameDesc) -> SettingCategory) {
         createInspector(listOf(this), list, style, getGroup)
     }
 
@@ -558,7 +552,7 @@ open class Transform() : Saveable(),
             "blendMode" -> blendMode = BlendMode[value as? String ?: ""]
             "children" -> {
                 when (value) {
-                    is Array<*> -> value.filterIsInstance<Transform>().forEach(::addChild)
+                    is List<*> -> value.filterIsInstance<Transform>().forEach(::addChild)
                     is Transform -> addChild(value)
                 }
             }

@@ -2,6 +2,7 @@ package me.anno.remsstudio.audio.effects.falloff
 
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
 import me.anno.io.base.BaseWriter
+import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.mix
 import me.anno.remsstudio.Selection.selectedTransforms
 import me.anno.remsstudio.audio.effects.Domain
@@ -64,9 +65,8 @@ abstract class Falloff : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
     }
 
     override fun createInspector(
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         list.add(audio.vi(
             selectedTransforms, "Half Distance",

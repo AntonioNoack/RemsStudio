@@ -4,6 +4,7 @@ import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
 import me.anno.ui.Style
@@ -28,11 +29,11 @@ class EffectMorphing : Transform() {
         inspected: List<Inspectable>,
         list: PanelListY,
         style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        getGroup: (nameDesc: NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<EffectMorphing>()
-        val fx = getGroup("Effect", "", "effects")
+        val fx = getGroup(NameDesc("Effect", "", "obj.effects"))
         fx += vis(
             c, "Strength", "The effective scale",
             c.map { it.zooming }, style

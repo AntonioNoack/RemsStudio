@@ -105,7 +105,7 @@ class History : Saveable() {
             "nextInsertIndex" -> nextInsertIndex = value as? Int ?: return
             "state" -> states += value as? HistoryState ?: return
             "states" -> {
-                val values = value as? Array<*> ?: return
+                val values = value as? List<*> ?: return
                 synchronized(states) {
                     states += values.filterIsInstance<HistoryState>()
                 }

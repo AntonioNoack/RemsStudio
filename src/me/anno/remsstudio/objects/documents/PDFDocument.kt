@@ -13,6 +13,7 @@ import me.anno.gpu.texture.TextureLib.colorShowTexture
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.remsstudio.gpu.TexFiltering
@@ -178,14 +179,12 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
     }
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<PDFDocument>()
-        val doc = getGroup("Document", "", "docs")
+        val doc = getGroup(NameDesc("Document", "", "obj.docs"))
         doc += vi(
             inspected, "Path", "", null, file, style
         ) { it, _ -> for (x in c) x.file = it }

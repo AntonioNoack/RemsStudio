@@ -12,6 +12,7 @@ import me.anno.remsstudio.objects.TextSegmentKey
 import me.anno.remsstudio.objects.text.Text
 import me.anno.engine.inspector.Inspectable
 import me.anno.jvm.fonts.AWTFont
+import me.anno.language.translation.NameDesc
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -28,10 +29,8 @@ class TextParticles : ParticleSystem() {
     override fun needsChildren() = false
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
         text.createInspectorWithoutSuper(inspected, list, style, getGroup)

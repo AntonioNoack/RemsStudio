@@ -3,6 +3,7 @@ package me.anno.remsstudio.audio.effects.impl
 import audacity.soundtouch.TimeDomainStretch
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
 import me.anno.io.base.BaseWriter
+import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.SoundEffect
@@ -29,9 +30,8 @@ class PitchEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
     }
 
     override fun createInspector(
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         // todo effect broken, dragging not working?
         val inspected = listOf(audio)

@@ -16,9 +16,8 @@ object ProjectSettings : Transform() {
     override val defaultDisplayName get() = "Project Settings"
 
     override fun createInspector(
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         list.add(createSpellcheckingPanel(style))
     }

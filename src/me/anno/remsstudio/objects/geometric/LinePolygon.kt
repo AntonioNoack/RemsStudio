@@ -6,6 +6,7 @@ import me.anno.gpu.drawing.GFXx3D
 import me.anno.gpu.drawing.UVProjection
 import me.anno.gpu.shader.Shader
 import me.anno.io.base.BaseWriter
+import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths
 import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.RemsStudio
@@ -68,14 +69,12 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
     }
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<LinePolygon>()
-        val group = getGroup("Line", "Properties of the line", "line")
+        val group = getGroup(NameDesc("Line", "Properties of the line", "obj.line"))
         group += vis(c, "Segment Start", "", c.map { it.segmentStart }, style)
         group += vis(c, "Segment Length", "", c.map { it.segmentLength }, style)
         group += vis(c, "Line Strength", "", c.map { it.lineStrength }, style)

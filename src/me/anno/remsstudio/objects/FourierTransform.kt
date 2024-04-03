@@ -10,6 +10,7 @@ import me.anno.io.MediaMetadata
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
+import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.fract
@@ -242,14 +243,12 @@ class FourierTransform : Transform() {
     }
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<FourierTransform>()
-        val fourier = getGroup("Fourier Transform", "", "fourier")
+        val fourier = getGroup(NameDesc("Fourier Transform", "", "obj.fourier"))
         list.addChild(vi(
             inspected, "Audio File", "", null, file, style
         ) { it, _ -> for (x in c) x.file = it })
@@ -277,7 +276,7 @@ class FourierTransform : Transform() {
                 inspected, "Buffer Max", "Use only a part of the fourier transform; -1 = disabled",
                 null, maxBufferIndex, style
             ) { it, _ -> for (x in c) x.maxBufferIndex = it })
-        val amplitude = getGroup("Amplitude", "", "amplitude")
+        val amplitude = getGroup(NameDesc("Amplitude", "", "obj.amplitude"))
         amplitude.addChild(vis(c, "Position, Linear", "", c.map { it.posLin }, style))
         amplitude.addChild(vis(c, "Position, Logarithmic", "", c.map { it.posLog }, style))
         amplitude.addChild(vis(c, "Rotation, Linear", "", c.map { it.rotLin }, style))

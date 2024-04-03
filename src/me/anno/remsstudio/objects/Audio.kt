@@ -7,6 +7,7 @@ import me.anno.io.MediaMetadata.Companion.getMeta
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.audio.AudioFileStreamOpenAL2
 import me.anno.remsstudio.audio.effects.SoundPipeline
@@ -83,10 +84,8 @@ abstract class Audio(var file: FileReference = InvalidRef, parent: Transform? = 
     }
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
         if (inspected.size == 1) { // else not really supported well

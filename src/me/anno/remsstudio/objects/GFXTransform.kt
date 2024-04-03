@@ -3,6 +3,7 @@ package me.anno.remsstudio.objects
 import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.shader.Shader
 import me.anno.io.base.BaseWriter
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.gpu.ShaderLibV2.colorForceFieldBuffer
 import me.anno.remsstudio.gpu.ShaderLibV2.maxColorForceFields
@@ -43,14 +44,12 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
     }
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<GFXTransform>()
-        val fx = getGroup("Effects", "Visual Effects Settings", "effects")
+        val fx = getGroup(NameDesc("Effects", "Visual Effects Settings", "obj.effects"))
         fx += vis(
             c, "Coloring: Base Color", "Base color for coloring", c.map { it.attractorBaseColor },
             style

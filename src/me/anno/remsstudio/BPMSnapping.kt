@@ -3,6 +3,7 @@ package me.anno.remsstudio
 import me.anno.ui.input.NumberType
 import me.anno.remsstudio.objects.Transform
 import me.anno.engine.inspector.Inspectable
+import me.anno.language.translation.NameDesc
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.text.TextPanel
@@ -16,10 +17,8 @@ object BPMSnapping : Transform() {
     override val defaultDisplayName get() = "Render Settings"
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         val project = RemsStudio.project ?: return
         list += TextPanel(

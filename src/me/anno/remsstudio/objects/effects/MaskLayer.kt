@@ -17,6 +17,7 @@ import me.anno.gpu.texture.Filtering
 import me.anno.gpu.texture.Texture2D
 import me.anno.image.utils.GaussianBlur
 import me.anno.io.base.BaseWriter
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.Scene
 import me.anno.remsstudio.Scene.mayUseMSAA
 import me.anno.remsstudio.animation.AnimatedProperty
@@ -253,7 +254,7 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
 
                 val src0 = masked
                 val src0Tex = src0.getTexture0() as Texture2D
-                src0.bindTexture0(0, src0Tex.filtering, src0Tex.clamping!!)
+                src0.bindTexture0(0, src0Tex.filtering, src0Tex.clamping)
                 val srcBuffer = (src0 as Framebuffer).ssBuffer ?: src0
                 BokehBlur.draw(srcBuffer.textures!![0], temp, pixelSize, Scene.usesFPBuffers)
 
@@ -313,14 +314,12 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
     }
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<MaskLayer>()
-        val mask = getGroup("Mask Settings", "Masks are multipurpose objects", "mask")
+        val mask = getGroup(NameDesc("Mask Settings", "Masks are multipurpose objects", "obj.mask"))
         mask += vi(
             inspected, "Type", "Specifies what kind of mask it is", null, type, style
         ) { it, _ -> for (x in c) x.type = it }
@@ -371,8 +370,12 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
             null, useExperimentalMSAA, style
         ) { it, _ -> for (x in c) x.useExperimentalMSAA = it }
 
-        val greenScreen =
-            getGroup("Green Screen", "Type needs to be green-screen; cuts out a specific color", "greenScreen")
+        val greenScreen = getGroup(
+            NameDesc(
+                "Green Screen", "Type needs to be green-screen; cuts out a specific color",
+                "obj.greenScreen"
+            )
+        )
         greenScreen += vis(c, "Similarity", "", c.map { it.greenScreenSimilarity }, style)
         greenScreen += vis(c, "Smoothness", "", c.map { it.greenScreenSmoothness }, style)
         greenScreen += vis(c, "Spill Value", "", c.map { it.greenScreenSpillValue }, style)
@@ -380,10 +383,10 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
             inspected, "Invert Mask 2", "", null, isInverted2, style
         ) { it, _ -> for (x in c) x.isInverted2 = it }
 
-        val transition = getGroup("Transition", "Type needs to be transition", "transition")
+        val transition = getGroup(NameDesc("Transition", "Type needs to be transition", "obj.transition"))
         transition += vis(c, "Progress", "", c.map { it.transitionProgress }, style)
         transition += vis(c, "Smoothness", "", c.map { it.transitionSmoothness }, style)
-        val editor = getGroup("Editor", "", "editor")
+        val editor = getGroup(NameDesc("Editor", "", "obj.editor"))
         editor += vi(
             inspected, "Show Mask", "for debugging purposes; shows the stencil",
             null, showMask, style

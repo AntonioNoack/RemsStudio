@@ -1,8 +1,10 @@
 package me.anno.remsstudio.audio.effects
 
 import me.anno.Engine
+import me.anno.engine.inspector.Inspectable
 import me.anno.io.Saveable
 import me.anno.io.base.BaseWriter
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.audio.effects.falloff.ExponentialFalloff
 import me.anno.remsstudio.audio.effects.falloff.LinearFalloff
@@ -10,7 +12,6 @@ import me.anno.remsstudio.audio.effects.falloff.SquareFalloff
 import me.anno.remsstudio.audio.effects.impl.*
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
-import me.anno.engine.inspector.Inspectable
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
@@ -29,11 +30,10 @@ class SoundPipeline() : Saveable(), Inspectable {
     }
 
     override fun createInspector(
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
-        val effectsGroup = getGroup("Audio Effects", "Audio Effects", "audio-fx")
+        val effectsGroup = getGroup(NameDesc("Audio Effects", "Audio Effects", "obj.audio-fx"))
         effectsGroup += object : StackPanel(
             "Effects Stack",
             "Effects can be added with RMB, are applied one after another",
@@ -111,7 +111,7 @@ class SoundPipeline() : Saveable(), Inspectable {
     }
 
     override fun setProperty(name: String, value: Any?) {
-        when(name){
+        when (name) {
             "stage" -> {
                 if (value is SoundEffect) {
                     effects.add(value)
@@ -161,7 +161,7 @@ class SoundPipeline() : Saveable(), Inspectable {
 
         fun option(generator: () -> SoundEffect): Option {
             val sample = generator()
-            return Option(sample.displayName, sample.description, generator)
+            return Option(NameDesc(sample.displayName, sample.description, ""), generator)
         }
 
         /**

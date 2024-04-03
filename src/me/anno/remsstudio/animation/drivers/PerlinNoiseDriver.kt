@@ -2,6 +2,7 @@ package me.anno.remsstudio.animation.drivers
 
 import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
+import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
 import me.anno.maths.noise.FullNoise
 import me.anno.remsstudio.animation.AnimatedProperty
@@ -43,11 +44,8 @@ class PerlinNoiseDriver : AnimationDriver() {
     }
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        transforms: List<Transform>,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, transforms: List<Transform>, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, transforms, style, getGroup)
         val transform = transforms.first()

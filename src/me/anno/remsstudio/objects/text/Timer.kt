@@ -5,6 +5,7 @@ import me.anno.language.translation.Dict
 import me.anno.maths.Maths.fract
 import me.anno.remsstudio.objects.Transform
 import me.anno.engine.inspector.Inspectable
+import me.anno.language.translation.NameDesc
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -76,10 +77,8 @@ class Timer(parent: Transform? = null) : Text("", parent) {
     private fun Long.formatTwoDigits() = if (this < 10) "0$this" else this.toString()
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
         list.children.removeIf { it is TextInputML && it.base.placeholder == "Text" }

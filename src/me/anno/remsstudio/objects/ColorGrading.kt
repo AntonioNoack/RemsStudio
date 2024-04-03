@@ -1,5 +1,6 @@
 package me.anno.remsstudio.objects
 
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.ui.Panel
 import me.anno.ui.Style
@@ -16,11 +17,11 @@ object ColorGrading {
         cgOffsetAdd: List<AnimatedProperty<*>>,
         cgOffsetSub: List<AnimatedProperty<*>>,
         img: (Panel) -> Panel,
-        getGroup: (name: String, ttt: String, id: String) -> SettingCategory,
+        getGroup: (NameDesc) -> SettingCategory,
         style: Style
     ) {
 
-        val group = getGroup("Color Grading (ASC CDL)", "", "color-grading")
+        val group = getGroup(NameDesc("Color Grading (ASC CDL)", "", "obj.color-grading"))
         group.addChild(
             img(TextPanel(
                 "" +

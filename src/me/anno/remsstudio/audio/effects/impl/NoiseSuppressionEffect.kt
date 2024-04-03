@@ -3,6 +3,7 @@ package me.anno.remsstudio.audio.effects.impl
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
 import me.anno.engine.Events.addEvent
 import me.anno.io.base.BaseWriter
+import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.min
 import me.anno.maths.Maths.mix
@@ -86,9 +87,8 @@ class NoiseSuppressionEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAI
     }
 
     override fun createInspector(
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         val nlp = audio.vi("Noise Level", "All audio below this relative level will be silenced", noiseLevel, style)
         list += nlp

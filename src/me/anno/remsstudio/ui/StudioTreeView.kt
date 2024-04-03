@@ -191,8 +191,8 @@ class StudioTreeView(style: Style) :
                     }
                 }
                 val additional = baseTransform.getAdditionalChildrenOptions().map { option ->
-                    MenuOption(NameDesc(option.title, option.description, "")) {
-                        RemsStudio.largeChange("Added ${option.title}") {
+                    MenuOption(option.nameDesc) {
+                        RemsStudio.largeChange("Added ${option.nameDesc.name}") {
                             val new = option.generator() as Transform
                             baseTransform.addChild(new)
                             Selection.selectTransform(new)

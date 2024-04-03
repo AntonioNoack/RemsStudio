@@ -4,6 +4,7 @@ import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
@@ -137,10 +138,8 @@ class RegularList(parent: Transform? = null) : GFXTransform(parent) {
     override fun drawChildrenAutomatically() = false
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
-        getGroup: (title: String, description: String, dictSubPath: String) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance<RegularList>()
@@ -148,7 +147,7 @@ class RegularList(parent: Transform? = null) : GFXTransform(parent) {
         // todo we need to be able to insert properties...
         // todo replace? :D, # String Array
 
-        val child = getGroup("Per-Child Transform", "For the n-th child, it is applied (n-1) times.", "per-child")
+        val child = getGroup(NameDesc("Per-Child Transform", "For the n-th child, it is applied (n-1) times.", "obj.per-child"))
         child += vis(
             c, "Offset/Child", "", "array.offset", c.map { it.perChildTranslation },
             style
@@ -160,7 +159,7 @@ class RegularList(parent: Transform? = null) : GFXTransform(parent) {
             style
         )
 
-        val instances = getGroup("Instances", "", "children")
+        val instances = getGroup(NameDesc("Instances", "", "obj.children"))
         instances += vis(c, "Instance Count", "", "array.instanceCount", c.map { it.instanceCount }, style)
         instances += vi(
             inspected, "Selection Mode", "", "array.selectionMode",
