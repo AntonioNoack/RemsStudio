@@ -169,7 +169,6 @@ class SoundPipeline() : Saveable(), Inspectable {
          * */
         val options = arrayListOf(
             { EchoEffect() },
-            { AmplitudeEffect() },
             { EqualizerEffect() },
             { PitchEffect() },
             { SquareFalloff() },

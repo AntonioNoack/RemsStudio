@@ -1,7 +1,6 @@
 package me.anno.remsstudio.ui
 
 import me.anno.config.DefaultConfig
-import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
@@ -41,22 +40,22 @@ class StudioUITypeLibrary : UITypeLibrary(typeList) {
             }
         }
 
-        val typeList = listOf<Pair<String, () -> Panel>>(
-            Dict["Scene", "ui.customize.sceneView"] to
+        val typeList = listOf<Pair<NameDesc, () -> Panel>>(
+            NameDesc("Scene", "", "ui.customize.sceneView") to
                     { StudioSceneView(DefaultConfig.style) },
-            Dict["Tree", "ui.customize.treeView"] to
+            NameDesc("Tree", "", "ui.customize.treeView") to
                     { StudioTreeView(DefaultConfig.style) },
-            Dict["Properties", "ui.customize.inspector"] to
+            NameDesc("Properties", "", "ui.customize.inspector") to
                     { StudioPropertyInspector({ Selection.selectedInspectables }, DefaultConfig.style) },
-            Dict["Cutting", "ui.customize.cuttingPanel"] to
+            NameDesc("Cutting", "", "ui.customize.cuttingPanel") to
                     { LayerViewContainer(DefaultConfig.style) },
-            Dict["Timeline", "ui.customize.timeline"] to
+            NameDesc("Timeline", "", "ui.customize.timeline") to
                     { TimelinePanel(DefaultConfig.style) },
-            Dict["Keyframe Editor", "ui.customize.graphEditor"] to
+            NameDesc("Keyframe Editor", "", "ui.customize.graphEditor") to
                     { GraphEditor(DefaultConfig.style) },
-            Dict["Files", "ui.customize.fileExplorer"] to
+            NameDesc("Files", "", "ui.customize.fileExplorer") to
                     { StudioFileExplorer(RemsStudio.project?.scenes, DefaultConfig.style) },
-            Dict["Time Control", "ui.customize.timeControl"] to
+            NameDesc("Time Control", "", "ui.customize.timeControl") to
                     { TimeControlsPanel(DefaultConfig.style) }
         ).map { CustomPanelType(it.first, it.second) }.toMutableList()
     }

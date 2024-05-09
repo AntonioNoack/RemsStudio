@@ -1,11 +1,11 @@
 package me.anno.remsstudio.audio.effects
 
 import me.anno.engine.EngineBase.Companion.workspace
+import me.anno.engine.inspector.Inspectable
 import me.anno.io.Saveable
 import me.anno.io.json.saveable.JsonStringReader
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
-import me.anno.engine.inspector.Inspectable
 
 abstract class SoundEffect(val inputDomain: Domain, val outputDomain: Domain) : Saveable(), Inspectable {
 
@@ -33,11 +33,5 @@ abstract class SoundEffect(val inputDomain: Domain, val outputDomain: Domain) : 
 
     override val approxSize get() = 10
     override fun isDefaultValue() = false
-
-    companion object {
-        fun copy(src: FloatArray, dst: FloatArray) {
-            System.arraycopy(src, 0, dst, 0, src.size)
-        }
-    }
 
 }

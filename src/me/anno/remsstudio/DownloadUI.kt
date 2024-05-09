@@ -88,7 +88,6 @@ object DownloadUI {
     }
 
     private fun executeInstall(progress: ProgressBarPanel, version: String) {
-
         // download zip
         Installer.download("yt-dlp/yt-dlp-$version.zip", tmpZip) {
             progress.progress = 1.0

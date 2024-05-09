@@ -33,7 +33,7 @@ class PitchEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
         list: PanelListY, style: Style,
         getGroup: (NameDesc) -> SettingCategory
     ) {
-        // todo effect broken, dragging not working?
+        // todo bug: effect broken, dragging not working?
         val inspected = listOf(audio)
         list += audio.vi(
             inspected,
@@ -84,7 +84,7 @@ class PitchEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
 
         // nothing to do, should be exact enough
         if (tempo in 0.999f..1.001f) {
-            copy(getDataSrc(0), dataDst)
+            getDataSrc(0).copyInto(dataDst)
             return
         }
 

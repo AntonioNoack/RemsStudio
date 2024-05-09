@@ -64,8 +64,8 @@ abstract class Audio(var file: FileReference = InvalidRef, parent: Transform? = 
         component = null // for garbage collection
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun destroy() {
+        super.destroy()
         addAudioTask("stop", 1) { stopPlayback() }
     }
 

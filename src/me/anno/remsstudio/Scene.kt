@@ -3,7 +3,6 @@ package me.anno.remsstudio
 import me.anno.config.DefaultConfig
 import me.anno.gpu.DepthMode
 import me.anno.gpu.GFX
-import me.anno.gpu.GFX.flat01
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.GFXState
 import me.anno.gpu.GFXState.blendMode
@@ -13,6 +12,7 @@ import me.anno.gpu.GFXState.renderDefault
 import me.anno.gpu.GFXState.renderPurely
 import me.anno.gpu.GFXState.useFrame
 import me.anno.gpu.blending.BlendMode
+import me.anno.gpu.buffer.SimpleBuffer
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.framebuffer.DepthBufferType
 import me.anno.gpu.framebuffer.FBStack
@@ -403,7 +403,7 @@ object Scene {
         lutShader.use()
         lut.bind(1, Filtering.LINEAR, Clamping.CLAMP)
         lutBuffer.bindTextures(0, Filtering.TRULY_NEAREST, Clamping.CLAMP)
-        flat01.draw(lutShader)
+        SimpleBuffer.flat01.draw(lutShader)
         GFX.check()
 
     }
@@ -435,7 +435,7 @@ object Scene {
             val shader = addBloomShader.value
             shader.use()
             shader.v1f("intensity", bloomIntensity)
-            flat01.draw(shader)
+            SimpleBuffer.flat01.draw(shader)
         }
 
         return bloomed
@@ -447,12 +447,9 @@ object Scene {
         camera: Camera, cameraTime: Double,
         w: Int, h: Int, flipY: Boolean
     ) {
-
         /**
          * Tone Mapping, Distortion, and applying the sqrt operation (reverse pow(, 2.2))
          * */
-
-        // outputTexture.bind(0, true)
 
         // todo render at higher resolution for extreme distortion?
         // msaa should help, too
@@ -469,9 +466,8 @@ object Scene {
         uploadCameraUniforms(shader, isFakeColorRendering, camera, cameraTime, w, h)
 
         // draw it!
-        flat01.draw(shader)
+        SimpleBuffer.flat01.draw(shader)
         GFX.check()
-
     }
 
     private fun uploadCameraUniforms(

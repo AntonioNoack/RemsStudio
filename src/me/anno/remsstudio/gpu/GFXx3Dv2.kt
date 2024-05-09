@@ -14,11 +14,16 @@ import me.anno.gpu.shader.ShaderLib
 import me.anno.gpu.shader.builder.ShaderStage
 import me.anno.gpu.shader.builder.Variable
 import me.anno.gpu.shader.builder.VariableMode
-import me.anno.gpu.texture.*
+import me.anno.gpu.texture.Clamping
+import me.anno.gpu.texture.Filtering
+import me.anno.gpu.texture.ITexture2D
+import me.anno.gpu.texture.Texture2D
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.gpu.ShaderLibV2.colorGrading
 import me.anno.remsstudio.gpu.ShaderLibV2.getForceFieldColor
+import me.anno.remsstudio.gpu.ShaderLibV2.getForceFieldColorUniforms
 import me.anno.remsstudio.gpu.ShaderLibV2.getTextureLib
+import me.anno.remsstudio.gpu.ShaderLibV2.getTextureLibUniforms
 import me.anno.remsstudio.gpu.ShaderLibV2.hasForceFieldColor
 import me.anno.remsstudio.gpu.ShaderLibV2.shader3DCircle
 import me.anno.remsstudio.gpu.ShaderLibV2.shader3DText
@@ -178,7 +183,7 @@ object GFXx3Dv2 {
         val shader0 = get3DShader(texture)
         val shader = shader0.value
         shader.use()
-        defineAdvancedGraphicalFeatures(shader, video, time,uvProjection != UVProjection.Planar)
+        defineAdvancedGraphicalFeatures(shader, video, time, uvProjection != UVProjection.Planar)
         shader3DUniforms(shader, stack, texture.width, texture.height, color, tiling, filtering, uvProjection)
         colorGradingUniforms(video as? Video, time, shader)
         texture.bind(0, filtering.convert(), clamping)
@@ -398,7 +403,8 @@ object GFXx3Dv2 {
         return shaderMap3d.getOrPut(key) {
             ShaderLib.createShader(
                 "3dx-$javaClass", ShaderLib.v3Dl, ShaderLib.v3D, ShaderLib.y3D,
-                key.variables.filter { !it.isOutput } + listOf(
+                key.variables.filter { !it.isOutput } +
+                        getForceFieldColorUniforms + getTextureLibUniforms + listOf(
                     Variable(GLSLType.V3F, "finalColor", VariableMode.OUT),
                     Variable(GLSLType.V1F, "finalAlpha", VariableMode.OUT),
                 ), "" +
@@ -412,11 +418,11 @@ object GFXx3Dv2 {
                         "   vec2 uvB = getProjectedUVs(uv, uvw, +1.0);\n" +
                         "   vec2 finalUV;\n" +
                         "   vec4 color; vec3 result = vec3(1.0);\n" +
-                        "   {\n finalUV = uvR;\n" + key.body +  "}\n" +
+                        "   {\n finalUV = uvR;\n" + key.body + "}\n" +
                         "   result.r = color.r;\n" +
-                        "   {\n finalUV = uvB;\n" + key.body +  "}\n" +
+                        "   {\n finalUV = uvB;\n" + key.body + "}\n" +
                         "   result.b = color.b;\n" +
-                        "   {\n finalUV = uvG;\n" + key.body +  "}\n" + // + alpha
+                        "   {\n finalUV = uvG;\n" + key.body + "}\n" + // + alpha
                         "   result.g = color.g;\n" +
                         "   color.rgb = colorGrading(result.rgb);\n" +
                         "   if($hasForceFieldColor) color *= getForceFieldColor(finalPosition);\n" +

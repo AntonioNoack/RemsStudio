@@ -240,8 +240,8 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
             "renderToTexture" -> renderToTexture = value == true
             "cameraIndex" -> cameraIndex = value as? Int ?: return
             "filtering" -> filtering.value = filtering.value.find(value as? Int ?: return)
-            "clamping" -> clampMode.value = Clamping.values().firstOrNull { it.id == value } ?: return
-            "uvProjection" -> uvProjection.value = UVProjection.values().firstOrNull { it.id == value } ?: return
+            "clamping" -> clampMode.value = Clamping.entries.firstOrNull { it.id == value } ?: return
+            "uvProjection" -> uvProjection.value = UVProjection.entries.firstOrNull { it.id == value } ?: return
             "file" -> file = (value as? String)?.toGlobalFile() ?: (value as? FileReference) ?: InvalidRef
             else -> super.setProperty(name, value)
         }

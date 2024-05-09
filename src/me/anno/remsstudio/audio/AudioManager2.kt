@@ -45,7 +45,8 @@ object AudioManager2 {
     fun init() {
         AudioManager.onUpdate = { time ->
             if (RemsStudio.isPlaying && AudioManager.ctr++ > 15) {
-                AudioManager.ctr = 0;checkTree(root)
+                AudioManager.ctr = 0
+                checkTree(root)
             }
             if (RemsStudio.isPlaying && AudioManager.needsUpdate && abs(time - AudioManager.lastUpdate) > 200 * MILLIS_TO_NANOS) {
                 // ensure 200 ms delay between changing the time / dilation

@@ -1,5 +1,6 @@
 package me.anno.remsstudio.objects
 
+import me.anno.cache.ICacheData
 import me.anno.config.DefaultConfig
 import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.engine.inspector.Inspectable
@@ -60,7 +61,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 @Suppress("MemberVisibilityCanBePrivate")
 open class Transform() : Saveable(),
-    Inspectable, Hierarchical<Transform> {
+    Inspectable, Hierarchical<Transform>, ICacheData {
 
     // todo generally "play" the animation of a single transform for testing purposes?
     // todo maybe only for video or audio? for audio it would be simple :)
@@ -805,11 +806,8 @@ open class Transform() : Saveable(),
         return ComponentUIV2.vis(selves, title, ttt, visibilityKey, values, style)
     }
 
-    override fun onDestroy() {}
-
     override fun destroy() {
         removeFromParent()
-        onDestroy()
     }
 
     /**

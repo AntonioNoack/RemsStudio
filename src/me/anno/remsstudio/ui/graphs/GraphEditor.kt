@@ -13,7 +13,6 @@ import me.anno.ui.base.text.TextPanel
 import me.anno.ui.input.components.Checkbox
 import me.anno.utils.Color.black
 
-@OptIn(ExperimentalStdlibApi::class)
 @Suppress("MemberVisibilityCanBePrivate")
 class GraphEditor(style: Style) : PanelListY(style) {
 

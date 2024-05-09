@@ -3,7 +3,7 @@ package me.anno.remsstudio.objects
 import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.GFX
-import me.anno.gpu.drawing.Perspective.perspective2
+import me.anno.gpu.drawing.Perspective.setPerspective
 import me.anno.gpu.pipeline.Sorting
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
@@ -359,9 +359,8 @@ class Camera(parent: Transform? = null) : Transform(parent) {
             .sub(position).normalize()
         val lookAt = cameraTransform2.transformProject(tmp2.set(0f, 0f, -1f))
         val aspectRatio = GFX.viewportWidth.toFloat() / GFX.viewportHeight
-        stack.perspective2(
-            fov.toRadians(), aspectRatio, near, far, 0f, 0f
-        ).lookAt(position, lookAt, up)
+        setPerspective(stack, fov.toRadians(), aspectRatio, near, far, 0f, 0f)
+        stack.lookAt(position, lookAt, up)
         val scale = pow(1f / orbitRadius, orthographicness[time])
         if (scale != 0f && scale.isFinite()) stack.scale(scale)
         JomlPools.vec3f.sub(3)

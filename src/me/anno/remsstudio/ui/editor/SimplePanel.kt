@@ -51,7 +51,6 @@ class SimplePanel(
         px = x + deltaX + (relativeX + 1) * w / 2
         py = y + deltaY + (relativeY + 1) * h / 2
         // hide if half/a third the size is not enough
-        // todo avoid recalculation
         drawable.setPosSize(px, py, sizeX, sizeY)
         drawable.draw(
             max(x0, px), max(y0, py),

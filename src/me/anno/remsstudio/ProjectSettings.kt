@@ -22,7 +22,6 @@ object ProjectSettings : Transform() {
         list.add(createSpellcheckingPanel(style))
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     fun createSpellcheckingPanel(style: Style): Panel {
         val project = project ?: return TextPanel("Project missing :/", style)
         val name = NameDesc("Language", "For Spellchecking", "")

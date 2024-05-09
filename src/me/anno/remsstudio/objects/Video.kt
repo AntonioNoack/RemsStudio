@@ -1022,8 +1022,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
             "cgPower" -> cgPower.copyFrom(value)
             "videoScale" -> videoScale.value = value as? Int ?: return
             "filtering" -> filtering.value = filtering.value.find(value as? Int ?: return)
-            "clamping" -> clampMode.value = Clamping.values().firstOrNull { it.id == value } ?: return
-            "uvProjection" -> uvProjection.value = UVProjection.values().firstOrNull { it.id == value } ?: return
+            "clamping" -> clampMode.value = Clamping.entries.firstOrNull { it.id == value } ?: return
+            "uvProjection" -> uvProjection.value = UVProjection.entries.firstOrNull { it.id == value } ?: return
             "editorVideoFPS" -> editorVideoFPS.value = clamp(value as? Int ?: return, 1, 1000)
             else -> super.setProperty(name, value)
         }

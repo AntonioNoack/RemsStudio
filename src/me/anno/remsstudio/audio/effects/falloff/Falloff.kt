@@ -16,9 +16,7 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.NumberType
 import org.joml.Vector3f
 
-abstract class Falloff : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
-
-    var halfDistance = 1f
+abstract class Falloff(var halfDistance: Float = 1f) : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
 
     abstract fun getAmplitude(relativeDistance: Float): Float
 

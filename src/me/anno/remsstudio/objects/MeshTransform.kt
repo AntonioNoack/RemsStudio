@@ -20,10 +20,10 @@ import me.anno.gpu.shader.Shader
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.texture.ITexture2D
 import me.anno.gpu.texture.TextureLib.whiteTexture
+import me.anno.image.thumbs.AssetThumbHelper.warnMissingMesh
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
-import me.anno.image.thumbs.ThumbsExt
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.fract
@@ -241,7 +241,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                         animTexture?.bindTrulyNearest(shader, "animTexture")
                         mesh.draw(shader, index)
                     }
-                } else ThumbsExt.warnMissingMesh(comp, mesh)
+                } else warnMissingMesh(comp, mesh)
             }
         }
 

@@ -20,23 +20,6 @@ import kotlin.math.PI
 @Suppress("MemberVisibilityCanBePrivate")
 object ShaderLibV2 {
 
-    val v3DlPolygon = listOf(
-        Variable(GLSLType.V3F, "coords", VariableMode.ATTR),
-        Variable(GLSLType.V2F, "uvs", VariableMode.ATTR),
-        Variable(GLSLType.V1F, "inset"),
-        Variable(GLSLType.M4x4, "transform")
-    )
-
-    val v3DPolygon = "" +
-            "void main(){\n" +
-            "   vec2 betterUV = coords.xy;\n" +
-            "   betterUV *= mix(1.0, uvs.r, inset);\n" +
-            "   finalPosition = vec3(betterUV, coords.z);\n" +
-            "   gl_Position = matMul(transform, vec4(finalPosition, 1.0));\n" +
-            ShaderLib.flatNormal +
-            "   uv = uvs.yx;\n" +
-            "}"
-
     // https://en.wikipedia.org/wiki/ASC_CDL
     // color grading with asc cdl standard
     const val colorGrading = "" +
@@ -49,13 +32,16 @@ object ShaderLibV2 {
             "}\n"
 
     val maxColorForceFields = DefaultConfig["objects.attractors.color.maxCount", 12]
-    val getForceFieldColor = "" +
+    val getForceFieldColorUniforms = listOf(
+        Variable(GLSLType.V1I, "forceFieldColorCount"),
+        Variable(GLSLType.V4F, "forceFieldBaseColor"),
+        Variable(GLSLType.V4F, "forceFieldColors", maxColorForceFields),
+        Variable(GLSLType.V4F, "forceFieldPositionsNWeights", maxColorForceFields),
+        Variable(GLSLType.V4F, "forceFieldColorPowerSizes", maxColorForceFields),
+    )
+
+    const val getForceFieldColor = "" +
 // additional weights?...
-            "uniform int forceFieldColorCount;\n" +
-            "uniform vec4 forceFieldBaseColor;\n" +
-            "uniform vec4[$maxColorForceFields] forceFieldColors;\n" +
-            "uniform vec4[$maxColorForceFields] forceFieldPositionsNWeights;\n" +
-            "uniform vec4[$maxColorForceFields] forceFieldColorPowerSizes;\n" +
             "vec4 getForceFieldColor(vec3 finalPosition){\n" +
             "   float sumWeight = 0.25;\n" +
             "   vec4 sumColor = sumWeight * forceFieldBaseColor;\n" +
@@ -120,13 +106,16 @@ object ShaderLibV2 {
     const val hasForceFieldColor = "(forceFieldColorCount > 0)"
     const val hasForceFieldUVs = "(forceFieldUVCount > 0)"
 
+    val getTextureLibUniforms = listOf(
+        Variable(GLSLType.V2F, "textureDeltaUV"),
+        Variable(GLSLType.V1I, "filtering"),
+        Variable(GLSLType.V1I, "uvProjection")
+    )
     val getTextureLib = "" +
             ShaderLib.bicubicInterpolation +
             getForceFieldUVs +
             // the uvs correspond to the used mesh
             // used meshes are flat01 and cubemapBuffer
-            "uniform vec2 textureDeltaUV;\n" +
-            "uniform int filtering, uvProjection;\n" +
             "vec2 getProjectedUVs(vec2 uv){ return uv; }\n" +
             "vec2 getProjectedUVs(vec3 uvw){\n" +
             "   float u = atan(uvw.z, uvw.x)*${0.5 / PI}+0.5;\n " +
@@ -232,7 +221,7 @@ object ShaderLibV2 {
                 "3d-masked", v3DlMasked, v3DMasked, y3DMasked, listOf(
                     Variable(GLSLType.V3F, "finalColor", VariableMode.OUT),
                     Variable(GLSLType.V1F, "finalAlpha", VariableMode.OUT)
-                ), f3DMasked
+                ) + getForceFieldColorUniforms, f3DMasked
             )
         shader3DMasked.setTextureIndices(listOf("maskTex", "tex", "tex2"))
         shader3DMasked.ignoreNameWarnings("tiling")
@@ -261,22 +250,33 @@ object ShaderLibV2 {
                 "}"
     )
 
-    val f3D = "" +
-            getTextureLib +
-            getForceFieldColor +
-            "void main(){\n" +
-            // todo enable chroma separation for this?
-            "   vec4 color = getTexture(tex, getProjectedUVs(uv, uvw, 0.0));\n" +
-            "   if($hasForceFieldColor) color *= getForceFieldColor(finalPosition);\n" +
-            "   finalColor = color.rgb;\n" +
-            "   finalAlpha = color.a;\n" +
-            "}"
-
     val shader3DPolygon =
         ShaderLib.createShader(
             "3d-polygon",
-            v3DlPolygon, v3DPolygon, ShaderLib.y3D, ShaderLib.f3Dl, f3D,
-            listOf("tex"),
+            listOf(
+                Variable(GLSLType.V3F, "coords", VariableMode.ATTR),
+                Variable(GLSLType.V2F, "uvs", VariableMode.ATTR),
+                Variable(GLSLType.V1F, "inset"),
+                Variable(GLSLType.M4x4, "transform")
+            ), "" +
+                    "void main(){\n" +
+                    "   vec2 betterUV = coords.xy;\n" +
+                    "   betterUV *= mix(1.0, uvs.r, inset);\n" +
+                    "   finalPosition = vec3(betterUV, coords.z);\n" +
+                    "   gl_Position = matMul(transform, vec4(finalPosition, 1.0));\n" +
+                    ShaderLib.flatNormal +
+                    "   uv = uvs.yx;\n" +
+                    "}", ShaderLib.y3D,
+            ShaderLib.f3Dl + getForceFieldColorUniforms + getTextureLibUniforms, "" +
+                    getTextureLib +
+                    getForceFieldColor +
+                    "void main(){\n" +
+                    // todo enable chroma separation for this?
+                    "   vec4 color = getTexture(tex, getProjectedUVs(uv, uvw, 0.0));\n" +
+                    "   if($hasForceFieldColor) color *= getForceFieldColor(finalPosition);\n" +
+                    "   finalColor = color.rgb;\n" +
+                    "   finalAlpha = color.a;\n" +
+                    "}", listOf("tex"),
             "tiling",
             "forceFieldUVCount"
         )
@@ -296,7 +296,7 @@ object ShaderLibV2 {
                 "}", ShaderLib.y3D, listOf(
             Variable(GLSLType.V3F, "finalColor", VariableMode.OUT),
             Variable(GLSLType.V1F, "finalAlpha", VariableMode.OUT)
-        ), getForceFieldColor +
+        ) + getForceFieldColorUniforms, getForceFieldColor +
                 "void main(){\n" +
                 "   vec4 finalColor2 = ($hasForceFieldColor) ? getForceFieldColor(finalPosition) : vec4(1);\n" +
                 "   finalColor = finalColor2.rgb;\n" +
@@ -307,9 +307,9 @@ object ShaderLibV2 {
     )
 
     val shader3DText = ShaderLib.createShader(
-        "3d-text", ShaderLib.v3Dl,
-        "uniform vec3 offset;\n" +
-                getForceFieldUVs +
+        "3d-text", ShaderLib.v3Dl + listOf(
+            Variable(GLSLType.V3F, "offset")
+        ), getForceFieldUVs +
                 "void main(){\n" +
                 "   vec3 localPos0 = coords + offset;\n" +
                 // to do enable chroma separation for this? (probably impossible like that)
@@ -321,7 +321,7 @@ object ShaderLibV2 {
                 "}", ShaderLib.y3D + listOf(Variable(GLSLType.V1I, "vertexId").flat()), listOf(
             Variable(GLSLType.V3F, "finalColor", VariableMode.OUT),
             Variable(GLSLType.V1F, "finalAlpha", VariableMode.OUT)
-        ), "" +
+        ) + getForceFieldColorUniforms + getTextureLibUniforms, "" +
                 getTextureLib +
                 getForceFieldColor +
                 "void main(){\n" +
@@ -355,7 +355,7 @@ object ShaderLibV2 {
             Variable(GLSLType.V4F, "tint"),
             Variable(GLSLType.V3F, "finalColor", VariableMode.OUT),
             Variable(GLSLType.V1F, "finalAlpha", VariableMode.OUT),
-        ), "" +
+        ) + getForceFieldColorUniforms + getTextureLibUniforms, "" +
                 ShaderFuncLib.randomGLSL +
                 getTextureLib +
                 getForceFieldColor +
@@ -395,103 +395,94 @@ object ShaderLibV2 {
 
         // with texture
         // somehow becomes dark for large |steps|-values
+        shader3DSVG = ShaderLib.createShader(
+            "3d-svg", listOf(
+                Variable(GLSLType.V3F, "aLocalPosition", VariableMode.ATTR),
+                Variable(GLSLType.V2F, "aLocalPos2", VariableMode.ATTR),
+                Variable(GLSLType.V4F, "aFormula0", VariableMode.ATTR),
+                Variable(GLSLType.V1F, "aFormula1", VariableMode.ATTR),
+                Variable(GLSLType.V4F, "aColor0", VariableMode.ATTR),
+                Variable(GLSLType.V4F, "aColor1", VariableMode.ATTR),
+                Variable(GLSLType.V4F, "aColor2", VariableMode.ATTR),
+                Variable(GLSLType.V4F, "aColor3", VariableMode.ATTR),
+                Variable(GLSLType.V4F, "aStops", VariableMode.ATTR),
+                Variable(GLSLType.V1F, "aPadding", VariableMode.ATTR),
+                Variable(GLSLType.M4x4, "transform")
+            ), "" +
+                    "void main(){\n" +
+                    "   finalPosition = aLocalPosition;\n" +
+                    "   gl_Position = matMul(transform, vec4(finalPosition, 1.0));\n" +
+                    ShaderLib.flatNormal +
+                    "   color0 = aColor0;\n" +
+                    "   color1 = aColor1;\n" +
+                    "   color2 = aColor2;\n" +
+                    "   color3 = aColor3;\n" +
+                    "   stops = aStops;\n" +
+                    "   padding = aPadding;\n" +
+                    "   localPos2 = aLocalPos2;\n" +
+                    "   formula0 = aFormula0;\n" +
+                    "   formula1 = aFormula1;\n" +
+                    "}", ShaderLib.y3D + listOf(
+                Variable(GLSLType.V4F, "color0"),
+                Variable(GLSLType.V4F, "color1"),
+                Variable(GLSLType.V4F, "color2"),
+                Variable(GLSLType.V4F, "color3"),
+                Variable(GLSLType.V4F, "stops"),
+                Variable(GLSLType.V4F, "formula0"), // pos, dir
+                Variable(GLSLType.V1F, "formula1"), // is circle
+                Variable(GLSLType.V1F, "padding"), // spread method / repetition type
+                Variable(GLSLType.V2F, "localPos2"), // position for gradient
+            ), listOf(
+                Variable(GLSLType.V4F, "uvLimits"),
+                Variable(GLSLType.S2D, "tex"),
+                Variable(GLSLType.V3F, "finalColor", VariableMode.OUT),
+                Variable(GLSLType.V1F, "finalAlpha", VariableMode.OUT)
+            ) + getForceFieldColorUniforms + getTextureLibUniforms, "" +
+                    getTextureLib +
+                    getForceFieldColor +
+                    ShaderLib.brightness +
+                    colorGrading +
+                    "bool isInLimits(float value, vec2 minMax){\n" +
+                    "   return value >= minMax.x && value <= minMax.y;\n" +
+                    "}\n" + // sqrt and ² for better color mixing
+                    "vec4 mix2(vec4 a, vec4 b, float stop, vec2 stops){\n" +
+                    "   float f = clamp((stop-stops.x)/(stops.y-stops.x), 0.0, 1.0);\n" +
+                    "   return vec4(sqrt(mix(a.rgb*a.rgb, b.rgb*b.rgb, f)), mix(a.a, b.a, f));\n" +
+                    "}\n" +
+                    "void main(){\n" +
+                    // apply the formula; polynomial of 2nd degree
+                    "   vec2 delta = localPos2 - formula0.xy;\n" +
+                    "   vec2 dir = formula0.zw;\n" +
+                    "   float stopValue = formula1 > 0.5 ? length(delta * dir) : dot(dir, delta);\n" +
 
-        val vSVGl = listOf(
-            Variable(GLSLType.V3F, "aLocalPosition", VariableMode.ATTR),
-            Variable(GLSLType.V2F, "aLocalPos2", VariableMode.ATTR),
-            Variable(GLSLType.V4F, "aFormula0", VariableMode.ATTR),
-            Variable(GLSLType.V1F, "aFormula1", VariableMode.ATTR),
-            Variable(GLSLType.V4F, "aColor0", VariableMode.ATTR),
-            Variable(GLSLType.V4F, "aColor1", VariableMode.ATTR),
-            Variable(GLSLType.V4F, "aColor2", VariableMode.ATTR),
-            Variable(GLSLType.V4F, "aColor3", VariableMode.ATTR),
-            Variable(GLSLType.V4F, "aStops", VariableMode.ATTR),
-            Variable(GLSLType.V1F, "aPadding", VariableMode.ATTR),
-            Variable(GLSLType.M4x4, "transform")
+                    "   if(padding < 0.5){\n" + // clamp
+                    "       stopValue = clamp(stopValue, 0.0, 1.0);\n" +
+                    "   } else if(padding < 1.5){\n" + // repeat mirrored, and yes, it looks like magic xD
+                    "       stopValue = 1.0 - abs(fract(stopValue*0.5)*2.0-1.0);\n" +
+                    "   } else {\n" + // repeat
+                    "       stopValue = fract(stopValue);\n" +
+                    "   }\n" +
+
+                    // find the correct color
+                    "   vec4 color = \n" +
+                    "       stopValue <= stops.x ? color0:\n" +
+                    "       stopValue >= stops.w ? color3:\n" +
+                    "       stopValue <  stops.y ? mix2(color0, color1, stopValue, stops.xy):\n" +
+                    "       stopValue <  stops.z ? mix2(color1, color2, stopValue, stops.yz):\n" +
+                    "                              mix2(color2, color3, stopValue, stops.zw);\n" +
+                    // "   color.rgb = fract(vec3(stopValue));\n" +
+                    "   color.rgb = colorGrading(color.rgb);\n" +
+                    "   if($hasForceFieldColor) color *= getForceFieldColor(finalPosition);\n" +
+                    "   if(isInLimits(uv.x, uvLimits.xz) && isInLimits(uv.y, uvLimits.yw)){" +
+                    "       vec4 color2 = color * getTexture(tex, uv * 0.5 + 0.5);\n" +
+                    "       finalColor = color2.rgb;\n" +
+                    "       finalAlpha = color2.a;\n" +
+                    "   } else {" +
+                    "       finalColor = vec3(0);\n" +
+                    "       finalAlpha = 0.0;\n" +
+                    "   }" +
+                    "}", listOf("tex")
         )
-
-        val vSVG = "" +
-                "void main(){\n" +
-                "   finalPosition = aLocalPosition;\n" +
-                "   gl_Position = matMul(transform, vec4(finalPosition, 1.0));\n" +
-                ShaderLib.flatNormal +
-                "   color0 = aColor0;\n" +
-                "   color1 = aColor1;\n" +
-                "   color2 = aColor2;\n" +
-                "   color3 = aColor3;\n" +
-                "   stops = aStops;\n" +
-                "   padding = aPadding;\n" +
-                "   localPos2 = aLocalPos2;\n" +
-                "   formula0 = aFormula0;\n" +
-                "   formula1 = aFormula1;\n" +
-                "}"
-
-        val ySVG = ShaderLib.y3D + listOf(
-            Variable(GLSLType.V4F, "color0"),
-            Variable(GLSLType.V4F, "color1"),
-            Variable(GLSLType.V4F, "color2"),
-            Variable(GLSLType.V4F, "color3"),
-            Variable(GLSLType.V4F, "stops"),
-            Variable(GLSLType.V4F, "formula0"), // pos, dir
-            Variable(GLSLType.V1F, "formula1"), // is circle
-            Variable(GLSLType.V1F, "padding"), // spread method / repetition type
-            Variable(GLSLType.V2F, "localPos2"), // position for gradient
-        )
-
-        val fSVGl = listOf(
-            Variable(GLSLType.V4F, "uvLimits"),
-            Variable(GLSLType.S2D, "tex"),
-            Variable(GLSLType.V3F, "finalColor", VariableMode.OUT),
-            Variable(GLSLType.V1F, "finalAlpha", VariableMode.OUT)
-        )
-
-        val fSVG = "" +
-                getTextureLib +
-                getForceFieldColor +
-                ShaderLib.brightness +
-                colorGrading +
-                "bool isInLimits(float value, vec2 minMax){\n" +
-                "   return value >= minMax.x && value <= minMax.y;\n" +
-                "}\n" + // sqrt and ² for better color mixing
-                "vec4 mix2(vec4 a, vec4 b, float stop, vec2 stops){\n" +
-                "   float f = clamp((stop-stops.x)/(stops.y-stops.x), 0.0, 1.0);\n" +
-                "   return vec4(sqrt(mix(a.rgb*a.rgb, b.rgb*b.rgb, f)), mix(a.a, b.a, f));\n" +
-                "}\n" +
-                "void main(){\n" +
-                // apply the formula; polynomial of 2nd degree
-                "   vec2 delta = localPos2 - formula0.xy;\n" +
-                "   vec2 dir = formula0.zw;\n" +
-                "   float stopValue = formula1 > 0.5 ? length(delta * dir) : dot(dir, delta);\n" +
-
-                "   if(padding < 0.5){\n" + // clamp
-                "       stopValue = clamp(stopValue, 0.0, 1.0);\n" +
-                "   } else if(padding < 1.5){\n" + // repeat mirrored, and yes, it looks like magic xD
-                "       stopValue = 1.0 - abs(fract(stopValue*0.5)*2.0-1.0);\n" +
-                "   } else {\n" + // repeat
-                "       stopValue = fract(stopValue);\n" +
-                "   }\n" +
-
-                // find the correct color
-                "   vec4 color = \n" +
-                "       stopValue <= stops.x ? color0:\n" +
-                "       stopValue >= stops.w ? color3:\n" +
-                "       stopValue <  stops.y ? mix2(color0, color1, stopValue, stops.xy):\n" +
-                "       stopValue <  stops.z ? mix2(color1, color2, stopValue, stops.yz):\n" +
-                "                              mix2(color2, color3, stopValue, stops.zw);\n" +
-                // "   color.rgb = fract(vec3(stopValue));\n" +
-                "   color.rgb = colorGrading(color.rgb);\n" +
-                "   if($hasForceFieldColor) color *= getForceFieldColor(finalPosition);\n" +
-                "   if(isInLimits(uv.x, uvLimits.xz) && isInLimits(uv.y, uvLimits.yw)){" +
-                "       vec4 color2 = color * getTexture(tex, uv * 0.5 + 0.5);\n" +
-                "       finalColor = color2.rgb;\n" +
-                "       finalAlpha = color2.a;\n" +
-                "   } else {" +
-                "       finalColor = vec3(0);\n" +
-                "       finalAlpha = 0.0;\n" +
-                "   }" +
-                "}"
-
-        shader3DSVG = ShaderLib.createShader("3d-svg", vSVGl, vSVG, ySVG, fSVGl, fSVG, listOf("tex"))
     }
 
     lateinit var shader3DSVG: BaseShader
@@ -516,7 +507,8 @@ object ShaderLibV2 {
                 "   uv = uvs;\n" +
                 "   uvw = coords;\n" +
                 "   colX = mix(col0, col1, att.y);\n" +
-                "}", ShaderLib.y3D + Variable(GLSLType.V4F, "colX"), listOf(), "" +
+                "}", ShaderLib.y3D + Variable(GLSLType.V4F, "colX"),
+        getForceFieldColorUniforms + getTextureLibUniforms, "" +
                 getTextureLib +
                 getForceFieldColor +
                 "void main(){\n" +

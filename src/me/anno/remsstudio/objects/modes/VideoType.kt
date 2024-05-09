@@ -2,11 +2,10 @@ package me.anno.remsstudio.objects.modes
 
 import me.anno.language.translation.NameDesc
 
-// todo translations for these
 enum class VideoType(val displayName: NameDesc) {
-    UNKNOWN(NameDesc("Unknown")),
-    IMAGE(NameDesc("Image")),
-    VIDEO(NameDesc("Video")),
-    AUDIO(NameDesc("Audio")),
-    IMAGE_SEQUENCE(NameDesc("Image Sequence"))
+    UNKNOWN(NameDesc("Unknown", "", "ui.videoType.unknown")),
+    IMAGE(NameDesc("Image", "", "ui.videoType.image")),
+    VIDEO(NameDesc("Video", "", "ui.videoType.video")),
+    AUDIO(NameDesc("Audio", "", "ui.videoType.audio")),
+    IMAGE_SEQUENCE(NameDesc("Image Sequence", "", "ui.videoType.imgSequence"))
 }

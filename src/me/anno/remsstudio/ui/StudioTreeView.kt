@@ -66,7 +66,7 @@ class StudioTreeView(style: Style) :
     }
 
     override fun destroy(element: Transform) {
-        element.onDestroy()
+        element.destroy()
         invalidateLayout()
     }
 
@@ -97,8 +97,8 @@ class StudioTreeView(style: Style) :
         }
     }
 
-    override fun focusOnElement(element: Transform) {
-        zoomToObject(element)
+    override fun focusOnElement(element: Transform): Boolean {
+        return zoomToObject(element)
     }
 
     override fun openAddMenu(parent: Transform) {
@@ -146,11 +146,11 @@ class StudioTreeView(style: Style) :
 
     companion object {
 
-        fun zoomToObject(obj: Transform) {
+        fun zoomToObject(obj: Transform): Boolean {
             // instead of asking for the name, move the camera towards the target
             // todo also zoom in/out correctly to match the object...
             // identify the currently used camera
-            val camera = lastTouchedCamera ?: nullCamera ?: return
+            val camera = lastTouchedCamera ?: nullCamera ?: return false
             val time = RemsStudio.editorTime
             // calculate the movement, which would be necessary
             val cameraToWorld = camera.parent?.getGlobalTransform(time)
@@ -165,6 +165,7 @@ class StudioTreeView(style: Style) :
             RemsStudio.largeChange("Move Camera to Object") {
                 camera.position.addKeyframe(camera.lastLocalTime, objectCameraPosition)
             }
+            return true
         }
 
         private val LOGGER = LogManager.getLogger(StudioTreeView::class)

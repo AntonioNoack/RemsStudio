@@ -42,6 +42,9 @@ import me.anno.utils.OS
 import me.anno.utils.hpc.ProcessingQueue
 import kotlin.math.min
 
+// todo bug: usual 0-key should work like numpad-0 to reset transform
+// todo option to lock transform, e.g. of camera?
+
 // todo improvements:
 //  if playing forward, and time is non-modified, use VideoStream for much better playback performance
 
@@ -341,7 +344,7 @@ object RemsStudio : EngineBase("Rem's Studio", 10301, true), WelcomeUI {
 
     override fun clearAll() {
         super.clearAll()
-        root.findFirstInAll { it.clearCache(); false }
+        root.forAllInHierarchy { it.clearCache() }
     }
 
     // UI with traditional editor?

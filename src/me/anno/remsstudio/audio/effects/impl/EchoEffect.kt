@@ -78,7 +78,7 @@ class EchoEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
         val echoes = min(maxEchoes, (log2(minRelativeAmplitude) / log2(falloff)).toInt())
         val offset0 = offset[time] * bufferSize / (time1.localTime - time0.localTime)
 
-        copy(getDataSrc(0), dataDst)
+        getDataSrc(0).copyInto(dataDst)
 
         if (echoes > 0 && offset0 > 0.5) {
 
@@ -113,9 +113,7 @@ class EchoEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
             for (i in 0 until bufferSize) {
                 dataDst[i] *= totalMultiplier
             }
-
         }
-
     }
 
     override fun clone(): SoundEffect {

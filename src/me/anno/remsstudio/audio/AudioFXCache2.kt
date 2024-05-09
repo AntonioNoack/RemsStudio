@@ -16,7 +16,6 @@ import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.max
 import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.SoundEffect
-import me.anno.remsstudio.audio.effects.SoundEffect.Companion.copy
 import me.anno.remsstudio.audio.effects.SoundPipeline.Companion.changeDomain
 import me.anno.remsstudio.audio.effects.Time
 import me.anno.remsstudio.objects.Audio
@@ -152,7 +151,6 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
         }
 
         fun getBuffersOfDomain(domain: Domain): Pair<FloatArray, FloatArray> {
-            // if (isDestroyed > 0L) throw IllegalAccessException("Value was already destroyed")
             val buffer = this
             var left = if (domain == Domain.FREQUENCY_DOMAIN) buffer.freqLeft else buffer.timeLeft
             var right = if (domain == Domain.FREQUENCY_DOMAIN) buffer.freqRight else buffer.timeRight
@@ -160,8 +158,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
                 left = if (domain == Domain.TIME_DOMAIN) buffer.freqLeft else buffer.timeLeft
                 left!!
                 val other = if (domain == Domain.TIME_DOMAIN) Domain.FREQUENCY_DOMAIN else Domain.TIME_DOMAIN
-                val left2 = FloatArray(left.size) // FAPool[left.size]
-                copy(left, left2)
+                val left2 = left.copyOf() // FAPool[left.size]
                 changeDomain(domain, other, left2)
                 left = left2
                 if (domain == Domain.TIME_DOMAIN) buffer.timeLeft = left else buffer.freqLeft = left
@@ -170,8 +167,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
                 right = if (domain == Domain.TIME_DOMAIN) buffer.freqRight else buffer.timeRight
                 right!!
                 val other = if (domain == Domain.TIME_DOMAIN) Domain.FREQUENCY_DOMAIN else Domain.TIME_DOMAIN
-                val right2 = FloatArray(right.size) // FAPool[right.size]
-                copy(right, right2)
+                val right2 = right.copyOf() // FAPool[right.size]
                 changeDomain(domain, other, right2)
                 right = right2
                 if (domain == Domain.TIME_DOMAIN) buffer.timeRight = right else buffer.freqRight = right

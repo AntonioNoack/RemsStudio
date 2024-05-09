@@ -1,7 +1,11 @@
 package audacity.soundtouch
 
-interface FloatPtr {
-    operator fun plus(deltaOffset: Int): FloatPtr
-    operator fun get(index: Int): Float
-    operator fun set(index: Int, value: Float)
+import me.anno.utils.structures.arrays.FloatArrayList
+
+class FloatPtr(val array: FloatArrayList, val offset: Int) {
+    operator fun plus(deltaOffset: Int) = FloatPtr(array, offset + deltaOffset)
+    operator fun get(index: Int) = array[index + offset]
+    operator fun set(index: Int, value: Float) {
+        array[index + offset] = value
+    }
 }

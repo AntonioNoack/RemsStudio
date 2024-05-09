@@ -167,14 +167,14 @@ object RenderSettings : Transform() {
             "How much time is spent on compressing the video into a smaller file",
             "ui.ffmpeg.encodingSpeed",
             project.ffmpegBalance.nameDesc,
-            FFMPEGEncodingBalance.values().map { it.nameDesc },
+            FFMPEGEncodingBalance.entries.map { it.nameDesc },
             style
-        ).setChangeListener { _, index, _ -> project.ffmpegBalance = FFMPEGEncodingBalance.values()[index]; save() }
+        ).setChangeListener { _, index, _ -> project.ffmpegBalance = FFMPEGEncodingBalance.entries[index]; save() }
 
         list += EnumInput(
             "Encoding Type", "Helps FFMPEG with the encoding process", "ui.ffmpeg.flags.input",
-            project.ffmpegFlags.nameDesc, FFMPEGEncodingType.values().map { it.nameDesc }, style
-        ).setChangeListener { _, index, _ -> project.ffmpegFlags = FFMPEGEncodingType.values()[index]; save() }
+            project.ffmpegFlags.nameDesc, FFMPEGEncodingType.entries.map { it.nameDesc }, style
+        ).setChangeListener { _, index, _ -> project.ffmpegFlags = FFMPEGEncodingType.entries[index]; save() }
 
         val fileInput = FileInput("Output File", style, targetOutputFile, emptyList())
         val originalColor = fileInput.base2.textColor

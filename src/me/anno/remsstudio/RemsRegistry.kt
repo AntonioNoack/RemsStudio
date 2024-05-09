@@ -40,8 +40,7 @@ object RemsRegistry {
 
         registerCustomClass(StringMap())
 
-        ECSRegistry.initPrefabs()
-        ECSRegistry.initMeshes()
+        ECSRegistry.init()
 
         registerCustomClass(SaveableArray())
         registerCustomClass(Transform())

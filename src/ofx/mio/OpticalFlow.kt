@@ -1,7 +1,7 @@
 package ofx.mio
 
-import me.anno.gpu.GFX.flat01
 import me.anno.gpu.GFXState.useFrame
+import me.anno.gpu.buffer.SimpleBuffer.Companion.flat01
 import me.anno.gpu.framebuffer.DepthBufferType
 import me.anno.gpu.framebuffer.FBStack
 import me.anno.gpu.framebuffer.IFramebuffer

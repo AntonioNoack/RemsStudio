@@ -19,7 +19,6 @@ import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.dtTo10
-import me.anno.maths.Maths.hasFlag
 import me.anno.maths.Maths.length
 import me.anno.maths.Maths.mix
 import me.anno.maths.Maths.pow
@@ -46,6 +45,7 @@ import me.anno.utils.Color.toARGB
 import me.anno.utils.Color.white
 import me.anno.utils.Color.withAlpha
 import me.anno.utils.types.AnyToFloat.getFloat
+import me.anno.utils.types.Booleans.hasFlag
 import me.anno.utils.types.Booleans.toInt
 import org.apache.logging.log4j.LogManager
 import org.joml.*
@@ -766,7 +766,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
                 } else {
                     openMenu(windowStack,
                         NameDesc("Interpolation", "", "ui.graphEditor.interpolation.title"),
-                        Interpolation.values().map { mode ->
+                        Interpolation.entries.map { mode ->
                             MenuOption(NameDesc(mode.displayName, mode.description, "")) {
                                 RemsStudio.incrementalChange("Change interpolation type") {
                                     for (kf in selectedKeyframes) {

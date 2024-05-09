@@ -101,7 +101,7 @@ class EqualizerEffect : SoundEffect(Domain.FREQUENCY_DOMAIN, Domain.FREQUENCY_DO
         val sliders = sliders.map { it[time] }
         if (sliders.all { abs(it - 0.5) < 1e-3f }) {
             // LOGGER.info("no change at all")
-            copy(dataSrc, dataDst)
+            dataSrc.copyInto(dataDst)
             return
         }
 
