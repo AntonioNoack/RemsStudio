@@ -132,7 +132,7 @@ object GFXx3Dv2 {
         stack: Matrix4fArrayList, texture: ITexture2D, color: Vector4f,
         filtering: TexFiltering, clamping: Clamping, tiling: Vector4f?, uvProjection: UVProjection
     ) {
-        val shader = get3DShader(GPUFrame.swizzleStages[""]).value
+        val shader = get3DShader(GPUFrame.swizzleStage0).value
         shader.use()
         defineAdvancedGraphicalFeatures(shader, video, time, uvProjection != UVProjection.Planar)
         shader3DUniforms(shader, stack, texture.width, texture.height, color, tiling, filtering, uvProjection)
@@ -385,7 +385,7 @@ object GFXx3Dv2 {
         stack: Matrix4fArrayList, texture: Texture2D, w: Int, h: Int, color: Vector4f,
         filtering: TexFiltering, clamping: Clamping, tiling: Vector4f?, uvProjection: UVProjection
     ) {
-        val shader = get3DShader(GPUFrame.swizzleStages[""]).value
+        val shader = get3DShader(GPUFrame.swizzleStage0).value
         shader.use()
         shader3DUniforms(shader, stack, w, h, color, tiling, filtering, uvProjection)
         texture.bind(0, filtering.convert(), clamping)

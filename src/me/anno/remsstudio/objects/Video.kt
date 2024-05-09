@@ -66,7 +66,7 @@ import me.anno.utils.types.Strings.getImportType
 import me.anno.video.ImageSequenceMeta
 import me.anno.video.ImageSequenceMeta.Companion.imageSequenceIdentifier
 import me.anno.video.MissingFrameException
-import me.anno.video.VideoCache.getVideoFrame
+import me.anno.video.VideoCache
 import me.anno.video.VideoCache.getVideoFrameWithoutGenerator
 import me.anno.video.ffmpeg.FrameReader.Companion.isFFMPEGOnlyExtension
 import me.anno.video.formats.gpu.BlankFrameDetector
@@ -346,7 +346,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         // LOGGER.info("missing frame")
     }
 
-    fun getFrameAtLocalTime(time: Double, width: Int, meta: MediaMetadata): GPUFrame? {
+    fun getFrameAtLocalTimeForPreview(time: Double, width: Int, meta: MediaMetadata): GPUFrame? {
 
         // only load a single frame at a time?? idk...
 
@@ -369,11 +369,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 val localTime = isLooping[time, duration]
                 val frameIndex = (localTime * videoFPS).toInt() % frameCount
 
-                val frame = getVideoFrame(
-                    file, scale, frameIndex,
-                    framesPerContainer, videoFPS, videoFrameTimeout, meta,
-                    true
-                )
+                val frame = getVideoFrameCustom(scale, frameIndex, videoFPS)
 
                 if (frame != null && frame.isCreated) {
                     lastW = frame.width
@@ -499,7 +495,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         var frame0 = if (blankFrameThreshold > 0f) {
             BlankFrameDetector.getFrame(file, scale, frameIndex, bufferSize, videoFPS, timeout, meta, true)
         } else {
-            getVideoFrame(file, scale, frameIndex, bufferSize, videoFPS, timeout, true)
+            getVideoFrameCustom(scale, frameIndex, videoFPS)
         }
 
         if (frame0 == null || !frame0.isCreated || frame0.isDestroyed) {
@@ -520,7 +516,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 SVGMeshCache[file, imageTimeout, true]
             ext.equals("webp", true) || ext.equals("dds", true) ->
                 // calculate required scale? no, without animation, we don't need to scale it down ;)
-                getVideoFrame(file, 1, 0, 1, 1.0, imageTimeout, true)
+                VideoCache.getVideoFrame(file, 1, 0, 1, 1.0, imageTimeout, true)
             else -> // some image
                 TextureCache[file, imageTimeout, true]
         }
@@ -544,7 +540,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
             ext.isFFMPEGOnlyExtension() -> {
                 val tiling = tiling[time]
                 // calculate required scale? no, without animation, we don't need to scale it down ;)
-                val texture = getVideoFrame(file, 1, 0, 1, 1.0, imageTimeout, true)
+                val texture = VideoCache.getVideoFrame(file, 1, 0, 1, 1.0, imageTimeout, true)
                 if (texture == null || !texture.isCreated) onMissingImageOrFrame(0)
                 else {
                     lastW = texture.width
@@ -570,6 +566,10 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 }
             }
         }
+    }
+
+    private fun getVideoFrameCustom(scale: Int, index: Int, fps: Double): GPUFrame? {
+        return VideoCache.getVideoFrame(file, scale, index, framesPerContainer, fps, videoFrameTimeout, true)
     }
 
     var needsImageUpdate = false
@@ -615,10 +615,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                                 val buffer = frameIndex / framesPerContainer
                                 if (buffer != lastBuffer) {
                                     lastBuffer = buffer
-                                    getVideoFrame(
-                                        file, max(1, zoomLevel), frameIndex,
-                                        framesPerContainer, videoFPS, videoFrameTimeout, true
-                                    )
+                                    getVideoFrameCustom(max(1, zoomLevel), frameIndex, videoFPS)
                                 }
                             }
                         }

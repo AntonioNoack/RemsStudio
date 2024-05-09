@@ -288,7 +288,7 @@ class LayerStripeSolution(
             val localTime = clampTime(video.getLocalTimeFromRoot(timeAtX, false), video)
             // get frame at time
             val videoWidth = (frameWidth / (1f + relativeVideoBorder)).toInt()
-            val frame = video.getFrameAtLocalTime(localTime, videoWidth, meta)
+            val frame = video.getFrameAtLocalTimeForPreview(localTime, videoWidth, meta)
             if (frame == null || !frame.isCreated) {
                 drawRectGradient(x0, y, x1 - x0, h, c0, c1)
             } else {
@@ -325,7 +325,7 @@ class LayerStripeSolution(
             val localTime = clampTime(video.getLocalTimeFromRoot(timeAtX, false), video)
             // get frame at time
             val videoWidth = (frameWidth / (1f + relativeVideoBorder)).toInt()
-            video.getFrameAtLocalTime(localTime, videoWidth, meta)
+            video.getFrameAtLocalTimeForPreview(localTime, videoWidth, meta)
         }
     }
 
