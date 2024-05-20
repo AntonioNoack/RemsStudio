@@ -25,11 +25,11 @@ class GraphEditor(style: Style) : PanelListY(style) {
         Checkbox(true, true, size, style) {
         override fun getColor(): Int = maskColor
         @Suppress("UNUSED_PARAMETER")
-        override var isVisible: Boolean
+        override var isEnabled: Boolean
             get() {
                 // hide them, when a channel isn't available
                 val property = Selection.selectedProperties?.firstOrNull()
-                return property != null && index < property.type.components
+                return property != null && index < property.type.numComponents
             }
             set(value) {}
     }

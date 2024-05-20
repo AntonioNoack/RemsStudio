@@ -76,7 +76,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
             val type = comp?.type
             return if (type != null) {
                 var sum = 0
-                for (i in 0 until type.components) {
+                for (i in 0 until type.numComponents) {
                     sum += editor.channelMasks[i].value.toInt(1 shl i)
                 }
                 if (sum == 0) -1 else sum
@@ -166,7 +166,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
 
         fun add(value: Any?) {
             value ?: return
-            for (i in 0 until property.type.components) {
+            for (i in 0 until property.type.numComponents) {
                 add(getFloat(value, i, 0f))
             }
         }
@@ -233,7 +233,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
         val green = 0x1fa34a or black
         val blue = 0x4a8cf8 or black
 
-        val channelCount = property.type.components
+        val channelCount = property.type.numComponents
         val valueColors = intArrayOf(
             if (type.defaultValue is Float || type.defaultValue is Double)
                 blueish
@@ -274,8 +274,8 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
         }
 
         // draw all data points
-        val yValues = IntArray(type.components)
-        val prevYValues = IntArray(type.components)
+        val yValues = IntArray(type.numComponents)
+        val prevYValues = IntArray(type.numComponents)
         val kfs = property.keyframes
 
         // draw colored stripes to show the color...
@@ -433,7 +433,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
             val globalT = mix(0.0, 1.0, kf2Global(kf.time))
             val dx = x - getXAt(globalT)
             if (abs(dx) < maxMargin) {
-                for (channel in 0 until property.type.components) {
+                for (channel in 0 until property.type.numComponents) {
                     if (channel.isChannelActive(activeChannels)) {
                         val dy = y - getYAt(kf.getChannelAsFloat(channel))
                         if (abs(dy) < maxMargin) {
@@ -468,7 +468,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
         keyframes@ for (kf in property.keyframes) {
             val globalT = mix(0.0, 1.0, kf2Global(kf.time))
             if (getXAt(globalT) in minX - halfSize..maxX + halfSize) {
-                for (channel in 0 until property.type.components) {
+                for (channel in 0 until property.type.numComponents) {
                     if (channel.isChannelActive(activeChannels)) {
                         if (getYAt(kf.getChannelAsFloat(channel)) in minY - halfSize..maxY + halfSize) {
                             keyframes += kf
@@ -648,7 +648,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
                             draggedKeyframe.setValue(draggedChannel, newValue, selectedProperty.type)
                         } else if (property != null) {
                             val dv = (getValueAt(dy) - getValueAt(0f)).toFloat()
-                            for (ch in 0 until property.type.components) {
+                            for (ch in 0 until property.type.numComponents) {
                                 if (draggedChannel.hasFlag(1 shl ch)) {
                                     for (kf in selectedKeyframes) {
                                         val oldValue = getFloat(kf.value, ch, 0f)

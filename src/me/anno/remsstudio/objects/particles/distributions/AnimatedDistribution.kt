@@ -103,7 +103,7 @@ class AnimatedDistribution(
         if (lastDist !== distribution) update()
         for (index in properties.indices) {
             val property = properties[index]
-            when (type.components) {
+            when (type.numComponents) {
                 1 -> property.value.set(channels[index][time] as Float)
                 2 -> property.value.set(channels[index][time] as Vector2f)
                 3 -> property.value.set(channels[index][time] as Vector3f)

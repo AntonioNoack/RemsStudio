@@ -60,7 +60,7 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
         fun alignment() = AnimatedProperty(NumberType.ALIGNMENT, 0f)
     }
 
-    val drivers = arrayOfNulls<AnimationDriver>(type.components)
+    val drivers = arrayOfNulls<AnimationDriver>(type.numComponents)
 
     var isAnimated = false
     var lastChanged = 0L
@@ -321,7 +321,7 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
                 writer.writeSomething(this, "v", value0, true)
             }
         }
-        for (i in 0 until min(type.components, drivers.size)) {
+        for (i in 0 until min(type.numComponents, drivers.size)) {
             writer.writeObject(this, "driver$i", drivers[i])
         }
     }
@@ -367,7 +367,7 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
 
     fun setDriver(index: Int, value: Saveable?) {
         if (index >= drivers.size) {
-            LOGGER.warn("Driver$index out of bounds for ${type.components}/${drivers.size}/$type")
+            LOGGER.warn("Driver$index out of bounds for ${type.numComponents}/${drivers.size}/$type")
             return
         }
         if (value is AnimationDriver) {
@@ -390,7 +390,7 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
                 } else LOGGER.warn("${src.value} is not accepted by $type")
                 // else convert the type??...
             }
-            for (i in 0 until type.components) {
+            for (i in 0 until type.numComponents) {
                 this.drivers[i] = obj.drivers.getOrNull(i)
             }
             lastChanged = Time.nanoTime

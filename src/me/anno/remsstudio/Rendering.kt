@@ -23,7 +23,6 @@ import me.anno.ui.base.menu.Menu.ask
 import me.anno.ui.base.menu.Menu.msg
 import me.anno.ui.base.progress.ProgressBar
 import me.anno.utils.files.FileChooser
-import me.anno.utils.types.Strings.defaultImportType
 import me.anno.utils.types.Strings.getImportType
 import me.anno.video.VideoCreator
 import me.anno.video.VideoCreator.Companion.defaultQuality
@@ -319,7 +318,7 @@ object Rendering {
             }
         } while (file0 !== targetOutputFile)
         val importType = targetOutputFile.extension.getImportType()
-        if (importType == defaultImportType && RenderType.entries.none { importType == it.importType }) {
+        if (importType == "Text" && RenderType.entries.none { importType == it.importType }) {
             LOGGER.warn("The file extension .${targetOutputFile.extension} is unknown! Your export may fail!")
             return targetOutputFile
         }
