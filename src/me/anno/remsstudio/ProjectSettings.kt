@@ -1,5 +1,6 @@
 package me.anno.remsstudio
 
+import me.anno.engine.inspector.Inspectable
 import me.anno.language.Language
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio.project
@@ -16,7 +17,7 @@ object ProjectSettings : Transform() {
     override val defaultDisplayName get() = "Project Settings"
 
     override fun createInspector(
-        list: PanelListY, style: Style,
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
         getGroup: (NameDesc) -> SettingCategory
     ) {
         list.add(createSpellcheckingPanel(style))

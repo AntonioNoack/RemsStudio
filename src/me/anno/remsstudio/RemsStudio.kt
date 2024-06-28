@@ -3,6 +3,7 @@ package me.anno.remsstudio
 import me.anno.Build
 import me.anno.Time.deltaTime
 import me.anno.Time.gameTime
+import me.anno.Time.rawDeltaTime
 import me.anno.audio.openal.ALBase
 import me.anno.audio.openal.AudioManager
 import me.anno.audio.openal.AudioTasks.addAudioTask
@@ -41,6 +42,8 @@ import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.OS
 import me.anno.utils.hpc.ProcessingQueue
 import kotlin.math.min
+
+// todo: add Japanese as language!!
 
 // todo bug: usual 0-key should work like numpad-0 to reset transform
 // todo option to lock transform, e.g. of camera?
@@ -141,7 +144,8 @@ object RemsStudio : EngineBase("Rem's Studio", 10301, true), WelcomeUI {
     }
 
     private fun updateEditorTime() {
-        editorTime += deltaTime * editorTimeDilation
+        // if we'd use the clamped deltaTime, audio and video would run out of sync
+        editorTime += rawDeltaTime * editorTimeDilation
         if (editorTime <= 0.0 && editorTimeDilation < 0.0) {
             editorTimeDilation = 0.0
             editorTime = 0.0

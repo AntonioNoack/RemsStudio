@@ -1,7 +1,7 @@
 package me.anno.remsstudio
 
 import me.anno.engine.inspector.Inspectable
-import me.anno.io.Saveable
+import me.anno.io.saveable.Saveable
 import me.anno.io.find.PropertyFinder
 import me.anno.remsstudio.RemsStudio.root
 import me.anno.remsstudio.animation.AnimatedProperty

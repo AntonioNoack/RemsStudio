@@ -11,6 +11,7 @@ import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.NumberType
+import me.anno.utils.structures.Collections.filterIsInstance2
 import kotlin.math.min
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -49,7 +50,7 @@ class PerlinNoiseDriver : AnimationDriver() {
     ) {
         super.createInspector(inspected, list, transforms, style, getGroup)
         val transform = transforms.first()
-        val c = inspected.filterIsInstance<PerlinNoiseDriver>()
+        val c = inspected.filterIsInstance2(PerlinNoiseDriver::class)
         list += transform.vi(
             inspected, "Octaves", "Levels of Detail", NumberType.INT_PLUS, octaves, style
         ) { it, _ -> for (x in c) x.octaves = it }

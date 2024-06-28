@@ -10,6 +10,7 @@ import me.anno.remsstudio.ui.StudioFileImporter.addChildFromFile
 import me.anno.ui.base.groups.PanelList
 import me.anno.ui.base.scrolling.ScrollPanelX
 import me.anno.ui.editor.files.FileContentImporter
+import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.structures.lists.Lists.getOrPrevious
 import org.apache.logging.log4j.LogManager
 
@@ -21,7 +22,7 @@ object SceneTabs : ScrollPanelX(DefaultConfig.style) {
 
     val content = child as PanelList
     val panelChildren = content.children
-    val sceneTabs get() = panelChildren.filterIsInstance<SceneTab>()
+    val sceneTabs get() = panelChildren.filterIsInstance2(SceneTab::class)
 
     var currentTab: SceneTab? = null
 

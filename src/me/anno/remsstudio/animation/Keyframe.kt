@@ -1,7 +1,7 @@
 package me.anno.remsstudio.animation
 
 import me.anno.animation.Interpolation
-import me.anno.io.Saveable
+import me.anno.io.saveable.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.ui.input.NumberType
 import me.anno.utils.types.AnyToFloat

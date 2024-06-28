@@ -1,7 +1,7 @@
 package me.anno.remsstudio.animation.drivers
 
 import me.anno.engine.inspector.Inspectable
-import me.anno.io.Saveable
+import me.anno.io.saveable.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
@@ -96,12 +96,6 @@ abstract class AnimationDriver : Saveable(), Inspectable {
     }
 
     abstract fun getDisplayName(): String
-
-    // requires, that an object is selected
-    override fun createInspector(
-        list: PanelListY, style: Style,
-        getGroup: (NameDesc) -> SettingCategory
-    ) = createInspector(listOf(this), list, style, getGroup)
 
     override fun createInspector(
         inspected: List<Inspectable>, list: PanelListY, style: Style,

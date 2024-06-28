@@ -1,6 +1,6 @@
 package me.anno.remsstudio.utils
 
-import me.anno.io.Saveable
+import me.anno.io.saveable.Saveable
 import org.apache.logging.log4j.LogManager
 
 object WrongClassType {

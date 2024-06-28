@@ -16,6 +16,7 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.color.spaces.HSLuv
 import me.anno.ui.input.BooleanInput
 import me.anno.ui.input.TextInputML
+import me.anno.utils.structures.Collections.filterIsInstance2
 import org.joml.Vector3f
 import org.joml.Vector4f
 
@@ -26,8 +27,8 @@ fun Text.createInspectorWithoutSuperImpl(
 
     // todo propagate all changes to shadows
 
-    val t = inspected.filterIsInstance<Transform>()
-    val c = inspected.filterIsInstance<Text>()
+    val t = inspected.filterIsInstance2(Transform::class)
+    val c = inspected.filterIsInstance2(Text::class)
 
     val textInput0 = vis(c, "Text", "", "", c.map { it.text }, style) as IsSelectedWrapper
     list += textInput0

@@ -2,6 +2,7 @@ package me.anno.remsstudio.audio.effects.impl
 
 import audacity.soundtouch.TimeDomainStretch
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
+import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
@@ -30,7 +31,7 @@ class PitchEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
     }
 
     override fun createInspector(
-        list: PanelListY, style: Style,
+        inspected0: List<Inspectable>, list: PanelListY, style: Style,
         getGroup: (NameDesc) -> SettingCategory
     ) {
         // todo bug: effect broken, dragging not working?

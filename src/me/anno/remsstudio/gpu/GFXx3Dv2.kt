@@ -116,7 +116,7 @@ object GFXx3Dv2 {
         shader3DUniforms(shader, stack, color)
         shader.v3f("offset", offset)
         GFXTransform.uploadAttractors(that, shader, time, false)
-        mesh.draw(shader, 0)
+        mesh.draw(null, shader, 0)
         GFX.check()
     }
 
@@ -124,7 +124,7 @@ object GFXx3Dv2 {
         val shader = shader3DText.value
         shader.use()
         shader.v3f("offset", offset)
-        mesh.draw(shader, 0)
+        mesh.draw(null, shader, 0)
     }
 
     fun draw3DVideo(
@@ -137,7 +137,7 @@ object GFXx3Dv2 {
         defineAdvancedGraphicalFeatures(shader, video, time, uvProjection != UVProjection.Planar)
         shader3DUniforms(shader, stack, texture.width, texture.height, color, tiling, filtering, uvProjection)
         texture.bind(0, filtering.convert(), clamping)
-        uvProjection.mesh.draw(shader, 0)
+        uvProjection.mesh.draw(null, shader, 0)
         GFX.check()
     }
 
@@ -169,7 +169,7 @@ object GFXx3Dv2 {
         shader3DUniforms(shader, stack, v0.width, v0.height, color, tiling, filtering, uvProjection)
         colorGradingUniforms(video as? Video, time, shader)
         v0.bindUVCorrection(shader)
-        uvProjection.mesh.draw(shader, 0)
+        uvProjection.mesh.draw(null, shader, 0)
         GFX.check()
 
     }
@@ -188,7 +188,7 @@ object GFXx3Dv2 {
         colorGradingUniforms(video as? Video, time, shader)
         texture.bind(0, filtering.convert(), clamping)
         texture.bindUVCorrection(shader)
-        uvProjection.mesh.draw(shader, 0)
+        uvProjection.mesh.draw(null, shader, 0)
         GFX.check()
     }
 
@@ -206,7 +206,7 @@ object GFXx3Dv2 {
         shader3DUniforms(shader, stack, texture.width, texture.height, color, null, filtering, null)
         shader.v1f("inset", inset)
         texture.bind(0, filtering.convert(), clamping)
-        buffer.draw(shader, 0)
+        buffer.draw(null, shader, 0)
         GFX.check()
     }
 
@@ -280,7 +280,7 @@ object GFXx3Dv2 {
         texture.bind(0, Filtering.LINEAR, Clamping.CLAMP)
         // if we have a force field applied, subdivide the geometry
         val buffer = if (hasUVAttractors) SimpleBuffer.flat01CubeX10 else SimpleBuffer.flat01Mesh
-        buffer.draw(shader, 0)
+        buffer.draw(null, shader, 0)
         GFX.check()
     }
 
@@ -329,7 +329,7 @@ object GFXx3Dv2 {
         defineAdvancedGraphicalFeatures(shader, that, time, false)
         shader3DUniforms(shader, stack, 1, 1, color, null, TexFiltering.NEAREST, null)
         circleParams(innerRadius, startDegrees, endDegrees, shader)
-        circleData.draw(shader, 0)
+        circleData.draw(null, shader, 0)
         GFX.check()
     }
 
@@ -389,7 +389,7 @@ object GFXx3Dv2 {
         shader.use()
         shader3DUniforms(shader, stack, w, h, color, tiling, filtering, uvProjection)
         texture.bind(0, filtering.convert(), clamping)
-        uvProjection.mesh.draw(shader, 0)
+        uvProjection.mesh.draw(null, shader, 0)
         GFX.check()
     }
 

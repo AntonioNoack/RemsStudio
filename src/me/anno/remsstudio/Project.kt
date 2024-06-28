@@ -4,7 +4,7 @@ import me.anno.config.DefaultConfig.style
 import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.engine.Events.addEvent
 import me.anno.gpu.GFX
-import me.anno.io.Saveable
+import me.anno.io.saveable.Saveable
 import me.anno.io.config.ConfigBasics
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
@@ -31,6 +31,8 @@ import me.anno.ui.Panel
 import me.anno.ui.custom.CustomContainer
 import me.anno.ui.custom.CustomList
 import me.anno.ui.input.NumberType
+import me.anno.utils.structures.Collections.filterIsInstance2
+import me.anno.utils.structures.lists.Lists.firstInstanceOrNull2
 import me.anno.utils.types.AnyToFloat
 import me.anno.video.ffmpeg.FFMPEGEncodingBalance
 import me.anno.video.ffmpeg.FFMPEGEncodingType
@@ -75,8 +77,8 @@ class Project(var name: String, val file: FileReference) : Saveable() {
             val tab0 = if (ref.exists) {
                 try {
                     val data = JsonStringReader.read(ref.inputStreamSync(), workspace, true)
-                    val trans = data.filterIsInstance<Transform>().firstOrNull()
-                    val history = data.filterIsInstance<History>().firstOrNull()
+                    val trans = data.firstInstanceOrNull2(Transform::class)
+                    val history = data.firstInstanceOrNull2(History::class)
                     if (trans != null) Pair(trans, history ?: History()) else null
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -106,7 +108,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
                 val loadedUIData = JsonStringReader
                     .read(tabsFile, workspace, true)
                 val sceneTabs = loadedUIData
-                    .filterIsInstance<SceneTabData>()
+                    .filterIsInstance2(SceneTabData::class)
                 if (sceneTabs.isEmpty()) {
                     tabsDefault()
                 } else {

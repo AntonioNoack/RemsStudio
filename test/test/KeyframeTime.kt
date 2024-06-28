@@ -4,6 +4,7 @@ import me.anno.animation.Interpolation
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringReader
 import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.utils.structures.lists.Lists.firstInstanceOrNull2
 import org.apache.logging.log4j.LogManager
 
 fun main() {
@@ -21,7 +22,7 @@ fun main() {
 
     val asString = prop.toString()
     val fromString = JsonStringReader.read(asString, InvalidRef, false)
-        .filterIsInstance<AnimatedProperty<*>>().first()
+        .firstInstanceOrNull2(AnimatedProperty::class)
 
     logger.info(asString)
     logger.info(fromString)

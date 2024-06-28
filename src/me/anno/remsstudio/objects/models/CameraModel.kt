@@ -33,15 +33,15 @@ object CameraModel {
         shader.m4x4("transform", stack)
         shader.v4f("color", color)
         shader.v4f("tint", -1)
-        cameraModel.draw(shader, 0)
+        cameraModel.draw(null, shader, 0)
 
         stack.scale(near)
         shader.m4x4("transform", stack)
-        cameraModel.draw(shader, 0)
+        cameraModel.draw(null, shader, 0)
 
         stack.scale(far / near)
         shader.m4x4("transform", stack)
-        cameraModel.draw(shader, 0)
+        cameraModel.draw(null, shader, 0)
 
     }
 

@@ -31,6 +31,7 @@ import me.anno.ui.Style
 import me.anno.ui.base.SpyPanel
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
+import me.anno.utils.structures.Collections.filterIsInstance2
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector4f
@@ -318,7 +319,7 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
         getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
-        val c = inspected.filterIsInstance<MaskLayer>()
+        val c = inspected.filterIsInstance2(MaskLayer::class)
         val mask = getGroup(NameDesc("Mask Settings", "Masks are multipurpose objects", "obj.mask"))
         mask += vi(
             inspected, "Type", "Specifies what kind of mask it is", null, type, style

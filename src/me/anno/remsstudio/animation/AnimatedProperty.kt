@@ -3,7 +3,7 @@ package me.anno.remsstudio.animation
 import me.anno.Time
 import me.anno.animation.Interpolation
 import me.anno.gpu.GFX.glThread
-import me.anno.io.Saveable
+import me.anno.io.saveable.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.RemsStudio.root
@@ -13,6 +13,7 @@ import me.anno.remsstudio.animation.Keyframe.Companion.getWeights
 import me.anno.remsstudio.animation.drivers.AnimationDriver
 import me.anno.remsstudio.utils.WrongClassType
 import me.anno.ui.input.NumberType
+import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.structures.lists.UnsafeArrayList
 import me.anno.utils.types.AnyToDouble.getDouble
 import org.apache.logging.log4j.LogManager
@@ -348,21 +349,25 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
                         addKeyframe(value.time, clamp(castValue as V) as Any, 0.0)?.apply {
                             interpolation = value.interpolation
                         }
-                    } else LOGGER.warn("Dropped keyframe!, incompatible type ${value.value} for $type")
+                    } else warnDroppedKeyframe(value)
                 } else if (value is List<*>) {
-                    for (vi in value.filterIsInstance<Keyframe<*>>()) {
+                    for (vi in value.filterIsInstance2(Keyframe::class)) {
                         val castValue = type.acceptOrNull(vi.value)
                         if (castValue != null) {
                             @Suppress("UNCHECKED_CAST")
                             addKeyframe(vi.time, clamp(castValue as V) as Any, 0.0)?.apply {
                                 interpolation = vi.interpolation
                             }
-                        } else LOGGER.warn("Dropped keyframe!, incompatible type ${vi.value} for $type")
+                        } else warnDroppedKeyframe(vi)
                     }
                 } else WrongClassType.warn("keyframe", value as? Saveable)
             }
             else -> super.setProperty(name, value)
         }
+    }
+
+    private fun warnDroppedKeyframe(vi: Keyframe<*>){
+        LOGGER.warn("Dropped keyframe!, incompatible type ${vi.value} for $type")
     }
 
     fun setDriver(index: Int, value: Saveable?) {

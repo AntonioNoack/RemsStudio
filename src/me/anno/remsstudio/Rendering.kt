@@ -23,6 +23,8 @@ import me.anno.ui.base.menu.Menu.ask
 import me.anno.ui.base.menu.Menu.msg
 import me.anno.ui.base.progress.ProgressBar
 import me.anno.utils.files.FileChooser
+import me.anno.utils.structures.Collections.filterIsInstance2
+import me.anno.utils.structures.lists.Lists.firstInstanceOrNull2
 import me.anno.utils.types.Strings.getImportType
 import me.anno.video.VideoCreator
 import me.anno.video.VideoCreator.Companion.defaultQuality
@@ -61,7 +63,7 @@ object Rendering {
 
     fun filterAudio(scene: Transform): List<Audio> {
         return scene.listOfAll
-            .filterIsInstance<Audio>()
+            .filterIsInstance2(Audio::class)
             .filter {
                 it.forcedMeta?.hasAudio == true && (it.amplitude.isAnimated || it.amplitude[0.0] * 32e3f > 1f)
             }.toList()
@@ -176,8 +178,8 @@ object Rendering {
     }
 
     private fun findCamera(scene: Transform): Camera {
-        val cameras = scene.listOfAll.filterIsInstance<Camera>()
-        return cameras.firstOrNull() ?: RemsStudio.nullCamera ?: Camera()
+        val camera0 = scene.listOfAll.firstInstanceOrNull2(Camera::class)
+        return camera0 ?: RemsStudio.nullCamera ?: Camera()
     }
 
     fun overrideAudio(callback: () -> Unit) {

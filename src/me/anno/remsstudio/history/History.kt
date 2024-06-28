@@ -1,6 +1,6 @@
 package me.anno.remsstudio.history
 
-import me.anno.io.Saveable
+import me.anno.io.saveable.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
@@ -8,6 +8,7 @@ import me.anno.remsstudio.RemsStudio.defaultWindowStack
 import me.anno.remsstudio.history.HistoryState.Companion.capture
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
+import me.anno.utils.structures.Collections.filterIsInstance2
 import org.apache.logging.log4j.LogManager
 import kotlin.math.max
 
@@ -106,8 +107,9 @@ class History : Saveable() {
             "state" -> states += value as? HistoryState ?: return
             "states" -> {
                 val values = value as? List<*> ?: return
+                val states1 = values.filterIsInstance2(HistoryState::class)
                 synchronized(states) {
-                    states += values.filterIsInstance<HistoryState>()
+                    states.addAll(states1)
                 }
             }
             else -> super.setProperty(name, value)

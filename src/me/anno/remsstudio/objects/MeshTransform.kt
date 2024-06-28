@@ -41,6 +41,7 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.EnumInput
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.pooling.JomlPools
+import me.anno.utils.structures.Collections.filterIsInstance2
 import org.joml.*
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -239,7 +240,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                         material.bind(shader)
                         shader.v4f("diffuseBase", material.diffuseBase * color)
                         animTexture?.bindTrulyNearest(shader, "animTexture")
-                        mesh.draw(shader, index)
+                        mesh.draw(null, shader, index)
                     }
                 } else warnMissingMesh(comp, mesh)
             }
@@ -251,7 +252,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             if (animMeshRenderer != null) {
                 val skinningMatrices = uploadJointMatrices(shader, animation, time)
                 SkeletonCache[animMeshRenderer.skeleton]
-                    ?.draw(shader, localTransform, skinningMatrices)
+                    ?.draw(null, shader, localTransform, skinningMatrices)
             }
         }*/
 
@@ -273,7 +274,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
     ) {
 
         super.createInspector(inspected, list, style, getGroup)
-        val c = inspected.filterIsInstance<MeshTransform>()
+        val c = inspected.filterIsInstance2(MeshTransform::class)
 
         list += vi(
             inspected, "File", "", null, file, style

@@ -1,6 +1,7 @@
 package me.anno.remsstudio.audio.effects.falloff
 
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
+import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.mix
@@ -63,7 +64,7 @@ abstract class Falloff(var halfDistance: Float = 1f) : SoundEffect(Domain.TIME_D
     }
 
     override fun createInspector(
-        list: PanelListY, style: Style,
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
         getGroup: (NameDesc) -> SettingCategory
     ) {
         list.add(audio.vi(

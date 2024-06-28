@@ -2,7 +2,7 @@ package me.anno.remsstudio.cli
 
 import me.anno.Engine
 import me.anno.Time
-import me.anno.cache.Cache
+import me.anno.cache.CacheSection
 import me.anno.engine.Events.workEventTasks
 import me.anno.gpu.GFX
 import me.anno.gpu.framebuffer.Frame
@@ -98,7 +98,7 @@ object RemsCLI {
         init()
 
         val scene = try {
-            JsonStringReader.readFirstOrNull<Transform>(sceneSourceFile, project0, true)
+            JsonStringReader.readFirstOrNull(sceneSourceFile, project0, Transform::class)
                 ?: return error("Could not find scene")
         } catch (e: RuntimeException) {
             e.printStackTrace()
@@ -189,7 +189,7 @@ object RemsCLI {
             Texture2D.destroyTextures()
             GFX.resetFBStack()
             Time.updateTime()
-            Cache.update()
+            CacheSection.updateAll()
             bindTexture(GL11C.GL_TEXTURE_2D, 0)
             // BlendDepth.reset()
             GL11C.glDisable(GL11C.GL_CULL_FACE)

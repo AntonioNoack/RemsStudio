@@ -1,5 +1,6 @@
 package me.anno.remsstudio.audio.effects.impl
 
+import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.animation.AnimatedProperty
@@ -26,7 +27,7 @@ class EchoEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
     }
 
     override fun createInspector(
-        list: PanelListY, style: Style,
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
         getGroup: (NameDesc) -> SettingCategory
     ) {
         list += audio.vi("Offset", "Distance of 1st echo in seconds", offset, style)

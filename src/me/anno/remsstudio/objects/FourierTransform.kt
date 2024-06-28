@@ -27,6 +27,7 @@ import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.NumberType
 import me.anno.utils.files.LocalFile.toGlobalFile
+import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.video.MissingFrameException
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
@@ -247,7 +248,7 @@ class FourierTransform : Transform() {
         getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
-        val c = inspected.filterIsInstance<FourierTransform>()
+        val c = inspected.filterIsInstance2(FourierTransform::class)
         val fourier = getGroup(NameDesc("Fourier Transform", "", "obj.fourier"))
         list.addChild(vi(
             inspected, "Audio File", "", null, file, style

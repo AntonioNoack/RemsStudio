@@ -1,5 +1,6 @@
 package me.anno.remsstudio.animation.drivers
 
+import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio
@@ -16,7 +17,7 @@ class RhythmDriver : AnimationDriver() {
     var timestamps: DoubleArray = rhythm
 
     override fun createInspector(
-        list: PanelListY, style: Style,
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
         getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(list, style, getGroup)

@@ -1,6 +1,6 @@
 package test
 
-import me.anno.io.Saveable.Companion.registerCustomClass
+import me.anno.io.saveable.Saveable.Companion.registerCustomClass
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringReader
 import me.anno.remsstudio.animation.AnimatedProperty

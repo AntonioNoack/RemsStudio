@@ -10,6 +10,7 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
+import me.anno.utils.structures.Collections.filterIsInstance2
 import org.joml.Vector4f
 
 class EffectColoring : Transform() {
@@ -27,13 +28,11 @@ class EffectColoring : Transform() {
     override val symbol get() = DefaultConfig["ui.symbol.fx.coloring", "\uD83C\uDFA8"]
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
         getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
-        val c = inspected.filterIsInstance<EffectColoring>()
+        val c = inspected.filterIsInstance2(EffectColoring::class)
         val fx = getGroup(NameDesc("Effect", "", "obj.effect"))
         fx += vis(c, "Strength", "How much this color shall be used", c.map { it.influence }, style)
         fx += vis(c, "Sharpness", "How sharp the circle is", c.map { it.sharpness }, style)

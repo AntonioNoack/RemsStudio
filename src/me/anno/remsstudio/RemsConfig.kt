@@ -59,7 +59,7 @@ object RemsConfig {
         if (DefaultConfig["createNewInstancesList"] is StringMap)
             return
 
-        val tick = Clock()
+        val tick = Clock("RemsConfig")
 
         val newInstances: Map<String, Transform> = mapOf(
             "Mesh" to MeshTransform(getReference("res://icon.obj"), null),

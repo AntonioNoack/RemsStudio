@@ -20,6 +20,7 @@ import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
+import me.anno.utils.structures.Collections.filterIsInstance2
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
@@ -73,7 +74,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
         getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
-        val c = inspected.filterIsInstance<LinePolygon>()
+        val c = inspected.filterIsInstance2(LinePolygon::class)
         val group = getGroup(NameDesc("Line", "Properties of the line", "obj.line"))
         group += vis(c, "Segment Start", "", c.map { it.segmentStart }, style)
         group += vis(c, "Segment Length", "", c.map { it.segmentLength }, style)
@@ -264,7 +265,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
         shader.v4f("col0", c0)
         shader.v4f("col1", c1)
         shader.v4f("finalId", clickId)
-        UVProjection.Planar.mesh.draw(shader, 0)
+        UVProjection.Planar.mesh.draw(null, shader, 0)
         GFX.check()
     }
 

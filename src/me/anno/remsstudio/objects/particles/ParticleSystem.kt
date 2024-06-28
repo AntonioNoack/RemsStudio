@@ -30,6 +30,7 @@ import me.anno.ui.editor.stacked.Option
 import me.anno.ui.input.BooleanInput
 import me.anno.ui.input.NumberType
 import me.anno.utils.hpc.HeavyProcessing.processBalanced
+import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
 import me.anno.video.MissingFrameException
@@ -83,7 +84,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
     override fun getStartTime(): Double = Double.NEGATIVE_INFINITY
     override fun getEndTime(): Double = Double.POSITIVE_INFINITY
 
-    val forces get() = children.filterIsInstance<ForceField>()
+    val forces get() = children.filterIsInstance2(ForceField::class)
 
     private fun spawnIfRequired(time: Double, onlyFirst: Boolean) {
 
@@ -300,7 +301,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
     ) {
 
         super.createInspector(inspected, list, style, getGroup)
-        val c = inspected.filterIsInstance<ParticleSystem>()
+        val c = inspected.filterIsInstance2(ParticleSystem::class)
 
         var viCtr = 0
         fun vi(c: List<ParticleSystem>, name: String, description: String, properties: List<AnimatedDistribution>) {
@@ -381,7 +382,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
 
         general += BooleanInput("Show Children", showChildren, false, style)
             .setChangeListener { for (x in c) x.showChildren = it }
-            .setIsSelectedListener { show(inspected.filterIsInstance<Transform>(), null) }
+            .setIsSelectedListener { show(inspected.filterIsInstance2(Transform::class), null) }
 
         general += vi(inspected, "Seed", "The seed for all randomness", null, seed, style) { it, _ ->
             for (x in c) x.seed = it

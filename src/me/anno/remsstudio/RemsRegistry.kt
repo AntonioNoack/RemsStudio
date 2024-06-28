@@ -1,8 +1,8 @@
 package me.anno.remsstudio
 
 import me.anno.engine.ECSRegistry
-import me.anno.io.Saveable.Companion.registerCustomClass
-import me.anno.io.SaveableArray
+import me.anno.io.saveable.Saveable.Companion.registerCustomClass
+import me.anno.io.saveable.SaveableArray
 import me.anno.io.utils.StringMap
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.animation.Keyframe

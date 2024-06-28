@@ -1,6 +1,6 @@
 package me.anno.remsstudio.objects.particles.distributions
 
-import me.anno.io.Saveable
+import me.anno.io.saveable.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform

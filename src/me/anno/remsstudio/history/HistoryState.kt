@@ -1,6 +1,6 @@
 package me.anno.remsstudio.history
 
-import me.anno.io.Saveable
+import me.anno.io.saveable.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.defaultWindowStack
@@ -14,6 +14,7 @@ import me.anno.remsstudio.ui.sceneTabs.SceneTabs
 import me.anno.ui.Panel
 import me.anno.ui.base.groups.PanelGroup
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
+import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.types.AnyToInt
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -92,24 +93,11 @@ class HistoryState() : Saveable() {
         state.title = title
         state.selectedUUIDs = Selection.selectedTransforms.map { it.getUUID() }
         state.usedCameras = defaultWindowStack.map { window ->
-            asyncSequenceOfAll(window.panel)
-                .filterIsInstance<StudioSceneView>()
+            window.panel.listOfAll
+                .filterIsInstance2(StudioSceneView::class)
                 .map { it.camera.getUUID() }.toList()
         }.flatten().toIntArray()
 
-    }
-
-    private fun asyncSequenceOfAll(panel: Panel): Sequence<Panel> {
-        return sequence {
-            yield(panel)
-            if (panel is PanelGroup) {
-                val children = panel.children
-                for (i in children.indices) {
-                    val child = children.getOrNull(i) ?: break
-                    yieldAll(asyncSequenceOfAll(child))
-                }
-            }
-        }
     }
 
     companion object {

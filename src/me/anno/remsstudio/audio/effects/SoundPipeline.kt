@@ -2,7 +2,7 @@ package me.anno.remsstudio.audio.effects
 
 import me.anno.Engine
 import me.anno.engine.inspector.Inspectable
-import me.anno.io.Saveable
+import me.anno.io.saveable.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio
@@ -18,6 +18,7 @@ import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.stacked.Option
 import me.anno.ui.editor.stacked.StackPanel
+import me.anno.utils.structures.Collections.filterIsInstance2
 import org.jtransforms.fft.FloatFFT_1D
 
 class SoundPipeline() : Saveable(), Inspectable {
@@ -30,8 +31,8 @@ class SoundPipeline() : Saveable(), Inspectable {
     }
 
     override fun createInspector(
-        list: PanelListY, style: Style,
-        getGroup: (NameDesc) -> SettingCategory
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
+        getGroup: (nameDesc: NameDesc) -> SettingCategory
     ) {
         val effectsGroup = getGroup(NameDesc("Audio Effects", "Audio Effects", "obj.audio-fx"))
         effectsGroup += object : StackPanel(
@@ -52,7 +53,7 @@ class SoundPipeline() : Saveable(), Inspectable {
             override fun setValue(newValue: List<Inspectable>, mask: Int, notify: Boolean): Panel {
                 if (newValue !== effects) {
                     effects.clear()
-                    effects.addAll(newValue.filterIsInstance<SoundEffect>())
+                    effects.addAll(newValue.filterIsInstance2(SoundEffect::class))
                 }
                 return this
             }

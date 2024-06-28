@@ -29,9 +29,11 @@ import me.anno.ui.editor.files.FileContentImporter
 import me.anno.ui.editor.frames.FrameSizeInput
 import me.anno.ui.input.NumberType
 import me.anno.utils.files.LocalFile.toGlobalFile
+import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
 import me.anno.utils.structures.ValueWithDefaultFunc
+import me.anno.utils.structures.lists.Lists.firstInstanceOrNull2
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
@@ -159,8 +161,7 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
                     ) { transform ->
                         softChild = transform
                         lastCamera = transform.listOfAll
-                            .filterIsInstance<Camera>()
-                            .toList()
+                            .filterIsInstance2(Camera::class)
                             .getOrNull(cameraIndex - 1)// 1 = first, 0 = none
                     }
                 }
@@ -180,8 +181,8 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
         getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
-        val t = inspected.filterIsInstance<Transform>()
-        val c = inspected.filterIsInstance<SoftLink>()
+        val t = inspected.filterIsInstance2(Transform::class)
+        val c = inspected.filterIsInstance2(SoftLink::class)
         val link = getGroup(NameDesc("Link Data", "", "obj.softLink"))
         link += vi(
             inspected, "File", "Where the data is to be loaded from", "", null, file, style

@@ -56,6 +56,7 @@ import me.anno.ui.custom.CustomContainer
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.Color.black
+import me.anno.utils.structures.lists.Lists.firstInstanceOrNull2
 import me.anno.utils.types.Booleans.toInt
 import me.anno.utils.types.Floats.toRadians
 import org.apache.logging.log4j.LogManager
@@ -688,7 +689,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
     }
 
     val cameraTime get() = camera.getGlobalTransformTime(editorTime).second
-    val firstCamera get() = root.listOfAll.filterIsInstance<Camera>().firstOrNull()
+    val firstCamera get() = root.listOfAll.firstInstanceOrNull2(Camera::class)
 
     fun rotateCameraTo(rotation: Vector3f) {
         camera.putValue(camera.rotationYXZ, rotation, true)

@@ -24,6 +24,7 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.NumberType
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.pooling.JomlPools
+import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.types.Casting.castToFloat2
 import me.anno.utils.types.Floats.toRadians
 import org.joml.*
@@ -87,7 +88,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
     ) {
 
         super.createInspector(inspected, list, style, getGroup)
-        val c = inspected.filterIsInstance<Camera>()
+        val c = inspected.filterIsInstance2(Camera::class)
 
         val transform = getGroup(NameDesc("Transform", "", "obj.transform"))
         transform += vis(

@@ -18,6 +18,7 @@ import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.input.*
 import me.anno.utils.Color.toHexColor
 import me.anno.utils.Color.toVecRGBA
+import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefaultFunc
 import org.joml.Quaternionf
@@ -40,7 +41,7 @@ object ComponentUIV2 {
         type: NumberType?, value: V,
         style: Style, setValue: (value: V, mask: Int) -> Unit
     ): Panel {
-        val t = inspected.filterIsInstance<Transform>()
+        val t = inspected.filterIsInstance2(Transform::class)
         val panel = when (value) {
             is Boolean -> BooleanInput(title, value, type?.defaultValue as? Boolean ?: false, style)
                 .setChangeListener {

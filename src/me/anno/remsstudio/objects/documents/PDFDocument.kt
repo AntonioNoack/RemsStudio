@@ -29,6 +29,7 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.NumberType
 import me.anno.utils.Clipping
 import me.anno.utils.files.LocalFile.toGlobalFile
+import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
 import me.anno.utils.structures.ValueWithDefaultFunc
 import me.anno.utils.structures.lists.Lists.median
@@ -183,7 +184,7 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
         getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
-        val c = inspected.filterIsInstance<PDFDocument>()
+        val c = inspected.filterIsInstance2(PDFDocument::class)
         val doc = getGroup(NameDesc("Document", "", "obj.docs"))
         doc += vi(
             inspected, "Path", "", null, file, style

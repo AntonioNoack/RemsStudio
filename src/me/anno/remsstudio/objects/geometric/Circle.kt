@@ -13,6 +13,7 @@ import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.NumberType
+import me.anno.utils.structures.Collections.filterIsInstance2
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
@@ -37,7 +38,7 @@ open class Circle(parent: Transform? = null) : GFXTransform(parent) {
         getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
-        val c = inspected.filterIsInstance<Circle>()
+        val c = inspected.filterIsInstance2(Circle::class)
         val geo = getGroup(NameDesc("Geometry", "", "obj.geometry"))
         geo += vis(c, "Inner Radius", "Relative size of hole in the middle", c.map { it.innerRadius }, style)
         geo += vis(c, "Start Degrees", "To cut a piece out of the circle", c.map { it.startDegrees }, style)

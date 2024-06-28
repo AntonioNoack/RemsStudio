@@ -10,6 +10,7 @@ import me.anno.remsstudio.objects.modes.ArraySelectionMode
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
+import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.types.Floats.toRadians
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
@@ -134,7 +135,7 @@ class GFXArray(parent: Transform? = null) : GFXTransform(parent) {
         getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
-        val c = inspected.filterIsInstance<GFXArray>()
+        val c = inspected.filterIsInstance2(GFXArray::class)
         // todo create apply button?
         // todo we need to be able to insert properties...
         // todo replace? :D, # String Array

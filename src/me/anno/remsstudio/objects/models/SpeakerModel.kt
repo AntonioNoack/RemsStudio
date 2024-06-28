@@ -76,15 +76,15 @@ object SpeakerModel {
         if (is3D) {
             val r = 0.85f
             stack.translate(r, 0f, 0f)
-            Grid.drawLineMesh(stack, color, speakerModel)
+            Grid.drawLineMesh(null, stack, color, speakerModel)
             stack.translate(-2 * r, 0f, 0f)
-            Grid.drawLineMesh(stack, color, speakerModel)
+            Grid.drawLineMesh(null, stack, color, speakerModel)
         } else {
             // mark the speaker with yellow,
             // and let it face upwards (+y) to symbolize, that it's global
             color.z *= 0.8f // yellow
             stack.rotateX(-PIf * 0.5f)
-            Grid.drawLineMesh(stack, color, speakerModel)
+            Grid.drawLineMesh(null, stack, color, speakerModel)
         }
     }
 }

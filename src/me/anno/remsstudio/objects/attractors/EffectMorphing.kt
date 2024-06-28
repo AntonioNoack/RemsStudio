@@ -10,6 +10,7 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
+import me.anno.utils.structures.Collections.filterIsInstance2
 
 class EffectMorphing : Transform() {
 
@@ -26,13 +27,11 @@ class EffectMorphing : Transform() {
     override val symbol get() = DefaultConfig["ui.symbol.fx.morphing", "\uD83D\uDCA0"]
 
     override fun createInspector(
-        inspected: List<Inspectable>,
-        list: PanelListY,
-        style: Style,
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
         getGroup: (nameDesc: NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
-        val c = inspected.filterIsInstance<EffectMorphing>()
+        val c = inspected.filterIsInstance2(EffectMorphing::class)
         val fx = getGroup(NameDesc("Effect", "", "obj.effects"))
         fx += vis(
             c, "Strength", "The effective scale",

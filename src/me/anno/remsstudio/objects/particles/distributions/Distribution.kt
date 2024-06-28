@@ -1,6 +1,6 @@
 package me.anno.remsstudio.objects.particles.distributions
 
-import me.anno.io.Saveable
+import me.anno.io.saveable.Saveable
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.inspectable.InspectableAttribute
@@ -65,7 +65,7 @@ abstract class Distribution(val nameDesc: NameDesc) : Saveable(), InspectableAtt
 
     fun drawSphere(stack: Matrix4fArrayList, color: Vector4f, alpha: Float = 1f) {
         Grid.drawLineMesh(
-            stack,
+            null, stack,
             if (alpha == 1f) color
             else color.mulAlpha(alpha, Vector4f()),
             sphereAxesModels[sphereSubDivision].value

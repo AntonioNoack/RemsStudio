@@ -39,7 +39,7 @@ class SceneTab(var file: FileReference, var scene: Transform, history: History?)
 
     var history = history ?: try {
         // todo find project for file
-        JsonStringReader.readFirstOrNull<History>(file, workspace)!!
+        JsonStringReader.readFirstOrNull(file, workspace, History::class)!!
     } catch (e: java.lang.Exception) {
         History()
     }

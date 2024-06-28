@@ -9,7 +9,7 @@ import me.anno.gpu.GFXState
 import me.anno.gpu.blending.BlendMode
 import me.anno.gpu.drawing.GFXx3D
 import me.anno.gpu.shader.renderer.Renderer
-import me.anno.io.Saveable
+import me.anno.io.saveable.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.base.InvalidFormatException
 import me.anno.io.files.FileReference
@@ -43,6 +43,7 @@ import me.anno.ui.input.NumberType
 import me.anno.ui.input.TextInput
 import me.anno.ui.input.TextInputML
 import me.anno.utils.Color.mulARGB
+import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.structures.Hierarchical
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
@@ -227,7 +228,7 @@ open class Transform() : Saveable(),
         getGroup: (nameDesc: NameDesc) -> SettingCategory
     ) {
 
-        val c = inspected.filterIsInstance<Transform>()
+        val c = inspected.filterIsInstance2(Transform::class)
 
         list += TextInput("Name ($className)", "", name, style)
             .addChangeListener { for (x in c) name = it.ifEmpty { "-" } }
@@ -334,10 +335,6 @@ open class Transform() : Saveable(),
                 }
             }
         }
-    }
-
-    override fun createInspector(list: PanelListY, style: Style, getGroup: (nameDesc: NameDesc) -> SettingCategory) {
-        createInspector(listOf(this), list, style, getGroup)
     }
 
     open fun getLocalTime(parentTime: Double): Double {
@@ -553,7 +550,7 @@ open class Transform() : Saveable(),
             "blendMode" -> blendMode = BlendMode[value as? String ?: ""]
             "children" -> {
                 when (value) {
-                    is List<*> -> value.filterIsInstance<Transform>().forEach(::addChild)
+                    is List<*> -> value.filterIsInstance2(Transform::class).forEach(::addChild)
                     is Transform -> addChild(value)
                 }
             }
@@ -909,7 +906,7 @@ open class Transform() : Saveable(),
         val nextClickId = AtomicInteger()
 
         fun String.toTransform() = try {
-            JsonStringReader.readFirstOrNull<Transform>(this, workspace, true)
+            JsonStringReader.readFirstOrNull(this, workspace, Transform::class)
         } catch (e: InvalidFormatException) {
             null
         }

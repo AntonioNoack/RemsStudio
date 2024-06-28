@@ -1,5 +1,6 @@
 package me.anno.remsstudio.audio.effects.impl
 
+import me.anno.engine.inspector.Inspectable
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.SoundEffect
@@ -35,7 +36,7 @@ class AmplitudeEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
     }
 
     override fun createInspector(
-        list: PanelListY, style: Style,
+        inspected: List<Inspectable>, list: PanelListY, style: Style,
         getGroup: (NameDesc) -> SettingCategory
     ) {
     }

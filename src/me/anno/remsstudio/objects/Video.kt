@@ -1,5 +1,6 @@
 package me.anno.remsstudio.objects
 
+import me.anno.Engine
 import me.anno.animation.LoopingState
 import me.anno.audio.openal.AudioManager
 import me.anno.audio.openal.AudioTasks.addAudioTask
@@ -55,6 +56,7 @@ import me.anno.ui.input.EnumInput
 import me.anno.ui.input.FloatInput
 import me.anno.ui.input.NumberType
 import me.anno.utils.Clipping
+import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
 import me.anno.utils.structures.ValueWithDefaultFunc
@@ -101,6 +103,8 @@ import kotlin.math.*
 @Suppress("MemberVisibilityCanBePrivate")
 class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
     Audio(file, parent), SplittableElement {
+
+    constructor() : this(InvalidRef, null)
 
     companion object {
 
@@ -785,10 +789,9 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         inspected: List<Inspectable>, list: PanelListY, style: Style,
         getGroup: (NameDesc) -> SettingCategory
     ) {
-
         super.createInspector(inspected, list, style, getGroup)
-        val t = inspected.filterIsInstance<Transform>()
-        val c = inspected.filterIsInstance<Video>()
+        val t = inspected.filterIsInstance2(Transform::class)
+        val c = inspected.filterIsInstance2(Video::class)
 
         // to hide elements, which are not usable / have no effect
         val videoPanels = ArrayList<Panel>()

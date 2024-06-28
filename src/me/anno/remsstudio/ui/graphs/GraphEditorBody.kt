@@ -44,6 +44,7 @@ import me.anno.utils.Color.mulAlpha
 import me.anno.utils.Color.toARGB
 import me.anno.utils.Color.white
 import me.anno.utils.Color.withAlpha
+import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.types.AnyToFloat.getFloat
 import me.anno.utils.types.Booleans.hasFlag
 import me.anno.utils.types.Booleans.toInt
@@ -705,7 +706,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
             val target = selectedProperty ?: return super.onPaste(x, y, data, type)
             val targetType = target.type
             val parsedKeyframes = JsonStringReader.read(data, workspace, true)
-                .filterIsInstance<Keyframe<*>>()
+                .filterIsInstance2(Keyframe::class)
             if (parsedKeyframes.isNotEmpty()) {
                 RemsStudio.largeChange("Pasted Keyframes") {
                     for (kf in parsedKeyframes) {

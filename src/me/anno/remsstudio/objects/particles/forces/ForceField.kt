@@ -19,6 +19,7 @@ import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.sceneView.Grid
 import me.anno.ui.editor.stacked.Option
+import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.types.Floats.toRadians
 import org.joml.*
 import kotlin.math.abs
@@ -55,13 +56,13 @@ abstract class ForceField(val displayName: String, val descriptionI: String) : T
         getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
-        createInspector(
-            inspected.filterIsInstance<ForceField>(),
+        createInspector2(
+            inspected.filterIsInstance2(ForceField::class),
             getGroup(NameDesc("Force Field", "", "obj.forces")).content, style
         )
     }
 
-    fun createInspector(inspected: List<ForceField>, list: PanelList, style: Style) {
+    fun createInspector2(inspected: List<ForceField>, list: PanelList, style: Style) {
         val properties = HashMap<Pair<ForceField, String>, AnimatedProperty<*>>()
         for (ins in inspected) {
             for (p in ins.listProperties()) {
@@ -102,7 +103,7 @@ abstract class ForceField(val displayName: String, val descriptionI: String) : T
                     stack.translate(position)
                     applyTransform(particle, index0, indexF)
                     Grid.drawLineMesh(
-                        stack, Vector4f(color.x, color.y, color.z, color.w * opacity),
+                        null, stack, Vector4f(color.x, color.y, color.z, color.w * opacity),
                         ArrowModel.arrowLineModel
                     )
                 }

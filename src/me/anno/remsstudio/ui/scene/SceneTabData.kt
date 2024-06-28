@@ -1,7 +1,7 @@
 package me.anno.remsstudio.ui.scene
 
 import me.anno.engine.EngineBase.Companion.workspace
-import me.anno.io.Saveable
+import me.anno.io.saveable.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
