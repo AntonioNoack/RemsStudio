@@ -56,6 +56,7 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
     var selectedSites = ""
 
     var padding = AnimatedProperty.float(0f)
+    val cornerRadius = AnimatedProperty.vec4(Vector4f(0f))
 
     var direction = AnimatedProperty.rotY()
 
@@ -151,13 +152,15 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
                                 stack.scale(x, 1f, 1f)
                                 GFXx3Dv2.draw3DVideo(
                                     this, time, stack, texture, color,
-                                    TexFiltering.NEAREST, Clamping.CLAMP, null, UVProjection.Planar
+                                    TexFiltering.NEAREST, Clamping.CLAMP, null, UVProjection.Planar,
+                                    cornerRadius[time]
                                 )
                             }
                         } else {
                             GFXx3Dv2.draw3DVideo(
                                 this, time, stack, texture, color,
-                                filtering.value, Clamping.CLAMP, null, UVProjection.Planar
+                                filtering.value, Clamping.CLAMP, null, UVProjection.Planar,
+                                cornerRadius[time]
                             )
                         }
                     }
@@ -185,6 +188,8 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
     ) {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance2(PDFDocument::class)
+        val colorGroup = getGroup(NameDesc("Color", "", "obj.color"))
+        colorGroup += vis(c, "Corner Radius", "Makes the corners round", c.map { it.cornerRadius }, style)
         val doc = getGroup(NameDesc("Document", "", "obj.docs"))
         doc += vi(
             inspected, "Path", "", null, file, style
@@ -218,6 +223,7 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
         writer.writeFloat("editorQuality", editorQuality)
         writer.writeFloat("renderQuality", renderQuality)
         writer.writeMaybe(this, "filtering", filtering)
+        writer.writeObject(this, "cornerRadius", cornerRadius)
     }
 
     override fun setProperty(name: String, value: Any?) {
@@ -229,6 +235,7 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
             "selectedSites" -> selectedSites = value as? String ?: return
             "padding" -> padding.copyFrom(value)
             "direction" -> direction.copyFrom(value)
+            "cornerRadius" -> cornerRadius.copyFrom(value)
             else -> super.setProperty(name, value)
         }
     }

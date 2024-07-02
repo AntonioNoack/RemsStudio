@@ -130,12 +130,14 @@ object GFXx3Dv2 {
     fun draw3DVideo(
         video: GFXTransform, time: Double,
         stack: Matrix4fArrayList, texture: ITexture2D, color: Vector4f,
-        filtering: TexFiltering, clamping: Clamping, tiling: Vector4f?, uvProjection: UVProjection
+        filtering: TexFiltering, clamping: Clamping, tiling: Vector4f?, uvProjection: UVProjection,
+        cornerRadius: Vector4f
     ) {
         val shader = get3DShader(GPUFrame.swizzleStage0).value
         shader.use()
         defineAdvancedGraphicalFeatures(shader, video, time, uvProjection != UVProjection.Planar)
         shader3DUniforms(shader, stack, texture.width, texture.height, color, tiling, filtering, uvProjection)
+        cornerRadius(shader, cornerRadius, texture.width, texture.height)
         texture.bind(0, filtering.convert(), clamping)
         uvProjection.mesh.draw(null, shader, 0)
         GFX.check()
@@ -144,7 +146,8 @@ object GFXx3Dv2 {
     fun draw3DVideo(
         video: GFXTransform, time: Double,
         stack: Matrix4fArrayList, v0: GPUFrame, v1: GPUFrame, interpolation: Float, color: Vector4f,
-        filtering: TexFiltering, clamping: Clamping, tiling: Vector4f?, uvProjection: UVProjection
+        filtering: TexFiltering, clamping: Clamping, tiling: Vector4f?, uvProjection: UVProjection,
+        cornerRadius: Vector4f
     ) {
 
         if (!v0.isCreated || !v1.isCreated) throw RuntimeException("Frame must be loaded to be rendered!")
@@ -168,16 +171,23 @@ object GFXx3Dv2 {
         defineAdvancedGraphicalFeatures(shader, video, time, uvProjection != UVProjection.Planar)
         shader3DUniforms(shader, stack, v0.width, v0.height, color, tiling, filtering, uvProjection)
         colorGradingUniforms(video as? Video, time, shader)
+        cornerRadius(shader, cornerRadius, v0.width, v0.height)
         v0.bindUVCorrection(shader)
         uvProjection.mesh.draw(null, shader, 0)
         GFX.check()
 
     }
 
+    private fun cornerRadius(shader: Shader, cornerRadius: Vector4f, w: Int, h: Int) {
+        shader.v4f("cornerRadius", cornerRadius)
+        shader.v2f("cornerSize", 2f * w.toFloat() / h.toFloat(), 2f)
+    }
+
     fun draw3DVideo(
         video: GFXTransform, time: Double,
         stack: Matrix4fArrayList, texture: GPUFrame, color: Vector4f,
-        filtering: TexFiltering, clamping: Clamping, tiling: Vector4f?, uvProjection: UVProjection
+        filtering: TexFiltering, clamping: Clamping, tiling: Vector4f?, uvProjection: UVProjection,
+        cornerRadius: Vector4f
     ) {
         if (!texture.isCreated) throw RuntimeException("Frame must be loaded to be rendered!")
         val shader0 = get3DShader(texture)
@@ -186,6 +196,7 @@ object GFXx3Dv2 {
         defineAdvancedGraphicalFeatures(shader, video, time, uvProjection != UVProjection.Planar)
         shader3DUniforms(shader, stack, texture.width, texture.height, color, tiling, filtering, uvProjection)
         colorGradingUniforms(video as? Video, time, shader)
+        cornerRadius(shader, cornerRadius, texture.width, texture.height)
         texture.bind(0, filtering.convert(), clamping)
         texture.bindUVCorrection(shader)
         uvProjection.mesh.draw(null, shader, 0)
@@ -405,6 +416,8 @@ object GFXx3Dv2 {
                 "3dx-$javaClass", ShaderLib.v3Dl, ShaderLib.v3D, ShaderLib.y3D,
                 key.variables.filter { !it.isOutput } +
                         getForceFieldColorUniforms + getTextureLibUniforms + listOf(
+                    Variable(GLSLType.V4F, "cornerRadius"),
+                    Variable(GLSLType.V2F, "cornerSize"),
                     Variable(GLSLType.V3F, "finalColor", VariableMode.OUT),
                     Variable(GLSLType.V1F, "finalAlpha", VariableMode.OUT),
                 ), "" +
@@ -412,6 +425,12 @@ object GFXx3Dv2 {
                         getForceFieldColor +
                         ShaderLib.brightness +
                         colorGrading +
+                        "float sdRoundedBox(vec2 p, vec2 b, vec4 r){\n" +
+                        "   vec2 rxy = (p.x>0.0) ? r.xy : r.zw;\n" +
+                        "   float rx = (p.y>0.0) ? rxy.x  : rxy.y;\n" +
+                        "   vec2 q = abs(p)-b+rx;\n" +
+                        "   return min(max(q.x,q.y),0.0) + length(max(q,0.0)) - rx;\n" +
+                        "}\n" +
                         "void main(){\n" +
                         "   vec2 uvR = getProjectedUVs(uv, uvw, -1.0);\n" +
                         "   vec2 uvG = getProjectedUVs(uv, uvw,  0.0);\n" +
@@ -426,8 +445,10 @@ object GFXx3Dv2 {
                         "   result.g = color.g;\n" +
                         "   color.rgb = colorGrading(result.rgb);\n" +
                         "   if($hasForceFieldColor) color *= getForceFieldColor(finalPosition);\n" +
+                        "   vec2 cornerUV = (uv-0.5) * cornerSize;\n" +
+                        "   float cornerSDF = sdRoundedBox(cornerUV, cornerSize * 0.5, cornerRadius);\n" +
                         "   finalColor = color.rgb;\n" +
-                        "   finalAlpha = color.a;\n" +
+                        "   finalAlpha = color.a * clamp(0.5 - cornerSDF / length(vec4(dFdx(cornerUV),dFdy(cornerUV))), 0.0, 1.0);\n" +
                         "}", listOf("tex")
             )
         }

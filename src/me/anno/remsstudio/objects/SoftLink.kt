@@ -33,7 +33,6 @@ import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
 import me.anno.utils.structures.ValueWithDefaultFunc
-import me.anno.utils.structures.lists.Lists.firstInstanceOrNull2
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
@@ -64,7 +63,8 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
     // filtering
     val filtering = ValueWithDefaultFunc { DefaultConfig.getFiltering("default.link.filtering", TexFiltering.LINEAR) }
 
-    var resolution = AnimatedProperty.vec2(Vector2f(1920f, 1080f))
+    val resolution = AnimatedProperty.vec2(Vector2f(1920f, 1080f))
+    val cornerRadius = AnimatedProperty.vec4(Vector4f(0f))
 
     /**
      * to apply LUTs, effects and such
@@ -93,7 +93,7 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
                 }
                 draw3DVideo(
                     this, time, stack, fb.getTexture0(), color, filtering.value, clampMode.value,
-                    tiling[time], uvProjection.value
+                    tiling[time], uvProjection.value, cornerRadius[time]
                 )
             }
         } else {
@@ -183,6 +183,8 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
         super.createInspector(inspected, list, style, getGroup)
         val t = inspected.filterIsInstance2(Transform::class)
         val c = inspected.filterIsInstance2(SoftLink::class)
+        val colorGroup = getGroup(NameDesc("Color", "", "obj.color"))
+        colorGroup += vis(c, "Corner Radius", "Makes the corners round", c.map { it.cornerRadius }, style)
         val link = getGroup(NameDesc("Link Data", "", "obj.softLink"))
         link += vi(
             inspected, "File", "Where the data is to be loaded from", "", null, file, style
@@ -232,6 +234,7 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
         writer.writeMaybe(this, "filtering", filtering)
         writer.writeMaybe(this, "clamping", clampMode)
         writer.writeMaybe(this, "uvProjection", uvProjection)
+        writer.writeObject(this, "cornerRadius", cornerRadius)
     }
 
     override fun setProperty(name: String, value: Any?) {
@@ -244,6 +247,7 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
             "clamping" -> clampMode.value = Clamping.entries.firstOrNull { it.id == value } ?: return
             "uvProjection" -> uvProjection.value = UVProjection.entries.firstOrNull { it.id == value } ?: return
             "file" -> file = (value as? String)?.toGlobalFile() ?: (value as? FileReference) ?: InvalidRef
+            "cornerRadius" -> cornerRadius.copyFrom(value)
             else -> super.setProperty(name, value)
         }
     }

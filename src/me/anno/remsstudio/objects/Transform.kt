@@ -52,16 +52,14 @@ import me.anno.utils.types.AnyToBool
 import me.anno.utils.types.AnyToDouble
 import me.anno.utils.types.AnyToFloat
 import me.anno.utils.types.AnyToInt
+import me.anno.utils.types.Booleans.hasFlag
 import me.anno.utils.types.Casting.castToDouble
 import me.anno.utils.types.Casting.castToDouble2
 import me.anno.utils.types.Floats.toRadians
 import me.anno.utils.types.Strings.isBlank2
 import me.anno.video.MissingFrameException
 import org.apache.logging.log4j.LogManager
-import org.joml.Matrix4f
-import org.joml.Matrix4fArrayList
-import org.joml.Vector3f
-import org.joml.Vector4f
+import org.joml.*
 import java.util.concurrent.atomic.AtomicInteger
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -675,13 +673,6 @@ open class Transform() : Saveable(),
         )
     }
 
-    fun <V> vi(
-        inspected: List<Inspectable>,
-        title: String, ttt: String, dictPath: String, visibilityKey: String,
-        type: NumberType?, value: ValueWithDefault<V>,
-        style: Style
-    ) = vi(inspected, Dict[title, "obj.$dictPath"], Dict[ttt, "obj.$dictPath.desc"], visibilityKey, type, value, style)
-
     fun <V> vis(
         inspected: List<Inspectable>,
         title: String, ttt: String, dictPath: String, type: NumberType?, visibilityKey: String,
@@ -691,26 +682,28 @@ open class Transform() : Saveable(),
         visibilityKey, type, values, style
     )
 
-    fun <V> vi(
-        inspected: List<Inspectable>,
-        title: String, ttt: String, visibilityKey: String,
-        type: NumberType?, value: ValueWithDefault<V>,
-        style: Style
-    ): Panel {
-        return vi(inspected, title, ttt, visibilityKey, type, value.value, style) { newValue, mask ->
-            // todo respect mask
-            // todo assign to all???
-            value.value = newValue
+    fun <V> clone(that: V): Any? {
+        return when (that) {
+            is Vector2f -> Vector2f(that)
+            is Vector3f -> Vector3f(that)
+            is Vector4f -> Vector4f(that)
+            is Vector2d -> Vector2d(that)
+            is Vector3d -> Vector3d(that)
+            is Vector4d -> Vector4d(that)
+            else -> null
         }
     }
 
-    fun <V> vi(
-        inspected: List<Inspectable>,
-        title: String, ttt: String,
-        type: NumberType?, value: ValueWithDefault<V>,
-        style: Style
-    ): Panel {
-        return vi(inspected, title, ttt, title, type, value, style)
+    fun <V> setViaMask(old: V, new: V, mask: Int): V {
+        if (mask == -1 || old !is Vector || new !is Vector) return new
+        val clone = clone(old) as? Vector ?: return new
+        for (i in 0 until old.numComponents) {
+            if (mask.hasFlag(1 shl i)) {
+                clone.setComp(i, new.getComp(i))
+            }
+        }
+        @Suppress("UNCHECKED_CAST")
+        return clone as V
     }
 
     fun <V> vis(
@@ -719,9 +712,8 @@ open class Transform() : Saveable(),
         values: List<ValueWithDefault<V>>, style: Style
     ): Panel {
         return vi(inspected, title, ttt, visibilityKey, type, values[0].value, style) { newValue, mask ->
-            // todo respect mask
             for (x in values) {
-                x.value = newValue
+                x.value = setViaMask(x.value, newValue, mask)
             }
         }
     }

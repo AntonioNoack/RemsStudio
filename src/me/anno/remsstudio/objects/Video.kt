@@ -1,6 +1,5 @@
 package me.anno.remsstudio.objects
 
-import me.anno.Engine
 import me.anno.animation.LoopingState
 import me.anno.audio.openal.AudioManager
 import me.anno.audio.openal.AudioTasks.addAudioTask
@@ -197,6 +196,9 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
     val cgPower = AnimatedProperty.color(Vector4f(1f, 1f, 1f, 1f))
     val cgSaturation = AnimatedProperty.float(1f)
 
+    // todo support this for polygons, too?
+    val cornerRadius = AnimatedProperty.vec4(Vector4f(0f))
+
     var lastW = 16
     var lastH = 9
 
@@ -325,7 +327,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                     draw3DVideo(
                         this, time,
                         stack, frame, color, this@Video.filtering.value, this@Video.clampMode.value,
-                        tiling[time], uvProjection.value
+                        tiling[time], uvProjection.value, cornerRadius[time]
                     )
                     wasDrawn = true
                 }
@@ -448,7 +450,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                         lastH = meta.videoHeight
                         draw3DVideo(
                             this, time, stack, frame0, color, filtering, clamp,
-                            tiling[time], uvProjection.value
+                            tiling[time], uvProjection.value, cornerRadius[time]
                         )
                         wasDrawn = true
                         lastFrame = frame0
@@ -462,7 +464,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                         lastH = meta.videoHeight
                         draw3DVideo(
                             this, time, stack, frame0, frame1, interpolation, color, filtering, clamp,
-                            tiling[time], uvProjection.value
+                            tiling[time], uvProjection.value, cornerRadius[time]
                         )
                         wasDrawn = true
                     }
@@ -551,7 +553,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                     lastH = texture.height
                     draw3DVideo(
                         this, time, stack, texture, color,
-                        filtering.value, clampMode.value, tiling, uvProjection.value
+                        filtering.value, clampMode.value, tiling, uvProjection.value,
+                        cornerRadius[time]
                     )
                 }
             }
@@ -565,7 +568,8 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                     lastH = texture.height
                     draw3DVideo(
                         this, time, stack, texture, color,
-                        filtering.value, clampMode.value, tiling, uvProjection.value
+                        filtering.value, clampMode.value, tiling, uvProjection.value,
+                        cornerRadius[time]
                     )
                 }
             }
@@ -840,6 +844,9 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
             for (x in c) x.file = newFile
         }
 
+        val colorGroup = getGroup(NameDesc("Color", "", "obj.color"))
+        colorGroup += vis(c, "Corner Radius", "Makes the corners round", c.map { it.cornerRadius }, style)
+
         val uvMap = getGroup(NameDesc("Texture", "", "obj.uvs"))
         uvMap += img(
             vis(
@@ -1009,6 +1016,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
         writer.writeObject(this, "cgPower", cgPower)
         writer.writeMaybe(this, "editorVideoFPS", editorVideoFPS)
         writer.writeBoolean("stayVisibleAtEnd", stayVisibleAtEnd)
+        writer.writeObject(this, "cornerRadius", cornerRadius)
     }
 
     override fun setProperty(name: String, value: Any?) {
@@ -1025,6 +1033,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
             "clamping" -> clampMode.value = Clamping.entries.firstOrNull { it.id == value } ?: return
             "uvProjection" -> uvProjection.value = UVProjection.entries.firstOrNull { it.id == value } ?: return
             "editorVideoFPS" -> editorVideoFPS.value = clamp(value as? Int ?: return, 1, 1000)
+            "cornerRadius" -> cornerRadius.copyFrom(value)
             else -> super.setProperty(name, value)
         }
     }
