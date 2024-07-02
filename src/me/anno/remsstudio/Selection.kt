@@ -1,8 +1,8 @@
 package me.anno.remsstudio
 
 import me.anno.engine.inspector.Inspectable
-import me.anno.io.saveable.Saveable
 import me.anno.io.find.PropertyFinder
+import me.anno.io.saveable.Saveable
 import me.anno.remsstudio.RemsStudio.root
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
@@ -18,7 +18,7 @@ object Selection {
 
     private val LOGGER = LogManager.getLogger(Selection::class)
 
-    var selectedProperties: List<AnimatedProperty<*>?>? = null
+    var selectedProperties: List<AnimatedProperty<*>?> = emptyList()
         private set
 
     var selectedTransforms: List<Transform> = emptyList()
@@ -45,25 +45,25 @@ object Selection {
 
     fun selectProperty(property: List<Saveable?>) {
         if (selectedProperties == property) {
-            select(selectedTransforms, null)
+            select(selectedTransforms, emptyList())
         } else select(selectedTransforms, property)
     }
 
     fun selectTransform(transform: List<Transform>) {
-        select(transform, null)
+        select(transform, emptyList())
     }
 
     fun selectTransform(transform: Transform?) {
-        select(if (transform != null) listOf(transform) else emptyList(), null)
+        select(if (transform != null) listOf(transform) else emptyList(), emptyList())
     }
 
     fun select(transform: Transform, property: Saveable?) {
-        select(listOf(transform), if (property != null) listOf(property) else null)
+        select(listOf(transform), if (property != null) listOf(property) else emptyList())
     }
 
-    fun select(transforms0: List<Transform>, properties0: List<Saveable?>?) {
+    fun select(transforms0: List<Transform>, properties0: List<Saveable?>) {
 
-        if (same(transforms0, selectedTransforms) && same(properties0, selectedProperties)) return
+        if ((transforms0 == selectedTransforms) && (properties0 == selectedProperties)) return
         val transforms = transforms0.map { transform ->
             val loi = transform.listOfInheritance.toList()
             var replacement: Transform? = null
@@ -77,8 +77,8 @@ object Selection {
             replacement ?: transform
         }
 
-        if (same(transforms, selectedTransforms) && same(properties0, selectedProperties)) return
-        val newName = if (properties0.isNullOrEmpty() || properties0[0] == null) null
+        if ((transforms == selectedTransforms) && (properties0 == selectedProperties)) return
+        val newName = if (properties0.isEmpty() || properties0[0] == null) null
         else PropertyFinder.getName(transforms[0], properties0[0]!!)
         val propName = newName ?: selectedPropName
 
@@ -106,17 +106,6 @@ object Selection {
         }
     }
 
-    fun <V> same(l0: List<V>?, l1: List<V>?): Boolean {
-        if (l0 === l1) return true
-        if (l0 == null || l1 == null) return false
-        if (l0.size != l1.size) return false
-        for (i in l0.indices) {
-            if (l0[i] !== l1[i])
-                return false
-        }
-        return true
-    }
-
     fun update() {
         if (needsUpdate) {
             // re-find the selected transform and property...
@@ -130,7 +119,7 @@ object Selection {
                 selectedProperties = values.map { it as? AnimatedProperty<*> }
                 selectedInspectables = values.mapNotNull { it as? Inspectable }
             } else {
-                selectedProperties = null
+                selectedProperties = emptyList()
                 selectedInspectables = selectedTransforms
             }
             invalidateUI(true)
@@ -151,29 +140,18 @@ object Selection {
         return selectedUUIDs.mapNotNull { selectedUUID ->
             when {
                 selectedUUID < 0 -> null
-                selectedUUID < specialIdOffset -> root.listOfAll.getOrNull(selectedUUID)
+                selectedUUID < SPECIAL_ID_OFFSET -> root.listOfAll.getOrNull(selectedUUID)
                 else -> specialIds.reverse.getOrDefault(selectedUUID, null)
             }
         }
     }
 
-    private fun <V> Sequence<V>.getOrNull(index: Int): V? {
-        if (index < 0) return null
-        val iterator = iterator()
-        for (i in 0 until index) {
-            if (!iterator.hasNext()) return null
-            iterator.next()
-        }
-        if (!iterator.hasNext()) return null
-        return iterator.next()
-    }
-
-    private const val specialIdOffset = 1_000_000_000
+    private const val SPECIAL_ID_OFFSET = 1_000_000_000
     private val specialIds = BiMap<Transform, Int>(32)
     private fun getSpecialUUID(t: Transform): Int {
         val givenId = specialIds[t]
         if (givenId != null) return givenId
-        val newId = specialIds.size + specialIdOffset
+        val newId = specialIds.size + SPECIAL_ID_OFFSET
         specialIds[t] = newId
         return newId
     }

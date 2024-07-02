@@ -1,6 +1,7 @@
 package me.anno.remsstudio
 
 import me.anno.engine.EngineBase.Companion.workspace
+import me.anno.engine.Events.addEvent
 import me.anno.gpu.GFX
 import me.anno.gpu.GFXBase
 import me.anno.io.MediaMetadata.Companion.getMeta
@@ -23,9 +24,11 @@ import me.anno.ui.base.menu.Menu.ask
 import me.anno.ui.base.menu.Menu.msg
 import me.anno.ui.base.progress.ProgressBar
 import me.anno.utils.files.FileChooser
+import me.anno.utils.files.FileExtensionFilter
 import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.structures.lists.Lists.firstInstanceOrNull2
-import me.anno.utils.types.Strings.getImportType
+import me.anno.utils.types.Strings
+import me.anno.utils.types.Strings.getImportTypeByExtension
 import me.anno.video.VideoCreator
 import me.anno.video.VideoCreator.Companion.defaultQuality
 import me.anno.video.ffmpeg.FFMPEGEncodingBalance
@@ -189,20 +192,28 @@ object Rendering {
             allowFiles = true, allowFolders = false,
             allowMultiples = false, toSave = false,
             startFolder = project?.scenes ?: workspace,
-            filters = emptyList() // todo video filter
-        ) {
-            if (it.size == 1) {
-                val video = it.first()
-                if (video != project?.targetOutputFile) {
-                    overrideAudio(video, callback)
+            filters = listOf(
+                FileExtensionFilter(
+                    NameDesc("Video"),
+                    Strings.findImportTypeExtensions("Video")
+                ),
+                FileExtensionFilter(NameDesc("*"), emptyList())
+            )
+        ) { videoSources ->
+            if (videoSources.size == 1) {
+                val videoSrc = videoSources.first()
+                if (videoSrc != project?.targetOutputFile) {
+                    addEvent { // wait for other window to be closed, so the progress bar chooses a good window
+                        overrideAudio(videoSrc, callback)
+                    }
                 } else LOGGER.warn("Files must not be the same")
             }
         }
     }
 
-    fun overrideAudio(video: FileReference, callback: () -> Unit) {
+    fun overrideAudio(videoSrc: FileReference, callback: () -> Unit) {
 
-        val meta = getMeta(video, false)!!
+        val meta = getMeta(videoSrc, false)!!
 
         isRendering = true
         LOGGER.info("Rendering audio onto video")
@@ -216,7 +227,6 @@ object Rendering {
         // if empty, skip?
         LOGGER.info("Found ${audioSources.size} audio sources")
 
-        // todo progress bar didn't show up :/, why?
         val progress = GFX.someWindow.addProgressBar(object :
             ProgressBar("Audio Override", "Samples", duration * sampleRate) {
             override fun formatProgress(): String {
@@ -225,13 +235,14 @@ object Rendering {
         })
         AudioCreatorV2(scene, findCamera(scene), audioSources, duration, sampleRate, progress).apply {
             onFinished = {
+                println("Finished overriding audio")
                 isRendering = false
                 progress.finish()
                 callback()
                 targetOutputFile.invalidate()
             }
             thread(name = "Rendering::renderAudio()") {
-                createOrAppendAudio(targetOutputFile, video, false)
+                createOrAppendAudio(targetOutputFile, videoSrc, false)
             }
         }
     }
@@ -319,7 +330,7 @@ object Rendering {
                 targetOutputFile = targetOutputFile.getSiblingWithExtension(defaultExtension)
             }
         } while (file0 !== targetOutputFile)
-        val importType = targetOutputFile.extension.getImportType()
+        val importType = getImportTypeByExtension(targetOutputFile.lcExtension)
         if (importType == "Text" && RenderType.entries.none { importType == it.importType }) {
             LOGGER.warn("The file extension .${targetOutputFile.extension} is unknown! Your export may fail!")
             return targetOutputFile

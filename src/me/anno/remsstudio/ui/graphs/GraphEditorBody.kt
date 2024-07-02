@@ -73,7 +73,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
 
     val activeChannels: Int
         get() {
-            val comp = selectedProperties?.firstOrNull()
+            val comp = selectedProperties.firstOrNull()
             val type = comp?.type
             return if (type != null) {
                 var sum = 0
@@ -196,7 +196,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
         drawBackground(x0, y0, x1, y1)
         drawTypeInCorner("Keyframe Editor", fontColor)
 
-        val property = selectedProperties?.firstOrNull()
+        val property = selectedProperties.firstOrNull()
         val targetUnitScale = property?.type?.unitScale ?: lastUnitScale
         if (lastUnitScale != targetUnitScale) {
             val scale = targetUnitScale / lastUnitScale
@@ -423,7 +423,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
     fun Int.isChannelActive(activeChannels: Int) = activeChannels.hasFlag(1 shl this)
 
     fun getKeyframeAt(x: Float, y: Float): Pair<Keyframe<*>, Int>? {
-        val selectedProperty = selectedProperties?.firstOrNull()
+        val selectedProperty = selectedProperties.firstOrNull()
         val property = selectedProperty ?: return null
         var bestDragged: Keyframe<*>? = null
         var bestChannel = 0
@@ -463,7 +463,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
             max(minY, maxY)
         )
         val halfSize = dotSize / 2
-        val property = selectedProperties?.firstOrNull() ?: return emptyList()
+        val property = selectedProperties.firstOrNull() ?: return emptyList()
         val keyframes = ArrayList<Keyframe<*>>()
         val activeChannels = activeChannels
         keyframes@ for (kf in property.keyframes) {
@@ -531,7 +531,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
 
     override fun onDeleteKey(x: Float, y: Float) {
         RemsStudio.largeChange("Deleted Keyframes") {
-            val selectedProperty = selectedProperties?.firstOrNull()
+            val selectedProperty = selectedProperties.firstOrNull()
             for (kf in selectedKeyframes) {
                 selectedProperty?.remove(kf)
             }
@@ -566,7 +566,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
                                     for (it in selectedKeyframes) {
                                         it.time = (it.time - avg) * scale + avg
                                     }
-                                    val selectedProperty = selectedProperties?.firstOrNull()
+                                    val selectedProperty = selectedProperties.firstOrNull()
                                     selectedProperty?.sort()
                                 }
                             }
@@ -616,7 +616,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
 
     override fun onMouseMoved(x: Float, y: Float, dx: Float, dy: Float) {
         val draggedKeyframe = draggedKeyframe
-        val selectedProperty = selectedProperties?.firstOrNull()
+        val selectedProperty = selectedProperties.firstOrNull()
         if (isSelecting) {
             // select new elements, update the selected keyframes?
             invalidateDrawing()
@@ -625,7 +625,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
             val time = getTimeAt(x)
             // if there are multiples selected, allow them to be moved via shift key
             val moveValues = isShiftDown || selectedKeyframes.size < 2
-            val property = selectedProperties?.firstOrNull()
+            val property = selectedProperties.firstOrNull()
             RemsStudio.incrementalChange("Dragging keyframe") {
                 val timeHere = global2Kf(time) // global -> local
                 val deltaTime = timeHere - draggedKeyframe.time
@@ -680,7 +680,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
     }
 
     override fun onDoubleClick(x: Float, y: Float, button: Key) {
-        val selectedProperty = selectedProperties?.firstOrNull()
+        val selectedProperty = selectedProperties.firstOrNull()
         if (selectedProperty != null) {
             val time = global2Kf(getTimeAt(x))
             RemsStudio.largeChange("Created keyframe at ${time}s") {
@@ -702,7 +702,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
         // paste float/vector values at the mouse position?
         try {
             val time0 = getTimeAt(x)
-            val selectedProperty = selectedProperties?.firstOrNull()
+            val selectedProperty = selectedProperties.firstOrNull()
             val target = selectedProperty ?: return super.onPaste(x, y, data, type)
             val targetType = target.type
             val parsedKeyframes = JsonStringReader.read(data, workspace, true)
@@ -736,7 +736,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
     }
 
     override fun onMouseWheel(x: Float, y: Float, dx: Float, dy: Float, byMouse: Boolean) {
-        val selectedProperty = selectedProperties?.firstOrNull()
+        val selectedProperty = selectedProperties.firstOrNull()
         if (selectedProperty == null || isShiftDown) {
             super.onMouseWheel(x, y, dx, dy, byMouse)
         } else {
@@ -750,7 +750,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
     }
 
     override fun onSelectAll(x: Float, y: Float) {
-        val selectedProperty = selectedProperties?.firstOrNull()
+        val selectedProperty = selectedProperties.firstOrNull()
         val kf = selectedProperty?.keyframes
         if (kf != null) {
             selectedKeyframes.clear()

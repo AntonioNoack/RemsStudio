@@ -1,7 +1,6 @@
 package me.anno.remsstudio
 
 import me.anno.Build
-import me.anno.Time.deltaTime
 import me.anno.Time.gameTime
 import me.anno.Time.rawDeltaTime
 import me.anno.audio.openal.ALBase
@@ -31,6 +30,8 @@ import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.text.Text
 import me.anno.remsstudio.ui.StudioFileImporter
+import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.centralTime
+import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.dtHalfLength
 import me.anno.remsstudio.ui.scene.ScenePreview
 import me.anno.remsstudio.ui.sceneTabs.SceneTabs.currentTab
 import me.anno.ui.Panel
@@ -41,42 +42,37 @@ import me.anno.ui.editor.WelcomeUI
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.OS
 import me.anno.utils.hpc.ProcessingQueue
+import kotlin.math.abs
 import kotlin.math.min
 
-// todo: add Japanese as language!!
+// todo bug: 0-key should work like numpad-0 to reset transform
+// todo bug: space is not working everywhere/every time to start playback
 
-// todo bug: usual 0-key should work like numpad-0 to reset transform
-// todo option to lock transform, e.g. of camera?
+// todo bugs:
+//  - sometimes delete-key isn't registered as such
+//  - video files cannot be properly deleted, because files can't be deleted when reading them
 
 // todo improvements:
 //  if playing forward, and time is non-modified, use VideoStream for much better playback performance
 
 // todo bug: when editing a driver, we should see its curve
-// todo bug: there is a webm file, whose video is black, and the audio only plays in the file explorer, not the studio :(
 // todo right-click option to remove linear sections from keyframe panel;
 // todo right-click option to thin out sections from keyframe panel;
 // todo right-click option to select by specific channel only (e.g. to rect-select all y over 0.5);
 // to do morphing: up/down/left/right
 // to do morphing: rect/hexagon shape?, rotate it?
 // to do hexagon/triangle/rectangle pixelation: rotate it?
-// done record multiple properties at once, e.g. camera motion and rotation
-// done morphing: swirl
 
 // todo respect masks when editing multiple instances at once
 
 // todo make music x times calmer, if another audio line (voice) is on as an optional feature
-
-// todo bugs:
-//  - shadows on SDF text have a black border, but they shouldn't
-//  - sometimes delete-key isn't registered as such
-//  - video files cannot be properly deleted, because files can't be deleted when reading them
 
 // todo use reflectionMap for mesh rendering where available
 //       - option to bake it around the mesh?
 
 // todo isolate and remove certain frequencies from audio
 // todo visualize audio frequency, always!!!, from 25Hz to 48kHz
-// inspiration: https://www.youtube.com/watch?v=RA5UiLYWdbM
+//  inspiration: https://www.youtube.com/watch?v=RA5UiLYWdbM
 
 // todo show loudness of audio based on perceived amplitude, instead of real amplitude
 
@@ -92,31 +88,16 @@ import kotlin.math.min
 // todo mode to move vertices of rectangle one by one (requires clever transforms, or a new type of GFXTransform)
 // for perspective matching: e.g. moving a fake image onto another image
 
-// todo create proxies only for sections of video
 // todo proxies for sped-up videos? e.g. every 10th frame? idk...
-
-// proxy creation uses 100% cpu... prevent that somehow, or decrease process priority?
-// it uses 36% on its own -> heavier weight?
-// -> idk how on Windows; done for Linux
-
-// nearby frame compression (small changes between frames, could use lower resolution) on the gpu side? maybe...
-// -> would maybe allow 60fps playback better
 
 // todo discard alpha being > or < than x / map alpha
 
 // todo splines for the polygon line
 
-// todo sketching: draw frame by frame, only save x,y,radius?
-//  record drawing, and use meta-ball like shapes (maybe)
-
 // todo translations for everything...
 // todo limit the history to entries with 5x the same name? how exactly?...
 
 // todo saturation/lightness controls by hue
-
-// to do Mod with "hacked"-text effect for text: swizzle characters and introduce others?
-
-// todo when playing video, and the time hasn't been touched manually, slide the time panel, when the time reaches the end: slide by 1x window width
 
 @Suppress("MemberVisibilityCanBePrivate")
 object RemsStudio : EngineBase("Rem's Studio", 10301, true), WelcomeUI {
@@ -145,11 +126,21 @@ object RemsStudio : EngineBase("Rem's Studio", 10301, true), WelcomeUI {
 
     private fun updateEditorTime() {
         // if we'd use the clamped deltaTime, audio and video would run out of sync
+        val oldTime = editorTime
         editorTime += rawDeltaTime * editorTimeDilation
         if (editorTime <= 0.0 && editorTimeDilation < 0.0) {
             editorTimeDilation = 0.0
             editorTime = 0.0
         }
+        // when playing video, and the time hasn't been touched manually, slide the time panel,
+        // when the time reaches the end: slide by 1x window width
+        if (isTimeVisible(oldTime) && !isTimeVisible(editorTime)) {
+            centralTime += dtHalfLength * 2.0
+        }
+    }
+
+    private fun isTimeVisible(time: Double): Boolean {
+        return abs(centralTime - time) < dtHalfLength
     }
 
     override fun loadConfig() {
@@ -350,11 +341,6 @@ object RemsStudio : EngineBase("Rem's Studio", 10301, true), WelcomeUI {
         super.clearAll()
         root.forAllInHierarchy { it.clearCache() }
     }
-
-    // UI with traditional editor?
-    // - adding effects
-    // - simple mask overlays
-    // - simple color correction
 
     @JvmStatic
     fun main(args: Array<String>) {

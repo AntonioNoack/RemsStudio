@@ -79,7 +79,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
     var outlineDepth = AnimatedProperty.float(0f)
 
     val shadowColor = AnimatedProperty.color(Vector4f(0f))
-    val shadowOffset = AnimatedProperty.pos(Vector3f(0f, 0f, -0.1f))
+    val shadowOffset = AnimatedProperty.pos(Vector3f(0.2f, -0.2f, -0.1f))
     val shadowSmoothness = AnimatedProperty.floatPlus(0f)
 
     val startCursor = AnimatedProperty.int(-1)

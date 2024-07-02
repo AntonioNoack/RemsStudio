@@ -267,7 +267,7 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
         RemsStudio.largeChange("Deleted Component") {
             for (selectedTransform in selectedTransforms)
                 selectedTransform.destroy()
-            select(emptyList<Transform>(), null)
+            select(emptyList(), emptyList())
         }
     }
 

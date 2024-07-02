@@ -77,7 +77,7 @@ abstract class AnimationDriver : Saveable(), Inspectable {
         ) { it, _ -> frequency = it }
     }
 
-    fun show(toShow: List<AnimatedProperty<*>>?) {
+    fun show(toShow: List<AnimatedProperty<*>>) {
         select(selectedTransforms, toShow)
     }
 

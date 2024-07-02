@@ -9,13 +9,13 @@ import me.anno.gpu.GFXState
 import me.anno.gpu.blending.BlendMode
 import me.anno.gpu.drawing.GFXx3D
 import me.anno.gpu.shader.renderer.Renderer
-import me.anno.io.saveable.Saveable
 import me.anno.io.base.BaseWriter
 import me.anno.io.base.InvalidFormatException
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringReader
 import me.anno.io.json.saveable.JsonStringWriter
+import me.anno.io.saveable.Saveable
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
@@ -48,6 +48,10 @@ import me.anno.utils.structures.Hierarchical
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
 import me.anno.utils.structures.ValueWithDefaultFunc
+import me.anno.utils.types.AnyToBool
+import me.anno.utils.types.AnyToDouble
+import me.anno.utils.types.AnyToFloat
+import me.anno.utils.types.AnyToInt
 import me.anno.utils.types.Casting.castToDouble
 import me.anno.utils.types.Casting.castToDouble2
 import me.anno.utils.types.Floats.toRadians
@@ -88,6 +92,7 @@ open class Transform() : Saveable(),
     val timelineSlot = ValueWithDefault(-1)
 
     var visibility = TransformVisibility.VISIBLE
+    var lockTransform = false
     override var isEnabled = true
 
     var position = AnimatedProperty.pos()
@@ -198,7 +203,7 @@ open class Transform() : Saveable(),
     }
 
     fun show(selves: List<Transform>, anim: List<AnimatedProperty<*>?>?) {
-        select(selves, anim)
+        select(selves, anim ?: emptyList())
     }
 
     private val tmp0 = Vector4f()
@@ -276,6 +281,11 @@ open class Transform() : Saveable(),
             c.map { it.alignWithCamera },
             style
         )
+        transform += vi(
+            c, "Lock Transform", "So you don't accidentally move them", null, lockTransform, style
+        ) { value, _ ->
+            for (ci in c) ci.lockTransform = value
+        }
 
         // color
         val colorGroup = getGroup(NameDesc("Color", "", "obj.color"))
@@ -525,17 +535,19 @@ open class Transform() : Saveable(),
         writer.writeObjectList(this, "children", children)
         writer.writeMaybe(this, "timelineSlot", timelineSlot)
         writer.writeInt("visibility", visibility.id, false)
+        writer.writeBoolean("lockTransform", lockTransform)
     }
 
     override fun setProperty(name: String, value: Any?) {
         when (name) {
-            "collapsed" -> isCollapsed = value == true
-            "timelineSlot" -> timelineSlot.value = value as? Int ?: return
+            "collapsed" -> isCollapsed = AnyToBool.anyToBool(value)
+            "timelineSlot" -> timelineSlot.value = AnyToInt.getInt(value, 0)
             "visibility" -> visibility = TransformVisibility[value as? Int ?: return]
             "uuid" -> Unit// hide the warning
-            "weight" -> weight = value as? Float ?: return
-            "timeDilation" -> timeDilation.value = value as? Double ?: return
-            "timeOffset" -> timeOffset.value = value as? Double ?: return
+            "weight" -> weight = AnyToFloat.getFloat(value, 0f)
+            "timeDilation" -> timeDilation.value = AnyToDouble.getDouble(value, 1.0)
+            "timeOffset" -> timeOffset.value = AnyToDouble.getDouble(value, 0.0)
+            "lockTransform" -> lockTransform = AnyToBool.anyToBool(value)
             "fadeIn" -> {
                 if (value is Double && value >= 0.0) fadeIn.set(value.toFloat())
                 else fadeIn.copyFrom(value)

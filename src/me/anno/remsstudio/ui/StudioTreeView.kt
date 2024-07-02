@@ -88,7 +88,7 @@ class StudioTreeView(style: Style) :
     override fun selectElementsMaybe(elements: List<Transform>) {
         // if already selected, don't inspect that property/driver
         if (Selection.selectedTransforms == elements &&
-            (Selection.selectedProperties != null ||
+            (Selection.selectedProperties.isNotEmpty() ||
                     (Selection.selectedInspectables.isNotEmpty() && Selection.selectedInspectables != elements))
         ) {
             Selection.clear()

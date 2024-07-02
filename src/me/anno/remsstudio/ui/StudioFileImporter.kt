@@ -19,7 +19,7 @@ import me.anno.ui.base.menu.Menu.ask
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.editor.files.FileContentImporter
-import me.anno.utils.types.Strings.getImportType
+import me.anno.utils.types.Strings.getImportTypeByExtension
 import org.apache.logging.log4j.LogManager
 import org.joml.Vector3f
 import kotlin.concurrent.thread
@@ -44,7 +44,7 @@ object StudioFileImporter : FileContentImporter<Transform>() {
         callback: (Transform) -> Unit
     ) {
         val name = file.name
-        when (file.extension.getImportType()) {
+        when (getImportTypeByExtension(file.lcExtension)) {
             "Transform" -> when (useSoftLink) {
                 SoftLinkMode.ASK -> openMenu(
                     defaultWindowStack, listOf(

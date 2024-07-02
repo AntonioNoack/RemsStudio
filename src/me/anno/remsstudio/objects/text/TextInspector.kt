@@ -11,6 +11,7 @@ import me.anno.remsstudio.ui.IsSelectedWrapper
 import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
+import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.FontListMenu.createFontInput
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.color.spaces.HSLuv
@@ -167,7 +168,8 @@ fun Text.createInspectorWithoutSuperImpl(
         }
     }
 
-    val rpgEffects = getGroup(NameDesc("RPG Effects", "This effect is for fading in/out letters one by one.", "obj.rpg-effects"))
+    val rpgEffects =
+        getGroup(NameDesc("RPG Effects", "This effect is for fading in/out letters one by one.", "obj.rpg-effects"))
     rpgEffects += vis(
         c, "Start Cursor", "The first character index to be drawn", c.map { it.startCursor },
         style
@@ -223,6 +225,7 @@ fun Text.createInspectorWithoutSuperImpl(
     }
 
     val shadows = getGroup(NameDesc("Shadow", "Built-in Shadow", "obj.shadow"))
+    shadows += TextPanel("To enable shadows, change the opacity of the shadow color!", style)
     shadows += vis(c, "Color", "", "shadow.color", c.map { it.shadowColor }, style)
     shadows += vis(c, "Offset", "", "shadow.offset", c.map { it.shadowOffset }, style)
     shadows += vis(c, "Smoothness", "", "shadow.smoothness", c.map { it.shadowSmoothness }, style)

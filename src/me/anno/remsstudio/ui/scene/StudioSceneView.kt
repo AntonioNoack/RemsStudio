@@ -369,36 +369,37 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
     fun moveCamera(dt: Float) {
 
         val camera = camera
-        val (cameraTransform, cameraTime) = camera.getGlobalTransformTime(editorTime)
+        if (!camera.lockTransform) {
+            val (cameraTransform, cameraTime) = camera.getGlobalTransformTime(editorTime)
 
-        val radius = camera.orbitRadius[cameraTime]
-        val speed = if (radius == 0f) 1f else 0.1f + 0.9f * radius
-        val acceleration = Vector3f(inputDx, inputDy, inputDz).mul(speed)
+            val radius = camera.orbitRadius[cameraTime]
+            val speed = if (radius == 0f) 1f else 0.1f + 0.9f * radius
+            val acceleration = Vector3f(inputDx, inputDy, inputDz).mul(speed)
 
-        velocity.mul(1f - dt)
-        velocity.mulAdd(dt, acceleration)
+            velocity.mul(1f - dt)
+            velocity.mulAdd(dt, acceleration)
 
-        if (velocity.lengthSquared() > 0f) {
-            val oldPosition = camera.position[cameraTime]
-            val step = velocity * dt
-            val step2 = cameraTransform.transformDirection(step)
-            val newPosition = oldPosition + step2
-            if (camera == nullCamera) {
-                camera.position.addKeyframe(cameraTime, newPosition, 0.01)
-            } else {
-                RemsStudio.incrementalChange("Move Camera") {
+            if (velocity.lengthSquared() > 0f) {
+                val oldPosition = camera.position[cameraTime]
+                val step = velocity * dt
+                val step2 = cameraTransform.transformDirection(step)
+                val newPosition = oldPosition + step2
+                if (camera == nullCamera) {
                     camera.position.addKeyframe(cameraTime, newPosition, 0.01)
+                } else {
+                    RemsStudio.incrementalChange("Move Camera") {
+                        camera.position.addKeyframe(cameraTime, newPosition, 0.01)
+                    }
                 }
+                invalidateDrawing()
             }
-            invalidateDrawing()
         }
 
-        // todo if camera.isOrthographic, then change fov instead of moving forward/backward
+        // todo if camera.isOrthographic, then change fov instead of moving forward/backward?
 
         inputDx = 0f
         inputDy = 0f
         inputDz = 0f
-
     }
 
     fun parseTouchInput() {
@@ -485,7 +486,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
 
     fun moveSelected(selected: Transform, dx0: Float, dy0: Float) {
 
-        if (!mayControlCamera) return
+        if (!mayControlCamera || selected.lockTransform) return
         if (dx0 == 0f && dy0 == 0f) return
 
         val (target2global, localTime) = (selected.parent ?: selected).getGlobalTransformTime(editorTime)
@@ -553,7 +554,6 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     invalidateUI(false)
                 }
             }
-
             SceneDragMode.SCALE -> {
                 val speed2 = 1f / height
                 val oldScale = selected.scale[localTime]
@@ -604,7 +604,6 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     invalidateUI(false)
                 }
             }
-
             SceneDragMode.ROTATE -> {
                 // todo transform rotation??? quaternions...
                 val centerX = x + width / 2
@@ -710,17 +709,14 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                 mode = SceneDragMode.MOVE
                 invalidateDrawing()
             }
-
             "SetMode(SCALE)" -> {
                 mode = SceneDragMode.SCALE
                 invalidateDrawing()
             }
-
             "SetMode(ROTATE)" -> {
                 mode = SceneDragMode.ROTATE
                 invalidateDrawing()
             }
-
             "Cam0", "ResetCamera" -> {
                 val firstCamera = firstCamera
                 if (firstCamera == null) {
@@ -791,9 +787,9 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
     }
 
     override fun onDoubleClick(x: Float, y: Float, button: Key) {
-        onInteraction()
-        invalidateDrawing()
-        if (button == Key.BUTTON_LEFT) {
+        if (button == Key.BUTTON_LEFT && mayControlCamera) {
+            onInteraction()
+            invalidateDrawing()
             val xi = x.toInt()
             val yi = y.toInt()
             for (it in controls) {
@@ -809,7 +805,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     zoomToObject(it)
                 }
             }
-        }
+        } else super.onDoubleClick(x, y, button)
     }
 
     override fun onMouseClicked(x: Float, y: Float, button: Key, long: Boolean) {
@@ -837,7 +833,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                             } else {
                                 selectedTransforms + tr
                             }
-                            select(newList, null)
+                            select(newList, emptyList())
                         }
                     } else selectTransform(tr)
                     invalidateDrawing()
@@ -879,7 +875,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         invalidateDrawing()
         RemsStudio.largeChange("Deleted Component") {
             for (s in selectedTransforms) s.destroy()
-            select(emptyList<Transform>(), null)
+            select(emptyList(), emptyList())
         }
     }
 
@@ -892,35 +888,37 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
     }
 
     override fun onMouseWheel(x: Float, y: Float, dx: Float, dy: Float, byMouse: Boolean) {
-        onInteraction()
-        invalidateDrawing()
-        RemsStudio.incrementalChange("Zoom In / Out") {
-            val camera = camera
-            val radius = camera.orbitRadius[cameraTime]
-            if (radius == 0f) {
-                // no orbiting
-                moveCamera(0f, 0f, -0.5f * dy)
-            } else {
-                val delta = -dy * shiftSlowdown
-                val factor = pow(1.02f, delta)
-                val newOrbitDistance = radius * factor
-                if (isLocked2D) {
-                    // zoom in on point in 2D using mouse position
-                    val fov =
-                        (factor - 1f) * radius * tan(camera.fovYDegrees[cameraTime].toRadians() * 0.5f) * 2f / height
-                    val dx2 = +(this.x - x + this.width * 0.5f) * fov
-                    val dy2 = -(this.y - y + this.height * 0.5f) * fov
-                    val oldPos = camera.position[cameraTime]
-                    oldPos.add(dx2, dy2, 0f)
-                    camera.putValue(camera.position, oldPos, false)
-                }
-                camera.putValue(camera.orbitRadius, newOrbitDistance, false)
-                if (camera == nullCamera) {
-                    camera.putValue(camera.farZ, camera.farZ[cameraTime] * factor, false)
-                    camera.putValue(camera.nearZ, camera.nearZ[cameraTime] * factor, false)
+        if (mayControlCamera && !camera.lockTransform) {
+            onInteraction()
+            invalidateDrawing()
+            RemsStudio.incrementalChange("Zoom In / Out") {
+                val camera = camera
+                val radius = camera.orbitRadius[cameraTime]
+                if (radius == 0f) {
+                    // no orbiting
+                    moveCamera(0f, 0f, -0.5f * dy)
+                } else {
+                    val delta = -dy * shiftSlowdown
+                    val factor = pow(1.02f, delta)
+                    val newOrbitDistance = radius * factor
+                    if (isLocked2D) {
+                        // zoom in on point in 2D using mouse position
+                        val fov =
+                            (factor - 1f) * radius * tan(camera.fovYDegrees[cameraTime].toRadians() * 0.5f) * 2f / height
+                        val dx2 = +(this.x - x + this.width * 0.5f) * fov
+                        val dy2 = -(this.y - y + this.height * 0.5f) * fov
+                        val oldPos = camera.position[cameraTime]
+                        oldPos.add(dx2, dy2, 0f)
+                        camera.putValue(camera.position, oldPos, false)
+                    }
+                    camera.putValue(camera.orbitRadius, newOrbitDistance, false)
+                    if (camera == nullCamera) {
+                        camera.putValue(camera.farZ, camera.farZ[cameraTime] * factor, false)
+                        camera.putValue(camera.nearZ, camera.nearZ[cameraTime] * factor, false)
+                    }
                 }
             }
-        }
+        } else super.onMouseWheel(x, y, dx, dy, byMouse)
     }
 
     override val className get() = "StudioSceneView"

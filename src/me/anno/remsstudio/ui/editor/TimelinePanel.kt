@@ -182,10 +182,10 @@ open class TimelinePanel(style: Style) : Panel(style) {
             timestampCache[key] = solution
             return solution
         }
-    }
 
-    fun normTime01(time: Double) = (time - centralTime) / dtHalfLength * 0.5 + 0.5
-    fun normAxis11(lx: Float, x0: Int, size: Int) = (lx - x0) / size * 2f - 1f
+        fun normTime01(time: Double) = (time - centralTime) / dtHalfLength * 0.5 + 0.5
+        fun normAxis11(lx: Float, x0: Int, size: Int) = (lx - x0) / size * 2f - 1f
+    }
 
     fun getTimeAt(mx: Float) = centralTime + dtHalfLength * normAxis11(mx, x, width)
     fun getXAt(time: Double) = x + width * normTime01(time)

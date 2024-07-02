@@ -15,7 +15,7 @@ class ColorInputV2(
     override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
         if (RemsStudio.hideUnusedProperties) {
             val focused1 = titleView.isInFocus || contentView.listOfAll.any { it.isInFocus }
-            val focused2 = focused1 || (property in (Selection.selectedProperties ?: emptyList()))
+            val focused2 = focused1 || (property in Selection.selectedProperties)
             contentView.isVisible = focused2
         }
         super.onDraw(x0, y0, x1, y1)

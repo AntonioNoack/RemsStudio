@@ -64,7 +64,7 @@ import me.anno.utils.structures.maps.BiMap
 import me.anno.utils.types.Booleans.toInt
 import me.anno.utils.types.Floats.f2
 import me.anno.utils.types.Strings.formatTime2
-import me.anno.utils.types.Strings.getImportType
+import me.anno.utils.types.Strings.getImportTypeByExtension
 import me.anno.video.ImageSequenceMeta
 import me.anno.video.ImageSequenceMeta.Companion.imageSequenceIdentifier
 import me.anno.video.MissingFrameException
@@ -696,7 +696,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                 this.imageSequenceMeta = imageSequenceMeta
                 VideoType.IMAGE_SEQUENCE
             } else if (meta == null) {
-                when (file.extension.getImportType()) {
+                when (getImportTypeByExtension(file.lcExtension)) {
                     "Video" -> VideoType.VIDEO
                     "Audio" -> VideoType.AUDIO
                     else -> VideoType.IMAGE
@@ -725,7 +725,7 @@ class Video(file: FileReference = InvalidRef, parent: Transform? = null) :
                         }
                         VideoType.UNKNOWN
                     } else {
-                        when (file.extension.getImportType()) {
+                        when (getImportTypeByExtension(file.lcExtension)) {
                             "Video" -> VideoType.VIDEO
                             "Audio" -> VideoType.AUDIO
                             else -> VideoType.IMAGE

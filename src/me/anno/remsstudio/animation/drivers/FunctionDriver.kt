@@ -28,7 +28,7 @@ class FunctionDriver : AnimationDriver() {
         list += TextInputML(Dict["Function f(time)", "driver.function"], formula, style)
             .apply { base.enableSpellcheck = false }
             .addChangeListener { formula = it; updateFormula() }
-            .setIsSelectedListener { show(null) }
+            .setIsSelectedListener { show(emptyList()) }
             .setTooltip(Dict["Example: sin(time*pi)", "driver.function.desc"])
     }
 

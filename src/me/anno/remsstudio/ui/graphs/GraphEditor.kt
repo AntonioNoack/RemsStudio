@@ -28,7 +28,7 @@ class GraphEditor(style: Style) : PanelListY(style) {
         override var isEnabled: Boolean
             get() {
                 // hide them, when a channel isn't available
-                val property = Selection.selectedProperties?.firstOrNull()
+                val property = Selection.selectedProperties.firstOrNull()
                 return property != null && index < property.type.numComponents
             }
             set(value) {}

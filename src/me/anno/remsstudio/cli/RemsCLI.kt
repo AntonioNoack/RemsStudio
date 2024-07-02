@@ -23,7 +23,7 @@ import me.anno.remsstudio.*
 import me.anno.remsstudio.gpu.ShaderLibV2
 import me.anno.remsstudio.objects.Transform
 import me.anno.utils.Sleep.sleepABit
-import me.anno.utils.types.Strings.getImportType
+import me.anno.utils.types.Strings.getImportTypeByExtension
 import me.anno.utils.types.Strings.isBlank2
 import me.anno.utils.types.Strings.parseTimeOrNull
 import org.apache.commons.cli.*
@@ -128,7 +128,7 @@ object RemsCLI {
                 "image" -> Rendering.RenderType.FRAME
                 else -> return error("Unknown type $type")
             }
-        } else when (outputFile.extension.getImportType()) {
+        } else when (getImportTypeByExtension(outputFile.lcExtension)) {
             "Video" -> Rendering.RenderType.VIDEO
             "Audio" -> Rendering.RenderType.AUDIO
             else -> Rendering.RenderType.FRAME
