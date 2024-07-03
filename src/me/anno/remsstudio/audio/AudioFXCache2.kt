@@ -150,27 +150,25 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
             FAPool.returnBuffer(freqRight)*/
         }
 
-        fun getBuffersOfDomain(domain: Domain): Pair<FloatArray, FloatArray> {
+        fun getBuffersOfDomain(dst: Domain): Pair<FloatArray, FloatArray> {
             val buffer = this
-            var left = if (domain == Domain.FREQUENCY_DOMAIN) buffer.freqLeft else buffer.timeLeft
-            var right = if (domain == Domain.FREQUENCY_DOMAIN) buffer.freqRight else buffer.timeRight
+            var left = if (dst == Domain.FREQUENCY_DOMAIN) buffer.freqLeft else buffer.timeLeft
+            var right = if (dst == Domain.FREQUENCY_DOMAIN) buffer.freqRight else buffer.timeRight
             if (left == null) {
-                left = if (domain == Domain.TIME_DOMAIN) buffer.freqLeft else buffer.timeLeft
+                left = if (dst == Domain.TIME_DOMAIN) buffer.freqLeft else buffer.timeLeft
                 left!!
-                val other = if (domain == Domain.TIME_DOMAIN) Domain.FREQUENCY_DOMAIN else Domain.TIME_DOMAIN
                 val left2 = left.copyOf() // FAPool[left.size]
-                changeDomain(domain, other, left2)
+                changeDomain(dst, left2)
                 left = left2
-                if (domain == Domain.TIME_DOMAIN) buffer.timeLeft = left else buffer.freqLeft = left
+                if (dst == Domain.TIME_DOMAIN) buffer.timeLeft = left else buffer.freqLeft = left
             }
             if (right == null) {
-                right = if (domain == Domain.TIME_DOMAIN) buffer.freqRight else buffer.timeRight
+                right = if (dst == Domain.TIME_DOMAIN) buffer.freqRight else buffer.timeRight
                 right!!
-                val other = if (domain == Domain.TIME_DOMAIN) Domain.FREQUENCY_DOMAIN else Domain.TIME_DOMAIN
                 val right2 = right.copyOf() // FAPool[right.size]
-                changeDomain(domain, other, right2)
+                changeDomain(dst, right2)
                 right = right2
-                if (domain == Domain.TIME_DOMAIN) buffer.timeRight = right else buffer.freqRight = right
+                if (dst == Domain.TIME_DOMAIN) buffer.timeRight = right else buffer.freqRight = right
             }
             return left to right
         }
@@ -217,9 +215,9 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
             )
             val pair = stream.getBuffer(key.bufferSize, key.time0.globalTime, key.time1.globalTime)
             AudioData(key, convert(pair.first), convert(pair.second), Domain.TIME_DOMAIN)
-        } as AudioData
+        }
         rawDataLimiter.release()
-        return entry
+        return entry!!
     }
 
     fun convert(src: ShortArray): FloatArray {
@@ -245,7 +243,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
         if (effectKey != null) throw IllegalStateException()
         return getEntry(pipelineKey, timeout, async) { key ->
             getRawData(meta, source, destination, key)
-        } as? AudioData
+        }
     }
 
     fun getBuffer0(
@@ -257,10 +255,10 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
     fun getBuffer(
         source: Audio,
         destination: Camera,
-        pipelineKey: PipelineKey,
+        key1: PipelineKey,
         async: Boolean
     ): AudioData? {
-        return getEntry(pipelineKey, timeout, async) { key ->
+        return getEntry(key1, timeout, async) { key ->
             val effectKey = key.effectKey
             if (effectKey == null) {
                 // get raw data
@@ -268,7 +266,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
             } else {
                 // get previous data, and process it
                 val effect = effectKey.effect
-                val previousKey = pipelineKey.lastEffectKey!!
+                val previousKey = key.lastEffectKey!!
                 val left = FAPool[bufferSize, true, true]
                 val right = FAPool[bufferSize, true, true]
                 val cachedSolutions = HashMap<Int, Pair<FloatArray, FloatArray>>()
@@ -284,7 +282,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
                 }, right, source, destination, key.time0, key.time1)
                 AudioData(key, left, right, effect.outputDomain)
             }
-        } as? AudioData
+        }
     }
 
     fun getBuffer(
@@ -403,7 +401,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
                 data.value = values
             }
             data
-        } as? ShortData ?: return null
+        } ?: return null
         return entry.value
     }
 

@@ -2,14 +2,17 @@ package me.anno.remsstudio.audio.effects
 
 import me.anno.Engine
 import me.anno.engine.inspector.Inspectable
-import me.anno.io.saveable.Saveable
 import me.anno.io.base.BaseWriter
+import me.anno.io.saveable.Saveable
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.audio.effects.falloff.ExponentialFalloff
 import me.anno.remsstudio.audio.effects.falloff.LinearFalloff
 import me.anno.remsstudio.audio.effects.falloff.SquareFalloff
-import me.anno.remsstudio.audio.effects.impl.*
+import me.anno.remsstudio.audio.effects.impl.EchoEffect
+import me.anno.remsstudio.audio.effects.impl.EqualizerEffect
+import me.anno.remsstudio.audio.effects.impl.NoiseSuppressionEffect
+import me.anno.remsstudio.audio.effects.impl.PitchEffect
 import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
 import me.anno.ui.Panel
@@ -147,17 +150,24 @@ class SoundPipeline() : Saveable(), Inspectable {
         }
 
         fun changeDomain(
-            src: Domain,
             dst: Domain, data: FloatArray,
             fft: FloatFFT_1D = FloatFFT_1D(data.size.toLong())
-        ): FloatFFT_1D {
-            if (src != dst) {
-                when (dst) {
-                    Domain.TIME_DOMAIN -> fft.realInverse(data, true)
-                    Domain.FREQUENCY_DOMAIN -> fft.realForward(data)
-                }
+        ) {
+            /*val rx = min(data.size / 2, 10)
+            val r = (0 until rx)
+            println(
+                "changing ${data.size}x (" +
+                        "${r.map { data[it] }},...," +
+                        "${r.map { data[data.size - rx + it] }}) to $dst"
+            )*/
+            when (dst) {
+                Domain.TIME_DOMAIN -> fft.realInverse(data, true)
+                Domain.FREQUENCY_DOMAIN -> fft.realForward(data)
             }
-            return fft
+            /*println(
+                "  -> (${r.map { data[it] }},...," +
+                        "${r.map { data[data.size - rx + it] }})"
+            )*/
         }
 
         fun option(generator: () -> SoundEffect): Option {

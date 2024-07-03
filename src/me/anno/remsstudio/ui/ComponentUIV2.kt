@@ -7,6 +7,8 @@ import me.anno.io.files.FileReference
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.audio.effects.impl.EqualizerEffect
+import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.ui.input.ColorInputV2
 import me.anno.remsstudio.ui.input.FloatInputV2
@@ -228,14 +230,27 @@ object ComponentUIV2 {
                 }
                 .setIsSelectedListener(sl)
                 .setTooltip(ttt)
-            is Float -> FloatInputV2(title, visibilityKey, values, time, style)
-                .setChangeListener {
-                    RemsStudio.incrementalChange("Set $title to $it", title) {
-                        self.putValue(values, it.toFloat(), false)
-                    }
+            is Float -> {
+                if(self is Audio && values in self.pipeline.effects.filterIsInstance2(EqualizerEffect::class).flatMap { it.sliders.toList() }) {
+                    SliderInput(0.0, 1.0, 0.0, value.toDouble(), title, visibilityKey, style)
+                        .setChangeListener {
+                            RemsStudio.incrementalChange("Set $title to $it", title) {
+                                self.putValue(values, it.toFloat(), false)
+                            }
+                        }
+                        .setIsSelectedListener(sl)
+                        .setTooltip(ttt)
+                } else {
+                    FloatInputV2(title, visibilityKey, values, time, style)
+                        .setChangeListener {
+                            RemsStudio.incrementalChange("Set $title to $it", title) {
+                                self.putValue(values, it.toFloat(), false)
+                            }
+                        }
+                        .setIsSelectedListener(sl)
+                        .setTooltip(ttt)
                 }
-                .setIsSelectedListener(sl)
-                .setTooltip(ttt)
+            }
             is Double -> FloatInputV2(title, visibilityKey, values, time, style)
                 .setChangeListener {
                     RemsStudio.incrementalChange("Set $title to $it", title) {
@@ -317,7 +332,6 @@ object ComponentUIV2 {
                 .setTooltip(ttt)
             else -> throw RuntimeException("Type $value not yet implemented!")
         }
-        panel.alignmentX = AxisAlignment.FILL
         return IsAnimatedWrapper(panel, values)
     }
 
@@ -470,12 +484,9 @@ object ComponentUIV2 {
             setTooltip(ttt)
         }
         val wrapper0 = IsAnimatedWrapper(panel, values.first())
-        val wrapper = IsSelectedWrapper(wrapper0) {
+        return IsSelectedWrapper(wrapper0) {
             Selection.selectedProperties == values &&
                     InputVisibility[title]
         }
-        panel.alignmentX = AxisAlignment.FILL
-        wrapper.alignmentX = AxisAlignment.FILL
-        return wrapper
     }
 }

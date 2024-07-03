@@ -63,18 +63,19 @@ import kotlin.math.min
 // to do morphing: rect/hexagon shape?, rotate it?
 // to do hexagon/triangle/rectangle pixelation: rotate it?
 
-// todo respect masks when editing multiple instances at once
-
 // todo make music x times calmer, if another audio line (voice) is on as an optional feature
 
 // todo use reflectionMap for mesh rendering where available
 //       - option to bake it around the mesh?
 
-// todo isolate and remove certain frequencies from audio
-// todo visualize audio frequency, always!!!, from 25Hz to 48kHz
+// isolate and remove certain frequencies from audio
+// visualize audio frequency, always!!!, from 25Hz to 48kHz
 //  inspiration: https://www.youtube.com/watch?v=RA5UiLYWdbM
+//  -> not really required, would be visible in the curve view as a very fast signal
+// done: test that our equalizer can remove very high frequencies
 
-// todo show loudness of audio based on perceived amplitude, instead of real amplitude
+// to do show loudness of audio based on perceived amplitude, instead of real amplitude
+// -> idk about that...
 
 // todo scripting?...
 // todo gizmos

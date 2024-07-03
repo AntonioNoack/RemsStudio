@@ -2,6 +2,7 @@ package me.anno.remsstudio.audio
 
 import me.anno.animation.LoopingState
 import me.anno.audio.AudioPools.SAPool
+import me.anno.audio.AudioReadable
 import me.anno.audio.AudioSliceKey
 import me.anno.audio.AudioTransfer
 import me.anno.audio.SimpleTransfer
@@ -55,6 +56,7 @@ class AudioStreamRaw2(
     }
 
     val ffmpegSampleRate = meta.audioSampleRate
+    val invSampleRate = 1.0 / ffmpegSampleRate.toDouble()
     val maxSampleIndex = meta.audioSampleCount
 
     val ffmpegSliceSampleCount = (ffmpegSampleRate * ffmpegSliceSampleDuration).toInt()
@@ -63,20 +65,27 @@ class AudioStreamRaw2(
     private var lastSoundBuffer: SoundBuffer? = null
     private var lastChannels: Int = 0
 
-    private fun getAmplitudeSync(index0: Long, shortPair: ShortPair): ShortPair {
+    private fun getAmplitudeSync(index0: Long, dst: ShortPair): ShortPair {
 
         val maxSampleIndex = maxSampleIndex
         val repeat = repeat
 
-        if (index0 < 0 || (repeat === LoopingState.PLAY_ONCE && index0 >= maxSampleIndex)) return shortPair.set(0, 0)
+        if (index0 < 0 || (repeat === LoopingState.PLAY_ONCE && index0 >= maxSampleIndex)) return dst.set(0, 0)
         val index = repeat[index0, maxSampleIndex]
+
+        val file = file
+        if (file is AudioReadable) {
+            val t = index * invSampleRate
+            val v0 = file.sample(t, 0)
+            val v1 = file.sample(t, 1)
+            return dst.set(v0, v1)
+        }
 
         val ffmpegSliceSampleCount = ffmpegSliceSampleCount
         val sliceIndex = index / ffmpegSliceSampleCount
         val soundBuffer: SoundBuffer? = if (sliceIndex == lastSliceIndex) {
             lastSoundBuffer
         } else {
-            val file = file
             val ffmpegSliceSampleDuration = ffmpegSliceSampleDuration
             val key = AudioSliceKey(file, sliceIndex)
             val timeout = (ffmpegSliceSampleDuration * 2 * 1000).toLong()
@@ -93,19 +102,19 @@ class AudioStreamRaw2(
             sv
         }
 
-        val data = soundBuffer?.data ?: return shortPair.set(0, 0)
+        val data = soundBuffer?.data ?: return dst.set(0, 0)
         val localIndex = (index % ffmpegSliceSampleCount).toInt()
         val arrayIndex0 = localIndex * lastChannels // for stereo
 
         return when {
             lastChannels >= 2 && arrayIndex0 + 1 < data.limit() -> {
-                shortPair.set(data[arrayIndex0], data[arrayIndex0 + 1])
+                dst.set(data[arrayIndex0], data[arrayIndex0 + 1])
             }
             lastChannels == 1 && arrayIndex0 < data.limit() -> {
                 val v = data[arrayIndex0]
-                shortPair.set(v, v)
+                dst.set(v, v)
             }
-            else -> shortPair.set(0, 0)
+            else -> dst.set(0, 0)
         }
     }
 
@@ -197,7 +206,6 @@ class AudioStreamRaw2(
         var indexI = ffmpegSampleRate * local0
 
         while (++sampleIndex < bufferSize) {
-
             if (sampleIndex % updateInterval == 0) {
 
                 // load loudness from camera

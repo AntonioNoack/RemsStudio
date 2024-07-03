@@ -31,7 +31,7 @@ fun main() {
     pipeline.audio = audio
     pipeline.camera = camera
 
-    for (i in effect.frequencies.indices) {
+    for (i in EqualizerEffect.frequencies.indices) {
         effect.sliders[i].set(Math.random().toFloat()) // 0.37457f
     }
 
