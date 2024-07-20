@@ -52,9 +52,6 @@ import kotlin.math.min
 //  - sometimes delete-key isn't registered as such
 //  - video files cannot be properly deleted, because files can't be deleted when reading them
 
-// todo improvements:
-//  if playing forward, and time is non-modified, use VideoStream for much better playback performance
-
 // todo bug: when editing a driver, we should see its curve
 // todo right-click option to remove linear sections from keyframe panel;
 // todo right-click option to thin out sections from keyframe panel;
@@ -67,15 +64,6 @@ import kotlin.math.min
 
 // todo use reflectionMap for mesh rendering where available
 //       - option to bake it around the mesh?
-
-// isolate and remove certain frequencies from audio
-// visualize audio frequency, always!!!, from 25Hz to 48kHz
-//  inspiration: https://www.youtube.com/watch?v=RA5UiLYWdbM
-//  -> not really required, would be visible in the curve view as a very fast signal
-// done: test that our equalizer can remove very high frequencies
-
-// to do show loudness of audio based on perceived amplitude, instead of real amplitude
-// -> idk about that...
 
 // todo scripting?...
 // todo gizmos
