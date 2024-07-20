@@ -22,6 +22,12 @@ object VideoResourceClaiming {
     }
 
     fun Video.claimVideo(minT: Double, maxT: Double) {
+
+        if (streamManager.canUseVideoStreaming()) {
+            // skipping any claims
+            return
+        }
+
         val meta = meta
         if (meta != null) {
 
@@ -55,7 +61,7 @@ object VideoResourceClaiming {
                         val buffer = frameIndex / framesPerContainer
                         if (buffer != lastBuffer) {
                             lastBuffer = buffer
-                            getVideoFrameCustom(max(1, zoomLevel), frameIndex, videoFPS)
+                            getVideoFrame(max(1, zoomLevel), frameIndex, videoFPS)
                         }
                     }
                 }

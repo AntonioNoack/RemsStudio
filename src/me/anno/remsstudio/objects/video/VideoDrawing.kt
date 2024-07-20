@@ -1,5 +1,6 @@
 package me.anno.remsstudio.objects.video
 
+import me.anno.Time
 import me.anno.animation.LoopingState
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.texture.Clamping
@@ -10,7 +11,7 @@ import me.anno.gpu.texture.TextureLib.colorShowTexture
 import me.anno.gpu.texture.TextureReader.Companion.imageTimeout
 import me.anno.image.svg.SVGMeshCache
 import me.anno.io.MediaMetadata
-import me.anno.maths.Maths.fract
+import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.remsstudio.gpu.GFXx3Dv2.draw3DVideo
 import me.anno.remsstudio.gpu.GFXxSVGv2
@@ -22,6 +23,7 @@ import me.anno.remsstudio.objects.video.Video.Companion.tiling16x9
 import me.anno.remsstudio.objects.video.Video.Companion.videoFrameTimeout
 import me.anno.remsstudio.objects.video.VideoSize.calculateSize
 import me.anno.remsstudio.objects.video.VideoSize.getCacheableZoomLevel
+import me.anno.ui.editor.files.FileExplorerEntry.Companion.drawLoadingCircle
 import me.anno.utils.Clipping
 import me.anno.video.VideoCache
 import me.anno.video.VideoCache.getVideoFrameWithoutGenerator
@@ -31,7 +33,10 @@ import me.anno.video.formats.gpu.GPUFrame
 import org.apache.logging.log4j.LogManager
 import org.joml.Matrix4fArrayList
 import org.joml.Vector4f
-import kotlin.math.*
+import kotlin.math.floor
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.roundToInt
 
 object VideoDrawing {
     private val LOGGER = LogManager.getLogger(VideoDrawing::class)
@@ -133,18 +138,8 @@ object VideoDrawing {
 
     fun Video.drawVideo(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         // drawing speakers is covering the video too much
-        val meta = meta
-        if (meta != null && meta.hasVideo) {
-            drawVideo(meta, stack, time, color) { zoom, index, fps ->
-                getFrame(zoom, meta, index, fps)
-            }
-        }
-    }
-
-    fun Video.drawVideo(
-        meta: MediaMetadata, stack: Matrix4fArrayList, time: Double, color: Vector4f,
-        getFrame: (zoomLevel: Int, frameIndex0: Int, videoFPS: Double) -> GPUFrame?
-    ) {
+        val meta = meta ?: return
+        if (!meta.hasVideo) return
 
         val duration = meta.duration
         lastDuration = duration
@@ -186,44 +181,25 @@ object VideoDrawing {
                 val localTime = isLooping[time, duration]
                 val frameIndexD = localTime * videoFPS
 
-                val frameIndex0 = floor(frameIndexD).toInt() % frameCount
-                val frame0 = getFrame(zoomLevel, frameIndex0, videoFPS)
+                val frameIndex = clamp(floor(frameIndexD).toInt(), 0, frameCount - 1)
+                val frame0 = getFrame(zoomLevel, meta, frameIndex, videoFPS)
 
                 val filtering = filtering.value
                 val clamp = clampMode.value
 
-                // todo why is it still flickering???
-                val useInterpolation = false
-                if (!useInterpolation) {
-                    if (frame0 != null) {
-                        lastW = meta.videoWidth
-                        lastH = meta.videoHeight
-                        draw3DVideo(
-                            this, time, stack, frame0, color, filtering, clamp,
-                            tiling[time], uvProjection.value, cornerRadius[time]
-                        )
-                        wasDrawn = true
-                        lastFrame = frame0
+                if (frame0 != null) {
+                    lastW = meta.videoWidth
+                    lastH = meta.videoHeight
+                    draw3DVideo(
+                        this, time, stack, frame0, color, filtering, clamp,
+                        tiling[time], uvProjection.value, cornerRadius[time]
+                    )
+                    if (frame0.frameIndex != frameIndex) {
+                        drawLoadingCircle(stack, (Time.nanoTime * 1e-9f) % 1f)
                     }
-                } else {
-                    val interpolation = fract(frameIndexD).toFloat()
-                    val frameIndex1 = ceil(frameIndexD).toInt() % frameCount
-                    val frame1 = getFrame(zoomLevel, frameIndex1, videoFPS)
-                    if (frame0 != null && frame1 != null) {
-                        lastW = meta.videoWidth
-                        lastH = meta.videoHeight
-                        draw3DVideo(
-                            this, time, stack, frame0, frame1, interpolation, color, filtering, clamp,
-                            tiling[time], uvProjection.value, cornerRadius[time]
-                        )
-                        wasDrawn = true
-                    }
+                    wasDrawn = true
+                    lastFrame = frame0
                 }
-
-                // stack.scale(0.1f)
-                // draw3D(stack, FontManager.getString("Verdana",15f, "$frameIndex/$fps/$duration/$frameCount")!!, Vector4f(1f,1f,1f,1f), 0f)
-                // stack.scale(10f)
-
             } else wasDrawn = true
         }
 
@@ -236,7 +212,7 @@ object VideoDrawing {
         }
     }
 
-    fun Video.getFrame(zoomLevel: Int, meta: MediaMetadata, frameIndex: Int, videoFPS: Double): GPUFrame? {
+    private fun Video.getFrame(zoomLevel: Int, meta: MediaMetadata, frameIndex: Int, videoFPS: Double): GPUFrame? {
 
         val scale = max(1, zoomLevel)
         val bufferSize = framesPerContainer
@@ -248,10 +224,14 @@ object VideoDrawing {
             throw IllegalArgumentException("Frame index must be within bounds!")
         }
 
-        var frame0 = if (blankFrameThreshold > 0f) {
+        var frame0 = if (usesBlankFrameDetection()) {
             BlankFrameDetector.getFrame(file, scale, frameIndex, bufferSize, videoFPS, timeout, meta, true)
         } else {
-            getVideoFrameCustom(scale, frameIndex, videoFPS)
+            if (streamManager.canUseVideoStreaming()) {
+                streamManager.getFrame(scale, frameIndex, videoFPS)
+            } else {
+                getVideoFrame(scale, frameIndex, videoFPS)
+            }
         }
 
         if (frame0 == null || !frame0.isCreated || frame0.isDestroyed) {

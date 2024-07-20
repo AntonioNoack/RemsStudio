@@ -8,6 +8,7 @@ import me.anno.remsstudio.RemsStudio.editorTimeDilation
 import me.anno.remsstudio.RemsStudio.root
 import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.objects.video.AudioPlayback.startPlayback
 import kotlin.math.abs
 
 @Suppress("MemberVisibilityCanBePrivate")

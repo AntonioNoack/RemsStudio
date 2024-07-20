@@ -14,6 +14,7 @@ import me.anno.remsstudio.objects.video.Video.Companion.forceAutoScale
 import me.anno.remsstudio.objects.video.Video.Companion.forceFullScale
 import me.anno.remsstudio.objects.video.Video.Companion.videoScaleNames
 import me.anno.remsstudio.objects.modes.VideoType
+import me.anno.remsstudio.objects.video.AudioPlayback.startPlayback
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.SpyPanel
@@ -212,19 +213,19 @@ object VideoInspector {
 
         val playbackTitles = "Test Playback" to "Stop Playback"
         fun getPlaybackTitle(invert: Boolean) =
-            if ((component == null) != invert) playbackTitles.first else playbackTitles.second
+            if ((audioStream == null) != invert) playbackTitles.first else playbackTitles.second
 
         val playbackButton = TextButton(getPlaybackTitle(false), false, style)
         audio += aud(playbackButton
             .addLeftClickListener {
                 if (isPaused) {
                     playbackButton.text = getPlaybackTitle(true)
-                    if (component == null) {
+                    if (audioStream == null) {
                         addAudioTask("start", 5) {
                             val audio2 = Video(file, null)
                             audio2.update() // load type
                             audio2.startPlayback(0.0, 1.0, nullCamera!!)
-                            component = audio2.component
+                            audioStream = audio2.audioStream
                         }
                     } else {
                         addAudioTask("stop", 1) {

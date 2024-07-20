@@ -34,7 +34,7 @@ object VideoPreview {
                 val localTime = isLooping[time, duration]
                 val frameIndex = (localTime * videoFPS).toInt() % frameCount
 
-                val frame = getVideoFrameCustom(scale, frameIndex, videoFPS)
+                val frame = getVideoFrame(scale, frameIndex, videoFPS)
 
                 if (frame != null && frame.isCreated) {
                     lastW = frame.width

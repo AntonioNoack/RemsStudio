@@ -132,7 +132,7 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
         val w = StrictMath.max(size.x.roundToInt(), 4)
         val h = StrictMath.max(size.y.roundToInt(), 4)
         val wasFinalRendering = isFinalRendering
-        isFinalRendering = true
+        isFinalRendering = true // todo isn't this crash-prone???
         Scene.draw(
             camera, softChild,
             0, 0, w, h,

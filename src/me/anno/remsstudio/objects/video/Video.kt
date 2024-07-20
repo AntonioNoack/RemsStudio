@@ -25,7 +25,6 @@ import me.anno.remsstudio.audio.AudioFileStreamOpenAL2
 import me.anno.remsstudio.audio.effects.SoundPipeline
 import me.anno.remsstudio.gpu.TexFiltering
 import me.anno.remsstudio.gpu.TexFiltering.Companion.getFiltering
-import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.models.SpeakerModel.drawSpeakers
@@ -109,6 +108,8 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
 
     }
 
+    val streamManager = VideoStreamManager(this)
+
     // uv
     val tiling = AnimatedProperty.tiling()
     val uvProjection = ValueWithDefault(UVProjection.Planar)
@@ -138,6 +139,9 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
     @Range(0.0, 3.0)
     var blankFrameThreshold = 0f
 
+    fun usesBlankFrameDetection(): Boolean {
+        return blankFrameThreshold > 0f
+    }
 
     val amplitude = AnimatedProperty.floatPlus(1f)
     var pipeline = SoundPipeline(this)
@@ -150,20 +154,21 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
 
     var is3D = false
 
-    val meta get() = getMeta(file, true)
+    val meta get() = getMeta(file, async = !isFinalRendering)
     val forcedMeta get() = getMeta(file, false)
 
     var needsUpdate = true
-    var component: AudioFileStreamOpenAL2? = null
+    var audioStream: AudioFileStreamOpenAL2? = null
 
     fun stopPlayback() {
         needsUpdate = false
-        component?.stop()
-        component = null // for garbage collection
+        audioStream?.stop()
+        audioStream = null // for garbage collection
     }
 
     override fun destroy() {
         super.destroy()
+        streamManager.destroy()
         addAudioTask("stop", 1) { stopPlayback() }
     }
 
@@ -186,31 +191,6 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
         lastTexture = null
         needsImageUpdate = true
         lastFile = null
-        LOGGER.info("Clear cache")
-    }
-
-    /**
-     * is synchronized with the audio thread
-     * */
-    fun startPlayback(globalTime: Double, speed: Double, camera: Camera) {
-        when (type) {
-            VideoType.VIDEO, VideoType.AUDIO -> {
-                // why an exception? because I happened to run into this issue
-                if (speed == 0.0) throw IllegalArgumentException("Audio speed must not be 0.0, because that's inaudible")
-                stopPlayback()
-                val meta = forcedMeta
-                if (meta?.hasAudio == true) {
-                    val component = AudioFileStreamOpenAL2(this, speed, globalTime, camera)
-                    this.component = component
-                    component.start()
-                } else component = null
-            }
-            else -> {
-                // image and image sequence cannot contain audio,
-                // so we can avoid getting the metadata for the files with ffmpeg
-                stopPlayback()
-            }
-        }
     }
 
     var zoomLevel = 0
@@ -263,7 +243,6 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
     fun onMissingImageOrFrame(frame: Int) {
         if (isFinalRendering) throw MissingFrameException("$file, $frame/${meta?.videoFrameCount}")
         else needsImageUpdate = true
-        // LOGGER.info("missing frame")
     }
 
     var lastFrame: GPUFrame? = null
@@ -281,7 +260,7 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
         }
     }
 
-    fun getVideoFrameCustom(scale: Int, index: Int, fps: Double): GPUFrame? {
+    fun getVideoFrame(scale: Int, index: Int, fps: Double): GPUFrame? {
         return VideoCache.getVideoFrame(file, scale, index, framesPerContainer, fps, videoFrameTimeout, true)
     }
 

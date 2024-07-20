@@ -1,5 +1,6 @@
 package me.anno.remsstudio.video
 
+import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.io.files.FileReference
 import me.anno.remsstudio.Scene
@@ -19,9 +20,12 @@ class FrameTaskV2(
     dst: FileReference
 ) : FrameTask(width, height, fps, motionBlurSteps, shutterPercentage, time, dst) {
     override fun renderScene(time: Double, flipY: Boolean, renderer: Renderer) {
+        val wasFinalRendering = isFinalRendering
+        isFinalRendering = true
         Scene.draw(
             camera, scene, 0, 0, width, height, time,
             flipY, renderer, null
         )
+        isFinalRendering = wasFinalRendering
     }
 }

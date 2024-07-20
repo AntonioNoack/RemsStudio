@@ -49,7 +49,7 @@ object StudioActions {
 
     private var lastTimeDilationChange = 0L
     fun setEditorTimeDilation(dilation: Double, allowKeys: Boolean = false): Boolean {
-        val currentTime = Time.lastTimeNanos
+        val currentTime = Time.frameTimeNanos
         if (currentTime == lastTimeDilationChange || (!allowKeys && isInputInFocus())) {
             return false
         }
