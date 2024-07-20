@@ -3,7 +3,7 @@ package me.anno.remsstudio.video
 import me.anno.io.files.FileReference
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.audio.AudioCreatorV2
-import me.anno.remsstudio.objects.Audio
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
 import me.anno.ui.base.progress.ProgressBar
@@ -17,7 +17,7 @@ fun videoAudioCreatorV2(
     camera: Camera,
     durationSeconds: Double,
     sampleRate: Int,
-    audioSources: List<Audio>,
+    audioSources: List<Video>,
     motionBlurSteps: AnimatedProperty<Int>,
     shutterPercentage: AnimatedProperty<Float>,
     output: FileReference,

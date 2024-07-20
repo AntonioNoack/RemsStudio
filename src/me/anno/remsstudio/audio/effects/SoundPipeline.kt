@@ -13,8 +13,8 @@ import me.anno.remsstudio.audio.effects.impl.EchoEffect
 import me.anno.remsstudio.audio.effects.impl.EqualizerEffect
 import me.anno.remsstudio.audio.effects.impl.NoiseSuppressionEffect
 import me.anno.remsstudio.audio.effects.impl.PitchEffect
-import me.anno.remsstudio.objects.Audio
 import me.anno.remsstudio.objects.Camera
+import me.anno.remsstudio.objects.video.Video
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
@@ -26,10 +26,10 @@ import org.jtransforms.fft.FloatFFT_1D
 
 class SoundPipeline() : Saveable(), Inspectable {
 
-    lateinit var audio: Audio
+    lateinit var audio: Video
     lateinit var camera: Camera
 
-    constructor(audio: Audio) : this() {
+    constructor(audio: Video) : this() {
         this.audio = audio
     }
 

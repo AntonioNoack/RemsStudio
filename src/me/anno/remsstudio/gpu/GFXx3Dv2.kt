@@ -30,7 +30,7 @@ import me.anno.remsstudio.gpu.ShaderLibV2.shader3DText
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.GFXTransform.Companion.uploadAttractors0
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.objects.Video
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.geometric.Polygon
 import me.anno.utils.Color.white4
 import me.anno.video.formats.gpu.GPUFrame

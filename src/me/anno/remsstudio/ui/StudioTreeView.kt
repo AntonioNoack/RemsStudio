@@ -16,6 +16,7 @@ import me.anno.remsstudio.Selection
 import me.anno.remsstudio.objects.*
 import me.anno.remsstudio.objects.Transform.Companion.toTransform
 import me.anno.remsstudio.objects.effects.MaskLayer
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.ui.MenuUtils.drawTypeInCorner
 import me.anno.ui.Style
 import me.anno.ui.base.menu.Menu

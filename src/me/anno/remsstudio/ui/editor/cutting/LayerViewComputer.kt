@@ -3,7 +3,7 @@ package me.anno.remsstudio.ui.editor.cutting
 import me.anno.engine.Events.addEvent
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.objects.Video
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.utils.Color.white4
 import org.joml.Vector4f

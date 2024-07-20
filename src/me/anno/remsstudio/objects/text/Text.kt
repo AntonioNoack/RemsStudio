@@ -17,10 +17,7 @@ import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.mix
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.GFXTransform
-import me.anno.remsstudio.objects.TextSegmentKey
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.objects.lists.Element
-import me.anno.remsstudio.objects.lists.SplittableElement
 import me.anno.remsstudio.objects.modes.TextRenderMode
 import me.anno.ui.Style
 import me.anno.ui.base.components.AxisAlignment
@@ -32,12 +29,11 @@ import me.anno.utils.types.Strings.smallCaps
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
-import kotlin.streams.toList
 
 // todo background "color" in the shape of a plane? for selections and such
 
 @Suppress("MemberVisibilityCanBePrivate")
-open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableElement {
+open class Text(parent: Transform? = null) : GFXTransform(parent) {
 
     companion object {
 
@@ -330,73 +326,4 @@ open class Text(parent: Transform? = null) : GFXTransform(parent), SplittableEle
 
     override val symbol get() = DefaultConfig["ui.symbol.text", "\uD83D\uDCC4"]
 
-    override fun getSplittingModes(): List<String> {
-        return listOf("Letters", "Words", "Sentences", "Lines")
-    }
-
-    override fun getSplitElement(mode: String, index: Int): Element {
-        val text = text[0.0]
-        val word = when (mode) {
-            "Letters" -> String(Character.toChars(text.codePoints().toList()[index]))
-            "Words" -> splitWords(text)[index]
-            "Sentences" -> splitSentences(text)[index]
-            "Lines" -> text.split('\n')[index]
-            else -> "?"
-        }
-        val child = clone() as Text
-        child.text.set(word)
-        val (segments, _) = child.getSegments(word)
-        val part0 = segments.parts[0]
-        val width = part0.lineWidth
-        val height = 0f // ???
-        return Element(width, height, 0f, child)
-    }
-
-    fun splitWords(str: String): List<String> {
-        // todo better criterion (?)
-        return str.split(' ')
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
-    }
-
-    fun splitSentences(str: String): List<String> {
-        val result = ArrayList<String>()
-        var hasEndSymbols = false
-        var lastI = 0
-        for (i in str.indices) {
-            when (str[i]) {
-                '.', '!', '?' -> {
-                    hasEndSymbols = true
-                }
-                '\n' -> {
-                    if (i > lastI) result += str.substring(lastI, i)
-                    lastI = i + 1
-                    hasEndSymbols = false
-                }
-                ' ', '\t' -> {
-                    // ignore
-                }
-                else -> {// a letter
-                    if (hasEndSymbols) {
-                        if (i > lastI) result += str.substring(lastI, i).trim()
-                        lastI = i
-                        hasEndSymbols = false
-                    }
-                }
-            }
-        }
-        if (str.length > lastI) result += str.substring(lastI)
-        return result
-    }
-
-    override fun getSplitLength(mode: String): Int {
-        val text = text[0.0]
-        return when (mode) {
-            "Letters" -> text.codePointCount(0, text.length)
-            "Words" -> splitWords(text).size
-            "Sentences" -> splitSentences(text).size
-            "Lines" -> text.count { it == '\n' }
-            else -> 0
-        }
-    }
 }

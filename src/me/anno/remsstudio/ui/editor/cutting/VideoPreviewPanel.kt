@@ -1,7 +1,8 @@
 package me.anno.remsstudio.ui.editor.cutting
 
 import me.anno.gpu.drawing.DrawGradients
-import me.anno.remsstudio.objects.Video
+import me.anno.remsstudio.objects.video.Video
+import me.anno.remsstudio.objects.video.VideoPreview.getFrameAtLocalTimeForPreview
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import org.joml.Vector4f

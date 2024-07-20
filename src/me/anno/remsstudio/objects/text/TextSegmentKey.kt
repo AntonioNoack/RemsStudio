@@ -1,4 +1,4 @@
-package me.anno.remsstudio.objects
+package me.anno.remsstudio.objects.text
 
 import me.anno.fonts.TextGenerator
 

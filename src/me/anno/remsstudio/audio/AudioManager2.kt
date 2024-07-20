@@ -6,7 +6,7 @@ import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.editorTime
 import me.anno.remsstudio.RemsStudio.editorTimeDilation
 import me.anno.remsstudio.RemsStudio.root
-import me.anno.remsstudio.objects.Audio
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Transform
 import kotlin.math.abs
 
@@ -15,7 +15,7 @@ object AudioManager2 {
 
     val camera by lazy { RemsStudio.nullCamera!! }
     fun updateTime(time: Double, dilation: Double, transform: Transform) {
-        if (transform is Audio) {
+        if (transform is Video) {
             transform.startPlayback(time, dilation, camera)
         }
         for (child in transform.children) {
@@ -24,7 +24,7 @@ object AudioManager2 {
     }
 
     fun checkTree(transform: Transform) {
-        if (transform is Audio && transform.needsUpdate) {
+        if (transform is Video && transform.needsUpdate) {
             transform.needsUpdate = false
             transform.startPlayback(editorTime, editorTimeDilation, camera)
         }
@@ -34,7 +34,7 @@ object AudioManager2 {
     }
 
     fun stop(transform: Transform = root) {
-        if (transform is Audio) {
+        if (transform is Video) {
             transform.stopPlayback()
         }
         for (child in transform.children) {

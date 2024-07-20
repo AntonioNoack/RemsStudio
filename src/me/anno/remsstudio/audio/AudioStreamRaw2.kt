@@ -16,7 +16,7 @@ import me.anno.io.MediaMetadata
 import me.anno.io.files.FileReference
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.mix
-import me.anno.remsstudio.objects.Audio
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Transform
 import me.anno.utils.Sleep.waitUntil
 import me.anno.utils.structures.tuples.ShortPair
@@ -32,7 +32,7 @@ class AudioStreamRaw2(
     val repeat: LoopingState,
     val meta: MediaMetadata,
     val is3D: Boolean,
-    val source: Audio?,
+    val source: Video?,
     val destination: Transform?
 ) : StereoShortStream {
 

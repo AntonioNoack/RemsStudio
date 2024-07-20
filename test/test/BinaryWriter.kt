@@ -6,7 +6,7 @@ import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.objects.Video
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.geometric.Circle
 import me.anno.remsstudio.objects.geometric.Polygon
 import me.anno.remsstudio.objects.particles.ParticleSystem

@@ -11,7 +11,7 @@ import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.SoundEffect
 import me.anno.remsstudio.audio.effects.Time
-import me.anno.remsstudio.objects.Audio
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Camera
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
@@ -50,7 +50,7 @@ class EqualizerEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
         AnimatedProperty.float01(0.5f)
     }
 
-    override fun getStateAsImmutableKey(source: Audio, destination: Camera, time0: Time, time1: Time): Any {
+    override fun getStateAsImmutableKey(source: Video, destination: Camera, time0: Time, time1: Time): Any {
         return sliders.joinToString()
     }
 
@@ -88,7 +88,7 @@ class EqualizerEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
     override fun apply(
         getDataSrc: (Int) -> FloatArray,
         dataDst: FloatArray,
-        source: Audio,
+        source: Video,
         destination: Camera,
         time0: Time,
         time1: Time

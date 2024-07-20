@@ -1,7 +1,7 @@
 package me.anno.remsstudio.audio
 
 import me.anno.audio.streams.AudioStream
-import me.anno.remsstudio.objects.Audio
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
 import me.anno.ui.base.progress.ProgressBar
@@ -11,7 +11,7 @@ import me.anno.video.AudioCreator
 open class AudioCreatorV2(
     val scene: Transform,
     val camera: Camera,
-    val audioSources: List<Audio>,
+    val audioSources: List<Video>,
     durationSeconds: Double,
     sampleRate: Int,
     val progress: ProgressBar

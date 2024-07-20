@@ -9,7 +9,7 @@ import me.anno.remsstudio.Selection.selectedTransforms
 import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.SoundEffect
 import me.anno.remsstudio.audio.effects.Time
-import me.anno.remsstudio.objects.Audio
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Camera
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
@@ -21,13 +21,13 @@ abstract class Falloff(var halfDistance: Float = 1f) : SoundEffect(Domain.TIME_D
 
     abstract fun getAmplitude(relativeDistance: Float): Float
 
-    override fun getStateAsImmutableKey(source: Audio, destination: Camera, time0: Time, time1: Time): Any {
+    override fun getStateAsImmutableKey(source: Video, destination: Camera, time0: Time, time1: Time): Any {
         val amplitude0 = getAmplitude(source, destination, time0.globalTime)
         val amplitude1 = getAmplitude(source, destination, time1.globalTime)
         return Pair(amplitude0, amplitude1)
     }
 
-    fun getAmplitude(source: Audio, destination: Camera, globalTime: Double): Float {
+    fun getAmplitude(source: Video, destination: Camera, globalTime: Double): Float {
         val position = source.getGlobalTransformTime(globalTime).first.transformPosition(Vector3f())
         val camera = destination.getGlobalTransformTime(globalTime).first.transformPosition(Vector3f())
         val distance = camera.distance(position)
@@ -37,7 +37,7 @@ abstract class Falloff(var halfDistance: Float = 1f) : SoundEffect(Domain.TIME_D
     override fun apply(
         getDataSrc: (Int) -> FloatArray,
         dataDst: FloatArray,
-        source: Audio,
+        source: Video,
         destination: Camera,
         time0: Time,
         time1: Time

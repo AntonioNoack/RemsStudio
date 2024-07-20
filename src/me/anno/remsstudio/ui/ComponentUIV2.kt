@@ -8,7 +8,7 @@ import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.audio.effects.impl.EqualizerEffect
-import me.anno.remsstudio.objects.Audio
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.ui.input.ColorInputV2
 import me.anno.remsstudio.ui.input.FloatInputV2
@@ -231,7 +231,7 @@ object ComponentUIV2 {
                 .setIsSelectedListener(sl)
                 .setTooltip(ttt)
             is Float -> {
-                if(self is Audio && values in self.pipeline.effects.filterIsInstance2(EqualizerEffect::class).flatMap { it.sliders.toList() }) {
+                if(self is Video && values in self.pipeline.effects.filterIsInstance2(EqualizerEffect::class).flatMap { it.sliders.toList() }) {
                     SliderInput(0.0, 1.0, 0.0, value.toDouble(), title, visibilityKey, style)
                         .setChangeListener {
                             RemsStudio.incrementalChange("Set $title to $it", title) {

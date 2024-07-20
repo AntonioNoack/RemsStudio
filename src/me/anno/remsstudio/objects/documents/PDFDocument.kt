@@ -21,8 +21,6 @@ import me.anno.remsstudio.gpu.TexFiltering.Companion.getFiltering
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.documents.SiteSelection.parseSites
-import me.anno.remsstudio.objects.lists.Element
-import me.anno.remsstudio.objects.lists.SplittableElement
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -49,7 +47,7 @@ import kotlin.math.*
 // todo interpolation between lists and sets? could be interesting :)
 
 @Suppress("MemberVisibilityCanBePrivate")
-open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransform(parent), SplittableElement {
+open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransform(parent) {
 
     constructor() : this(InvalidRef, null)
 
@@ -246,49 +244,6 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
                 height//if (windowWidth > windowHeight) height else width
             }
         }.median(0f)
-    }
-
-    override fun getSplitElement(mode: String, index: Int): Element {
-        val ref = forcedMeta
-        val doc = ref.doc
-        val numberOfPages = doc.numberOfPages
-        val pages = getSelectedSitesList()
-        var remainingIndex = index
-        var pageNumber = 0
-        for (it in pages) {
-            val start = max(it.first, 0)
-            val end = min(it.last + 1, numberOfPages)
-            val length = max(0, end - start)
-            if (remainingIndex < length) {
-                pageNumber = start + remainingIndex
-                break
-            }
-            remainingIndex -= length
-        }
-        val child = clone() as PDFDocument
-        child.selectedSites = "$pageNumber"
-        val mediaBox = doc.getPage(pageNumber).mediaBox
-        val scale = 1f / getReferenceScale(doc, numberOfPages)
-        ref.returnInstance()
-        val w = mediaBox.width * scale
-        val h = mediaBox.height * scale
-        return Element(w, h, 0f, child)
-    }
-
-    override fun getSplitLength(mode: String): Int {
-        val ref = meta!!
-        val doc = ref.doc
-        val numberOfPages = doc.numberOfPages
-        val pages = getSelectedSitesList()
-        var sum = 0
-        for (it in pages) {
-            val start = max(it.first, 0)
-            val end = min(it.last + 1, numberOfPages)
-            val length = max(0, end - start)
-            sum += length
-        }
-        ref.returnInstance()
-        return sum
     }
 
     companion object {

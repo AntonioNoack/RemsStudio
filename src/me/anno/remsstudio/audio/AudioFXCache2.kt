@@ -18,7 +18,7 @@ import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.SoundEffect
 import me.anno.remsstudio.audio.effects.SoundPipeline.Companion.changeDomain
 import me.anno.remsstudio.audio.effects.Time
-import me.anno.remsstudio.objects.Audio
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Camera
 import me.anno.utils.Sleep.acquire
 import me.anno.utils.hpc.ProcessingQueue
@@ -176,7 +176,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
     }
 
     fun getBuffer(
-        source: Audio,
+        source: Video,
         destination: Camera,
         pipelineKey: PipelineKey,
         domain: Domain,
@@ -191,7 +191,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
     // I don't know where these problems came from... in Release 1.1.2, they were fine
     private val rawDataLimiter = Semaphore(32)
     fun getRawData(
-        source: Audio,
+        source: Video,
         destination: Camera,
         key: PipelineKey
     ): AudioData = getRawData(
@@ -201,7 +201,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
 
     fun getRawData(
         meta: MediaMetadata,
-        source: Audio?,
+        source: Video?,
         destination: Camera?,
         key: PipelineKey
     ): AudioData {
@@ -234,7 +234,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
 
     fun getBuffer0(
         meta: MediaMetadata,
-        source: Audio?,
+        source: Video?,
         destination: Camera?,
         pipelineKey: PipelineKey,
         async: Boolean
@@ -253,7 +253,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
     ): AudioData? = getBuffer0(meta, null, null, pipelineKey, async)
 
     fun getBuffer(
-        source: Audio,
+        source: Video,
         destination: Camera,
         key1: PipelineKey,
         async: Boolean
@@ -286,7 +286,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
     }
 
     fun getBuffer(
-        source: Audio, destination: Camera,
+        source: Video, destination: Camera,
         bufferSize: Int,
         domain: Domain,
         async: Boolean,
@@ -303,7 +303,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
         t0: Double,
         t1: Double,
         identifier: String,
-        source: Audio,
+        source: Video,
         destination: Camera,
         async: Boolean = true
     ): ShortArray? {
@@ -314,7 +314,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
         return getRange(bufferSize, index0, index1, identifier, source, destination, async)
     }
 
-    private fun getTime(index: Long, audio: Audio): Time {
+    private fun getTime(index: Long, audio: Video): Time {
         val globalTime = index * bufferSize.toDouble() / playbackSampleRate
         val localTime = audio.getLocalTimeFromRoot(globalTime, false)
         return Time(localTime, globalTime)
@@ -349,7 +349,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
         index0: Long,
         index1: Long,
         identifier: String,
-        source: Audio,
+        source: Video,
         destination: Camera,
         async: Boolean = true
     ): ShortArray? {
@@ -406,7 +406,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
     }
 
     fun getKey(
-        source: Audio, destination: Camera, bufferSize: Int,
+        source: Video, destination: Camera, bufferSize: Int,
         getTime: (i: Int) -> Time
     ): PipelineKey {
         val time0 = getTime(0)

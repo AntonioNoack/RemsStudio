@@ -16,7 +16,6 @@ import me.anno.gpu.framebuffer.StableWindowSize
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.shader.renderer.Renderer.Companion.colorRenderer
 import me.anno.gpu.shader.renderer.Renderer.Companion.colorSqRenderer
-import me.anno.gpu.texture.Texture2D.Companion.switchRGB2BGR
 import me.anno.input.Input
 import me.anno.input.Input.isControlDown
 import me.anno.input.Input.isShiftDown
@@ -56,6 +55,7 @@ import me.anno.ui.custom.CustomContainer
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.Color.black
+import me.anno.utils.Color.convertARGB2ABGR
 import me.anno.utils.structures.lists.Lists.firstInstanceOrNull2
 import me.anno.utils.types.Booleans.toInt
 import me.anno.utils.types.Floats.toRadians
@@ -319,7 +319,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             Scene.draw(camera, root, dx, dy, width, height, editorTime, false, Renderer.depthRenderer, this)
         }
 
-        switchRGB2BGR(idBuffer)
+        convertARGB2ABGR(idBuffer)
 
         LOGGER.debug(
             "ResolveClick: " +

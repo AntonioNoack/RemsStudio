@@ -1,7 +1,7 @@
 package bench
 
 import me.anno.io.files.FileReference
-import me.anno.remsstudio.objects.Video
+import me.anno.remsstudio.objects.video.Video
 import me.anno.utils.OS
 import me.anno.utils.Sleep
 import me.anno.video.VideoCache

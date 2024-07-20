@@ -15,7 +15,7 @@ import me.anno.remsstudio.RemsStudio.shutterPercentage
 import me.anno.remsstudio.RemsStudio.targetOutputFile
 import me.anno.remsstudio.RemsStudio.targetTransparency
 import me.anno.remsstudio.audio.AudioCreatorV2
-import me.anno.remsstudio.objects.Audio
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.video.FrameTaskV2
@@ -64,9 +64,9 @@ object Rendering {
         )
     }
 
-    fun filterAudio(scene: Transform): List<Audio> {
+    fun filterAudio(scene: Transform): List<Video> {
         return scene.listOfAll
-            .filterIsInstance2(Audio::class)
+            .filterIsInstance2(Video::class)
             .filter {
                 it.forcedMeta?.hasAudio == true && (it.amplitude.isAnimated || it.amplitude[0.0] * 32e3f > 1f)
             }.toList()

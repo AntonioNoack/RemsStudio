@@ -7,7 +7,7 @@ import me.anno.io.MediaMetadata.Companion.getMeta
 import me.anno.io.files.FileReference
 import me.anno.remsstudio.audio.AudioFXCache2.convert
 import me.anno.remsstudio.audio.effects.Time
-import me.anno.remsstudio.objects.Audio
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Camera
 
 // only play once, then destroy; it makes things easier
@@ -33,13 +33,13 @@ open class AudioFileStream2(
     repeat: LoopingState,
     startIndex: Long,
     meta: MediaMetadata,
-    val source: Audio,
+    val source: Video,
     val destination: Camera,
     speed: Double,
     playbackSampleRate: Int = 48000
 ) : AudioFileStream(file, repeat, startIndex, meta, speed, playbackSampleRate, true, false, true) {
 
-    constructor(audio: Audio, speed: Double, globalTime: Double, playbackSampleRate: Int, listener: Camera) :
+    constructor(audio: Video, speed: Double, globalTime: Double, playbackSampleRate: Int, listener: Camera) :
             this(
                 audio.file, audio.isLooping.value,
                 getIndex(globalTime, speed, playbackSampleRate),

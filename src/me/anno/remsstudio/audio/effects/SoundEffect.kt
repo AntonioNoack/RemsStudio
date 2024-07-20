@@ -2,26 +2,26 @@ package me.anno.remsstudio.audio.effects
 
 import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.engine.inspector.Inspectable
-import me.anno.io.saveable.Saveable
 import me.anno.io.json.saveable.JsonStringReader
-import me.anno.remsstudio.objects.Audio
+import me.anno.io.saveable.Saveable
 import me.anno.remsstudio.objects.Camera
+import me.anno.remsstudio.objects.video.Video
 
 abstract class SoundEffect(val inputDomain: Domain, val outputDomain: Domain) : Saveable(), Inspectable {
 
     // for the inspector
-    lateinit var audio: Audio
+    lateinit var audio: Video
 
     abstract fun apply(
         getDataSrc: (Int) -> FloatArray,
         dataDst: FloatArray,
-        source: Audio,
+        source: Video,
         destination: Camera,
         time0: Time, time1: Time,
     )
 
     abstract fun getStateAsImmutableKey(
-        source: Audio,
+        source: Video,
         destination: Camera,
         time0: Time, time1: Time
     ): Any

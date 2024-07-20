@@ -10,6 +10,7 @@ import me.anno.remsstudio.gpu.ShaderLibV2.maxColorForceFields
 import me.anno.remsstudio.gpu.ShaderLibV2.uvForceFieldBuffer
 import me.anno.remsstudio.objects.attractors.EffectColoring
 import me.anno.remsstudio.objects.attractors.EffectMorphing
+import me.anno.remsstudio.objects.video.Video
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory

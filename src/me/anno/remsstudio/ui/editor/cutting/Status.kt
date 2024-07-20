@@ -3,7 +3,7 @@ package me.anno.remsstudio.ui.editor.cutting
 import me.anno.gpu.drawing.DrawRectangles
 import me.anno.io.MediaMetadata
 import me.anno.io.files.FileReference
-import me.anno.remsstudio.objects.Video
+import me.anno.remsstudio.objects.video.Video
 import me.anno.utils.Color.black
 import me.anno.video.VideoCache
 import me.anno.video.VideoFramesKey

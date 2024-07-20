@@ -8,7 +8,7 @@ import me.anno.fonts.mesh.TextMesh
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringWriter
-import me.anno.remsstudio.objects.TextSegmentKey
+import me.anno.remsstudio.objects.text.TextSegmentKey
 import me.anno.remsstudio.objects.text.Text
 import me.anno.engine.inspector.Inspectable
 import me.anno.jvm.fonts.AWTFont

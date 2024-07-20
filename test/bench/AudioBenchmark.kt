@@ -5,7 +5,7 @@ import me.anno.maths.Maths.mix
 import me.anno.remsstudio.audio.AudioFXCache2
 import me.anno.remsstudio.audio.AudioFXCache2.SPLITS
 import me.anno.remsstudio.objects.Camera
-import me.anno.remsstudio.objects.Video
+import me.anno.remsstudio.objects.video.Video
 import me.anno.utils.OS
 import me.anno.utils.Sleep
 import org.apache.logging.log4j.LogManager

@@ -7,7 +7,7 @@ import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.objects.SoftLink
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.Transform.Companion.toTransform
-import me.anno.remsstudio.objects.Video
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.documents.PDFDocument
 import me.anno.remsstudio.objects.MeshTransform
 import me.anno.gpu.drawing.UVProjection

@@ -8,7 +8,6 @@ import me.anno.gpu.GFX
 import me.anno.jvm.fonts.AWTFont
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.gpu.GFXx3Dv2
-import me.anno.remsstudio.objects.TextSegmentKey
 import me.anno.remsstudio.objects.attractors.EffectMorphing
 import me.anno.remsstudio.objects.modes.TextRenderMode
 import me.anno.remsstudio.objects.text.Text.Companion.DEFAULT_FONT_HEIGHT

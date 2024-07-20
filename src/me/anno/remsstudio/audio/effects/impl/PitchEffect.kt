@@ -9,7 +9,7 @@ import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.SoundEffect
 import me.anno.remsstudio.audio.effects.Time
-import me.anno.remsstudio.objects.Audio
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Camera
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
@@ -54,14 +54,14 @@ class PitchEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
     var tempo = 1f
     var hasTempo = false
 
-    override fun getStateAsImmutableKey(source: Audio, destination: Camera, time0: Time, time1: Time): Any {
+    override fun getStateAsImmutableKey(source: Video, destination: Camera, time0: Time, time1: Time): Any {
         return Pair(pitch, tempo)
     }
 
     override fun apply(
         getDataSrc: (Int) -> FloatArray,
         dataDst: FloatArray,
-        source: Audio,
+        source: Video,
         destination: Camera,
         time0: Time,
         time1: Time

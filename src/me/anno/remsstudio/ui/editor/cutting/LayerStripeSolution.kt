@@ -15,7 +15,8 @@ import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.audio.AudioFXCache2
 import me.anno.remsstudio.audio.AudioFXCache2.SPLITS
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.objects.Video
+import me.anno.remsstudio.objects.video.Video
+import me.anno.remsstudio.objects.video.VideoPreview.getFrameAtLocalTimeForPreview
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.centralTime
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.dtHalfLength
 import me.anno.remsstudio.ui.editor.cutting.LayerView.Companion.maxLines

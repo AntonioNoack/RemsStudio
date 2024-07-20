@@ -11,9 +11,8 @@ import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.Time
 import me.anno.remsstudio.audio.effects.impl.EqualizerEffect
 import me.anno.remsstudio.audio.effects.impl.EqualizerEffect.Companion.frequencies
-import me.anno.remsstudio.objects.Audio
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Camera
-import me.anno.remsstudio.objects.Video
 import org.joml.Vector2f
 import org.junit.jupiter.api.Test
 import kotlin.math.*
@@ -30,7 +29,7 @@ class EqualizerTest {
         fun sample(time: Double, channel: Int): Double
     }
 
-    private fun getBuffer(audio: Audio): Pair<FloatArray, FloatArray> {
+    private fun getBuffer(audio: Video): Pair<FloatArray, FloatArray> {
         return AudioFXCache2.getBuffer(audio, Camera(), bufferSize, Domain.TIME_DOMAIN, false) {
             Time((it + 3) * bufferSize / sampleRate.toDouble())
         }!!

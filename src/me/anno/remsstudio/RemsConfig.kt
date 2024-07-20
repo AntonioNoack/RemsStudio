@@ -15,6 +15,7 @@ import me.anno.remsstudio.objects.particles.ParticleSystem
 import me.anno.remsstudio.objects.particles.TextParticles
 import me.anno.remsstudio.objects.text.Text
 import me.anno.remsstudio.objects.text.Timer
+import me.anno.remsstudio.objects.video.Video
 import me.anno.utils.Clock
 import me.anno.utils.OS
 import org.joml.Vector3f

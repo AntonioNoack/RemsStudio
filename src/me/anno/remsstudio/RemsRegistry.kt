@@ -32,6 +32,7 @@ import me.anno.remsstudio.objects.particles.distributions.*
 import me.anno.remsstudio.objects.text.Chapter
 import me.anno.remsstudio.objects.text.Text
 import me.anno.remsstudio.objects.text.Timer
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.ui.scene.SceneTabData
 
 object RemsRegistry {
