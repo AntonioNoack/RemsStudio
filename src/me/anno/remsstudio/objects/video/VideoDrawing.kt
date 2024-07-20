@@ -216,23 +216,28 @@ object VideoDrawing {
 
         val scale = max(1, zoomLevel)
         val bufferSize = framesPerContainer
-        val timeout = videoFrameTimeout
-        val file = file
 
         if (frameIndex < 0 || frameIndex >= max(1, meta.videoFrameCount)) {
             // a programming error probably
             throw IllegalArgumentException("Frame index must be within bounds!")
         }
 
-        var frame0 = if (usesBlankFrameDetection()) {
-            BlankFrameDetector.getFrame(file, scale, frameIndex, bufferSize, videoFPS, timeout, meta, true)
-        } else {
-            if (streamManager.canUseVideoStreaming()) {
-                streamManager.getFrame(scale, frameIndex, videoFPS)
-            } else {
-                getVideoFrame(scale, frameIndex, videoFPS)
-            }
+        val useStreaming = streamManager.canUseVideoStreaming()
+        fun getFrame(frameIndex: Int): GPUFrame? {
+            return if (frameIndex in 0 until meta.videoFrameCount) {
+                val frame = if (useStreaming) {
+                    streamManager.getFrame(scale, frameIndex, videoFPS)
+                } else getVideoFrame(scale, frameIndex, videoFPS)
+                if (frame == null) onMissingImageOrFrame(frameIndex)
+                frame
+            } else null
         }
+
+        var frame0 = if (usesBlankFrameDetection()) {
+            BlankFrameDetector.getFrame(blankFrameThreshold) { delta ->
+                getFrame(frameIndex + delta)
+            }
+        } else getFrame(frameIndex)
 
         if (frame0 == null || !frame0.isCreated || frame0.isDestroyed) {
             onMissingImageOrFrame(frameIndex)

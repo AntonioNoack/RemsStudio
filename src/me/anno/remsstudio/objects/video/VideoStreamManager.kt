@@ -3,11 +3,14 @@ package me.anno.remsstudio.objects.video
 import me.anno.Engine
 import me.anno.animation.LoopingState
 import me.anno.cache.ICacheData
+import me.anno.gpu.GFX
 import me.anno.gpu.GFX.isFinalRendering
+import me.anno.input.Input
 import me.anno.io.files.FileReference
 import me.anno.maths.Maths.ceilDiv
 import me.anno.remsstudio.RemsStudio
-import me.anno.utils.Logging.hash32
+import me.anno.remsstudio.ui.editor.TimelinePanel
+import me.anno.utils.structures.lists.Lists.any2
 import me.anno.video.VideoStream
 import me.anno.video.formats.gpu.GPUFrame
 import kotlin.math.max
@@ -41,11 +44,13 @@ class VideoStreamManager(val video: Video) : ICacheData {
         return meta.videoFrameCount < 100 // what do we set here??
     }
 
-    // todo support blank-frame-detection in streamed playback
+    fun isScrubbing(): Boolean {
+        return !isFinalRendering &&
+                Input.isControlDown && GFX.windows.any2 { it.windowStack.inFocus0 is TimelinePanel }
+    }
 
     fun canUseVideoStreaming(): Boolean {
-        return !video.usesBlankFrameDetection() && !isCacheableVideo() &&
-                hasSimpleTime() && isPlayingForward()
+        return !isCacheableVideo() && !isScrubbing() && hasSimpleTime() && isPlayingForward()
     }
 
     private val lastFile: FileReference? get() = stream?.file
@@ -79,7 +84,7 @@ class VideoStreamManager(val video: Video) : ICacheData {
             this.stream = stream
         }
         val stream = stream!!
-        val frame = stream.getFrame(frameIndex)
+        val frame = stream.getFrame(frameIndex, 7)
         return when {
             frame == null -> null
             isFinalRendering && frameIndex != frame.frameIndex -> null
