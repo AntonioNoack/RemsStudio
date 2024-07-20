@@ -3,6 +3,7 @@ package me.anno.remsstudio.objects.video
 import me.anno.animation.LoopingState
 import me.anno.gpu.GFX.isFinalRendering
 import me.anno.io.MediaMetadata
+import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.objects.video.VideoSize.getCacheableZoomLevel
 import me.anno.video.formats.gpu.GPUFrame
 import kotlin.math.max
@@ -32,7 +33,7 @@ object VideoPreview {
 
                 // draw the current texture
                 val localTime = isLooping[time, duration]
-                val frameIndex = (localTime * videoFPS).toInt() % frameCount
+                val frameIndex = clamp((localTime * videoFPS).toInt(), 0, frameCount - 1)
 
                 val frame = getVideoFrame(scale, frameIndex, videoFPS)
 

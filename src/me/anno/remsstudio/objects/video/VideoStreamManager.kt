@@ -84,6 +84,7 @@ class VideoStreamManager(val video: Video) : ICacheData {
             this.stream = stream
         }
         val stream = stream!!
+        // 6 is the number of extra frames needed for blank-frame removal; use 7 just to be sure
         val frame = stream.getFrame(frameIndex, 7)
         return when {
             frame == null -> null
