@@ -36,7 +36,6 @@ import me.anno.remsstudio.ui.scene.ScenePreview
 import me.anno.remsstudio.ui.sceneTabs.SceneTabs.currentTab
 import me.anno.ui.Panel
 import me.anno.ui.Style
-import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.WelcomeUI
 import me.anno.ui.editor.files.FileContentImporter
@@ -45,11 +44,7 @@ import me.anno.utils.hpc.ProcessingQueue
 import kotlin.math.abs
 import kotlin.math.min
 
-// todo bug: 0-key should work like numpad-0 to reset transform
-// todo bug: space is not working everywhere/every time to start playback
-
 // todo bugs:
-//  - sometimes delete-key isn't registered as such
 //  - video files cannot be properly deleted, because files can't be deleted when reading them
 
 // todo bug: when editing a driver, we should see its curve
@@ -162,14 +157,9 @@ object RemsStudio : EngineBase("Rem's Studio", 10301, true), WelcomeUI {
         val background = ScenePreview(style)
         root.children.clear()
         Text("Rem's Studio", root).apply {
-            blockAlignmentX.set(0f)
-            blockAlignmentY.set(0f)
-            textAlignment.set(0f)
             relativeCharSpacing = 0.12f
             invalidate()
         }
-        background.alignmentX = AxisAlignment.FILL
-        background.alignmentY = AxisAlignment.FILL
         return background
     }
 

@@ -18,6 +18,7 @@ import me.anno.remsstudio.objects.modes.TransformVisibility
 import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.ui.Panel
 import me.anno.ui.WindowStack.Companion.printLayout
+import me.anno.ui.input.components.TitlePanel
 import me.anno.utils.structures.lists.Lists.any2
 import org.apache.logging.log4j.LogManager
 import kotlin.math.round
@@ -39,11 +40,10 @@ object StudioActions {
 
     private fun isInputInFocus(): Boolean {
         return GFX.windows.any2 { w ->
-            w.windowStack.inFocus.any2 { p ->
-                p.anyInHierarchy { pi ->
-                    pi is Panel && pi.isKeyInput()
-                }
-            }
+            val inFocus = w.windowStack.inFocus0
+            inFocus != null &&
+                    inFocus !is TitlePanel &&
+                    inFocus.anyInHierarchy { pi -> pi is Panel && pi.isKeyInput() }
         }
     }
 
@@ -309,10 +309,15 @@ object StudioActions {
         register["StudioSceneView.left.p.s", "MoveObjectAlternate"]
 
         for (i in 0 until 10) {
-            // keyMap["SceneView.$i.down", "Cam$i"]
-            register["StudioSceneView.numpad$i.down", "Cam$i"]
-            // keyMap["SceneView.$i.down.${Modifiers[true, false]}", "Cam$i"]
-            register["StudioSceneView.numpad$i.down.c", "Cam$i"]
+            fun registerForClass(clazz: String) {
+                // not everyone has a numpad -> support normal number keys, too
+                val action = "Cam$i"
+                register["$clazz.$i.down", action]
+                register["$clazz.$i.down.c", action]
+                register["$clazz.numpad$i.down", action]
+                register["$clazz.numpad$i.down.c", action]
+            }
+            registerForClass("StudioSceneView")
         }
 
         register["StudioSceneView.w.p", "MoveForward"]
