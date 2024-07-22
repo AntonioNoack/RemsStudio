@@ -1,5 +1,6 @@
 lang.name: Deutsch
 lang.spellcheck: de-DE
+lang.enName: German
 obj.particles.spawnRate: Neue Objekte / s
 obj.particles.spawnRate.desc: Wieviele neue Objekte je Sekunde erscheinen
 obj.particles: Partikelsystem
@@ -37,9 +38,6 @@ obj.force.betweenParticleGravity: Gravitations-Galaxie
 obj.force.betweenParticleGravity.desc: Anziehungskräfte zwischen allen Partikeln
 obj.force.velocityFriction: Luftwiderstand
 obj.force.velocityFriction.desc: Je schneller ein Teilchen ist, umso stärker wird es abgebremst
-
-driver.add: Füge Treiber hinzu
-driver.change: Ändere Treiber-Typ
 
 ui.customize.sceneView: Szene
 ui.customize.treeView: Baumansicht

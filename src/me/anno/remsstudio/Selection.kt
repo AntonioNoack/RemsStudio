@@ -7,6 +7,7 @@ import me.anno.remsstudio.RemsStudio.root
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
+import me.anno.utils.structures.lists.Lists.wrap
 import me.anno.utils.structures.maps.BiMap
 import org.apache.logging.log4j.LogManager
 
@@ -54,11 +55,11 @@ object Selection {
     }
 
     fun selectTransform(transform: Transform?) {
-        select(if (transform != null) listOf(transform) else emptyList(), emptyList())
+        select(transform.wrap(), emptyList())
     }
 
     fun select(transform: Transform, property: Saveable?) {
-        select(listOf(transform), if (property != null) listOf(property) else emptyList())
+        select(listOf(transform), property.wrap())
     }
 
     fun select(transforms0: List<Transform>, properties0: List<Saveable?>) {

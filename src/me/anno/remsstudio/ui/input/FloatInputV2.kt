@@ -1,8 +1,6 @@
 package me.anno.remsstudio.ui.input
 
-import me.anno.input.Key
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.remsstudio.ui.input.components.NumberInputComponentV2
 import me.anno.ui.Style
 import me.anno.ui.input.FloatInput
 import me.anno.ui.input.NumberType
@@ -33,12 +31,6 @@ class FloatInputV2(
             is Double -> setValue(value, false)
             else -> throw RuntimeException("Unknown type $value for ${javaClass.simpleName}")
         }
-    }
-
-    override fun onMouseClicked(x: Float, y: Float, button: Key, long: Boolean) {
-        if (button != Key.BUTTON_LEFT || long) {
-            inputPanel.onMouseClicked(x, y, button, long)
-        } else super.onMouseClicked(x, y, button, false)
     }
 
     override fun getValue(value: Any): Double {

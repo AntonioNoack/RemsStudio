@@ -15,9 +15,9 @@ import me.anno.remsstudio.RemsStudio.shutterPercentage
 import me.anno.remsstudio.RemsStudio.targetOutputFile
 import me.anno.remsstudio.RemsStudio.targetTransparency
 import me.anno.remsstudio.audio.AudioCreatorV2
-import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.video.FrameTaskV2
 import me.anno.remsstudio.video.videoAudioCreatorV2
 import me.anno.ui.base.menu.Menu.ask
@@ -47,7 +47,7 @@ object Rendering {
             field = value
         }
 
-    const val minimumDivider = 4
+    const val minimumDivisor = 4
 
     private val LOGGER = LogManager.getLogger(Rendering::class)
 
@@ -58,8 +58,8 @@ object Rendering {
     fun renderSetPercent(ask: Boolean, callback: () -> Unit) {
         val project = project ?: throw IllegalStateException("Missing project")
         renderVideo(
-            max(minimumDivider, (project.targetWidth * project.targetSizePercentage / 100).roundToInt()),
-            max(minimumDivider, (project.targetHeight * project.targetSizePercentage / 100).roundToInt()),
+            max(minimumDivisor, (project.targetWidth * project.targetSizePercentage / 100).roundToInt()),
+            max(minimumDivisor, (project.targetHeight * project.targetSizePercentage / 100).roundToInt()),
             ask, callback
         )
     }
@@ -74,8 +74,8 @@ object Rendering {
 
     fun renderVideo(width: Int, height: Int, ask: Boolean, callback: () -> Unit) {
 
-        val divW = width % minimumDivider
-        val divH = height % minimumDivider
+        val divW = width % minimumDivisor
+        val divH = height % minimumDivisor
         if (divW != 0 || divH != 0) return renderVideo(
             width - divW,
             height - divH,
@@ -269,15 +269,12 @@ object Rendering {
 
         // todo if is empty, send a warning instead of doing something
 
-        fun createProgressBar(): ProgressBar {
-            return object : ProgressBar("Audio Export", "Samples", duration * sampleRate) {
+        val progress = GFX.someWindow.addProgressBar(
+            object : ProgressBar("Audio Export", "Samples", duration * sampleRate) {
                 override fun formatProgress(): String {
                     return "$name: ${progress.toLong()} / ${total.toLong()} $unit"
                 }
-            }
-        }
-
-        val progress = GFX.someWindow.addProgressBar(createProgressBar())
+            })
         AudioCreatorV2(scene, findCamera(scene), audioSources, duration, sampleRate, progress).apply {
             onFinished = {
                 isRendering = false

@@ -94,21 +94,18 @@ class CuboidHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4
                 z *= maxScale / scale.z
                 w *= maxScale / scale.w
             }
-
             ay -> {
                 y = if (y > 0f) +1f else -1f
                 x *= maxScale / scale.x
                 z *= maxScale / scale.z
                 w *= maxScale / scale.w
             }
-
             az -> {
                 z = if (z > 0f) +1f else -1f
                 x *= maxScale / scale.x
                 y *= maxScale / scale.y
                 w *= maxScale / scale.w
             }
-
             else -> {
                 w = if (w > 0f) +1f else -1f
                 x *= maxScale / scale.x
@@ -125,7 +122,7 @@ class CuboidHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4
 
     override fun drawTransformed(stack: Matrix4fArrayList, color: Vector4f) {
         // draw cube out of lines
-        Grid.drawLineMesh(null, stack, color, CubemapModel)
+        Grid.drawLineMesh(null, stack, color, CubemapModel.model.front)
     }
 
     override val className get() = "CuboidHullDistribution"

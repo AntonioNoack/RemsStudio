@@ -1,20 +1,16 @@
 package me.anno.remsstudio.animation.drivers
 
 import me.anno.engine.inspector.Inspectable
-import me.anno.io.saveable.Saveable
 import me.anno.io.base.BaseWriter
+import me.anno.io.saveable.Saveable
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.Selection.select
-import me.anno.remsstudio.Selection.selectProperty
 import me.anno.remsstudio.Selection.selectedTransforms
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
 import me.anno.ui.Style
-import me.anno.ui.WindowStack
 import me.anno.ui.base.groups.PanelListY
-import me.anno.ui.base.menu.Menu.openMenu
-import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.NumberType
@@ -22,6 +18,7 @@ import org.joml.Vector2d
 import org.joml.Vector3d
 import org.joml.Vector4d
 
+@Deprecated("Drivers are too technical (and would need better UI anyway)")
 @Suppress("MemberVisibilityCanBePrivate")
 abstract class AnimationDriver : Saveable(), Inspectable {
 
@@ -105,49 +102,4 @@ abstract class AnimationDriver : Saveable(), Inspectable {
         val t = selectedTransforms
         createInspector(inspected, list, t, style, getGroup)
     }
-
-
-    companion object {
-        fun openDriverSelectionMenu(
-            windowStack: WindowStack,
-            oldDriver: AnimationDriver?,
-            whenSelected: (AnimationDriver?) -> Unit
-        ) {
-            fun add(create: () -> AnimationDriver): () -> Unit = { whenSelected(create()) }
-            val options = arrayListOf(
-                MenuOption(NameDesc("Harmonics", "sin(pi*i*t)", "obj.driver.harmonics"), add { HarmonicDriver() }),
-                MenuOption(
-                    NameDesc("Noise", "Perlin Noise, Randomness", "obj.driver.noise"),
-                    add { PerlinNoiseDriver() }),
-                MenuOption(
-                    NameDesc("Custom", "Specify your own formula", "obj.driver.custom"),
-                    add { FunctionDriver() }),
-                MenuOption( // todo only add for "Advanced Time"?
-                    NameDesc(
-                        "Rhythm",
-                        "Map timestamps to musical rhythm for satisfying timelapses",
-                        "obj.driver.rhythm"
-                    ),
-                    add { RhythmDriver() }
-                )
-            )
-            if (oldDriver != null) {
-                options.add(0,
-                    MenuOption(NameDesc("Customize", "Change the driver properties", "driver.edit")) {
-                        selectProperty(listOf(oldDriver))
-                        // todo why doesn't it draw the lines when adding (Selection.selectedProperties ?: emptyList())?
-                    })
-                options += MenuOption(
-                    NameDesc("Remove Driver", "Changes back to keyframe-animation", "driver.remove")
-                ) { whenSelected(null) }
-            }
-            openMenu(
-                windowStack,
-                if (oldDriver == null) NameDesc("Add Driver", "", "driver.add")
-                else NameDesc("Change Driver", "", "driver.change"),
-                options
-            )
-        }
-    }
-
 }

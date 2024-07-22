@@ -124,9 +124,6 @@ object RemsStudioUILayouts {
         options.addAction(debugTitle, "Reload Cache (Ctrl+F5)") { RemsStudio.clearAll() }
         options.addAction(debugTitle, "Clear Cache") { ConfigBasics.cacheFolder.deleteRecursively() }
         options.addAction(debugTitle, "Reload Plugins") { ExtensionLoader.reloadPlugins() }
-        // todo overview to show plugins & mods
-        // todo marketplace for plugins & mods?
-        // ...
 
         /**
          * Rendering

@@ -13,6 +13,7 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.TextInputML
 import me.anno.ui.Style
 
+@Deprecated("Drivers are too technical")
 @Suppress("MemberVisibilityCanBePrivate")
 class FunctionDriver : AnimationDriver() {
 

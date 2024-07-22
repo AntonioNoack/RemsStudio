@@ -1,15 +1,16 @@
 package me.anno.remsstudio.ui.graphs
 
 import me.anno.animation.Interpolation
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.Selection
 import me.anno.ui.Style
 import me.anno.ui.base.SpacerPanel
-import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.groups.PanelList
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.scrolling.ScrollPanelX
 import me.anno.ui.base.text.TextPanel
+import me.anno.ui.input.EnumInput
 import me.anno.ui.input.components.Checkbox
 import me.anno.utils.Color.black
 
@@ -24,6 +25,7 @@ class GraphEditor(style: Style) : PanelListY(style) {
     class MaskCheckbox(private val maskColor: Int, val index: Int, size: Int, style: Style) :
         Checkbox(true, true, size, style) {
         override fun getColor(): Int = maskColor
+
         @Suppress("UNUSED_PARAMETER")
         override var isEnabled: Boolean
             get() {
@@ -52,29 +54,26 @@ class GraphEditor(style: Style) : PanelListY(style) {
         body.weight = 1f
         this += body
         val cc = controls.child as PanelList
-        cc += TextPanel("Channel Mask: ", style)
+        cc.padding.add(2)
+        cc += TextPanel("Channel Mask: ", style).apply {
+            textAlignmentY = AxisAlignment.CENTER
+        }
         // mask buttons for x,y,z,w
         for (mask in channelMasks) {
             mask.alignmentY = AxisAlignment.CENTER
             cc += mask
+            cc += SpacerPanel(3, 1, style).makeBackgroundTransparent()
         }
-        cc += SpacerPanel(4, 1, style)
-        // todo enum input, but change the state automatically based on the selected keyframes
-        cc += TextPanel("Interpolation: ", style)
-        for (type in Interpolation.entries) {
-            cc += TextButton(type.symbol, true, style).apply {
-                padding.left = 2
-                padding.right = 2
-                padding.top = 0
-                padding.bottom = 0
+        cc += EnumInput(
+            // todo change the state automatically based on the selected keyframes
+            "Interpolation", true, Interpolation.LINEAR_BOUNDED.displayName,
+            Interpolation.entries.map { NameDesc(it.displayName, it.description, "") }, style
+        ).setChangeListener { _, index, _ ->
+            val type = Interpolation.entries[index]
+            for (kf in body.selectedKeyframes) {
+                kf.interpolation = type
             }
-                .setTooltip(if (type.description.isEmpty()) type.displayName else "${type.displayName}: ${type.description}")
-                .addLeftClickListener {
-                    for (kf in body.selectedKeyframes) {
-                        kf.interpolation = type
-                    }
-                    body.invalidateDrawing()
-                }
+            body.invalidateDrawing()
         }
     }
 

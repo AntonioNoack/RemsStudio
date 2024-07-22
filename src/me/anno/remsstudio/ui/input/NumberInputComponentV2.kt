@@ -1,10 +1,8 @@
-package me.anno.remsstudio.ui.input.components
+package me.anno.remsstudio.ui.input
 
 import me.anno.input.Key
 import me.anno.remsstudio.RemsStudio
-import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.remsstudio.animation.drivers.AnimationDriver
 import me.anno.ui.Style
 import me.anno.ui.input.FloatInput
 import me.anno.ui.input.IntInput
@@ -70,27 +68,6 @@ class NumberInputComponentV2(
             }
         }
         super.onDraw(x0, y0, x1, y1)
-    }
-
-    override fun onMouseClicked(x: Float, y: Float, button: Key, long: Boolean) {
-        if (button != Key.BUTTON_LEFT || long) {
-            val oldDriver = owningProperty.drivers[indexInProperty]
-            AnimationDriver.openDriverSelectionMenu(windowStack, oldDriver) { driver ->
-                RemsStudio.largeChange("Changed driver to ${driver?.className}") {
-                    owningProperty.drivers[indexInProperty] = driver
-                    if (driver != null) Selection.selectProperty(listOf(driver))
-                    else {
-                        setValue(
-                            when (val numberInput = numberInput) {
-                                is IntInput -> numberInput.stringify(numberInput.value)
-                                is FloatInput -> numberInput.stringify(numberInput.value)
-                                else -> throw RuntimeException()
-                            }, true // todo notify?
-                        )
-                    }
-                }
-            }
-        } else super.onMouseClicked(x, y, button, false)
     }
 
     override fun onEmpty(x: Float, y: Float) {

@@ -47,10 +47,6 @@ import kotlin.math.min
 // todo bugs:
 //  - video files cannot be properly deleted, because files can't be deleted when reading them
 
-// todo bug: when editing a driver, we should see its curve
-// todo right-click option to remove linear sections from keyframe panel;
-// todo right-click option to thin out sections from keyframe panel;
-// todo right-click option to select by specific channel only (e.g. to rect-select all y over 0.5);
 // to do morphing: up/down/left/right
 // to do morphing: rect/hexagon shape?, rotate it?
 // to do hexagon/triangle/rectangle pixelation: rotate it?

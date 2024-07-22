@@ -14,6 +14,7 @@ import me.anno.ui.input.NumberType
 import me.anno.utils.structures.Collections.filterIsInstance2
 import kotlin.math.min
 
+@Deprecated("Drivers are too technical")
 @Suppress("MemberVisibilityCanBePrivate")
 class PerlinNoiseDriver : AnimationDriver() {
 

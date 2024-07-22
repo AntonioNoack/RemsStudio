@@ -15,6 +15,7 @@ import me.anno.ui.base.groups.PanelListY
 import kotlin.math.PI
 import kotlin.math.sin
 
+@Deprecated("Drivers are too technical")
 @Suppress("MemberVisibilityCanBePrivate")
 class HarmonicDriver : AnimationDriver() {
 

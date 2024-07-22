@@ -10,6 +10,7 @@ import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.text.TextPanel
 import me.anno.ui.editor.SettingCategory
 
+@Deprecated("Drivers are too technical")
 @Suppress("MemberVisibilityCanBePrivate")
 class RhythmDriver : AnimationDriver() {
 

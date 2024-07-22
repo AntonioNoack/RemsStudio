@@ -2,7 +2,6 @@ package me.anno.remsstudio.ui.input
 
 import me.anno.ui.input.NumberType
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.remsstudio.ui.input.components.NumberInputComponentV2
 import me.anno.ui.input.IntInput
 import me.anno.ui.Style
 import org.joml.Vector2i

@@ -53,7 +53,7 @@ import org.joml.*
 import java.util.*
 import kotlin.math.*
 
-// todo list all animated properties of this object (abbreviated)
+// todo list all (animated) properties of this object (abbreviated)
 
 @Suppress("MemberVisibilityCanBePrivate")
 class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(style.getChild("deep")) {
@@ -452,6 +452,9 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
         return bestDragged?.to(bestChannel)
     }
 
+    // todo right-click option to remove linear sections from keyframe panel;
+    // todo right-click option to thin out sections from keyframe panel;
+    // done right-click option to select by specific channel only (e.g. to rect-select all y over 0.5);, kind of
     // todo scale a group of selected keyframes
     // todo move a group of selected keyframes
     // todo select full keyframes, or partial keyframes?
@@ -779,7 +782,6 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
                         })
                 }
             }
-
             else -> super.onMouseClicked(x, y, button, long)
         }
     }
