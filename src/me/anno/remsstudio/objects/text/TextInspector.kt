@@ -53,7 +53,10 @@ fun Text.createInspectorWithoutSuperImpl(
         invalidate()
     }.setIsSelectedListener { show(t, null) }
 
-    fontGroup += BooleanInput("Italic", "Chooses a sideways-leaning variant of the font.", font.isItalic, false, style)
+    fontGroup += BooleanInput(
+        NameDesc("Italic", "Chooses a sideways-leaning variant of the font.", "obj.text.italic"),
+        font.isItalic, false, style
+    )
         .setChangeListener {
             RemsStudio.largeChange("Italic: $it") {
                 for (x in c) for (e in x.getSelfWithShadows()) {
@@ -63,7 +66,10 @@ fun Text.createInspectorWithoutSuperImpl(
             invalidate()
         }
         .setIsSelectedListener { show(t, null) }
-    fontGroup += BooleanInput("Bold", "Chooses a thicker variant of the font.", font.isBold, false, style)
+    fontGroup += BooleanInput(
+        NameDesc("Bold", "Chooses a thicker variant of the font.", "obj.text.bold"),
+        font.isBold, false, style
+    )
         .setChangeListener {
             RemsStudio.largeChange("Bold: $it") {
                 for (x in c) for (e in x.getSelfWithShadows()) {
@@ -74,11 +80,11 @@ fun Text.createInspectorWithoutSuperImpl(
         }
         .setIsSelectedListener { show(t, null) }
     fontGroup += BooleanInput(
-        "Small Caps",
-        "This is a hack, where English letters get replaced by an UTF-8 variant in small caps.",
-        smallCaps,
-        false,
-        style
+        NameDesc(
+            "Small Caps",
+            "This is a hack, where English letters get replaced by an UTF-8 variant in small caps.",
+            "obj.text.smallCaps"
+        ), smallCaps, false, style
     ).setChangeListener {
         RemsStudio.largeChange("Small Caps: $it") {
             for (x in c) for (e in x.getSelfWithShadows()) {
@@ -171,12 +177,12 @@ fun Text.createInspectorWithoutSuperImpl(
     val rpgEffects =
         getGroup(NameDesc("RPG Effects", "This effect is for fading in/out letters one by one.", "obj.rpg-effects"))
     rpgEffects += vis(
-        c, "Start Cursor", "The first character index to be drawn", c.map { it.startCursor },
-        style
+        c, "Start Cursor", "The first character index to be drawn", "text.startCursor",
+        c.map { it.startCursor }, style
     )
     rpgEffects += vis(
-        c, "End Cursor", "The last character index to be drawn; -1 = unlimited", c.map { it.endCursor },
-        style
+        c, "End Cursor", "The last character index to be drawn; -1 = unlimited", "text.endCursor",
+        c.map { it.endCursor }, style
     )
 
     val outline = getGroup(NameDesc("Outline", "", "obj.outline"))

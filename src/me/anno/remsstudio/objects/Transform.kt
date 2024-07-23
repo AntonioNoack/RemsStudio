@@ -345,17 +345,19 @@ open class Transform() : Saveable(),
 
         val editorGroup = getGroup(NameDesc("Editor", "", "obj.editor"))
         editorGroup += vi(
-            inspected, "Timeline Slot", "< 1 means invisible", NumberType.INT_PLUS, timelineSlot.value, style
+            inspected, "Timeline Slot", "< 1 means invisible", "editor.timelineSlot",
+            NumberType.INT_PLUS, timelineSlot.value, style
         ) { it, _ -> for (x in c) x.timelineSlot.value = it }
         // todo warn of invisible elements somehow!...
         editorGroup += vi(
-            inspected, "Visibility", "", null, visibility, style
+            inspected, "Visibility", "Whether the object is visible when rendering and/or when editing",
+            "visibility", null, visibility, style
         ) { it, _ -> for (x in c) x.visibility = it }
 
         if (parent?.acceptsWeight() == true) {
             val psGroup = getGroup(NameDesc("Particle System Child", "", "obj.particles"))
             psGroup += vi(
-                inspected, "Weight", "For particle systems",
+                inspected, "Weight", "For particle systems", "particles.weight",
                 NumberType.FLOAT_PLUS, weight, style
             ) { it, _ ->
                 for (x in c) {
@@ -741,15 +743,6 @@ open class Transform() : Saveable(),
         }
     }
 
-    @Deprecated("Please add dictSubPath")
-    fun <V> vis(
-        inspected: List<Inspectable>,
-        title: String, ttt: String, type: NumberType?,
-        values: List<ValueWithDefault<V>>, style: Style
-    ): Panel {
-        return vis(inspected, title, ttt, title, type, values, style)
-    }
-
     /**
      * creates a panel with the correct input for the type, and sets the default values:
      * title, tool tip text, type, start value
@@ -769,26 +762,6 @@ open class Transform() : Saveable(),
         )
     }
 
-    @Deprecated("Please add dictSubPath")
-    fun <V> vi(
-        inspected: List<Inspectable>,
-        title: String, ttt: String,
-        type: NumberType?, value: V,
-        style: Style, setValue: (value: V, mask: Int) -> Unit
-    ): Panel {
-        return ComponentUIV2.vi(inspected, this, title, ttt, title, type, value, style, setValue)
-    }
-
-    @Deprecated("Please add dictSubPath")
-    fun vis(
-        selves: List<Transform>,
-        title: String, ttt: String,
-        values: List<AnimatedProperty<*>>,
-        style: Style
-    ): Panel {
-        return vis(selves, title, ttt, title, values, style)
-    }
-
     /**
      * creates a panel with the correct input for the type, and sets the default values:
      * title, tool tip text, type, start value
@@ -805,11 +778,6 @@ open class Transform() : Saveable(),
             Dict[ttt, "obj.$dictSubPath.desc"],
             dictSubPath, values, style
         )
-    }
-
-    @Deprecated("Please add dictSubPath")
-    fun vi(title: String, ttt: String, values: AnimatedProperty<*>, style: Style): IsAnimatedWrapper {
-        return ComponentUIV2.vi(this, title, ttt, title, values, style)
     }
 
     fun vis(

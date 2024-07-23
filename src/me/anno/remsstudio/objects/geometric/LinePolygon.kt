@@ -76,13 +76,25 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance2(LinePolygon::class)
         val group = getGroup(NameDesc("Line", "Properties of the line", "obj.line"))
-        group += vis(c, "Segment Start", "", c.map { it.segmentStart }, style)
-        group += vis(c, "Segment Length", "", c.map { it.segmentLength }, style)
-        group += vis(c, "Line Strength", "", c.map { it.lineStrength }, style)
-        group += vis(c, "Is Closed", "", c.map { it.isClosed }, style)
         group += vis(
-            c, "Fading", "How much the last points fade, if the offsets exclude everything", c.map { it.fadingOnEnd },
-            style
+            c, "Segment Start", "", "line.segmentStart",
+            c.map { it.segmentStart }, style
+        )
+        group += vis(
+            c, "Segment Length", "", "line.segmentLength",
+            c.map { it.segmentLength }, style
+        )
+        group += vis(
+            c, "Line Strength", "Thickness of the line", "line.lineStrength",
+            c.map { it.lineStrength }, style
+        )
+        group += vis(
+            c, "Is Closed", "Whether the start shall be connected to the end automatically", "line.isClosed",
+            c.map { it.isClosed }, style
+        )
+        group += vis(
+            c, "Fading", "How much the last points fade, if the offsets exclude everything", "line.fading",
+            c.map { it.fadingOnEnd }, style
         )
         group += TextButton("Copy 1st child's scale to all", false, style).addLeftClickListener {
             RemsStudio.largeChange("Copy first's scale") {

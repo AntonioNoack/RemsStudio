@@ -70,9 +70,8 @@ abstract class Falloff(var halfDistance: Float = 1f) : SoundEffect(Domain.TIME_D
         list.add(audio.vi(
             selectedTransforms, "Half Distance",
             "Distance, where the amplitude is 50%",
-            NumberType.FLOAT_PLUS_EXP,
-            halfDistance,
-            style
+            "falloff.halfDistance",
+            NumberType.FLOAT_PLUS_EXP, halfDistance, style
         ) { it, _ -> halfDistance = it })
     }
 

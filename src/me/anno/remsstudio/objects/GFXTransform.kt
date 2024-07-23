@@ -53,7 +53,11 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
         val c = inspected.filterIsInstance2(GFXTransform::class)
         val fx = getGroup(NameDesc("Effects", "Visual Effects Settings", "obj.effects"))
         fx += vis(
-            c, "Coloring: Base Color", "Base color for coloring", c.map { it.attractorBaseColor },
+            c,
+            "Coloring: Base Color",
+            "Base color for coloring: What color is chosen when no circle is within the area",
+            "effects.baseColor",
+            c.map { it.attractorBaseColor },
             style
         )
     }

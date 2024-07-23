@@ -40,6 +40,12 @@ abstract class CenterDistribution(
     }
 
     override fun listProperties(): List<InspectableVector> {
-        return listOf(InspectableVector(center, "Center", InspectableVector.PType.DEFAULT))
+        val prefix = "obj.distribution"
+        return listOf(
+            InspectableVector(
+                center, NameDesc("Center", "", "$prefix.center"),
+                InspectableVector.PType.DEFAULT
+            )
+        )
     }
 }

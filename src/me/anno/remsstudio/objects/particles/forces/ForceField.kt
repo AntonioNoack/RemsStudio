@@ -13,6 +13,7 @@ import me.anno.remsstudio.objects.particles.Particle
 import me.anno.remsstudio.objects.particles.ParticleState
 import me.anno.remsstudio.objects.particles.ParticleSystem
 import me.anno.remsstudio.objects.particles.forces.impl.*
+import me.anno.remsstudio.ui.ComponentUIV2
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelList
 import me.anno.ui.base.groups.PanelListY
@@ -48,7 +49,13 @@ abstract class ForceField(val displayName: String, val descriptionI: String) : T
 
     open fun listProperties() = listOf(
         // include it for convenience
-        InspectableAnimProperty(strength, "Strength", "How much effect this force has")
+        InspectableAnimProperty(
+            strength, NameDesc(
+                "Strength",
+                "How much effect this force has",
+                "obj.effect.forceStrength"
+            )
+        )
     )
 
     override fun createInspector(
@@ -66,18 +73,18 @@ abstract class ForceField(val displayName: String, val descriptionI: String) : T
         val properties = HashMap<Pair<ForceField, String>, AnimatedProperty<*>>()
         for (ins in inspected) {
             for (p in ins.listProperties()) {
-                properties[Pair(ins, p.title)] = p.value
+                properties[Pair(ins, p.nameDesc.key)] = p.value
             }
         }
         for (property in listProperties()) {
-            val title = property.title
+            val title = property.nameDesc.key
             val matching = inspected.mapNotNull {
                 val p = properties[Pair(it, title)]
                 if (p != null) Pair(it, p) else null
             }
-            list += vis(
-                matching.map { it.first }, property.title, property.description, matching.map { it.second },
-                style
+            list += ComponentUIV2.vis(
+                matching.map { it.first }, property.nameDesc.name, property.nameDesc.desc, property.nameDesc.key,
+                matching.map { it.second }, style
             )
         }
     }

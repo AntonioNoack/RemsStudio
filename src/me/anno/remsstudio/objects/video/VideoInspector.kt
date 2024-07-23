@@ -9,12 +9,12 @@ import me.anno.remsstudio.RemsStudio.isPaused
 import me.anno.remsstudio.RemsStudio.nullCamera
 import me.anno.remsstudio.objects.ColorGrading
 import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.objects.modes.VideoType
+import me.anno.remsstudio.objects.video.AudioPlayback.startPlayback
 import me.anno.remsstudio.objects.video.Video.Companion.editorFPS
 import me.anno.remsstudio.objects.video.Video.Companion.forceAutoScale
 import me.anno.remsstudio.objects.video.Video.Companion.forceFullScale
 import me.anno.remsstudio.objects.video.Video.Companion.videoScaleNames
-import me.anno.remsstudio.objects.modes.VideoType
-import me.anno.remsstudio.objects.video.AudioPlayback.startPlayback
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.SpyPanel
@@ -95,23 +95,29 @@ object VideoInspector {
         infoGroup += aud(UpdatingTextPanel(250, style) { "Sample Rate: ${lastMeta?.audioSampleRate} samples/s" })
         infoGroup += aud(UpdatingTextPanel(250, style) { "Sample Count: ${lastMeta?.audioSampleCount} samples" })
 
-        list += vi(inspected, "File Location", "Source file of this video", null, file, style) { newFile, _ ->
+        list += vi(
+            inspected, "File Location", "Source file of this video", "video.fileLocation",
+            null, file, style
+        ) { newFile, _ ->
             for (x in c) x.file = newFile
         }
 
         val colorGroup = getGroup(NameDesc("Color", "", "obj.color"))
-        colorGroup += vis(c, "Corner Radius", "Makes the corners round", c.map { it.cornerRadius }, style)
+        colorGroup += vis(
+            c, "Corner Radius", "Makes the corners round", "cornerRadius",
+            c.map { it.cornerRadius }, style
+        )
 
         val uvMap = getGroup(NameDesc("Texture", "", "obj.uvs"))
         uvMap += img(
             vis(
-                c, "Tiling", "(tile count x, tile count y, offset x, offset y)", c.map { it.tiling },
-                style
+                c, "Tiling", "(tile count x, tile count y, offset x, offset y)", "video.tiling",
+                c.map { it.tiling }, style
             )
         )
         uvMap += img(
             vi(
-                inspected, "UV-Projection", "Can be used for 360°-Videos",
+                inspected, "UV-Projection", "Can be used for 360°-Videos", "video.uvProjection",
                 null, uvProjection.value, style
             ) { it, _ -> for (x in c) x.uvProjection.value = it })
         uvMap += img(
@@ -165,35 +171,42 @@ object VideoInspector {
         val videoScales = videoScaleNames.entries.sortedBy { it.value }
         (if (forceFullScale || forceAutoScale) editor else quality()) += vid(
             EnumInput(
-                "Preview Scale",
-                "Full video resolution isn't always required. Define it yourself, or set it to automatic.",
+                NameDesc(
+                    "Preview Scale",
+                    "Full video resolution isn't always required. Define it yourself, or set it to automatic.",
+                    "obj.video.previewScale"
+                ),
                 videoScaleNames.reverse[videoScale.value] ?: "Auto",
-                videoScales.map { NameDesc(it.key) },
-                style
+                videoScales.map { NameDesc(it.key) }, style
             )
                 .setChangeListener { _, index, _ -> for (x in c) x.videoScale.value = videoScales[index].value }
                 .setIsSelectedListener { show(t, null) })
 
         editor += vid(
             EnumInput(
-                "Preview FPS",
-                "Smoother preview, heavier calculation",
+                NameDesc(
+                    "Preview FPS",
+                    "Smoother preview, heavier calculation",
+                    "obj.video.previewFps"
+                ),
                 editorVideoFPS.value.toString(),
                 editorFPS.filterIndexed { index, it -> index == 0 || it * 0.98 <= (meta?.videoFPS ?: 1e85) }
-                    .map { NameDesc(it.toString()) },
-                style
+                    .map { NameDesc(it.toString()) }, style
             )
                 .setChangeListener { _, index, _ -> for (x in c) x.editorVideoFPS.value = editorFPS[index] }
                 .setIsSelectedListener { show(t, null) })
 
         quality() += vid(
             FloatInput(
-                "Blank Frames Removal",
-                "When a set percentage of pixels change within 1 frame, that frame is removed from the source\n" +
-                        "The higher, the more frames are accepted; 0 = disabled\n" +
-                        "Cannot handle more than two adjacent blank frames",
-                blankFrameThreshold, NumberType.FLOAT_03, style
+                NameDesc(
+                    "Blank Frames Removal",
+                    "When a set percentage of pixels change within 1 frame, that frame is removed from the source\n" +
+                            "The higher, the more frames are accepted; 0 = disabled\n" +
+                            "Cannot handle more than two adjacent blank frames", "obj.video.blankFrameRemoval"
+                ),
+                NumberType.FLOAT_03, style
             )
+                .setValue(blankFrameThreshold, false)
                 .setChangeListener { for (x in c) x.blankFrameThreshold = it.toFloat() }
                 .setIsSelectedListener { show(t, null) })
 

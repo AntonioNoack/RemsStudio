@@ -1,6 +1,7 @@
 package me.anno.remsstudio.objects.particles.forces.impl
 
 import me.anno.io.base.BaseWriter
+import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.pow
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.inspectable.InspectableAnimProperty
@@ -43,9 +44,11 @@ class BetweenParticleGravity : ForceField(
     override fun listProperties(): List<InspectableAnimProperty> {
         return super.listProperties() + listOf(
             InspectableAnimProperty(
-                exponent,
-                "Exponent",
-                "How quickly the force declines with distance"
+                exponent, NameDesc(
+                    "Exponent",
+                    "How quickly the force declines with distance",
+                    "obj.effect.gravityExponent"
+                )
             )
         )
     }

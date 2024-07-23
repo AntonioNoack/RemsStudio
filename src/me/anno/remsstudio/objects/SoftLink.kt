@@ -184,7 +184,14 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
         val t = inspected.filterIsInstance2(Transform::class)
         val c = inspected.filterIsInstance2(SoftLink::class)
         val colorGroup = getGroup(NameDesc("Color", "", "obj.color"))
-        colorGroup += vis(c, "Corner Radius", "Makes the corners round", c.map { it.cornerRadius }, style)
+        colorGroup += vis(
+            c,
+            "Corner Radius",
+            "Makes the corners round",
+            "cornerRadius",
+            c.map { it.cornerRadius },
+            style
+        )
         val link = getGroup(NameDesc("Link Data", "", "obj.softLink"))
         link += vi(
             inspected, "File", "Where the data is to be loaded from", "", null, file, style
@@ -205,21 +212,30 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
             }
             .setIsSelectedListener { show(t, t.map { (it as? SoftLink)?.resolution }) }
         list += vis(
-            c, "Tiling", "(tile count x, tile count y, offset x, offset y)", c.map { it.tiling },
-            style
+            c, "Tiling", "(tile count x, tile count y, offset x, offset y)", "softLink.tiling",
+            c.map { it.tiling }, style
         )
         list += vi(
-            inspected, "UV-Projection", "Can be used for 360°-Videos", null, uvProjection.value, style
+            inspected, "UV-Projection",
+            "Can be used for 360°-Videos",
+            "texture.uvProjection",
+            null, uvProjection.value, style
         ) { it, _ -> for (x in c) x.uvProjection.value = it }
         list += vi(
-            inspected, "Filtering", "Pixelated look?", "texture.filtering", null, filtering.value, style
+            inspected, "Filtering",
+            "Pixelated look?",
+            "texture.filtering",
+            null, filtering.value, style
         ) { it, _ -> for (x in c) x.filtering.value = it }
         list += vi(
-            inspected, "Clamping", "For tiled images", "texture.clamping", null, clampMode.value, style
+            inspected, "Clamping",
+            "For tiled images",
+            "texture.clamping", null, clampMode.value, style
         ) { it, _ -> for (x in c) x.clampMode.value = it }
         // not ready yet
         link += vi(
-            inspected, "Enable Postprocessing", "", "", null, renderToTexture, style
+            inspected, "Enable Post-Processing",
+            "", "", null, renderToTexture, style
         ) { it, _ -> for (x in c) x.renderToTexture = it }
     }
 

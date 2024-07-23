@@ -53,14 +53,22 @@ class PerlinNoiseDriver : AnimationDriver() {
         val transform = transforms.first()
         val c = inspected.filterIsInstance2(PerlinNoiseDriver::class)
         list += transform.vi(
-            inspected, "Octaves", "Levels of Detail", NumberType.INT_PLUS, octaves, style
+            inspected, "Octaves",
+            "Levels of Detail",
+            "perlinNoise.octaves",
+            NumberType.INT_PLUS, octaves, style
         ) { it, _ -> for (x in c) x.octaves = it }
         list += transform.vi(
-            inspected, "Seed", "Base value for randomness", NumberType.LONG, seed, style
+            inspected, "Seed",
+            "Base value for randomness",
+            "perlinNoise.seed",
+            NumberType.LONG, seed, style
         ) { it, _ -> for (x in c) x.seed = it }
         list += transform.vis(
-            c.map { transform }, "Falloff", "Changes high-frequency weight", c.map { it.falloff },
-            style
+            c.map { transform }, "Falloff",
+            "Changes high-frequency weight",
+            "perlinNoise.falloff",
+            c.map { it.falloff }, style
         )
     }
 

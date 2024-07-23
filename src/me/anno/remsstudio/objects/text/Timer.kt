@@ -82,7 +82,11 @@ class Timer(parent: Transform? = null) : Text("", parent) {
     ) {
         super.createInspector(inspected, list, style, getGroup)
         list.children.removeIf { it is TextInputML && it.base.placeholder == "Text" }
-        list += vi(inspected, "Format", "ss=sec, mm=min, hh=hours, dd=days, s3=millis", null, format, style) { it, _ ->
+        list += vi(
+            inspected, "Format",
+            "ss=sec, mm=min, hh=hours, dd=days, s3=millis",
+            "timer.format", null, format, style
+        ) { it, _ ->
             for (x in inspected) if (x is Timer) x.format = it
         }
     }

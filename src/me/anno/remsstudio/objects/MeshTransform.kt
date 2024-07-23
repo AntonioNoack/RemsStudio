@@ -277,15 +277,19 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         val c = inspected.filterIsInstance2(MeshTransform::class)
 
         list += vi(
-            inspected, "File", "", null, file, style
+            inspected, "File", "Source file to be loaded", "mesh.file", null, file, style
         ) { it, _ -> for (x in c) x.file = it }
 
         list += vi(
-            inspected, "Normalize Scale", "A quicker fix than manually finding the correct scale",
+            inspected, "Normalize Scale",
+            "A quicker fix than manually finding the correct scale",
+            "mesh.normalizeScale",
             null, normalizeScale, style
         ) { it, _ -> for (x in c) x.normalizeScale = it }
         list += vi(
-            inspected, "Center Mesh", "If your mesh is off-center, this corrects it",
+            inspected, "Center Mesh",
+            "If your mesh is off-center, this corrects it",
+            "mesh.centerMesh",
             null, centerMesh, style
         ) { it, _ -> for (x in c) x.centerMesh = it }
 

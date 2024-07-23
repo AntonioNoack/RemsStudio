@@ -144,11 +144,17 @@ class Camera(parent: Transform? = null) : Transform(parent) {
 
         val dist = getGroup(NameDesc("Distortion", "Transforms the image", "obj.distortion"))
         dist += vis(
-            c, "Distortion", "Params: R², R⁴, Scale", c.map { it.distortion },
+            c, "Distortion",
+            "Params: R², R⁴, Scale",
+            "camera.distortion",
+            c.map { it.distortion },
             style
         )
         dist += vis(
-            c, "Distortion Offset", "Moves the center of the distortion", c.map { it.distortionOffset },
+            c, "Distortion Offset",
+            "Moves the center of the distortion",
+            "camera.distortionOffset",
+            c.map { it.distortionOffset },
             style
         )
 
@@ -209,6 +215,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         editor += vi(
             inspected, "Only Show Target",
             "Forces the viewport to have the correct aspect ratio",
+            "camera.onlyShowTarget",
             null, onlyShowTarget, style
         ) { it, _ -> for (x in c) x.onlyShowTarget = it }
 

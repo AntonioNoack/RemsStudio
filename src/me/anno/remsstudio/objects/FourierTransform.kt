@@ -251,11 +251,12 @@ class FourierTransform : Transform() {
         val c = inspected.filterIsInstance2(FourierTransform::class)
         val fourier = getGroup(NameDesc("Fourier Transform", "", "obj.fourier"))
         list.addChild(vi(
-            inspected, "Audio File", "", null, file, style
+            inspected, "Audio File", "Source file, which gets used as an input into the FFT", "fourier.sourceFile",
+            null, file, style
         ) { it, _ -> for (x in c) x.file = it })
         fourier.addChild(
             vi(
-                inspected, "Sample Rate", "What the highest frequency should be",
+                inspected, "Sample Rate", "What the highest frequency should be", "fourier.sampleRate",
                 // higher frequencies are eliminated, because we interpolate samples (I think...)
                 sampleRateType, sampleRate, style
             ) { it, _ -> for (x in c) x.sampleRate = max(64, it) })
@@ -263,28 +264,64 @@ class FourierTransform : Transform() {
             vi(
                 inspected, "Buffer Size",
                 "Should be at least twice the buffer size, 'Resolution' of the fourier transform, and length of samples per batch",
-                bufferSizeType,
-                bufferSize,
-                style
+                "fourier.bufferSize",
+                bufferSizeType, bufferSize, style
             ) { it, _ -> for (x in c) x.bufferSize = max(64, it) })
         fourier.addChild(
             vi(
                 inspected, "Buffer Min", "Use only a part of the fourier transform; -1 = disabled",
+                "fourier.bufferMin",
                 null, minBufferIndex, style
             ) { it, _ -> for (x in c) x.minBufferIndex = it })
         fourier.addChild(
             vi(
                 inspected, "Buffer Max", "Use only a part of the fourier transform; -1 = disabled",
+                "fourier.bufferMax",
                 null, maxBufferIndex, style
             ) { it, _ -> for (x in c) x.maxBufferIndex = it })
         val amplitude = getGroup(NameDesc("Amplitude", "", "obj.amplitude"))
-        amplitude.addChild(vis(c, "Position, Linear", "", c.map { it.posLin }, style))
-        amplitude.addChild(vis(c, "Position, Logarithmic", "", c.map { it.posLog }, style))
-        amplitude.addChild(vis(c, "Rotation, Linear", "", c.map { it.rotLin }, style))
-        amplitude.addChild(vis(c, "Rotation, Logarithmic", "", c.map { it.rotLog }, style))
-        amplitude.addChild(vis(c, "Scale, Offset", "", c.map { it.scaOff }, style))
-        amplitude.addChild(vis(c, "Scale, Linear", "", c.map { it.scaLin }, style))
-        amplitude.addChild(vis(c, "Scale, Logarithmic", "", c.map { it.scaLog }, style))
+        amplitude.addChild(
+            vis(
+                c, "Position, Linear", "", "fourier.position.linear",
+                c.map { it.posLin }, style
+            )
+        )
+        amplitude.addChild(
+            vis(
+                c, "Position, Logarithmic", "", "fourier.position.logarithmic",
+                c.map { it.posLog }, style
+            )
+        )
+        amplitude.addChild(
+            vis(
+                c, "Rotation, Linear", "", "fourier.rotation.linear",
+                c.map { it.rotLin }, style
+            )
+        )
+        amplitude.addChild(
+            vis(
+                c, "Rotation, Logarithmic", "", "fourier.rotation.logarithmic",
+                c.map { it.rotLog }, style
+            )
+        )
+        amplitude.addChild(
+            vis(
+                c, "Scale, Offset", "", "fourier.scale.offset",
+                c.map { it.scaOff }, style
+            )
+        )
+        amplitude.addChild(
+            vis(
+                c, "Scale, Linear", "", "fourier.scale.linear",
+                c.map { it.scaLin }, style
+            )
+        )
+        amplitude.addChild(
+            vis(
+                c, "Scale, Logarithmic", "", "fourier.scale.logarithmic",
+                c.map { it.scaLog }, style
+            )
+        )
     }
 
     override fun drawChildrenAutomatically(): Boolean = false

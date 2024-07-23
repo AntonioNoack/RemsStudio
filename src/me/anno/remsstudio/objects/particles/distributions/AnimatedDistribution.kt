@@ -5,6 +5,7 @@ import me.anno.io.base.BaseWriter
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.inspectable.InspectableVector
+import me.anno.remsstudio.ui.ComponentUIV2
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.input.NumberType
@@ -41,9 +42,7 @@ class AnimatedDistribution(
     fun createInspector(
         c: List<Transform>,
         inspected: List<AnimatedDistribution>,
-        name: String,
         list: PanelListY,
-        transform: Transform,
         style: Style
     ) {
         if (lastDist !== distribution) update()
@@ -59,8 +58,8 @@ class AnimatedDistribution(
         for (index in properties.indices) {
             val property = properties[index]
             // could this crash? only if another property had differing amounts of channels
-            list += transform.vis(
-                c, property.title, property.description, "$name/${property.title}",
+            list += ComponentUIV2.vis(
+                c, property.nameDesc.name, property.nameDesc.desc, property.nameDesc.key,
                 inspected.map { it.channels[index] },
                 style
             )

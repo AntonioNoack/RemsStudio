@@ -319,10 +319,12 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
         getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
+        val prefix = "maskLayer"
         val c = inspected.filterIsInstance2(MaskLayer::class)
         val mask = getGroup(NameDesc("Mask Settings", "Masks are multipurpose objects", "obj.mask"))
         mask += vi(
-            inspected, "Type", "Specifies what kind of mask it is", null, type, style
+            inspected, "Type", "Specifies what kind of mask it is", "$prefix.type",
+            null, type, style
         ) { it, _ -> for (x in c) x.type = it }
 
         fun typeSpecific(panel: Panel, isVisible: (MaskType) -> Boolean) {
@@ -334,66 +336,83 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
         }
 
         mask += vis(
-            c,
-            "Size",
-            "How large pixelated pixels or blur should be",
+            c, "Size", "How large pixelated pixels or blur should be", "$prefix.size",
             c.map { it.effectSize },
             style
         )
         mask += vi(
-            inspected, "Invert Mask", "Changes transparency with opacity",
+            inspected, "Invert Mask", "Changes transparency with opacity", "$prefix.invertMask",
             null, isInverted, style
         ) { it, _ -> for (x in c) x.isInverted = it }
         mask += vis(
-            c, "Use Color / Transparency", "Should the color influence the masked?",
+            c, "Use Color / Transparency", "Should the color influence the masked?", "$prefix.useColor",
             c.map { it.useMaskColor },
             style
         )
-        typeSpecific(vis(c, "Effect Center", "", c.map { it.effectOffset }, style)) {
+        typeSpecific(vis(c, "Effect Center", "", "$prefix.effectCenter", c.map { it.effectOffset }, style)) {
             when (it) {
                 MaskType.RADIAL_BLUR_1, MaskType.RADIAL_BLUR_2 -> true
                 else -> false
             }
         }
-        typeSpecific(vis(c, "Blur Threshold", "", c.map { it.blurThreshold }, style)) {
+        typeSpecific(vis(c, "Blur Threshold", "", "$prefix.blurThreshold", c.map { it.blurThreshold }, style)) {
             when (it) {
                 MaskType.GAUSSIAN_BLUR, MaskType.BLOOM -> true
                 else -> false
             }
         }
         mask += vi(
-            inspected, "Make Huge", "Scales the mask, without affecting the children",
+            inspected, "Make Huge", "Scales the mask, without affecting the children", "$prefix.makeHuge",
             null, isFullscreen, style
         ) { it, _ -> for (x in c) x.isFullscreen = it }
         mask += vi(
             inspected, "Use MSAA(!)",
-            "MSAA is experimental, may not always work",
+            "MSAA is experimental, may not always work", "$prefix.useMSAA",
             null, useExperimentalMSAA, style
         ) { it, _ -> for (x in c) x.useExperimentalMSAA = it }
 
         val greenScreen = getGroup(
             NameDesc(
                 "Green Screen", "Type needs to be green-screen; cuts out a specific color",
-                "obj.greenScreen"
+                "obj.$prefix.greenScreen"
             )
         )
-        greenScreen += vis(c, "Similarity", "", c.map { it.greenScreenSimilarity }, style)
-        greenScreen += vis(c, "Smoothness", "", c.map { it.greenScreenSmoothness }, style)
-        greenScreen += vis(c, "Spill Value", "", c.map { it.greenScreenSpillValue }, style)
+        greenScreen += vis(
+            c, "Similarity", "", "$prefix.greenScreen.similarity",
+            c.map { it.greenScreenSimilarity }, style
+        )
+        greenScreen += vis(
+            c, "Smoothness", "", "$prefix.greenScreen.smoothness",
+            c.map { it.greenScreenSmoothness }, style
+        )
+        greenScreen += vis(
+            c, "Spill Value", "", "$prefix.greenScreen.spillValue",
+            c.map { it.greenScreenSpillValue }, style
+        )
         greenScreen += vi(
-            inspected, "Invert Mask 2", "", null, isInverted2, style
+            inspected, "Invert Mask 2", "", "$prefix.greenScreen.invertMask2", null, isInverted2, style
         ) { it, _ -> for (x in c) x.isInverted2 = it }
 
         val transition = getGroup(NameDesc("Transition", "Type needs to be transition", "obj.transition"))
-        transition += vis(c, "Progress", "", c.map { it.transitionProgress }, style)
-        transition += vis(c, "Smoothness", "", c.map { it.transitionSmoothness }, style)
+        transition += vis(
+            c,
+            "Progress",
+            "How much is visible; less = less, more = more; dark areas first, bright last", // todo is this correct??? I think so
+            "$prefix.transition.progress",
+            c.map { it.transitionProgress },
+            style
+        )
+        transition += vis(
+            c, "Smoothness", "How much color range is used for the transition", "$prefix.transition.smoothness",
+            c.map { it.transitionSmoothness }, style
+        )
         val editor = getGroup(NameDesc("Editor", "", "obj.editor"))
         editor += vi(
-            inspected, "Show Mask", "for debugging purposes; shows the stencil",
+            inspected, "Show Mask", "for debugging purposes; shows the stencil", "$prefix.showMask",
             null, showMask, style
         ) { it, _ -> for (x in c) x.showMask = it }
         editor += vi(
-            inspected, "Show Masked", "for debugging purposes",
+            inspected, "Show Masked", "for debugging purposes", "$prefix.showMasked",
             null, showMasked, style
         ) { it, _ -> for (x in c) x.showMasked = it }
 

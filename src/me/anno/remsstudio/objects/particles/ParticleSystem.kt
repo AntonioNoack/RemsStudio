@@ -334,12 +334,12 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
                             clearCache()
                             group.content.clear()
                             group.titlePanel.text = getName()
-                            property.createInspector(c, properties, name, group.content, this, style)
+                            property.createInspector(c, properties, group.content, style)
                         }
                     }
                 )
             }
-            property.createInspector(c, properties, name, group.content, this, style)
+            property.createInspector(c, properties, group.content, style)
             viCtr++
         }
 
@@ -371,6 +371,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
         general += vi(
             inspected, "Simulation Step",
             "Larger values are faster, while smaller values are more accurate for forces",
+            "particles.simulationStep",
             NumberType.DOUBLE, simulationStep, style
         ) { it, _ ->
             if (it > 1e-9) for (x in c) x.simulationStep = it
@@ -384,7 +385,10 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
             .setChangeListener { for (x in c) x.showChildren = it }
             .setIsSelectedListener { show(inspected.filterIsInstance2(Transform::class), null) }
 
-        general += vi(inspected, "Seed", "The seed for all randomness", null, seed, style) { it, _ ->
+        general += vi(
+            inspected, "Seed", "The seed for all randomness", "particles.seed",
+            null, seed, style
+        ) { it, _ ->
             for (x in c) x.seed = it
             clearCache()
         }

@@ -12,8 +12,8 @@ import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.SoundEffect
 import me.anno.remsstudio.audio.effects.Time
-import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Camera
+import me.anno.remsstudio.objects.video.Video
 import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
@@ -91,7 +91,10 @@ class NoiseSuppressionEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAI
         inspected: List<Inspectable>, list: PanelListY, style: Style,
         getGroup: (NameDesc) -> SettingCategory
     ) {
-        val nlp = audio.vi("Noise Level", "All audio below this relative level will be silenced", noiseLevel, style)
+        val nlp = audio.vi(
+            "Noise Level", "All audio below this relative level will be silenced", "audio.noiseLevel",
+            noiseLevel, style
+        )
         list += nlp
         list += TextButton("Detect Noise Level", false, style)
             .apply {

@@ -187,23 +187,33 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance2(PDFDocument::class)
         val colorGroup = getGroup(NameDesc("Color", "", "obj.color"))
-        colorGroup += vis(c, "Corner Radius", "Makes the corners round", c.map { it.cornerRadius }, style)
+        colorGroup += vis(
+            c, "Corner Radius", "Makes the corners round", "cornerRadius",
+            c.map { it.cornerRadius }, style
+        )
         val doc = getGroup(NameDesc("Document", "", "obj.docs"))
         doc += vi(
-            inspected, "Path", "", null, file, style
+            inspected, "Path", "Source file to be loaded and displayed", "docs.file", null, file, style
         ) { it, _ -> for (x in c) x.file = it }
         doc += vi(
-            inspected, "Pages", "Comma separated list of page numbers. Ranges like 1-9 are fine, too.",
-            null, selectedSites, style
+            inspected, "Pages",
+            "Comma separated list of page numbers. Ranges like 1-9 are fine, too.",
+            "docs.pagesList", null, selectedSites, style
         ) { it, _ -> for (x in c) x.selectedSites = it }
-        doc += vis(c, "Padding", "", c.map { it.padding }, style)
-        doc += vis(c, "Direction", "Top-Bottom/Left-Right in Degrees", c.map { it.direction }, style)
+        doc += vis(
+            c, "Padding", "Distance between pages when displaying more than one", "docs.padding",
+            c.map { it.padding }, style
+        )
+        doc += vis(
+            c, "Direction", "How left/right/top/bottom the padding is between pages, in degrees", "docs.direction",
+            c.map { it.direction }, style
+        )
         doc += vi(
-            inspected, "Editor Quality", "Factor for resolution; applied in editor",
+            inspected, "Editor Quality", "Factor for resolution; applied in editor", "docs.editorQuality",
             NumberType.FLOAT_PLUS, editorQuality, style
         ) { it, _ -> for (x in c) x.editorQuality = it }
         doc += vi(
-            inspected, "Render Quality", "Factor for resolution; applied when rendering",
+            inspected, "Render Quality", "Factor for resolution; applied when rendering", "docs.renderQuality",
             NumberType.FLOAT_PLUS, renderQuality, style
         ) { it, _ -> for (x in c) x.renderQuality = it }
         doc += vi(

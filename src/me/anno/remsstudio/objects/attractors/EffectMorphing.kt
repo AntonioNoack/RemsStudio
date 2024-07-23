@@ -35,23 +35,31 @@ class EffectMorphing : Transform() {
         val fx = getGroup(NameDesc("Effect", "", "obj.effects"))
         fx += vis(
             c, "Strength", "The effective scale",
+            "effect.morphStrength",
             c.map { it.zooming }, style
         )
         // like https://www.youtube.com/watch?v=QbwgQSwMSGM, at 6:27
         fx += vis(
-            c, "Chromatic Aberration", "Separates the effect for R/G/B channels; only works for video/images.",
-            c.map { it.chromatic }, style
+            c,
+            "Chromatic Aberration",
+            "Separates the effect for R/G/B channels; only works for video/images.",
+            "effect.chromaticAberration",
+            c.map { it.chromatic },
+            style
         )
         fx += vis(
             c, "Swirl Strength", "How badly/which way around it swirls",
+            "effect.swirlStrength",
             c.map { it.swirlStrength }, style
         )
         fx += vis(
             c, "Swirl Power", "How badly it swirls; 1 ~ wobble, 20 ~ swirls (at 1 Swirl Strength)",
+            "effect.swirlPower",
             c.map { it.swirlPower }, style
         )
         fx += vis(
             c, "Sharpness", "How sharp the lens effect is",
+            "effect.morphSharpness",
             c.map { it.sharpness }, style
         )
     }

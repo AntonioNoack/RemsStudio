@@ -9,8 +9,8 @@ import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.SoundEffect
 import me.anno.remsstudio.audio.effects.Time
-import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Camera
+import me.anno.remsstudio.objects.video.Video
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -39,11 +39,13 @@ class PitchEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
         list += audio.vi(
             inspected,
             "Inverse Speed", "Making something play faster, increases the pitch; this is undone by this node",
+            "pitch.inverseSpeed",
             null, inverseSpeed, style
         ) { it, _ -> inverseSpeed = it }
         list += audio.vi(
             inspected,
             "Value", "Pitch height, if Inverse Speed = false",
+            "pitch.height",
             pitchType, pitch, style
         ) { it, _ -> pitch = it }
     }
