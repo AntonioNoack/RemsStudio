@@ -143,25 +143,25 @@ class GFXArray(parent: Transform? = null) : GFXTransform(parent) {
         val child = getGroup(NameDesc("Per-Child Transform", "For the n-th child, it is applied (n-1) times.", "obj.per-child"))
         child += vis(
             c, "Offset/Child", "Translation from one child to the next",
-            "array.offset", "array.offset", c.map { it.perChildTranslation }, style
+            "array.offset", c.map { it.perChildTranslation }, style
         )
         child += vis(
             c, "Rotation/Child", "Rotation from one child to the next",
-            "array.rotation", "array.rotation", c.map { it.perChildRotation }, style
+            "array.rotation", c.map { it.perChildRotation }, style
         )
         child += vis(
             c, "Scale/Child", "Scale factor from one child to the next",
-            "array.scale", "array.scale", c.map { it.perChildScale }, style
+            "array.scale", c.map { it.perChildScale }, style
         )
         child += vis(
             c, "Delay/Child", "Temporal delay from one child to the next",
-            "array.delay", "array.delay", c.map { it.perChildDelay }, style
+            "array.delay", c.map { it.perChildDelay }, style
         )
 
         val instances = getGroup(NameDesc("Instances", "", "obj.children"))
         instances += vis(
             c, "Instance Count", "",
-            "array.instanceCount", "array.instanceCount", c.map { it.instanceCount }, style
+            "array.instanceCount", c.map { it.instanceCount }, style
         )
         instances += vi(
             c, "Selection Mode", "",

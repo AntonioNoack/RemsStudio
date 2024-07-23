@@ -17,5 +17,6 @@
     <orderEntry type="library" name="RemsEngine" level="project" />
     <orderEntry type="library" name="PDF" level="project" />
     <orderEntry type="library" name="junit.jupiter" level="project" />
+    <orderEntry type="library" name="jetbrains.kotlin.stdlib.jdk8" level="project" />
   </component>
 </module>

@@ -4,6 +4,7 @@ import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.GFX
 import me.anno.io.base.BaseWriter
+import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio.editorTime
 import me.anno.remsstudio.RemsStudio.motionBlurSteps
@@ -43,6 +44,7 @@ object RenderSettings : Transform() {
         getGroup: (NameDesc) -> SettingCategory
     ) {
 
+        val prefix = "renderSettings"
         val project = project ?: throw IllegalStateException("Missing project")
         list += TextPanel(defaultDisplayName, style)
             .apply { focusTextColor = textColor } // disable focus-color
@@ -55,14 +57,18 @@ object RenderSettings : Transform() {
         }
 
         list += vi(
-            inspected, "Relative Frame Size (%)", "For rendering tests, in percent",
+            inspected,
+            "Relative Frame Size (%)", "For rendering tests, in percent", "$prefix.relativeFrameSize",
             NumberType.FLOAT_PERCENT, project.targetSizePercentage, style
         ) { it, _ ->
             project.targetSizePercentage = it
             save()
         }
 
-        list += FrameSizeInput("Frame Size (Pixels)", "${project.targetWidth}x${project.targetHeight}", style)
+        list += FrameSizeInput(
+            Dict["Frame Size (Pixels)", "obj.$prefix.frameSizePixels"],
+            "${project.targetWidth}x${project.targetHeight}", style
+        )
             .setChangeListener { w, h ->
                 project.targetWidth = max(1, w)
                 project.targetHeight = max(1, h)
@@ -79,7 +85,11 @@ object RenderSettings : Transform() {
         if (project.targetFPS !in framesRates) framesRates.add(0, project.targetFPS)
 
         list += EnumInput(
-            "Frame Rate (Hz)", true, project.targetFPS.toString(),
+            NameDesc(
+                "Frame Rate (Hz)",
+                "Higher values give a smoother result, but render longer, and need more storage space.",
+                "obj.$prefix.frameRateHz"
+            ), NameDesc(project.targetFPS.toString()),
             framesRates.map { NameDesc(it.toString()) },
             style
         )
@@ -90,17 +100,18 @@ object RenderSettings : Transform() {
             .setTooltip("The fps of the video, or how many frame are shown per second")
 
         list += IntInput(
-            "Video Quality", "VideoQuality",
+            Dict["Video Quality", "obj.$prefix.videoQuality"], "obj.videoQuality",
             project.targetVideoQuality, NumberType.VIDEO_QUALITY_CRF, style
         )
             .setChangeListener {
                 project.targetVideoQuality = it.toInt()
                 save()
             }
-            .setTooltip("0 = lossless, 23 = default, 51 = worst; worse results have smaller file sizes")
+            .setTooltip(Dict["0 = lossless, 23 = default, 51 = worst; worse results have smaller file sizes", "obj.$prefix.videoQuality.desc"])
 
         val mbs = vi(
             "Motion-Blur-Steps", "0,1 = no motion blur, e.g. 16 = decent motion blur, sub-frames per frame",
+            "$prefix.motionBlurSteps",
             project.motionBlurSteps, style
         )
         val mbs0 = mbs.child as IntInput
@@ -112,8 +123,11 @@ object RenderSettings : Transform() {
         list += mbs
 
         list += BooleanInput(
-            "Render Transparency", "Only supported by webm at the moment.",
-            project.targetTransparency, false, style
+            Dict["Render Transparency", "obj.$prefix.renderTransparency"],
+            Dict["Only supported by webm at the moment.", "obj.$prefix.renderTransparency.desc"],
+            project.targetTransparency,
+            false,
+            style
         ).setChangeListener {
             project.targetTransparency = it
             save()
@@ -122,7 +136,8 @@ object RenderSettings : Transform() {
         val samples = EnumInput(
             NameDesc(
                 "GPU Samples",
-                "Smooths edges. 1 = default. Support depends on GPU.", ""
+                "Smooths edges. 1 = default. Support depends on GPU.",
+                "obj.$prefix.gpuSamples"
             ),
             NameDesc("MSAA ${project.targetSamples}x"),
             listOf(1, 2, 4, 8, 16, 32, 64, 128).map {
@@ -151,6 +166,7 @@ object RenderSettings : Transform() {
         val shp = vi(
             "Shutter-Percentage (0-1)",
             "[Motion Blur] 1 = full frame is used; 0.1 = only 1/10th of a frame time is used",
+            "$prefix.shutterPercentage",
             project.shutterPercentage,
             style
         )
@@ -163,20 +179,27 @@ object RenderSettings : Transform() {
         list += shp
 
         list += EnumInput(
-            "Encoding Speed / Compression",
-            "How much time is spent on compressing the video into a smaller file",
-            "ui.ffmpeg.encodingSpeed",
+            NameDesc(
+                "Encoding Speed / Compression",
+                "How much time is spent on compressing the video into a smaller file",
+                "obj.$prefix.encodingSpeed"
+            ),
             project.ffmpegBalance.nameDesc,
             FFMPEGEncodingBalance.entries.map { it.nameDesc },
             style
         ).setChangeListener { _, index, _ -> project.ffmpegBalance = FFMPEGEncodingBalance.entries[index]; save() }
 
         list += EnumInput(
-            "Encoding Type", "Helps FFMPEG with the encoding process", "ui.ffmpeg.flags.input",
+            NameDesc(
+                "Encoding Type",
+                "Helps FFMPEG with the encoding process",
+                "obj.$prefix.encodingType"
+            ),
             project.ffmpegFlags.nameDesc, FFMPEGEncodingType.entries.map { it.nameDesc }, style
         ).setChangeListener { _, index, _ -> project.ffmpegFlags = FFMPEGEncodingType.entries[index]; save() }
 
-        val fileInput = FileInput("Output File", style, targetOutputFile, emptyList())
+        val fileInput = FileInput(Dict["Output File", "obj.$prefix.outputFile"], style, targetOutputFile, emptyList())
+        fileInput.setTooltip(Dict["Where the render result shall be stored/saved.", "obj.$prefix.outputFile.desc"])
         val originalColor = fileInput.base2.textColor
         fun updateFileInputColor() {
             val file = project.targetOutputFile

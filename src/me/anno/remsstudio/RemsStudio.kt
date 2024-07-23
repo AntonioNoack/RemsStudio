@@ -80,7 +80,7 @@ import kotlin.math.min
 // todo saturation/lightness controls by hue
 
 @Suppress("MemberVisibilityCanBePrivate")
-object RemsStudio : EngineBase("Rem's Studio", 10301, true), WelcomeUI {
+object RemsStudio : EngineBase("Rem's Studio", 10302, true), WelcomeUI {
 
     val defaultWindowStack get() = GFX.someWindow.windowStack
     var hideUnusedProperties = false

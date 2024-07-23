@@ -268,56 +268,79 @@ open class Transform() : Saveable(),
 
         // transforms
         val transform = getGroup(NameDesc("Transform", "Translation Scale, Rotation, Skewing", "obj.transform"))
-        transform += vis(c, "Position", "Location of this object", c.map { it.position }, style)
-        transform += vis(c, "Scale", "Makes it bigger/smaller", c.map { it.scale }, style)
-        transform += vis(c, "Rotation", "Pitch,Yaw,Roll", c.map { it.rotationYXZ }, style)
-        transform += vis(c, "Skew", "Transform it similar to a shear", c.map { it.skew }, style)
+        transform += vis(
+            c,
+            "Position",
+            "Location of this object",
+            "obj.transform.position",
+            c.map { it.position },
+            style
+        )
+        transform += vis(c, "Scale", "Makes it bigger/smaller", "transform.scale", c.map { it.scale }, style)
+        transform += vis(c, "Rotation", "Pitch,Yaw,Roll", "transform.rotation", c.map { it.rotationYXZ }, style)
+        transform += vis(c, "Skew", "Transform it similar to a shear", "transform.skew", c.map { it.skew }, style)
         transform += vis(
             c,
             "Alignment with Camera",
             "0 = in 3D, 1 = looking towards the camera; billboards",
-            c.map { it.alignWithCamera },
-            style
+            "transform.alignWithCamera",
+            c.map { it.alignWithCamera }, style
         )
         transform += vi(
-            c, "Lock Transform", "So you don't accidentally move them", null, lockTransform, style
+            c, "Lock Transform", "So you don't accidentally move them", "transform.lockTransform",
+            null, lockTransform, style
         ) { value, _ ->
             for (ci in c) ci.lockTransform = value
         }
 
         // color
         val colorGroup = getGroup(NameDesc("Color", "", "obj.color"))
-        colorGroup += vis(c, "Color", "Tint, applied to this & children", c.map { it.color }, style)
+        colorGroup += vis(c, "Color", "Tint, applied to this & children", "color.tint", c.map { it.color }, style)
         colorGroup += vis(
-            c, "Color Multiplier", "To make things brighter than usually possible", c.map { it.colorMultiplier },
-            style
+            c, "Color Multiplier", "To make things brighter than usually possible", "color.multiplier",
+            c.map { it.colorMultiplier }, style
         )
 
         // kind of color...
         colorGroup += vi(
             inspected, "Blend Mode", "How this' element color is combined with what was rendered before that.",
+            "color.blendMode",
             null, blendMode, style
         ) { it, _ -> for (x in c) x.blendMode = it }
 
         // time
         val timeGroup = getGroup(NameDesc("Time", "", "obj.time"))
         timeGroup += vis(
-            inspected, "Start Time", "Delay the animation", null,
+            inspected, "Start Time", "Delay the animation", "time.startTime", null,
             c.map { it.timeOffset }, style
         )
         timeGroup += vis(
-            inspected, "Time Multiplier", "Speed up the animation",
+            inspected, "Time Multiplier", "Speed up the animation", "time.timeMultiplier",
             dilationType, c.map { it.timeDilation }, style
         )
         timeGroup += vis(
-            c, "Advanced Time", "Add acceleration/deceleration to your elements", c.map { it.timeAnimated },
-            style
+            c, "Advanced Time", "Add acceleration/deceleration to your elements", "time.advanced",
+            c.map { it.timeAnimated }, style
         )
 
         val ufd = usesFadingDifferently()
         if (ufd || getStartTime().isFinite()) {
-            timeGroup += vis(c, "Fade In", "Transparency at the start, in seconds", c.map { it.fadeIn }, style)
-            timeGroup += vis(c, "Fade Out", "Transparency at the end, in seconds", c.map { it.fadeOut }, style)
+            timeGroup += vis(
+                c,
+                "Fade In",
+                "Transparency at the start, in seconds",
+                "time.fadeIn",
+                c.map { it.fadeIn },
+                style
+            )
+            timeGroup += vis(
+                c,
+                "Fade Out",
+                "Transparency at the end, in seconds",
+                "time.fadeOut",
+                c.map { it.fadeOut },
+                style
+            )
         }
 
         val editorGroup = getGroup(NameDesc("Editor", "", "obj.editor"))
@@ -708,16 +731,17 @@ open class Transform() : Saveable(),
 
     fun <V> vis(
         inspected: List<Inspectable>,
-        title: String, ttt: String, visibilityKey: String, type: NumberType?,
+        title: String, ttt: String, dictSubPath: String, type: NumberType?,
         values: List<ValueWithDefault<V>>, style: Style
     ): Panel {
-        return vi(inspected, title, ttt, visibilityKey, type, values[0].value, style) { newValue, mask ->
+        return vi(inspected, title, ttt, dictSubPath, type, values[0].value, style) { newValue, mask ->
             for (x in values) {
                 x.value = setViaMask(x.value, newValue, mask)
             }
         }
     }
 
+    @Deprecated("Please add dictSubPath")
     fun <V> vis(
         inspected: List<Inspectable>,
         title: String, ttt: String, type: NumberType?,
@@ -733,13 +757,19 @@ open class Transform() : Saveable(),
      * */
     fun <V> vi(
         inspected: List<Inspectable>,
-        title: String, ttt: String, visibilityKey: String,
+        title: String, ttt: String, dictSubPath: String,
         type: NumberType?, value: V,
         style: Style, setValue: (value: V, mask: Int) -> Unit
     ): Panel {
-        return ComponentUIV2.vi(inspected, this, title, ttt, visibilityKey, type, value, style, setValue)
+        return ComponentUIV2.vi(
+            inspected, this,
+            Dict[title, "obj.$dictSubPath"],
+            Dict[ttt, "obj.$dictSubPath.desc"],
+            dictSubPath, type, value, style, setValue
+        )
     }
 
+    @Deprecated("Please add dictSubPath")
     fun <V> vi(
         inspected: List<Inspectable>,
         title: String, ttt: String,
@@ -749,25 +779,7 @@ open class Transform() : Saveable(),
         return ComponentUIV2.vi(inspected, this, title, ttt, title, type, value, style, setValue)
     }
 
-    fun vis(
-        selves: List<Transform>,
-        title: String,
-        ttt: String,
-        dictSubPath: String,
-        visibilityKey: String,
-        values: List<AnimatedProperty<*>>,
-        style: Style
-    ): Panel {
-        return vis(
-            selves,
-            Dict[title, "obj.$dictSubPath"],
-            Dict[ttt, "obj.$dictSubPath.desc"],
-            visibilityKey,
-            values,
-            style
-        )
-    }
-
+    @Deprecated("Please add dictSubPath")
     fun vis(
         selves: List<Transform>,
         title: String, ttt: String,
@@ -783,28 +795,34 @@ open class Transform() : Saveable(),
      * modifies the AnimatedProperty-Object, so no callback is needed
      * */
     fun vi(
-        title: String,
-        ttt: String,
-        visibilityKey: String,
+        title: String, ttt: String, dictSubPath: String,
         values: AnimatedProperty<*>,
         style: Style
     ): IsAnimatedWrapper {
-        return ComponentUIV2.vi(this, title, ttt, visibilityKey, values, style)
+        return ComponentUIV2.vi(
+            this,
+            Dict[title, "obj.$dictSubPath"],
+            Dict[ttt, "obj.$dictSubPath.desc"],
+            dictSubPath, values, style
+        )
     }
 
+    @Deprecated("Please add dictSubPath")
     fun vi(title: String, ttt: String, values: AnimatedProperty<*>, style: Style): IsAnimatedWrapper {
         return ComponentUIV2.vi(this, title, ttt, title, values, style)
     }
 
     fun vis(
         selves: List<Transform>,
-        title: String,
-        ttt: String,
-        visibilityKey: String,
-        values: List<AnimatedProperty<*>>,
-        style: Style
+        title: String, ttt: String, dictSubPath: String,
+        values: List<AnimatedProperty<*>>, style: Style
     ): Panel {
-        return ComponentUIV2.vis(selves, title, ttt, visibilityKey, values, style)
+        return ComponentUIV2.vis(
+            selves,
+            Dict[title, "obj.$dictSubPath"],
+            Dict[ttt, "obj.$dictSubPath.desc"],
+            dictSubPath, values, style
+        )
     }
 
     override fun destroy() {

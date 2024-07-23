@@ -93,34 +93,29 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         val transform = getGroup(NameDesc("Transform", "", "obj.transform"))
         transform += vis(
             c, "Orbit Radius", "Orbiting Distance", "camera.orbitDis",
-            "camera.orbitDis", c.map { it.orbitRadius },
-            style
+            c.map { it.orbitRadius }, style
         )
 
 
         val cam = getGroup(NameDesc("Projection", "How rays of light are mapped to the screen", "obj.projection"))
         cam += vis(
             c, "FOV", "Field Of View, in degrees, vertical", "camera.fov",
-            "camera.fov", c.map { it.fovYDegrees },
-            style
+            c.map { it.fovYDegrees }, style
         )
         cam += vis(
             c, "Perspective - Orthographic", "Sets back the camera", "camera.orthographicness",
-            "camera.orthographicness", c.map { it.orthographicness },
-            style
+            c.map { it.orthographicness }, style
         )
 
 
         val depth = getGroup(NameDesc("Depth", "Z-axis related settings; from camera perspective", "obj.depth"))
         depth += vis(
             c, "Near Z", "Closest Visible Distance", "camera.depth.near",
-            "camera.depth.near", c.map { it.nearZ },
-            style
+            c.map { it.nearZ }, style
         )
         depth += vis(
             c, "Far Z", "Farthest Visible Distance", "camera.depth.far",
-            "camera.depth.far", c.map { it.farZ },
-            style
+            c.map { it.farZ }, style
         )
         depth += vi(
             inspected, "Use Depth",
@@ -135,8 +130,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         val chroma = getGroup(NameDesc("Chromatic Aberration", "Effect occurring in cheap lenses", "obj.chroma"))
         chroma += vis(
             c, "Strength", "How large the effect is", "camera.chromaStrength",
-            "camera.chromaStrength", c.map { it.chromaticAberration },
-            style
+            c.map { it.chromaticAberration }, style
         )
         chroma += vis(
             c, "Offset", "Offset", "camera.chromaOffset", c.map { it.chromaticOffset },
@@ -144,8 +138,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         )
         chroma += vis(
             c, "Rotation", "Rotation/angle in Degrees", "camera.chromaRotation",
-            "camera.chromaRotation", c.map { it.chromaticAngle },
-            style
+            c.map { it.chromaticAngle }, style
         )
 
 
@@ -163,31 +156,26 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         val vignette = getGroup(NameDesc("Vignette", "Darkens/colors the border", "obj.vignette"))
         vignette += vis(
             c, "Vignette Color", "Color of border", "vignette.color",
-            "vignette.color", c.map { it.vignetteColor },
-            style
+            c.map { it.vignetteColor }, style
         )
         vignette += vis(
             c, "Vignette Strength", "Strength of colored border", "vignette.strength",
-            "vignette.strength", c.map { it.vignetteStrength },
-            style
+            c.map { it.vignetteStrength }, style
         )
 
 
         val bloom = getGroup(NameDesc("Bloom", "Adds a light halo around bright objects", "obj.bloom"))
         bloom += vis(
             c, "Intensity", "Brightness of effect, 0 = off", "bloom.intensity",
-            "bloom.intensity", c.map { it.bloomIntensity },
-            style
+            c.map { it.bloomIntensity }, style
         )
         bloom += vis(
             c, "Effect Size", "How much it is blurred", "bloom.size",
-            "bloom.size", c.map { it.bloomSize },
-            style
+            c.map { it.bloomSize }, style
         )
         bloom += vis(
             c, "Threshold", "Minimum brightness", "bloom.threshold",
-            "bloom.threshold", c.map { it.bloomThreshold },
-            style
+            c.map { it.bloomThreshold }, style
         )
 
 
@@ -196,7 +184,6 @@ class Camera(parent: Transform? = null) : Transform(parent) {
             c,
             "Background Color",
             "Clearing color for the screen",
-            "camera.backgroundColor",
             "camera.backgroundColor",
             c.map { it.backgroundColor },
             style
