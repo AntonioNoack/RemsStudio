@@ -5,6 +5,7 @@ import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.video.VideoPreview.getFrameAtLocalTimeForPreview
 import me.anno.ui.Panel
 import me.anno.ui.Style
+import me.anno.utils.Color.white4
 import org.joml.Vector4f
 
 // todo why is this flickering, when moving the mouse???...
@@ -34,15 +35,11 @@ class VideoPreviewPanel(
         val time = getTime(window.mouseX)
         val frame = video.getFrameAtLocalTimeForPreview(time, width1, meta)
         if (frame != null) {
+            val color = white4
             DrawGradients.drawRectGradient(
                 x0, y0, x1 - x0, y1 - y0, color, color, frame,
                 Vector4f(0f, 0f, 1f, 1f)
             )
         }
     }
-
-    companion object {
-        private val color = Vector4f(1f)
-    }
-
 }

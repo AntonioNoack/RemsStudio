@@ -88,13 +88,14 @@ class LayerStripeSolution(
         val xTimeCorrection = ((referenceTime - centralTime) * w / (dtHalfLength * 2)).roundToInt()
         val timeOffset = (-centralTime / (2f * dtHalfLength) * w).toInt()
 
-        for ((lineIndex, gradients) in lines.withIndex()) {
+        for (lineIndex in lines.indices) {
+            val gradients = lines[lineIndex]
 
             val y0 = y + 3 + lineIndex * 3
             val h0 = h - 10
 
-            for (gradient in gradients) {
-
+            for (j in gradients.indices) {
+                val gradient = gradients[j]
                 val tr = gradient.owner as? Transform
                 val isStriped = selectedTransform === tr || draggedTransform === tr
 

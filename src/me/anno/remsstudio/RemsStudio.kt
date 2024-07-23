@@ -46,6 +46,7 @@ import kotlin.math.min
 
 // todo bugs:
 //  - video files cannot be properly deleted, because files can't be deleted when reading them
+//  - treeview needs padding: last item cannot be properly selected
 
 // to do morphing: up/down/left/right
 // to do morphing: rect/hexagon shape?, rotate it?
@@ -325,8 +326,8 @@ object RemsStudio : EngineBase("Rem's Studio", 10302, true), WelcomeUI {
         // todo publish that project, and write an article for it
         // todo publish example projects for all wiki pages?
 
-        Build.isDebug = false
-        Build.isShipped = true
+        Build.isDebug = true // false
+        // Build.isShipped = true
         Build.lock()
 
         if (args.isEmpty()) {

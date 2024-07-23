@@ -24,8 +24,7 @@ class GravityField : RelativeForceField(
     override fun listProperties(): List<InspectableAnimProperty> {
         return super.listProperties() + listOf(
             InspectableAnimProperty(
-                exponent,
-                NameDesc(
+                exponent, NameDesc(
                     "Exponent",
                     "How quickly the force declines with distance",
                     "obj.effect.gravityExponent"

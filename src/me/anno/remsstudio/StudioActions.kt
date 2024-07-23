@@ -13,6 +13,7 @@ import me.anno.input.ActionManager
 import me.anno.input.Input
 import me.anno.io.files.Reference.getReference
 import me.anno.io.utils.StringMap
+import me.anno.language.translation.Dict
 import me.anno.remsstudio.RemsStudio.hoveredPanel
 import me.anno.remsstudio.objects.modes.TransformVisibility
 import me.anno.remsstudio.ui.editor.TimelinePanel
@@ -83,6 +84,7 @@ object StudioActions {
             "PlayReversedSlow" to { setEditorTimeDilation(-0.2) },
             "ToggleFullscreen" to { GFX.someWindow.toggleFullscreen(); true },
             "PrintLayout" to { printLayout();true },
+            "PrintDictDefaults" to { Dict.printDefaults();true },
             "NextFrame" to {
                 nextFrame()
                 true
