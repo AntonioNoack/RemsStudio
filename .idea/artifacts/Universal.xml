@@ -4,11 +4,6 @@
     <root id="archive" name="RemsStudio.jar">
       <element id="module-output" name="RemsStudio" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../RemsEngine/out/artifacts/Universal/RemsEngine.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$APPLICATION_PLUGINS_DIR$/Kotlin/kotlinc/lib/kotlin-stdlib.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$APPLICATION_PLUGINS_DIR$/Kotlin/kotlinc/lib/kotlin-reflect.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$APPLICATION_PLUGINS_DIR$/Kotlin/kotlinc/lib/kotlin-test.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$APPLICATION_PLUGINS_DIR$/Kotlin/kotlinc/lib/kotlin-stdlib-jdk7.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$APPLICATION_PLUGINS_DIR$/Kotlin/kotlinc/lib/kotlin-stdlib-jdk8.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../RemsEngine/out/artifacts/PDF/PDF.jar" path-in-jar="/" />
     </root>
   </artifact>
