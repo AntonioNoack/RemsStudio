@@ -1,1 +1,466 @@
 lang.name: English
+lang.en-US: English (American)
+lang.spellcheck: en-US
+
+colorSpace.hsluv: HSLuv
+gpu.blendMode.add: Add
+gpu.blendMode.addMul: Pure Mul
+gpu.blendMode.parent: Parent
+gpu.blendMode.subColor: Sub Color
+interpolation.back in: Back In
+interpolation.back out: Back Out
+interpolation.back symmetric: Back Symmetric
+interpolation.bounce in: Bounce In
+interpolation.bounce out: Bounce Out
+interpolation.bounce symmetric: Bounce Symmetric
+interpolation.circle in: Circle In
+interpolation.circle out: Circle Out
+interpolation.circle symmetric: Circle Symmetric
+interpolation.cubic in: Cubic In
+interpolation.cubic out: Cubic Out
+interpolation.cubic symmetric: Cubic Symmetric
+interpolation.ease-in: Ease-In
+interpolation.ease-out: Ease-Out
+interpolation.elastic in: Elastic In
+interpolation.elastic out: Elastic Out
+interpolation.elastic symmetric: Elastic Symmetric
+interpolation.exponential in: Exponential In
+interpolation.exponential out: Exponential Out
+interpolation.exponential symmetric: Exponential Symmetric
+interpolation.linear: Linear
+interpolation.linear.desc: Straight curve segments, mix(a,b,clamp(t,0.0,1.0))
+interpolation.quadratic in: Quadratic In
+interpolation.quadratic out: Quadratic Out
+interpolation.quadratic symmetric: Quadratic Symmetric
+interpolation.quart in: Quart In
+interpolation.quart out: Quart Out
+interpolation.quart symmetric: Quart Symmetric
+interpolation.quint in: Quint In
+interpolation.quint out: Quint Out
+interpolation.quint symmetric: Quint Symmetric
+interpolation.sine: Sine
+interpolation.sine in: Sine In
+interpolation.sine out: Sine Out
+interpolation.sine symmetric: Sine Symmetric
+interpolation.sine.desc: Uses a cosine function, mix(a, b, (1-cos(pi*t))/2)
+interpolation.spline: Spline
+interpolation.spline.desc: Smooth curve
+interpolation.step: Step
+interpolation.step.desc: First half is the first value, second half is the second value, t > 0.5 ? a : b
+interpolation.swinging: Swinging
+interpolation.swingingreverse: SwingingReverse
+lang.en-US: English (American)
+lang.spellcheck: en-US
+linearUnbounded: Linear (unbounded)
+linearUnbounded.desc: Straight curve segments, extending into infinity, mix(a,b,t)
+obj.alignment: Alignment
+obj.array: Array
+obj.audio: Audio
+obj.audio-fx: Audio Effects
+obj.audio-fx.desc: Audio Effects
+obj.audio.3d: Is 3D Sound
+obj.audio.3d.desc: Sound becomes directional
+obj.audio.amplitude: Amplitude
+obj.audio.amplitude.desc: How loud it is
+obj.bloom: Bloom
+obj.bloom.desc: Adds a light halo around bright objects
+obj.bloom.intensity: Intensity
+obj.bloom.intensity.desc: Brightness of effect, 0 = off
+obj.bloom.size: Effect Size
+obj.bloom.size.desc: How much it is blurred
+obj.bloom.threshold: Threshold
+obj.bloom.threshold.desc: Minimum brightness
+obj.camera: Camera
+obj.camera.backgroundColor: Background Color
+obj.camera.backgroundColor.desc: Clearing color for the screen
+obj.camera.chromaOffset: Offset
+obj.camera.chromaOffset.desc: Offset
+obj.camera.chromaRotation: Rotation
+obj.camera.chromaRotation.desc: Rotation/angle in Degrees
+obj.camera.chromaStrength: Strength
+obj.camera.chromaStrength.desc: How large the effect is
+obj.camera.depth.enabled: Use Depth
+obj.camera.depth.enabled.desc: Causes Z-Fighting, but allows 3D
+obj.camera.depth.far: Far Z
+obj.camera.depth.far.desc: Farthest Visible Distance
+obj.camera.depth.near: Near Z
+obj.camera.depth.near.desc: Closest Visible Distance
+obj.camera.distortion: Distortion
+obj.camera.distortion.desc: Params: R², R⁴, Scale
+obj.camera.distortionOffset: Distortion Offset
+obj.camera.distortionOffset.desc: Moves the center of the distortion
+obj.camera.fov: FOV
+obj.camera.fov.desc: Field Of View, in degrees, vertical
+obj.camera.lut: Look Up Table
+obj.camera.lut.desc: LUT, Look Up Table for colors, formatted like in UE4
+obj.camera.onlyShowTarget: Only Show Target
+obj.camera.onlyShowTarget.desc: Forces the viewport to have the correct aspect ratio
+obj.camera.orbitDis: Orbit Radius
+obj.camera.orbitDis.desc: Orbiting Distance
+obj.camera.orthographicness: Perspective - Orthographic
+obj.camera.orthographicness.desc: Sets back the camera
+obj.camera.resetTransform: Reset Transform
+obj.camera.resetTransform.desc: If accidentally moved
+obj.camera.toneMapping: Look Up Table
+obj.camera.toneMapping.desc: LUT, Look Up Table for colors, formatted like in UE4
+obj.cg.offset: Plus Offset
+obj.cg.offset.desc: Can be used to color black objects
+obj.cg.offset.sub: Minus Offset
+obj.cg.offset.sub.desc: Can be used to color white objects
+obj.cg.power: Power
+obj.cg.power.desc: sRGB, Linear, ...
+obj.cg.saturation: Saturation
+obj.cg.saturation.desc: 0 = gray scale, 1 = normal, -1 = inverted colors
+obj.cg.slope: Slope
+obj.cg.slope.desc: Intensity or Tint
+obj.chroma: Chromatic Aberration
+obj.chroma.desc: Effect occurring in cheap lenses
+obj.circle: Circle
+obj.color: Color
+obj.color-grading: Color Grading (ASC CDL)
+obj.color.blendMode: Blend Mode
+obj.color.blendMode.desc: How this' element color is combined with what was rendered before that.
+obj.color.multiplier: Brightness Multiplier
+obj.color.multiplier.desc: To make things brighter than usually possible
+obj.color.tint: Color
+obj.color.tint.desc: Tint, applied to this & children
+obj.cornerRadius: Corner Radius
+obj.cornerRadius.desc: Makes the corners round
+obj.depth: Depth
+obj.depth.desc: Z-axis related settings; from camera perspective
+obj.distortion: Distortion
+obj.distortion.desc: Transforms the image
+obj.distribution.center: Center
+obj.distribution.radius: Radius / Size
+obj.distribution.rotation: Rotation
+obj.docs: Document
+obj.docs.direction: Direction
+obj.docs.direction.desc: How left/right/top/bottom the padding is between pages, in degrees
+obj.docs.editorQuality: Editor Quality
+obj.docs.editorQuality.desc: Factor for resolution; applied in editor
+obj.docs.file: Path
+obj.docs.file.desc: Source file to be loaded and displayed
+obj.docs.padding: Padding
+obj.docs.padding.desc: Distance between pages when displaying more than one
+obj.docs.pagesList: Pages
+obj.docs.pagesList.desc: Comma-separated list of page numbers. Ranges like 1-9 are fine, too.
+obj.docs.renderQuality: Render Quality
+obj.docs.renderQuality.desc: Factor for resolution; applied when rendering
+obj.editor: Editor
+obj.editor.timelineSlot: Timeline Slot
+obj.editor.timelineSlot.desc: < 1 means invisible
+obj.effect: Effect
+obj.effect.chromaticAberration: Chromatic Aberration
+obj.effect.chromaticAberration.desc: Separates the effect for R/G/B channels; only works for video/images.
+obj.effect.colorSharpness: Sharpness
+obj.effect.colorSharpness.desc: How sharp the circle is
+obj.effect.colorStrength: Strength
+obj.effect.colorStrength.desc: How much this color shall be used
+obj.effect.coloring: Effect: Coloring
+obj.effect.morphSharpness: Sharpness
+obj.effect.morphSharpness.desc: How sharp the lens effect is
+obj.effect.morphStrength: Strength
+obj.effect.morphStrength.desc: The effective scale
+obj.effect.morphing: Effect: Morphing
+obj.effect.swirlPower: Swirl Power
+obj.effect.swirlPower.desc: How badly it swirls; 1 ~ wobble, 20 ~ swirls (at 1 Swirl Strength)
+obj.effect.swirlStrength: Swirl Strength
+obj.effect.swirlStrength.desc: How badly/which way around it swirls
+obj.effects: Effects
+obj.effects.baseColor: Coloring: Base Color
+obj.effects.baseColor.desc: Base color for coloring: What color is chosen when no circle is within the area
+obj.effects.desc: Visual Effects Settings
+obj.folder: Folder
+obj.font: Font
+obj.font.desc: In what style text is rendered.
+obj.font.name: Font Name
+obj.font.name.desc: The style of the text
+obj.force.betweenParticleGravity: Between-Particle Gravity
+obj.force.betweenParticleGravity.desc: Gravity towards all other particles; expensive to compute
+obj.force.centralGravity: Central Gravity
+obj.force.centralGravity.desc: Gravity towards a single point
+obj.force.global: Global Force
+obj.force.global.desc: Constant Acceleration, e.g. Gravity on Earth
+obj.force.lorentz: Lorentz Force
+obj.force.lorentz.desc: Circular motion by velocity and rotation axis
+obj.force.lorentz.noisy: Noisy Lorentz Force
+obj.force.lorentz.noisy.desc: Circular motion by velocity, randomized by location
+obj.force.tornado: Tornado
+obj.force.tornado.desc: Circular motion around center
+obj.force.velocityFriction: Velocity Friction
+obj.force.velocityFriction.desc: The faster a particle is, the more friction it will experience
+obj.geometry: Geometry
+obj.geometry.circle.endDegrees: End Degrees
+obj.geometry.circle.endDegrees.desc: To cut a piece out of the circle
+obj.geometry.circle.innerRadius: Inner Radius
+obj.geometry.circle.innerRadius.desc: Relative size of hole in the middle
+obj.geometry.circle.startDegrees: Start Degrees
+obj.geometry.circle.startDegrees.desc: To cut a piece out of the circle
+obj.info: Info
+obj.info.desc: File information
+obj.line: Line
+obj.line.desc: Properties of the line
+obj.line.fading: Fading
+obj.line.fading.desc: How much the last points fade, if the offsets exclude everything
+obj.line.isClosed: Is Closed
+obj.line.isClosed.desc: Whether the start shall be connected to the end automatically
+obj.line.lineStrength: Line Strength
+obj.line.lineStrength.desc: Thickness of the line
+obj.line.segmentLength: Segment Length
+obj.line.segmentStart: Segment Start
+obj.mask: Mask Settings
+obj.mask.desc: Masks are multipurpose objects
+obj.maskLayer.blurThreshold: Blur Threshold
+obj.maskLayer.effectCenter: Effect Center
+obj.maskLayer.greenScreen: Green Screen
+obj.maskLayer.greenScreen.desc: Type needs to be green-screen; cuts out a specific color
+obj.maskLayer.greenScreen.invertMask2: Invert Mask 2
+obj.maskLayer.greenScreen.similarity: Similarity
+obj.maskLayer.greenScreen.smoothness: Smoothness
+obj.maskLayer.greenScreen.spillValue: Spill Value
+obj.maskLayer.invertMask: Invert Mask
+obj.maskLayer.invertMask.desc: Changes transparency with opacity
+obj.maskLayer.makeHuge: Make Huge
+obj.maskLayer.makeHuge.desc: Scales the mask, without affecting the children
+obj.maskLayer.showMask: Show Mask
+obj.maskLayer.showMask.desc: for debugging purposes; shows the stencil
+obj.maskLayer.showMasked: Show Masked
+obj.maskLayer.showMasked.desc: for debugging purposes
+obj.maskLayer.size: Size
+obj.maskLayer.size.desc: How large pixelated pixels or blur should be
+obj.maskLayer.transition.progress: Progress
+obj.maskLayer.transition.progress.desc: How much is visible; less = less, more = more; dark areas first, bright last
+obj.maskLayer.transition.smoothness: Smoothness
+obj.maskLayer.transition.smoothness.desc: How much color range is used for the transition
+obj.maskLayer.type: Type
+obj.maskLayer.type.desc: Specifies what kind of mask it is
+obj.maskLayer.useColor: Use Color / Transparency
+obj.maskLayer.useColor.desc: Should the color influence the masked?
+obj.maskLayer.useMSAA: Use MSAA(!)
+obj.maskLayer.useMSAA.desc: MSAA is experimental, may not always work
+obj.maskType.bloom: Bloom
+obj.maskType.bokehBlur: Bokeh Blur
+obj.maskType.gaussianBlur: Gaussian Blur
+obj.maskType.greenScreen: Green-Screen
+obj.maskType.hexPixelating: Hexagon Pixelation
+obj.maskType.masking: Masking
+obj.maskType.pixelOffset: Per-Pixel Offset
+obj.maskType.pixelating: Quad Pixelation
+obj.maskType.radialBlur1: Radial Blur (1)
+obj.maskType.radialBlur2: Radial Blur (2)
+obj.maskType.transition: Transition
+obj.maskType.triPixelating: Triangle Pixelation
+obj.maskType.voronoiPixelating: Voronoi Pixelation
+obj.mesh: Mesh
+obj.mesh.centerMesh: Center Mesh
+obj.mesh.centerMesh.desc: If your mesh is off-center, this corrects it
+obj.mesh.file: File
+obj.mesh.file.desc: Source file to be loaded
+obj.mesh.normalizeScale: Normalize Scale
+obj.mesh.normalizeScale.desc: A quicker fix than manually finding the correct scale
+obj.operations: Operations
+obj.operations.desc: Actions
+obj.outline: Outline
+obj.outline.color1: Color 1
+obj.outline.color1.desc: First Outline Color
+obj.outline.color2: Color 2
+obj.outline.color2.desc: Second Outline Color
+obj.outline.color3: Color 3
+obj.outline.color3.desc: Third Outline Color
+obj.outline.depth: Depth
+obj.outline.depth.desc: For non-merged SDFs to join close characters correctly; needs a distance from the background
+obj.outline.roundCorners: Rounded Corners
+obj.outline.roundCorners.desc: Makes corners curvy
+obj.outline.smoothness: Smoothness
+obj.outline.smoothness.desc: How smooth the edge is, [Main, 1st, 2nd, 3rd]
+obj.outline.widths: Widths
+obj.outline.widths.desc: [Main, 1st, 2nd, 3rd]
+obj.particles: Particle System
+obj.particles.angularVel: Rotation Velocity
+obj.particles.angularVel.desc: How fast the particles are rotating
+obj.particles.color: Color
+obj.particles.color.desc: Initial particle color
+obj.particles.initPosition: Initial Position
+obj.particles.initPosition.desc: Where the particles spawn
+obj.particles.initRotation: Initial Rotation
+obj.particles.initRotation.desc: How the particles are rotated initially
+obj.particles.initVelocity: Initial Velocity
+obj.particles.initVelocity.desc: How fast the particles are, when they are spawned
+obj.particles.lifeTime: Life Time
+obj.particles.lifeTime.desc: How many seconds a particle is visible
+obj.particles.opacity: Opacity
+obj.particles.opacity.desc: Initial particle opacity (1-transparency)
+obj.particles.seed: Seed
+obj.particles.seed.desc: The seed for all randomness
+obj.particles.simulationStep: Simulation Step
+obj.particles.simulationStep.desc: Larger values are faster, while smaller values are more accurate for forces
+obj.particles.size: Size
+obj.particles.size.desc: Initial particle size
+obj.particles.spawnRate: Spawn Rate
+obj.particles.spawnRate.desc: How many particles are spawned per second
+obj.particles.weight: Weight
+obj.particles.weight.desc: For particle systems
+obj.polygon: Polygon
+obj.polygon.autoAlign: Auto-Align
+obj.polygon.autoAlign.desc: Rotate 45°/90, and scale a bit; for rectangles
+obj.polygon.extrusion: Extrude
+obj.polygon.extrusion.desc: Makes it 3D
+obj.polygon.pattern: Pattern Texture
+obj.polygon.pattern.desc: For patterns like gradients radially; use a mask layer for images with polygon shape
+obj.polygon.star-ness: Star-ness
+obj.polygon.star-ness.desc: Works best with even vertex count
+obj.polygon.vertexCount: Vertex Count
+obj.polygon.vertexCount.desc: Quads, Triangles, all possible
+obj.projection: Projection
+obj.projection.desc: How rays of light are mapped to the screen
+obj.quality: Quality
+obj.rpg-effects: RPG Effects
+obj.rpg-effects.desc: This effect is for fading in/out letters one by one.
+obj.shadow: Shadow
+obj.shadow.color: Color
+obj.shadow.desc: Built-in Shadow
+obj.shadow.offset: Offset
+obj.shadow.smoothness: Smoothness
+obj.spacing: Spacing
+obj.text: Text
+obj.text.bold: Bold
+obj.text.characterSpacing: Character Spacing
+obj.text.characterSpacing.desc: Space between individual characters
+obj.text.endCursor: End Cursor
+obj.text.endCursor.desc: The last character index to be drawn; -1 = unlimited
+obj.text.italic: Italic
+obj.text.lineSpacing: Line Spacing
+obj.text.lineSpacing.desc: How much lines are apart from each other
+obj.text.renderingMode: Rendering Mode
+obj.text.renderingMode.desc: Mesh: Sharp, Signed Distance Fields: with outline
+obj.text.smallCaps: Small Caps
+obj.text.startCursor: Start Cursor
+obj.text.startCursor.desc: The first character index to be drawn
+obj.text.tabSpacing: Tab Size
+obj.text.tabSpacing.desc: Relative tab size, in widths of o's
+obj.text.widthLimit: Line Break Width
+obj.text.widthLimit.desc: How broad the text shall be, at maximum; < 0 = no limit
+obj.texture: Pattern
+obj.texture.clamping: Clamping
+obj.texture.clamping.desc: For tiled images
+obj.texture.filtering: Filtering
+obj.texture.filtering.desc: Pixelated look?
+obj.time: Time
+obj.time.advanced: Advanced Time
+obj.time.advanced.desc: Add acceleration/deceleration to your elements
+obj.time.fadeIn: Fade In
+obj.time.fadeIn.desc: Transparency at the start, in seconds
+obj.time.fadeOut: Fade Out
+obj.time.fadeOut.desc: Transparency at the end, in seconds
+obj.time.startTime: Start Time
+obj.time.startTime.desc: Delay the animation
+obj.time.timeMultiplier: Time Multiplier
+obj.time.timeMultiplier.desc: Speed up the animation
+obj.timer: Timer
+obj.transform: Transform
+obj.transform.alignWithCamera: Alignment with Camera
+obj.transform.alignWithCamera.desc: 0 = in 3D, 1 = looking towards the camera; billboards
+obj.transform.desc: Translation, Scale, Rotation, Skewing
+obj.transform.lockTransform: Lock Transform
+obj.transform.lockTransform.desc: So you don't accidentally move them
+obj.obj.transform.position: Position
+obj.obj.transform.position.desc: Location of this object
+obj.transform.rotation: Rotation
+obj.transform.rotation.desc: Pitch,Yaw,Roll
+obj.transform.scale: Scale
+obj.transform.scale.desc: Makes it bigger/smaller
+obj.transform.skew: Skew
+obj.transform.skew.desc: Transform it similar to a shear
+obj.transition: Transition
+obj.transition.desc: Type needs to be transition
+obj.uvs: Texture
+obj.video: Video
+obj.video.blankFrameRemoval: Blank Frames Removal
+obj.video.blankFrameRemoval.desc: When a set percentage of pixels change within 1 frame, that frame is removed from the source\nThe higher, the more frames are accepted; 0 = disabled\nCannot handle more than two adjacent blank frames
+obj.video.fileLocation: File Location
+obj.video.fileLocation.desc: Source file of this video
+obj.video.loopingType: Looping Type
+obj.video.loopingType.desc: Whether to repeat the song/video
+obj.video.previewFps: Preview FPS
+obj.video.previewFps.desc: Smoother preview, heavier calculation
+obj.video.previewScale: Preview Scale
+obj.video.previewScale.desc: Full video resolution isn't always required. Define it yourself, or set it to automatic.
+obj.video.stayVisibleAtEnd: Stay Visible At End
+obj.video.stayVisibleAtEnd.desc: Normally a video fades out, or loops; this lets it stay on the last frame
+obj.video.tiling: Tiling
+obj.video.tiling.desc: (tile count x, tile count y, offset x, offset y)
+obj.video.uvProjection: UV-Projection
+obj.video.uvProjection.desc: Can be used for 360°-Videos
+obj.vignette: Vignette
+obj.vignette.color: Vignette Color
+obj.vignette.color.desc: Color of border
+obj.vignette.desc: Darkens/colors the border
+obj.vignette.strength: Vignette Strength
+obj.vignette.strength.desc: Strength of colored border
+obj.visibility: Visibility
+obj.visibility.desc: Whether the object is visible when rendering and/or when editing
+ui.createNewProject: Create Project
+ui.createNewProject.desc: Creates a new project
+ui.debug.ramUsage2: JVM/C/VRAM: %1/%3/%2 MB
+ui.fileExplorer.searchTerm.desc: Enter search terms, or paste a path, press enter to go there
+ui.general.search: Search
+ui.general.searchTerm: Search Term
+ui.gfxSettings.high: High
+ui.gfxSettings.low: Low
+ui.gfxSettings.medium: Medium
+ui.input.color.colorSpace: Color Space
+ui.input.color.colorSpace.desc: Color Layout: which colors are where?, e.g. color circle
+ui.input.color.vis.wheel: Wheel
+ui.input.language.title: Language
+ui.loadProject: Load Project
+ui.newProject.defaultName: New Project
+ui.newProject.location: Project Location
+ui.objects.add: Add Child
+ui.objects.addMask: Add Mask
+ui.objects.addMask.desc: Creates a mask component, which can be used for many effects
+ui.project.folderNotEmpty: Folder is not empty!
+ui.project.new: New Project
+ui.project.new.desc: New Workplace
+ui.recentProjects.title: Recent Projects
+ui.recentProjects.title.desc: Your projects of the past
+ui.sceneView.3dSwitch: 3D
+ui.sceneView.3dSwitch.desc: Lock the camera; use control to keep the angle
+ui.sceneView.takeScreenshot: 📷
+ui.sceneView.takeScreenshot.desc: Take a screenshot
+ui.settings.gfxQuality: GFX Quality
+ui.settings.gfxQuality.desc: Low disables UI MSAA
+ui.settings.showFPS: Show FPS
+ui.settings.vSync: Enable Vsync
+ui.top.add: Add
+ui.top.audioOnly: Audio Only
+ui.top.config: Config
+ui.top.config.bpmSnapping: BPM Snap Settings
+ui.top.config.keymap: Keymap
+ui.top.config.language: Language
+ui.top.config.openFolder: Open Config Folder
+ui.top.config.settings: Settings
+ui.top.config.style: Style
+ui.top.debug: Debug
+ui.top.help: Help
+ui.top.loadUILayout: Load Layout
+ui.top.project: Project
+ui.top.project.load: Load
+ui.top.project.save: Save
+ui.top.render: Render
+ui.top.render.full: Full
+ui.top.render.half: Half
+ui.top.render.overrideAudio: Override Audio
+ui.top.render.quarter: Quarter
+ui.top.render.settings: Settings
+ui.top.render.topPercent: Set%
+ui.top.resetUILayout: Reset Layout
+ui.top.saveUILayout: Save Layout
+ui.top.tools: Tools
+ui.top.window: Window
+ui.treeView.dragCameraToView: , drag onto scene to view
+ui.videoType.image: Image
+ui.videoType.unknown: Unknown
+ui.videoType.video: Video
+ui.welcome.quickSettings.title: Quick Settings
+ui.welcome.version: Version %1
+ui.welcome.version.desc: Which version is running in this window

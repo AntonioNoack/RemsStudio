@@ -267,12 +267,12 @@ open class Transform() : Saveable(),
             .setTooltip("For Search | Not implemented yet")
 
         // transforms
-        val transform = getGroup(NameDesc("Transform", "Translation Scale, Rotation, Skewing", "obj.transform"))
+        val transform = getGroup(NameDesc("Transform", "Translation, Scale, Rotation, Skewing", "obj.transform"))
         transform += vis(
             c,
             "Position",
             "Location of this object",
-            "obj.transform.position",
+            "transform.position",
             c.map { it.position },
             style
         )
@@ -297,7 +297,7 @@ open class Transform() : Saveable(),
         val colorGroup = getGroup(NameDesc("Color", "", "obj.color"))
         colorGroup += vis(c, "Color", "Tint, applied to this & children", "color.tint", c.map { it.color }, style)
         colorGroup += vis(
-            c, "Color Multiplier", "To make things brighter than usually possible", "color.multiplier",
+            c, "Brightness Multiplier", "To make things brighter than usually possible", "color.multiplier",
             c.map { it.colorMultiplier }, style
         )
 

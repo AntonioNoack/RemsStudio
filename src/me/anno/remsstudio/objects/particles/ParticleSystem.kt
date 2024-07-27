@@ -361,10 +361,9 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
         val general = getGroup(NameDesc("Particle System", "", "obj.particles"))
 
         general += vis(
-            c,
-            "Spawn Rate",
+            c, "Spawn Rate",
             "How many particles are spawned per second",
-            "",
+            "particles.spawnRate",
             c.map { it.spawnRate },
             style
         )

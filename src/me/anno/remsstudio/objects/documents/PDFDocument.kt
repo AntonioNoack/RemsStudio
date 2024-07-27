@@ -197,7 +197,7 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
         ) { it, _ -> for (x in c) x.file = it }
         doc += vi(
             inspected, "Pages",
-            "Comma separated list of page numbers. Ranges like 1-9 are fine, too.",
+            "Comma-separated list of page numbers. Ranges like 1-9 are fine, too.",
             "docs.pagesList", null, selectedSites, style
         ) { it, _ -> for (x in c) x.selectedSites = it }
         doc += vis(

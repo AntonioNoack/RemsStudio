@@ -1,165 +1,464 @@
 lang.name: Deutsch
 lang.spellcheck: de-DE
 lang.enName: German
-obj.particles.spawnRate: Neue Objekte / s
-obj.particles.spawnRate.desc: Wieviele neue Objekte je Sekunde erscheinen
-obj.particles: Partikelsystem
-obj.audio: Tonspur
-obj.video: Video
-obj.image: Bild
-obj.imageSequence: Bilderfolge
-obj.folder: Ordner
-obj.rectangle: Rechteck
-obj.array: Sequenz
+
+colorSpace.hsluv: HSLuv
+gpu.blendMode.add: Additiv
+gpu.blendMode.addMul: Reine Multiplikation
+gpu.blendMode.parent: Vererbt
+gpu.blendMode.subColor: Subtraktiv
+interpolation.back in: Back In
+interpolation.back out: Back Out
+interpolation.back symmetric: Back Symmetric
+interpolation.bounce in: Bounce In
+interpolation.bounce out: Bounce Out
+interpolation.bounce symmetric: Bounce Symmetric
+interpolation.circle in: Circle In
+interpolation.circle out: Circle Out
+interpolation.circle symmetric: Circle Symmetric
+interpolation.cubic in: Cubic In
+interpolation.cubic out: Cubic Out
+interpolation.cubic symmetric: Cubic Symmetric
+interpolation.ease-in: Ease-In
+interpolation.ease-out: Ease-Out
+interpolation.elastic in: Elastic In
+interpolation.elastic out: Elastic Out
+interpolation.elastic symmetric: Elastic Symmetric
+interpolation.exponential in: Exponentiell In
+interpolation.exponential out: Exponentiell Out
+interpolation.exponential symmetric: Exponential Symmetric
+interpolation.linear: Linear
+interpolation.linear.desc: Straight curve segments, mix(a,b,clamp(t,0.0,1.0))
+interpolation.quadratic in: Quadratic In
+interpolation.quadratic out: Quadratic Out
+interpolation.quadratic symmetric: Quadratic Symmetric
+interpolation.quart in: Quart In
+interpolation.quart out: Quart Out
+interpolation.quart symmetric: Quart Symmetric
+interpolation.quint in: Quint In
+interpolation.quint out: Quint Out
+interpolation.quint symmetric: Quint Symmetric
+interpolation.sine: Sine
+interpolation.sine in: Sine In
+interpolation.sine out: Sine Out
+interpolation.sine symmetric: Sine Symmetric
+interpolation.sine.desc: Uses a cosine function, mix(a, b, (1-cos(pi*t))/2)
+interpolation.spline: Spline
+interpolation.spline.desc: Smooth curve
+interpolation.step: Step
+interpolation.step.desc: First half is the first value, second half is the second value, t > 0.5 ? a : b
+interpolation.swinging: Swinging
+interpolation.swingingreverse: SwingingReverse
+linearUnbounded: Linear (unbeschränkt)
+linearUnbounded.desc: Straight curve segments, extending into infinity, mix(a,b,t)
+obj.alignment: Alignment
+obj.array: Array
+obj.audio: Audio
+obj.audio-fx: Audio Effekte
+obj.audio-fx.desc: Audio Effekte
+obj.audio.3d: 3D-Sound
+obj.audio.3d.desc: Geräusche werden räumlich zur Kamera
+obj.audio.amplitude: Amplitude
+obj.audio.amplitude.desc: Wie laut es ist
+obj.bloom: Bloom
+obj.bloom.desc: Lässt sehr helle Objekte scheinen
+obj.bloom.intensity: Intensität
+obj.bloom.intensity.desc: Effekthelligkeit, 0 = deaktiviert
+obj.bloom.size: Effektgröße
+obj.bloom.size.desc: Wie viel verschommen wird
+obj.bloom.threshold: Mindesthelligkeit
+obj.bloom.threshold.desc: Mindesthelligkeit fürs Scheinen
 obj.camera: Kamera
-obj.camera.fov: Sichtfeld
-obj.camera.fov.desc: Wie viel die Kamera sieht, als Winkel in Grad, vertikal
-obj.camera.toneMapping: Tone Mapping
-obj.camera.toneMapping.desc: Bildet riesige Helligkeitsunterschiede auf sRGB ab
+obj.camera.backgroundColor: Hintergrundfarbe
+obj.camera.backgroundColor.desc: Farbe, wenn mit Rendern begonnen wird
+obj.camera.chromaOffset: Verschiebung
+obj.camera.chromaOffset.desc: Verschiebung
+obj.camera.chromaRotation: Drehung
+obj.camera.chromaRotation.desc: Winkel in Grad
+obj.camera.chromaStrength: Stärke
+obj.camera.chromaStrength.desc: Wie stark der Effekt ist
+obj.camera.depth.enabled: Nutze Tiefenpuffer
+obj.camera.depth.enabled.desc: Causes Z-Fighting, but allows 3D
+obj.camera.depth.far: Maximalabstand
+obj.camera.depth.far.desc: Größte sichtbare Entfernung
+obj.camera.depth.near: Mindestabstand
+obj.camera.depth.near.desc: Naheste sichtbare Entfernung
+obj.camera.distortion: Verzerrung
+obj.camera.distortion.desc: Parameter: R², R⁴, Scale
+obj.camera.distortionOffset: Distortion Offset
+obj.camera.distortionOffset.desc: Moves the center of the distortion
+obj.camera.fov: Sichtbereich
+obj.camera.fov.desc: Sichtwinkel, in Grad, vertikal
 obj.camera.lut: Look Up Table
-obj.camera.lut.desc: Wie UE4, für universelle Kontrolle über Farben, via Photoshop or Gimp
-obj.camera.resetTransform: Setze Transformation zurück
-obj.camera.resetTransform.desc: Falls die Kamera aus Versehen bewegt wurde
-obj.text: Text
-obj.timer: Stoppuhr
-obj.force.global: Globale Kraft
-obj.polygon: Polygon
+obj.camera.lut.desc: LUT, Look Up Table for colors, formatted like in UE4
+obj.camera.onlyShowTarget: Zeige nur Zielseitenverhältnis an
+obj.camera.onlyShowTarget.desc: Schneidet den Rand ab
+obj.camera.orbitDis: Orbit Radius
+obj.camera.orbitDis.desc: Orbiting Distance
+obj.camera.orthographicness: Perspective - Orthographic
+obj.camera.orthographicness.desc: Sets back the camera
+obj.camera.resetTransform: Reset Transform
+obj.camera.resetTransform.desc: If accidentally moved
+obj.camera.toneMapping: Look Up Table
+obj.camera.toneMapping.desc: LUT, Look Up Table for colors, formatted like in UE4
+obj.cg.offset: Plus Offset
+obj.cg.offset.desc: Kann genutzt werden, um schwarze Objekte einzufärben
+obj.cg.offset.sub: Minus Offset
+obj.cg.offset.sub.desc: Kann genutzt werden, um weiße Objekte einzufärben
+obj.cg.power: Power
+obj.cg.power.desc: sRGB, Linear, ...
+obj.cg.saturation: Sättigung
+obj.cg.saturation.desc: 0 = Graustufen, 1 = normal, -1 = Invertierte Farben
+obj.cg.slope: Slope
+obj.cg.slope.desc: Intensity or Tint
+obj.chroma: Chromatic Aberration
+obj.chroma.desc: Effect occurring in cheap lenses
 obj.circle: Kreis
-obj.effect.morphing: Effekt: Verzerren
+obj.color: Farbe
+obj.color-grading: Color Grading (ASC CDL)
+obj.color.blendMode: Blendmodus
+obj.color.blendMode.desc: Wie die Farbe von diesem Element mit dem was davor gerendert wurde kombiniert wird.
+obj.color.multiplier: Helligkeitsfaktor
+obj.color.multiplier.desc: Um Elemente heller zu machen als normal mit den Farbeinstellungen möglich
+obj.color.tint: Farbe
+obj.color.tint.desc: Farbfilter, e.g. um ein Video rot zu färben
+obj.cornerRadius: Corner Radius
+obj.cornerRadius.desc: Makes the corners round
+obj.depth: Tiefe
+obj.depth.desc: Z-Achsen-bezogene Einstellungen; aus Kamera-Sicht
+obj.distortion: Verzerrung
+obj.distortion.desc: Transformiert das Bild
+obj.distribution.center: Mitte
+obj.distribution.radius: Radius / Größe
+obj.distribution.rotation: Drehung
+obj.docs: Dokument
+obj.docs.direction: Richtung
+obj.docs.direction.desc: How left/right/top/bottom the padding is between pages, in degrees
+obj.docs.editorQuality: Editor-Qualität
+obj.docs.editorQuality.desc: Faktor für genutze Auflösung im Editor
+obj.docs.file: Path
+obj.docs.file.desc: Source file to be loaded and displayed
+obj.docs.padding: Abstand
+obj.docs.padding.desc: Abstand zwischen Seiten, wenn mehrere dargestellt werden
+obj.docs.pagesList: Seitenliste
+obj.docs.pagesList.desc: Liste aus Seitenzahlen, per Komma getrennt; oder auch Bereiche via Bindestrich. Beispiel: 1,2,4-7,9
+obj.docs.renderQuality: Render-Qualität
+obj.docs.renderQuality.desc: Faktor für genutze Auflösung beim Rendern
+obj.editor: Editor
+obj.editor.timelineSlot: Timeline Slot
+obj.editor.timelineSlot.desc: < 1 heißt unsichtbar
+obj.effect: Effekt
+obj.effect.chromaticAberration: Chromatic Aberration
+obj.effect.chromaticAberration.desc: Separates the effect for R/G/B channels; only works for video/images.
+obj.effect.colorSharpness: Schärfe
+obj.effect.colorSharpness.desc: Wie scharf oder weich der Rand vom Kreis ist
+obj.effect.colorStrength: Stärke
+obj.effect.colorStrength.desc: Wie viel diese Farbe genutzt wird
 obj.effect.coloring: Effekt: Einfärben
-obj.force.global: Globale Kraft
-obj.force.lorentz: Lorentzkraft
-obj.force.lorentz.desc: Dreht Partikel ohne deren Geschwindigkeit zu ändern
-obj.force.lorentz.noisy: Variierende Lorentzkraft
-obj.force.lorentz.noisy.desc: Gut für zufällige, unregelmäßige Bewegungen
+obj.effect.morphSharpness: Schärfe
+obj.effect.morphSharpness.desc: Wie scharf der Rand vom Linseneffekt ist
+obj.effect.morphStrength: Stärke
+obj.effect.morphStrength.desc: Wieviel Pixel verschoben werden
+obj.effect.morphing: Effect: Morphing
+obj.effect.swirlPower: Swirl Power
+obj.effect.swirlPower.desc: How badly it swirls; 1 ~ wobble, 20 ~ swirls (at 1 Swirl Strength)
+obj.effect.swirlStrength: Swirl Strength
+obj.effect.swirlStrength.desc: How badly/which way around it swirls
+obj.effects: Effekte
+obj.effects.baseColor: Coloring: Grundfarbe
+obj.effects.baseColor.desc: Grundfarbe für Farbeffekte: Welche Farbe gewählt wird, wenn kein Farbeffekt in dem Gebiet aktiv ist
+obj.effects.desc: Visuelle Effekte
+obj.folder: Ordner
+obj.font: Schriftart
+obj.font.desc: In welchem Stil Text gerendert wird
+obj.font.name: Schriftart
+obj.font.name.desc: Der Stil des Textes
+obj.force.betweenParticleGravity: Gravitation zwischen Partikeln
+obj.force.betweenParticleGravity.desc: Gravity towards all other particles; expensive to compute
+obj.force.centralGravity: Punkt-Kraftfeld
+obj.force.centralGravity.desc: Gravitation zu einem Punkt
+obj.force.global: Globales Kraftfeld
+obj.force.global.desc: Kostante Beschleunigung, z.B. Fallbeschleunigung auf der Erdoberfläche
+obj.force.lorentz: Lorentz Kraftfeld
+obj.force.lorentz.desc: Kreisbewegung nach Bewegungsrichtung und Richtung
+obj.force.lorentz.noisy: Noisy Lorentz Force
+obj.force.lorentz.noisy.desc: Kreisbewegung per Geschwindigkeit; zufällig je nach Position; z.B. für Windwirbel
 obj.force.tornado: Tornado
-obj.force.tornado.desc: Dreht Partikel im Kreis
-obj.force.betweenParticleGravity: Gravitations-Galaxie
-obj.force.betweenParticleGravity.desc: Anziehungskräfte zwischen allen Partikeln
-obj.force.velocityFriction: Luftwiderstand
-obj.force.velocityFriction.desc: Je schneller ein Teilchen ist, umso stärker wird es abgebremst
-
-ui.customize.sceneView: Szene
-ui.customize.treeView: Baumansicht
-ui.customize.inspector: Eigenschaften
-ui.customize.cuttingPanel: Schnitt
-ui.customize.timeline: Zeitstrahl
-ui.customize.graphEditor: Animationen
-ui.customize.fileExplorer: Dateiexplorer
-
-ui.general.close: Schließen
-ui.general.search: Suche
-ui.general.apply: Anwenden
-ui.general.removeComponent: Komponente entfernen
-ui.general.removeComponent.desc: Die Komponente wird gelöscht
-
-ui.timePanel.setEndHere: Setze Ende
-ui.timePanel.setEndHere.desc: Setzt das Ende dieses Projektes hierhin
-ui.timePanel.jumpToStart: Springe an Anfang
-ui.timePanel.jumpToStart.desc: Setzt den Zeitcursor an den Start
-ui.timePanel.jumpToEnd: Spring ans Ende
-ui.timePanel.jumpToEnd.desc: Setzt den Zeitcursor an das Ende des Projektes
-
-ui.recentProjects.title: Letzte Projekte
-ui.recentProjects.title.desc: Deine letzten Projekte
-ui.recentProjects.projectNotFound: %1, Pfad wurde nicht gefunden
-ui.recentProjects.fileNotFound: Datei wurde nicht gefunden
-ui.recentProjects.open: Öffne Projekt
-ui.recentProjects.open.desc: Öffnet das Projekt in Rem's Studio
-ui.project.new: Neues Projekt
-ui.project.new.desc: Platz für neue Ideen, Spots oder Videos
+obj.force.tornado.desc: Kreisbewegung um die Mitte
+obj.force.velocityFriction: Reibung
+obj.force.velocityFriction.desc: Umso schneller ein Partikel ist, umso mehr wird es abgebremst
+obj.geometry: Geometrie
+obj.geometry.circle.endDegrees: End Degrees
+obj.geometry.circle.endDegrees.desc: To cut a piece out of the circle
+obj.geometry.circle.innerRadius: Inner Radius
+obj.geometry.circle.innerRadius.desc: Relative size of hole in the middle
+obj.geometry.circle.startDegrees: Start Degrees
+obj.geometry.circle.startDegrees.desc: To cut a piece out of the circle
+obj.info: Info
+obj.info.desc: Dateiinformationen
+obj.line: Linie
+obj.line.desc: Linieneigenschaften
+obj.line.fading: Ein-/Ausblenden
+obj.line.fading.desc: How much the last points fade, if the offsets exclude everything
+obj.line.isClosed: Geschlossen
+obj.line.isClosed.desc: Ob der Start automatisch mit dem Ende verbunden werden soll
+obj.line.lineStrength: Linienstärke
+obj.line.lineStrength.desc: Dicke der Linie
+obj.line.segmentLength: Segmentlänge
+obj.line.segmentStart: Segmentstart
+obj.mask: Maskeneinstellungen
+obj.mask.desc: Masken haben viele, verschiedene Anwendungen; verbinden zwei Bilder in eins mittels Shaders
+obj.maskLayer.blurThreshold: Blur Threshold
+obj.maskLayer.effectCenter: Mittelpunkt
+obj.maskLayer.greenScreen: Green-Screen
+obj.maskLayer.greenScreen.desc: Typ muss Green-Screen sein; schneidet die Maskenfarbe weg
+obj.maskLayer.greenScreen.invertMask2: Invertiere Maske 2
+obj.maskLayer.greenScreen.similarity: Ähnlichkeit
+obj.maskLayer.greenScreen.smoothness: Weichheit
+obj.maskLayer.greenScreen.spillValue: Spill-Wert
+obj.maskLayer.invertMask: Invertiere Maske
+obj.maskLayer.invertMask.desc: Changes transparency with opacity
+obj.maskLayer.makeHuge: Fullscreen-Mask
+obj.maskLayer.makeHuge.desc: Rendert die Maske auf dem ganzen Bildschirm statt in einem Quadrat
+obj.maskLayer.showMask: Zeige Maske
+obj.maskLayer.showMask.desc: Fürs Fehlerfinden
+obj.maskLayer.showMasked: Zeige Maskiertes
+obj.maskLayer.showMasked.desc: Fürs Fehlerfinden
+obj.maskLayer.size: Größe
+obj.maskLayer.size.desc: Wie groß die Verpixelung oder der Blur sein soll
+obj.maskLayer.transition.progress: Fortschritt
+obj.maskLayer.transition.progress.desc: Wie viel sichtbar ist. Dunkles zuerst, helles zuletzt
+obj.maskLayer.transition.smoothness: Weichheit
+obj.maskLayer.transition.smoothness.desc: Wie viel des Farbbereichs für den Übergang genutzt wird
+obj.maskLayer.type: Typ
+obj.maskLayer.type.desc: Was für ein Maskeneffekt angewendet wird
+obj.maskLayer.useColor: Nutze Farbe oder Transparenz?
+obj.maskLayer.useColor.desc: Normalerweise wird die Tranzparenz genutzt, aber man kann auch die Farbe nutzen
+obj.maskLayer.useMSAA: Nutze MSAA(!)
+obj.maskLayer.useMSAA.desc: MSAA is experimentell, kann kaputt sein; es verbessert die Qualität an Objektkanten
+obj.maskType.bloom: Bloom
+obj.maskType.bokehBlur: Bokeh Blur
+obj.maskType.gaussianBlur: Gaussian Blur
+obj.maskType.greenScreen: Green-Screen
+obj.maskType.hexPixelating: Hexagon-Verpixeln
+obj.maskType.masking: Maskieren
+obj.maskType.pixelOffset: Per-Pixel Verschiebung
+obj.maskType.pixelating: Quadratisches Verpixeln
+obj.maskType.radialBlur1: Radial Blur (1)
+obj.maskType.radialBlur2: Radial Blur (2)
+obj.maskType.transition: Transition
+obj.maskType.triPixelating: Dreieck-Verpixeln
+obj.maskType.voronoiPixelating: Voronoi-Verpixeln
+obj.mesh: Mesh
+obj.mesh.centerMesh: Mesh zentrieren
+obj.mesh.centerMesh.desc: Wenn dein Mesh nicht zentriert ist, kannst du es hiermit korrigieren
+obj.mesh.file: Datei
+obj.mesh.file.desc: Quelldatei, die geladen wird
+obj.mesh.normalizeScale: Skalierung normalisieren
+obj.mesh.normalizeScale.desc: Ein schnellerer Weg, die richtige Skalierung zu finden
+obj.operations: Operationen
+obj.operations.desc: Aktionen
+obj.outline: Umrandung
+obj.outline.color1: Farbe 1
+obj.outline.color1.desc: Erste Umrandungsfarbe
+obj.outline.color2: Farbe 2
+obj.outline.color2.desc: Zweite Umrandungsfarbe
+obj.outline.color3: Farbe 3
+obj.outline.color3.desc: Dritte Umrandungsfarbe
+obj.outline.depth: Tiefe
+obj.outline.depth.desc: Für non-merged SDFs to join close characters correctly; needs a distance from the background
+obj.outline.roundCorners: Abgerundete Ecken
+obj.outline.roundCorners.desc: Macht die Ecken rund
+obj.outline.smoothness: Rand-Weichheit
+obj.outline.smoothness.desc: Wie weich der Rand ist, [Haupt, 1., 2., 3.]
+obj.outline.widths: Breiten
+obj.outline.widths.desc: [Haupt, 1., 2., 3.]
+obj.particles: Partikelsystem
+obj.particles.angularVel: Drehgeschwindigkeit
+obj.particles.angularVel.desc: Wie schnell sich die Partikel drehen
+obj.particles.color: Farbe
+obj.particles.color.desc: Startfarbe
+obj.particles.initPosition: Startposition
+obj.particles.initPosition.desc: Wo die Partikel spawnen
+obj.particles.initRotation: Startdrehung
+obj.particles.initRotation.desc: Wie die Partikel gedreht sind, wenn sie gespawnt werden
+obj.particles.initVelocity: Startgeschwindigkeit
+obj.particles.initVelocity.desc: Wie schnell die Partikel sind, wenn sie gespawnt werden
+obj.particles.lifeTime: Lebenszeit
+obj.particles.lifeTime.desc: Wielange Partikel sichtbar sind
+obj.particles.opacity: Deckkraft
+obj.particles.opacity.desc: Start-Deckkraft (1-Transparenz)
+obj.particles.seed: Seed
+obj.particles.seed.desc: Der Seed für alle verwendeten Zufallszahlen
+obj.particles.simulationStep: Simulationsschritt
+obj.particles.simulationStep.desc: Große Schritte sind schneller zu berechnen, kleine Schritte sind dafür genauer für Kraftberechnungen
+obj.particles.size: Größe
+obj.particles.size.desc: Start Partikelgröße
+obj.particles.spawnRate: Spawn Rate
+obj.particles.spawnRate.desc: Wieviele Partikel in jeder Sekunde gespawnt werden
+obj.particles.weight: Gewicht
+obj.particles.weight.desc: Für Partikelsystems
+obj.polygon: Polygon
+obj.polygon.autoAlign: Auto-Align
+obj.polygon.autoAlign.desc: Drehe 45°/90°, und skaliere ein bisschen; für Rechtecke
+obj.polygon.extrusion: Extrudieren
+obj.polygon.extrusion.desc: Macht es 3D
+obj.polygon.pattern: Mustertextur
+obj.polygon.pattern.desc: For patterns like gradients radially; use a mask layer for images with polygon shape
+obj.polygon.star-ness: Stern-igkeit
+obj.polygon.star-ness.desc: Funktioniert am besten mit gerader Punkteanzahl
+obj.polygon.vertexCount: Punkteanzahl
+obj.polygon.vertexCount.desc: 4 für Vierecke, 3 für Dreiecke, und so weiter
+obj.projection: Projektion
+obj.projection.desc: Wie Lichtstrahlen auf den Bildschirm abgebildet werden
+obj.quality: Qualität
+obj.rpg-effects: RPG Effekte
+obj.rpg-effects.desc: Dieser Effekt kann genutzt werden, um einzelne Buchstaben ein- und auszublenden
+obj.shadow: Schatten
+obj.shadow.color: Farbe
+obj.shadow.desc: Automatischer Schatten
+obj.shadow.offset: Verschiebung
+obj.shadow.smoothness: Weicher Rand
+obj.spacing: Abstand
+obj.text: Text
+obj.text.bold: Fett
+obj.text.characterSpacing: Buchstabenabstand
+obj.text.characterSpacing.desc: Space between individual characters
+obj.text.endCursor: End Cursor
+obj.text.endCursor.desc: Der letzte Buchstabe, der gezeichnet wird; -1 = alle
+obj.text.italic: Kursiv
+obj.text.lineSpacing: Zeilenabstand
+obj.text.lineSpacing.desc: Wie weit die Zeilen voneinander entfernt sind
+obj.text.renderingMode: Rendering Modus
+obj.text.renderingMode.desc: Mesh: Sharp, Signed Distance Fields: with outline
+obj.text.smallCaps: Small Caps
+obj.text.startCursor: Start Cursor
+obj.text.startCursor.desc: Der erste Buchstabe, der gerendert werden soll
+obj.text.tabSpacing: Tab-Größe
+obj.text.tabSpacing.desc: Relative Tab-Größe, in Breiten vom Buchstaben 'o'
+obj.text.widthLimit: Zeilenbruch-Breite
+obj.text.widthLimit.desc: Wie breit der Text maximal sein darf. < 0 = kein Limit
+obj.texture: Muster
+obj.texture.clamping: Clamping
+obj.texture.clamping.desc: Für gekachelte Bilder
+obj.texture.filtering: Filter
+obj.texture.filtering.desc: Verpixeltes Aussehen?
+obj.time: Zeit
+obj.time.advanced: Animierbare zeitliche Verschiebung
+obj.time.advanced.desc: Füge Zeitbeschleunigung-, Verschiebungen, oder -Sprünge hinzu; deaktiviert manche Optimierungen
+obj.time.fadeIn: Einblenden
+obj.time.fadeIn.desc: Transparenz am Anfang, in Sekunden
+obj.time.fadeOut: Ausblenden
+obj.time.fadeOut.desc: Transparency am Ende, in Sekunden
+obj.time.startTime: Startzeit
+obj.time.startTime.desc: Verschiebt wann die Animation passiert
+obj.time.timeMultiplier: Zeitraffer
+obj.time.timeMultiplier.desc: Macht die Animation schneller oder langsamer
+obj.timer: Stoppuhr
+obj.transform: Transformation
+obj.transform.alignWithCamera: Nach Kamera ausrichten
+obj.transform.alignWithCamera.desc: 0 = in 3D, 1 = schaut zur Kamera
+obj.transform.desc: Verschiebung, Skalierung, Drehung, Scheren
+obj.transform.lockTransform: Transformationsänderungen verhindern
+obj.transform.lockTransform.desc: Damit du es nicht ausversehen änderst
+obj.transform.position: Position
+obj.transform.position.desc: Wo das Objekt ist
+obj.transform.rotation: Drehung
+obj.transform.rotation.desc: Pitch,Yaw,Roll
+obj.transform.scale: Skalierung
+obj.transform.scale.desc: Macht es größer oder kleiner
+obj.transform.skew: Scherung
+obj.transform.skew.desc: Wendet eine Transformation an, die wie bei einer Schere ist
+obj.transition: Übergang
+obj.transition.desc: Typ muss ein Übergang sein
+obj.uvs: Texture
+obj.video: Video
+obj.video.blankFrameRemoval: Entferne schwarze Zwischenbilder
+obj.video.blankFrameRemoval.desc: Wenn ein konfigurierbarer Anteil von Pixeln innerhalb eines einzelnen Bildes hin- und zurück wechselt, kann dieses Bild durch den Vor- oder Nachgänger ersetzt werden\nHöher = mehr Bilder werden akzeptiert; 0 = deaktiviert\nMehr als zwei schwarze aufeinanderfolgende Bilder können nicht ordentlich entfernt werden
+obj.video.fileLocation: Datei
+obj.video.fileLocation.desc: Quelldatei für das Video
+obj.video.loopingType: Wiederholungstyp
+obj.video.loopingType.desc: Ob das Video wiederholt werden soll
+obj.video.previewFps: Vorschau Wiederholrate
+obj.video.previewFps.desc: Weicheres Abspielen, dafür aber mehr Berechnungen notwendig
+obj.video.previewScale: Vorschau Skalierung
+obj.video.previewScale.desc: Manchmal braucht man beim Editieren nicht die ganze Auflösung. Setze sie manuell, oder nutze automatische Auflösung.
+obj.video.stayVisibleAtEnd: Bleib am Ende sichtbar
+obj.video.stayVisibleAtEnd.desc: Normallerweise werden Videos automatisch transparent, wenn sie zuende sind. Diese Einstellung deaktiviert den Effekt, z.B. für Bilder
+obj.video.tiling: Kachelmuster
+obj.video.tiling.desc: (Anzahl Kacheln horizontal, Anzahl Kacheln vertikal, Verschiebung horizontal, Verschiebung vertikal)
+obj.video.uvProjection: UV-Projektion
+obj.video.uvProjection.desc: Statt einer Platte kann das Video auch für 360°-Videos auf einen Würfel projiziert werden
+obj.vignette: Vignette
+obj.vignette.color: Vignette Farbe
+obj.vignette.color.desc: Farbe am Rand
+obj.vignette.desc: Dunkelt den Rand ab / färbt den Rand ein
+obj.vignette.strength: Vignette Stärke
+obj.vignette.strength.desc: Strength of colored border
+obj.visibility: Sichtbarkeit
+obj.visibility.desc: Ob das Objekt beim Rendern und Bearbeiten sichtbar ist
 ui.createNewProject: Erstelle Projekt
-ui.createNewProject.desc: Erstellt ein neues Projekt
-ui.welcome.quickSettings.title: Schnelleinstellungen
+ui.createNewProject.desc: Creates a new project
+ui.debug.ramUsage2: JVM/C/VRAM: %1/%3/%2 MB
+ui.fileExplorer.searchTerm.desc: Enter search terms, or paste a path, press enter to go there
+ui.general.search: Suche
+ui.general.searchTerm: Suchbegriff
+ui.gfxSettings.high: Hoch
+ui.gfxSettings.low: Niedrig
+ui.gfxSettings.medium: Mittel
+ui.input.color.colorSpace: Farbraum-Form
+ui.input.color.colorSpace.desc: Farbanordnung: wo welche Farben sind, z.B. als Farbkreis
+ui.input.color.vis.wheel: Farbkreis
 ui.input.language.title: Sprache
-ui.input.enum.menuTitle: Setze %1
-ui.settings.gfxQuality: Grafikqualität
-ui.settings.gfxQuality.desc: Wie schön der Editor gerendert wird; schöner ist langsamer
-ui.settings.vSync: Nutze VSync
-ui.settings.vSync.desc: Verhindert den "Tearing"-Effekt
-ui.settings.showFPS: Zeige FPS
-ui.settings.showFPS.desc: Zeigt an, wieviele Bilder pro Sekunde berechnet wurden; eher für Entwickler
-
-ui.gfxSettings.low: Schnell
-ui.gfxSettings.medium: Ausgewogen
-ui.gfxSettings.high: Schön
-
-ui.top.config: Konfig
-ui.top.project: Projekt
-ui.top.select: Auswahl
-ui.top.render: Rendering
-ui.top.debug: Debugging
-
-config.warn.needsReset.forMenu: Die Konfigurationsdatei muss gelöscht werden, um diese Funktion zu aktivieren
-
-ui.sceneView.3dSwitch.desc: Deaktiviert die Kameradrehung; nutze Strg, um die Drehung beizubehalten
-ui.sceneView.takeScreenshot.desc: Mach ein Foto der aktuellen Szene
-ui.sceneView.savedScreenshot: Bild wurde unter %1 gespeichert
-
-ui.graphEditor.interpolation.title: Interpolation
-
-ui.sceneTabs.cannotCloseLast: Der letzte Tab kann nicht geschlossen werden
-
-ui.cutting.splitHere: Hier Schneiden
-ui.cutting.splitHere.desc: Teilt das Element an diesem Zeitpunkt in zwei Hälften
-ui.objects.addMask: Maske anwenden
-ui.objects.addMask.desc: Fügt eine Maske hinzu, die für verschiedenste Effekte genutzt werden kann
-ui.objects.add: Kind hinzufügen
-
-ui.treeView.dragCameraToView: zum Inspizieren auf Szene ziehen
-
-ui.input.color.colorSpace: Farbraum
-ui.input.color.colorSpace.desc: Wo welche Farben sind, z.B. Farbkreis
-ui.input.color.vis.wheel: Farbrad
-ui.input.color.vis.circle: Farbkreis
-ui.input.color.vis.box: Farbkasten
-
-ui.loadProject: Projekt laden
-ui.newProject.pleaseChooseDir: Bitte wähle einen Ordner!
-ui.option.prepend: %1 einfügen
-ui.file.invalidName: '%1' ist kein gültiger Dateiname, benenne es anders!
-ui.newFolder: Erstelle Ordner
-ui.newFolder.desc: Kreiert einen neuen Unterordner
-ui.newFolder.askName: Name
-ui.newFolder.askName.desc: Wie soll der Ordner heißen?
-ui.newComponent: Erstelle Komponente
-ui.newComponent.desc: Erstellt eine neue Ordner-Komponente
-ui.newComponent.askName: Name
-ui.newComponent.askName.desc: Wie soll die Komponente heißen?
-
-ui.file.openInExplorer: Im Explorer öffnen
-ui.file.openInExplorer: Öffnet die Datei im Standard-Dateiexplorer
-obj.text.askLargeImport: Der Text hat %1 Zeichen, trotzdem importieren?
-ui.inspectHistory: Verlauf inspizieren
-ui.history.clickToUndo: Zum Wiederherstellen anklicken
+ui.loadProject: Lade Projekt
 ui.newProject.defaultName: Neues Projekt
-ui.newProject.location: Speicherort
-
-ui.closeProgram: %1 verlassen?
-
-ui.warn.renderingInProgress: Gerade wird schon gerendert!
-ui.warn.renderingInProgress.desc: Wenn du denkst, dass das falsch ist, starte Rem's Studio neu.
-
-ui.debug.ramUsage: RAM %1 MiB
-
+ui.newProject.location: Ordner zum Speichern
+ui.objects.add: Kindelement hinzufügen
+ui.objects.addMask: Maskeneffekt hinzufügen
+ui.objects.addMask.desc: Erstellt einen Maskeneffekt, der für Verschwimmen, Verpixeln, Ausschneiden, Greenscreens usw. genutzt werden kann.
+ui.project.folderNotEmpty: Ordner ist nicht leer!
+ui.project.new: Neues Projekt
+ui.project.new.desc: Erstellt einen Order zum Arbeiten
+ui.recentProjects.title: Letzte Projekte
+ui.recentProjects.title.desc: Deine vergangenen Projekte
+ui.sceneView.3dSwitch: 3D
+ui.sceneView.3dSwitch.desc: Deaktiviert Kameradrehungen in 3D; Steuerungstaste kann genutzt werden, um den aktuellen Winkel statt den Standardwinkel zu nutzen
+ui.sceneView.takeScreenshot: 📷
+ui.sceneView.takeScreenshot.desc: Mach einen Screenshot
+ui.settings.gfxQuality: Grafikqualität
+ui.settings.gfxQuality.desc: Niedrig deaktiviert MSAA beim Bearbeiten
+ui.settings.showFPS: FPS anzeigen
+ui.settings.vSync: V-Sync aktivieren
 ui.top.add: Hinzufügen
-ui.top.help: Hilfe
-ui.top.project.settings: Einstellungen
-ui.top.project.save: Speichern
-ui.top.project.load: Laden
-ui.top.config.settings: Einstellungen
-ui.top.config.style: Darstellung
+ui.top.audioOnly: Nur Audio
+ui.top.config: Konfiguration
+ui.top.config.bpmSnapping: BPM Snap Settings
+ui.top.config.keymap: Tastenbelegung
 ui.top.config.language: Sprache
-
-ui.project.folderNotEmpty: Ordner ist nicht leer
-ui.project.invalidFileName: Dateiname ist nicht erlaubt
-ui.project.parentMissing: Eltern-Order wurde nicht gefunden
-ui.project.rootMissing: Laufwerk wurde nicht gefunden
-
-ui.file.override: %1 überschreiben?
-ui.file.override.desc: Löscht/ersetzt die alte Datei unwiderrufbar
-
+ui.top.config.openFolder: Öffne Konfigurationsordner
+ui.top.config.settings: Einstellungen
+ui.top.config.style: Stileinstellungen
+ui.top.debug: Debug
+ui.top.help: Hilfe
+ui.top.loadUILayout: Lade Layout
+ui.top.project: Projekt
+ui.top.project.load: Laden
+ui.top.project.save: Speichern
+ui.top.render: Rendern
+ui.top.render.full: Voll
+ui.top.render.half: Halb
+ui.top.render.overrideAudio: Audio Überschreiben
+ui.top.render.quarter: Viertel
+ui.top.render.settings: Einstellungen
+ui.top.render.topPercent: Eingestellte%
+ui.top.resetUILayout: Setze Layout zurück
+ui.top.saveUILayout: Speichere Layout
+ui.top.tools: Werkzeuge
+ui.top.window: Fenster
+ui.treeView.dragCameraToView: , auf Scene ziehen, um die Perspektive zu sehen
+ui.videoType.image: Bild
+ui.videoType.unknown: Unbekannt
+ui.videoType.video: Video
+ui.welcome.quickSettings.title: Schnelleinstellungen
 ui.welcome.version: Version %1
 ui.welcome.version.desc: Welche Version in diesem Fenster läuft
-
-
