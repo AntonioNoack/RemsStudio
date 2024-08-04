@@ -1,7 +1,7 @@
 package me.anno.remsstudio.gpu
 
 import me.anno.config.DefaultConfig
-import me.anno.gpu.drawing.UVProjection
+import me.anno.remsstudio.video.UVProjection
 import me.anno.gpu.shader.BaseShader
 import me.anno.gpu.shader.GLSLType
 import me.anno.gpu.shader.ShaderFuncLib

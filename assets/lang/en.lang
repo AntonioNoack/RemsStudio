@@ -101,8 +101,10 @@ obj.camera.orthographicness: Perspective - Orthographic
 obj.camera.orthographicness.desc: Sets back the camera
 obj.camera.resetTransform: Reset Transform
 obj.camera.resetTransform.desc: If accidentally moved
-obj.camera.toneMapping: Look Up Table
-obj.camera.toneMapping.desc: LUT, Look Up Table for colors, formatted like in UE4
+obj.camera.toneMapping: Tone Mapping
+obj.camera.toneMapping.desc: Maps large ranges of brightnesses (e.g. HDR) to monitor color space
+obj.camera.lookUpTable: Look Up Table
+obj.camera.tookUpTable.desc: LUT, Look Up Table for colors, formatted like in UE4
 obj.cg.offset: Plus Offset
 obj.cg.offset.desc: Can be used to color black objects
 obj.cg.offset.sub: Minus Offset

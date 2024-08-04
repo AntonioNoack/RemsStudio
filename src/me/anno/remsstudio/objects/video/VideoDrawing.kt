@@ -14,13 +14,12 @@ import me.anno.io.MediaMetadata
 import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.remsstudio.gpu.GFXx3Dv2.draw3DVideo
-import me.anno.remsstudio.gpu.GFXxSVGv2
+import me.anno.remsstudio.gpu.DrawSVGv2
 import me.anno.remsstudio.gpu.TexFiltering
 import me.anno.remsstudio.objects.video.Video.Companion.forceAutoScale
 import me.anno.remsstudio.objects.video.Video.Companion.forceFullScale
 import me.anno.remsstudio.objects.video.Video.Companion.framesPerContainer
 import me.anno.remsstudio.objects.video.Video.Companion.tiling16x9
-import me.anno.remsstudio.objects.video.Video.Companion.videoFrameTimeout
 import me.anno.remsstudio.objects.video.VideoSize.calculateSize
 import me.anno.remsstudio.objects.video.VideoSize.getCacheableZoomLevel
 import me.anno.ui.editor.files.FileExplorerEntry.Companion.drawLoadingCircle
@@ -49,7 +48,7 @@ object VideoDrawing {
                 val bufferData = SVGMeshCache[file, imageTimeout, true]
                 if (bufferData == null) onMissingImageOrFrame(0)
                 else {
-                    GFXxSVGv2.draw3DSVG(
+                    DrawSVGv2.draw3DSVG(
                         this, time,
                         stack, bufferData, TextureLib.whiteTexture,
                         color, TexFiltering.NEAREST, clampMode.value, tiling[time]

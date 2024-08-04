@@ -6,7 +6,6 @@ import me.anno.gpu.GFXState
 import me.anno.gpu.buffer.SimpleBuffer
 import me.anno.gpu.drawing.GFXx3D
 import me.anno.gpu.drawing.GFXx3D.circleParams
-import me.anno.gpu.drawing.UVProjection
 import me.anno.gpu.shader.BaseShader
 import me.anno.gpu.shader.GLSLType
 import me.anno.gpu.shader.Shader
@@ -30,8 +29,9 @@ import me.anno.remsstudio.gpu.ShaderLibV2.shader3DText
 import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.GFXTransform.Companion.uploadAttractors0
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.geometric.Polygon
+import me.anno.remsstudio.objects.video.Video
+import me.anno.remsstudio.video.UVProjection
 import me.anno.utils.Color.white4
 import me.anno.video.formats.gpu.GPUFrame
 import ofx.mio.OpticalFlow
@@ -261,14 +261,14 @@ object GFXx3Dv2 {
             buffer.put(colorI.w)
         }
         buffer.position(0)
-        shader.v4Array("colors", buffer)
+        shader.v4fs("colors", buffer)
         buffer.position(0)
         for (i in 0 until cc) {
             buffer.put(distances[i])
             buffer.put(smoothness[i])
         }
         buffer.position(0)
-        shader.v2Array("distSmoothness", buffer)
+        shader.v2fs("distSmoothness", buffer)
         shader.v1i("colorCount", cc)
         shader.v1f("depth", depth * 0.00001f)
 

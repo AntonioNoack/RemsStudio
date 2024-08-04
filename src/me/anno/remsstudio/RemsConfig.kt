@@ -1,7 +1,6 @@
 package me.anno.remsstudio
 
 import me.anno.config.DefaultConfig
-import me.anno.gpu.drawing.UVProjection
 import me.anno.io.files.Reference.getReference
 import me.anno.io.utils.StringMap
 import me.anno.remsstudio.gpu.TexFiltering
@@ -16,6 +15,7 @@ import me.anno.remsstudio.objects.particles.TextParticles
 import me.anno.remsstudio.objects.text.Text
 import me.anno.remsstudio.objects.text.Timer
 import me.anno.remsstudio.objects.video.Video
+import me.anno.remsstudio.video.UVProjection
 import me.anno.utils.Clock
 import me.anno.utils.OS
 import org.joml.Vector3f

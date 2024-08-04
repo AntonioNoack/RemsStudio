@@ -203,7 +203,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         color += vi(
             inspected, "Look Up Table",
             "LUT, Look Up Table for colors, formatted like in UE4", "camera.lut",
-            "camera.toneMapping", null, lut, style
+            "camera.lookupTable", null, lut, style
         ) { it, _ -> for (x in c) x.lut = it }
 
         ColorGrading.createInspector(

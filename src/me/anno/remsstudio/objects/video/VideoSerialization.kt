@@ -1,13 +1,13 @@
 package me.anno.remsstudio.objects.video
 
 import me.anno.animation.LoopingState
-import me.anno.gpu.drawing.UVProjection
 import me.anno.gpu.texture.Clamping
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
 import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.audio.effects.SoundPipeline
+import me.anno.remsstudio.video.UVProjection
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
 import me.anno.utils.types.AnyToBool

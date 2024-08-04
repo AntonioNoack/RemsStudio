@@ -472,7 +472,6 @@ object ComponentUIV2 {
                 }
             else -> throw RuntimeException("Type $value not yet implemented!")
         }
-
         panel.apply {
             val sl = { self.show(transforms, values) }
             when (this) {

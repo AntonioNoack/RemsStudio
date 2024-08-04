@@ -6,7 +6,7 @@ import me.anno.config.DefaultConfig
 import me.anno.ecs.annotations.Range
 import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.GFX.isFinalRendering
-import me.anno.gpu.drawing.UVProjection
+import me.anno.remsstudio.video.UVProjection
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.TextureCache
 import me.anno.gpu.texture.TextureReader.Companion.imageTimeout
