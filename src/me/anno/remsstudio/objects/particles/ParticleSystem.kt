@@ -380,7 +380,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
         // general += vi("Fade In", "Time from spawning to the max. opacity", fadeIn, style)
         // general += vi("Fade Out", "Time before death, from which is starts to fade away", fadeOut, style)
 
-        general += BooleanInput("Show Children", showChildren, false, style)
+        general += BooleanInput(NameDesc("Show Children"), showChildren, false, style)
             .setChangeListener { for (x in c) x.showChildren = it }
             .setIsSelectedListener { show(inspected.filterIsInstance2(Transform::class), null) }
 
@@ -392,7 +392,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
             clearCache()
         }
 
-        general += TextButton("Reset Cache", false, style)
+        general += TextButton(NameDesc("Reset Cache"), false, style)
             .addLeftClickListener { for (x in c) x.clearCache() }
 
     }

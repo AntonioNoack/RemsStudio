@@ -5,8 +5,8 @@ import me.anno.Time
 import me.anno.cache.CacheSection
 import me.anno.engine.Events.workEventTasks
 import me.anno.gpu.GFX
+import me.anno.gpu.GPUTasks.workGPUTasks
 import me.anno.gpu.framebuffer.Frame
-import me.anno.gpu.shader.ShaderLib
 import me.anno.gpu.texture.Texture2D
 import me.anno.gpu.texture.Texture2D.Companion.bindTexture
 import me.anno.installer.Installer
@@ -195,7 +195,7 @@ object RemsCLI {
             GL11C.glDisable(GL11C.GL_CULL_FACE)
             GFX.check()
             Frame.reset()
-            GFX.workGPUTasks(false)
+            workGPUTasks(false)
             workEventTasks()
             sleepABit(true)
         }
@@ -214,7 +214,6 @@ object RemsCLI {
         // good size? mmh...
         HiddenOpenGLContext.setSize(2048, 2048)
         HiddenOpenGLContext.createOpenGL()
-        ShaderLib.init()
         ShaderLibV2.init()
     }
 

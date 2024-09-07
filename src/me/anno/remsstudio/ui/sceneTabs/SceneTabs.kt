@@ -11,8 +11,8 @@ import me.anno.ui.base.groups.PanelList
 import me.anno.ui.base.scrolling.ScrollPanelX
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.structures.Collections.filterIsInstance2
-import me.anno.utils.structures.lists.Lists.getOrPrevious
 import org.apache.logging.log4j.LogManager
+import kotlin.math.max
 
 // may there only be once instance? yes
 @Suppress("MemberVisibilityCanBePrivate")
@@ -86,7 +86,7 @@ object SceneTabs : ScrollPanelX(DefaultConfig.style) {
             } else {
                 val index = sceneTab.indexInParent
                 sceneTab.removeFromParent()
-                open(panelChildren.getOrPrevious(index) as SceneTab)
+                open(panelChildren[max(index, 0)] as SceneTab)
             }
         } else sceneTab.removeFromParent()
     }

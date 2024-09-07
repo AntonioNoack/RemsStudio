@@ -96,7 +96,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
             c, "Fading", "How much the last points fade, if the offsets exclude everything", "line.fading",
             c.map { it.fadingOnEnd }, style
         )
-        group += TextButton("Copy 1st child's scale to all", false, style).addLeftClickListener {
+        group += TextButton(NameDesc("Copy 1st child's scale to all"), false, style).addLeftClickListener {
             RemsStudio.largeChange("Copy first's scale") {
                 for (ci in c) {
                     val cis = ci.children

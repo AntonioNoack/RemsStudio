@@ -1,21 +1,21 @@
 package me.anno.remsstudio.ui.input
 
-import me.anno.ui.input.NumberType
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.ui.input.IntInput
 import me.anno.ui.Style
+import me.anno.ui.input.IntInput
+import me.anno.ui.input.NumberType
 import org.joml.Vector2i
 import org.joml.Vector3i
 import org.joml.Vector4i
 
 class IntInputV2(
-    title: String, visibilityKey: String,
-    type: NumberType, private val owningProperty: AnimatedProperty<*>,
-    style: Style,
+    title: NameDesc, visibilityKey: String, type: NumberType,
+    private val owningProperty: AnimatedProperty<*>, style: Style,
 ) : IntInput(title, visibilityKey, type, style, NumberInputComponentV2(owningProperty, visibilityKey, style)) {
 
     constructor(
-        title: String, visibilityKey: String,
+        title: NameDesc, visibilityKey: String,
         owningProperty: AnimatedProperty<*>, time: Double, style: Style
     ) : this(title, visibilityKey, owningProperty.type, owningProperty, style) {
         when (val value = owningProperty[time]) {

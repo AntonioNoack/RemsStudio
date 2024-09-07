@@ -1,7 +1,6 @@
 package me.anno.remsstudio.gpu
 
 import me.anno.config.DefaultConfig
-import me.anno.remsstudio.video.UVProjection
 import me.anno.gpu.shader.BaseShader
 import me.anno.gpu.shader.GLSLType
 import me.anno.gpu.shader.ShaderFuncLib
@@ -11,14 +10,21 @@ import me.anno.gpu.shader.ShaderLib.v3DlMasked
 import me.anno.gpu.shader.ShaderLib.y3DMasked
 import me.anno.gpu.shader.builder.Variable
 import me.anno.gpu.shader.builder.VariableMode
-import me.anno.io.files.Reference.getReference
+import me.anno.image.ImageCache
+import me.anno.io.files.Signature
 import me.anno.remsstudio.objects.effects.MaskType
+import me.anno.remsstudio.video.UVProjection
+import me.anno.utils.OS.desktop
+import me.anno.utils.OS.res
 import me.anno.utils.pooling.ByteBufferPool
+import org.apache.logging.log4j.LogManager
 import java.nio.FloatBuffer
 import kotlin.math.PI
 
 @Suppress("MemberVisibilityCanBePrivate")
 object ShaderLibV2 {
+
+    private val LOGGER = LogManager.getLogger(ShaderLibV2::class)
 
     // https://en.wikipedia.org/wiki/ASC_CDL
     // color grading with asc cdl standard
@@ -154,12 +160,14 @@ object ShaderLibV2 {
      * */
     const val maxOutlineColors = 6
 
-    private fun case(case: Int, path: String) = getReference("res://$path").readTextSync()
-        .trim().run {
-            replace("\r", "")
-        }.run {
-            "case $case:\n" + substring(indexOf('\n') + 1, lastIndexOf('\n')) + "\nbreak;\n"
-        }
+    private fun case(case: Int, path: String): String {
+        return res.getChild(path).readTextSync()
+            .trim().run {
+                replace("\r", "")
+            }.run {
+                "case $case:\n" + substring(indexOf('\n') + 1, lastIndexOf('\n')) + "\nbreak;\n"
+            }
+    }
 
     lateinit var shader3DMasked: BaseShader
 
@@ -224,8 +232,6 @@ object ShaderLibV2 {
                 ) + getForceFieldColorUniforms, f3DMasked
             )
         shader3DMasked.setTextureIndices(listOf("maskTex", "tex", "tex2"))
-        shader3DMasked.ignoreNameWarnings("tiling")
-
         init2()
 
     }
@@ -276,9 +282,7 @@ object ShaderLibV2 {
                     "   if($hasForceFieldColor) color *= getForceFieldColor(finalPosition);\n" +
                     "   finalColor = color.rgb;\n" +
                     "   finalAlpha = color.a;\n" +
-                    "}", listOf("tex"),
-            "tiling",
-            "forceFieldUVCount"
+                    "}", listOf("tex")
         )
 
     val shader3DCircle = ShaderLib.createShader(
@@ -301,9 +305,7 @@ object ShaderLibV2 {
                 "   vec4 finalColor2 = ($hasForceFieldColor) ? getForceFieldColor(finalPosition) : vec4(1);\n" +
                 "   finalColor = finalColor2.rgb;\n" +
                 "   finalAlpha = finalColor2.a;\n" +
-                "}", listOf(),
-        "filtering", "textureDeltaUV", "tiling", "uvProjection", "forceFieldUVCount",
-        "cgOffset", "cgSlope", "cgPower", "cgSaturation"
+                "}", emptyList()
     )
 
     val shader3DText = ShaderLib.createShader(
@@ -328,7 +330,7 @@ object ShaderLibV2 {
                 "   vec4 finalColor2 = ($hasForceFieldColor) ? getForceFieldColor(finalPosition) : vec4(1.0);\n" +
                 "   finalColor = finalColor2.rgb;\n" +
                 "   finalAlpha = finalColor2.a;\n" +
-                "}", listOf(), "tiling", "forceFieldUVCount"
+                "}", emptyList()
     )
 
     val shaderSDFText = ShaderLib.createShader(
@@ -383,12 +385,7 @@ object ShaderLibV2 {
                 "   if($hasForceFieldColor) color *= getForceFieldColor(finalPosition);\n" +
                 "   finalColor = color.rgb;\n" +
                 "   finalAlpha = color.a;\n" +
-                "}", listOf("tex"),
-        "tiling",
-        "filtering",
-        "uvProjection",
-        "forceFieldUVCount",
-        "textureDeltaUV"
+                "}", listOf("tex")
     )
 
     fun init2() {

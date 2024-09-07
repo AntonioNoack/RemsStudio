@@ -97,7 +97,7 @@ class SceneTab(var file: FileReference, var scene: Transform, history: History?)
     }
 
     fun save(dst: FileReference, onSuccess: () -> Unit) {
-        if (dst.isDirectory) dst.deleteRecursively()
+        if (dst.isDirectory) dst.delete()
         LOGGER.info("Saving $dst, ${scene.listOfAll.joinToString { it.name }}")
         thread(name = "SaveScene") {
             try {

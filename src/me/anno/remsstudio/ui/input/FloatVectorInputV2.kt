@@ -3,6 +3,7 @@ package me.anno.remsstudio.ui.input
 import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.input.Key
 import me.anno.io.json.saveable.JsonStringReader
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
@@ -16,21 +17,19 @@ import org.joml.Vector3f
 import org.joml.Vector4f
 
 class FloatVectorInputV2(
-    title: String,
-    visibilityKey: String,
-    type: NumberType,
+    title: NameDesc, visibilityKey: String, type: NumberType,
     private val owningProperty: AnimatedProperty<*>,
     style: Style
 ) : FloatVectorInput(
     title, visibilityKey, type, style,
-    { FloatInputV2(style, "", visibilityKey, type, owningProperty) }
+    { FloatInputV2(NameDesc.EMPTY, visibilityKey, type, owningProperty, style) }
 ) {
 
     companion object {
         private val LOGGER = LogManager.getLogger(FloatVectorInputV2::class)
     }
 
-    constructor(title: String, visibilityKey: String, property: AnimatedProperty<*>, time: Double, style: Style) :
+    constructor(title: NameDesc, visibilityKey: String, property: AnimatedProperty<*>, time: Double, style: Style) :
             this(title, visibilityKey, property.type, property, style) {
         when (val value = property[time]) {
             is Vector2f -> setValue(value, false)

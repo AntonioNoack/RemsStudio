@@ -8,6 +8,7 @@ import me.anno.ecs.components.anim.*
 import me.anno.ecs.components.anim.BoneData.uploadJointMatrices
 import me.anno.ecs.components.mesh.Mesh
 import me.anno.ecs.components.mesh.MeshComponentBase
+import me.anno.ecs.components.mesh.material.Materials
 import me.anno.ecs.prefab.PrefabCache
 import me.anno.engine.inspector.Inspectable
 import me.anno.engine.ui.render.ECSShaderLib
@@ -235,7 +236,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                     val materialOverrides = comp.materials
                     val materials = mesh.materials
                     for (index in 0 until mesh.numMaterials) {
-                        val material = Pipeline.getMaterial(materialOverrides, materials, index)
+                        val material = Materials.getMaterial(materialOverrides, materials, index)
                         shader.v1i("hasVertexColors", if (material.enableVertexColors) mesh.hasVertexColors else 0)
                         material.bind(shader)
                         shader.v4f("diffuseBase", material.diffuseBase * color)

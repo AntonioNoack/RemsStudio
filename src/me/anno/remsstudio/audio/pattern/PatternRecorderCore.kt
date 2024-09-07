@@ -72,7 +72,12 @@ class PatternRecorderCore(val tp: TextInput) : Panel(style) {
     private fun callAction() {
         openMenu(
             windowStack, NameDesc("Recording"), listOf(
-                MenuOption("Record", "Deletes all samples, and re-records; press any key when the time is right") {
+                MenuOption(
+                    NameDesc(
+                        "Record", "Deletes all samples, and re-records; press any key when the time is right",
+                        "ui.patternRecorder.start"
+                    )
+                ) {
                     times.clear()
                     onTimesChange()
                     ensurePlaying()
@@ -80,7 +85,12 @@ class PatternRecorderCore(val tp: TextInput) : Panel(style) {
                     invalidateDrawing()
                     requestFocus()
                 },
-                MenuOption("Stop Recording", "You can press ESC as well") {
+                MenuOption(
+                    NameDesc(
+                        "Stop Recording", "You can press ESC as well",
+                        "ui.patternRecorder.stop"
+                    )
+                ) {
                     isRecording = false
                     invalidateDrawing()
                     RemsStudio.editorTimeDilation = 0.0 // pause :)

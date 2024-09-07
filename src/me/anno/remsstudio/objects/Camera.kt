@@ -4,7 +4,6 @@ import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.Perspective.setPerspective
-import me.anno.gpu.pipeline.Sorting
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
@@ -37,9 +36,6 @@ class Camera(parent: Transform? = null) : Transform(parent) {
     // by implementing SoftLink: scenes can be included in others
 
     // orthographic-ness by setting the camera back some amount, and narrowing the view
-
-    // todo actually order the scene before drawing
-    var order = Sorting.FRONT_TO_BACK
 
     var lut: FileReference = InvalidRef
     val nearZ = AnimatedProperty.floatPlus(0.001f)

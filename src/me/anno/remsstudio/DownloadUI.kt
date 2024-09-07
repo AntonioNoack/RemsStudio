@@ -96,7 +96,7 @@ object DownloadUI {
             dstFile.tryMkdirs()
             for (child in dstFile.listChildren()) {
                 if (child != tmpZip) { // zip has to be kept ofc
-                    child.deleteRecursively()
+                    child.delete()
                 }
             }
 
@@ -172,13 +172,13 @@ object DownloadUI {
         for (p in ensureInstall(style)) ui.add(p)
 
         val srcInput = URLInput( // todo somehow not taking up all space :/
-            "Paste your link here", style, InvalidRef,
+            NameDesc("Paste your link here"), style, InvalidRef,
             emptyList(), false
         )
 
         val dstFolder = RemsStudio.project?.scenes ?: workspace
         val dstPanel = FileInput(
-            "Destination File", style,
+            NameDesc("Destination File"), style,
             dstFolder.getChild(System.currentTimeMillis().toString(16)),
             emptyList(), false
         )
@@ -370,7 +370,7 @@ object DownloadUI {
         ui.add(audioFormatUI)
         ui.add(dstPanel)
 
-        val button = TextButton("Start Download", false, style)
+        val button = TextButton(NameDesc("Start Download"), false, style)
         button.addLeftClickListener {
 
             if (videoFormatUI.value == discardFormat && audioFormatUI.value == discardFormat) {

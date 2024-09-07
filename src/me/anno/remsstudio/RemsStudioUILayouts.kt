@@ -122,7 +122,7 @@ object RemsStudioUILayouts {
          * Debugging
          * */
         options.addAction(debugTitle, "Reload Cache (Ctrl+F5)") { RemsStudio.clearAll() }
-        options.addAction(debugTitle, "Clear Cache") { ConfigBasics.cacheFolder.deleteRecursively() }
+        options.addAction(debugTitle, "Clear Cache") { ConfigBasics.cacheFolder.delete() }
         options.addAction(debugTitle, "Reload Plugins") { ExtensionLoader.reloadPlugins() }
 
         /**

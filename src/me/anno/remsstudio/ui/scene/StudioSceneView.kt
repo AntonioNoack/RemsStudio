@@ -4,9 +4,10 @@ import me.anno.Time.deltaTime
 import me.anno.config.DefaultConfig
 import me.anno.engine.EngineBase.Companion.dragged
 import me.anno.engine.EngineBase.Companion.shiftSlowdown
+import me.anno.gpu.Clipping
 import me.anno.gpu.GFX
-import me.anno.gpu.GFX.addGPUTask
 import me.anno.gpu.GFXState.renderDefault
+import me.anno.gpu.GPUTasks.addGPUTask
 import me.anno.gpu.drawing.DrawRectangles
 import me.anno.gpu.drawing.DrawRectangles.drawBorder
 import me.anno.gpu.framebuffer.DepthBufferType
@@ -137,10 +138,14 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             controls += SimplePanel(
                 object : TextButton(NameDesc(mode.displayName, mode.description, ""), true, style) {
                     override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
-                        draw(x0, y0, x1, y1, isHovered, isPressed || mode == this@StudioSceneView.mode)
+                        drawBackground(x0, y0, x1, y1)
+                        drawButtonText()
+                        drawButtonBorder(
+                            leftColor, topColor, rightColor, bottomColor,
+                            isInputAllowed, borderSize, isPressed || mode == this@StudioSceneView.mode
+                        )
                     }
-                },
-                true, true,
+                }, true, true,
                 pad * 2 + iconSize * (i + 1), pad,
                 iconSize
             ).setOnClickListener {
@@ -277,7 +282,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             )
         }
 
-        GFX.clip2(x0, y0, x1, y1) {
+        Clipping.clip2(x0, y0, x1, y1) {
             renderDefault {
                 for (control in controls) {
                     control.draw(x, y, width, height, x0, y0, x1, y1)

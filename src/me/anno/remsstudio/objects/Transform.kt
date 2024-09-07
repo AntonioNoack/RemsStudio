@@ -233,11 +233,11 @@ open class Transform() : Saveable(),
 
         val c = inspected.filterIsInstance2(Transform::class)
 
-        list += TextInput("Name ($className)", "", name, style)
+        list += TextInput(NameDesc("Name ($className)"), "", name, style)
             .addChangeListener { for (x in c) name = it.ifEmpty { "-" } }
             .setIsSelectedListener { show(c, null) }
             .apply { alignmentX = AxisAlignment.FILL }
-        list += TextInputML("Comment", comment, style)
+        list += TextInputML(NameDesc("Comment"), comment, style)
             .addChangeListener { for (x in c) comment = it }
             .setIsSelectedListener { show(c, null) }
             .apply { alignmentX = AxisAlignment.FILL }
@@ -261,7 +261,7 @@ open class Transform() : Saveable(),
 
         // todo if tags are the same, show same tags,
         // todo else show sth like ---
-        list += TextInput("Tags", "", tags, style)
+        list += TextInput(NameDesc("Tags"), "", tags, style)
             .addChangeListener { for (x in c) x.tags = it }
             .setIsSelectedListener { show(c, null) }
             .setTooltip("For Search | Not implemented yet")

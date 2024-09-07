@@ -3,7 +3,7 @@ package me.anno.remsstudio
 import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.engine.Events.addEvent
 import me.anno.gpu.GFX
-import me.anno.gpu.GFXBase
+import me.anno.gpu.WindowManagement
 import me.anno.io.MediaMetadata.Companion.getMeta
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
@@ -43,7 +43,7 @@ object Rendering {
 
     var isRendering = false
         set(value) {
-            GFXBase.mayIdle = !value
+            WindowManagement.mayIdle = !value
             field = value
         }
 

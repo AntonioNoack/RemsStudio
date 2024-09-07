@@ -57,14 +57,14 @@ object MenuUtils {
             Menu.close(panel)
         }
         panel.setTooltip(title.desc)
-        val submit = TextButton(actionName.name, false, style)
+        val submit = TextButton(actionName, false, style)
             .setTooltip(actionName.desc)
             .addLeftClickListener {
                 callback(panel.value)
                 Menu.close(panel)
             }
 
-        val cancel = TextButton("Cancel", false, style)
+        val cancel = TextButton(NameDesc("Cancel"), false, style)
             .addLeftClickListener { Menu.close(panel) }
 
         val buttons = PanelListX(style)

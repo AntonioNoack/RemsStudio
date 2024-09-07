@@ -66,8 +66,8 @@ class GraphEditor(style: Style) : PanelListY(style) {
         }
         cc += EnumInput(
             // todo change the state automatically based on the selected keyframes
-            "Interpolation", true, Interpolation.LINEAR_BOUNDED.displayName,
-            Interpolation.entries.map { NameDesc(it.displayName, it.description, "") }, style
+            NameDesc("Interpolation"), true, Interpolation.LINEAR_BOUNDED.nameDesc,
+            Interpolation.entries.map { it.nameDesc }, style
         ).setChangeListener { _, index, _ ->
             val type = Interpolation.entries[index]
             for (kf in body.selectedKeyframes) {

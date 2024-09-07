@@ -176,7 +176,7 @@ object VideoInspector {
                     "Full video resolution isn't always required. Define it yourself, or set it to automatic.",
                     "obj.video.previewScale"
                 ),
-                videoScaleNames.reverse[videoScale.value] ?: "Auto",
+                NameDesc(videoScaleNames.reverse[videoScale.value] ?: "Auto"),
                 videoScales.map { NameDesc(it.key) }, style
             )
                 .setChangeListener { _, index, _ -> for (x in c) x.videoScale.value = videoScales[index].value }
@@ -189,7 +189,7 @@ object VideoInspector {
                     "Smoother preview, heavier calculation",
                     "obj.video.previewFps"
                 ),
-                editorVideoFPS.value.toString(),
+                NameDesc(editorVideoFPS.value.toString()),
                 editorFPS.filterIndexed { index, it -> index == 0 || it * 0.98 <= (meta?.videoFPS ?: 1e85) }
                     .map { NameDesc(it.toString()) }, style
             )
@@ -203,10 +203,9 @@ object VideoInspector {
                     "When a set percentage of pixels change within 1 frame, that frame is removed from the source\n" +
                             "The higher, the more frames are accepted; 0 = disabled\n" +
                             "Cannot handle more than two adjacent blank frames", "obj.video.blankFrameRemoval"
-                ),
+                ), blankFrameThreshold,
                 NumberType.FLOAT_03, style
             )
-                .setValue(blankFrameThreshold, false)
                 .setChangeListener { for (x in c) x.blankFrameThreshold = it.toFloat() }
                 .setIsSelectedListener { show(t, null) })
 
@@ -228,7 +227,7 @@ object VideoInspector {
         fun getPlaybackTitle(invert: Boolean) =
             if ((audioStream == null) != invert) playbackTitles.first else playbackTitles.second
 
-        val playbackButton = TextButton(getPlaybackTitle(false), false, style)
+        val playbackButton = TextButton(NameDesc(getPlaybackTitle(false)), false, style)
         audio += aud(playbackButton
             .addLeftClickListener {
                 if (isPaused) {

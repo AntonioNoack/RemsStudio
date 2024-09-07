@@ -96,7 +96,7 @@ class NoiseSuppressionEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAI
             noiseLevel, style
         )
         list += nlp
-        list += TextButton("Detect Noise Level", false, style)
+        list += TextButton(NameDesc("Detect Noise Level"), false, style)
             .apply {
                 tooltip = "Scans the first 10 seconds of audio for the lowest volume"
                 addLeftClickListener {

@@ -1,6 +1,7 @@
 package me.anno.remsstudio.ui
 
 import me.anno.config.DefaultStyle
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.StudioActions
 import me.anno.remsstudio.ui.MenuUtils.drawTypeInCorner
@@ -20,7 +21,7 @@ class TimeControlsPanel(style: Style) : PanelListX(style) {
     }
 
     init {
-        val showButton = TextButton("Show Time Controls", style)
+        val showButton = TextButton(NameDesc("Show Time Controls"), style)
         val bg = showButton.backgroundColor
         backgroundColor = Color.mixARGB(backgroundColor, bg, 0.3f)
         fun space(): Panel {
@@ -32,7 +33,7 @@ class TimeControlsPanel(style: Style) : PanelListX(style) {
 
         fun addButton(name: String, desc: String, action: (Panel) -> Unit) {
             add(
-                TextButton(name, 1.5f, style)
+                TextButton(NameDesc(name), 1.5f, style)
                     .apply {
                         alignmentX = AxisAlignment.FILL
                         alignmentY = AxisAlignment.FILL

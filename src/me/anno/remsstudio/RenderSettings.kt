@@ -66,7 +66,7 @@ object RenderSettings : Transform() {
         }
 
         list += FrameSizeInput(
-            Dict["Frame Size (Pixels)", "obj.$prefix.frameSizePixels"],
+            NameDesc("Frame Size (Pixels)", "", "obj.$prefix.frameSizePixels"),
             "${project.targetWidth}x${project.targetHeight}", style
         )
             .setChangeListener { w, h ->
@@ -94,13 +94,13 @@ object RenderSettings : Transform() {
             style
         )
             .setChangeListener { value, _, _ ->
-                project.targetFPS = value.toDouble()
+                project.targetFPS = value.englishName.toDouble()
                 save()
             }
             .setTooltip("The fps of the video, or how many frame are shown per second")
 
         list += IntInput(
-            Dict["Video Quality", "obj.$prefix.videoQuality"], "obj.videoQuality",
+            NameDesc("Video Quality", "", "obj.$prefix.videoQuality"), "obj.videoQuality",
             project.targetVideoQuality, NumberType.VIDEO_QUALITY_CRF, style
         )
             .setChangeListener {
@@ -195,7 +195,10 @@ object RenderSettings : Transform() {
             project.ffmpegFlags.nameDesc, FFMPEGEncodingType.entries.map { it.nameDesc }, style
         ).setChangeListener { _, index, _ -> project.ffmpegFlags = FFMPEGEncodingType.entries[index]; save() }
 
-        val fileInput = FileInput(Dict["Output File", "obj.$prefix.outputFile"], style, targetOutputFile, emptyList())
+        val fileInput = FileInput(
+            NameDesc("Output File", "", "obj.$prefix.outputFile"),
+            style, targetOutputFile, emptyList()
+        )
         fileInput.setTooltip(Dict["Where the render result shall be stored/saved.", "obj.$prefix.outputFile.desc"])
         val originalColor = fileInput.base2.textColor
         fun updateFileInputColor() {

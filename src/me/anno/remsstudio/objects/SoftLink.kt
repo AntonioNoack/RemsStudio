@@ -201,7 +201,7 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
             NumberType.INT_PLUS, cameraIndex, style
         ) { it, _ -> for (x in c) x.cameraIndex = it }
         list += FrameSizeInput(
-            "Resolution",
+            NameDesc("Resolution"),
             resolution[lastLocalTime].run { "${x.roundToInt()} x ${y.roundToInt()}" }, style
         )
             .setChangeListener { w, h ->

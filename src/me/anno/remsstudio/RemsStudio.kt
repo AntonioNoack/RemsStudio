@@ -21,6 +21,7 @@ import me.anno.installer.Installer
 import me.anno.io.files.FileReference
 import me.anno.language.Language
 import me.anno.language.translation.Dict
+import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.CheckVersion.checkVersion
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.audio.AudioManager2
@@ -81,7 +82,7 @@ import kotlin.math.min
 // todo saturation/lightness controls by hue
 
 @Suppress("MemberVisibilityCanBePrivate")
-object RemsStudio : EngineBase("Rem's Studio", 10302, true), WelcomeUI {
+object RemsStudio : EngineBase(NameDesc("Rem's Studio"), 10302, true), WelcomeUI {
 
     val defaultWindowStack get() = GFX.someWindow.windowStack
     var hideUnusedProperties = false
