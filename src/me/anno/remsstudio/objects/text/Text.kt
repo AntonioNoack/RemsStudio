@@ -39,6 +39,11 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
 
         val DEFAULT_FONT_HEIGHT = 32
 
+        /**
+         * MeshScale in Rem's Engine was changed around Christmas 2024.
+         * */
+        val EXTRA_SCALE = 1f / 5f
+
         val tabSpaceType = NumberType.FLOAT_PLUS.withDefaultValue(4f)
         val lineBreakType = NumberType.FLOAT_PLUS.withDefaultValue(0f)
 
@@ -55,8 +60,6 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
     }
 
     override fun getDocumentationURL() = "https://remsstudio.phychi.com/?s=learn/text"
-
-    val backgroundColor = AnimatedProperty.color(Vector4f(0f))
 
     var text = AnimatedProperty.string()
 
@@ -141,11 +144,10 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
         val rts: Float
     )
 
-    fun getVisualState(text: String): Any =
-        VisState(
-            renderingMode, roundSDFCorners, charSpacing,
-            text, font, smallCaps, lineBreakWidth, relativeTabSize
-        )
+    fun getVisualState(text: String): Any = VisState(
+        renderingMode, roundSDFCorners, charSpacing,
+        text, font, smallCaps, lineBreakWidth, relativeTabSize
+    )
 
     private val shallLoadAsync get() = !forceVariableBuffer
     fun getTextMesh(key: TextSegmentKey): TextMeshGroup? {
@@ -156,14 +158,13 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
                 keyInstance.charSpacing,
                 forceVariableBuffer
             )
-        } as? TextMeshGroup
+        }
     }
 
     fun getSDFTexture(key: TextSegmentKey): TextSDFGroup? {
         val entry = TextCache.getEntry(key to 1, textMeshTimeout, false) { (keyInstance, _) ->
             TextSDFGroup((keyInstance.font as AWTFont).font, keyInstance.text, keyInstance.charSpacing.toDouble())
         } ?: return null
-        if (entry !is TextSDFGroup) throw RuntimeException("Got different class for $key to 1: ${entry.javaClass.simpleName}")
         return entry
     }
 
@@ -195,8 +196,11 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
     }
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
-        if (color.w >= 1f / 255f) TextRenderer.draw(this, stack, time, color) {
-            super.onDraw(stack, time, color)
+        if (color.w >= 1f / 255f) {
+            stack.scale(EXTRA_SCALE)
+            TextRenderer.draw(this, stack, time, color) {
+                super.onDraw(stack, time, color)
+            }
         }
     }
 
@@ -273,7 +277,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
             "relativeCharSpacing" -> relativeCharSpacing = value as? Float ?: return
             "lineBreakWidth" -> lineBreakWidth = value as? Float ?: return
             "text" -> {
-                if (value is String) text.set(value as? String ?: "")
+                if (value is String) text.set(value)
                 else text.copyFrom(value)
             }
             "font" -> font = font.withName(value as? String ?: "")

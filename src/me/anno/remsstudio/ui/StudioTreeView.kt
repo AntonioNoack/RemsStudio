@@ -13,12 +13,16 @@ import me.anno.remsstudio.RemsStudio.defaultWindowStack
 import me.anno.remsstudio.RemsStudio.lastTouchedCamera
 import me.anno.remsstudio.RemsStudio.nullCamera
 import me.anno.remsstudio.Selection
-import me.anno.remsstudio.objects.*
+import me.anno.remsstudio.objects.Camera
+import me.anno.remsstudio.objects.MeshTransform
+import me.anno.remsstudio.objects.Rectangle
+import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.Transform.Companion.toTransform
 import me.anno.remsstudio.objects.effects.MaskLayer
 import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.ui.MenuUtils.drawTypeInCorner
 import me.anno.ui.Style
+import me.anno.ui.base.SpacerPanel
 import me.anno.ui.base.menu.Menu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.editor.treeView.TreeView
@@ -32,6 +36,86 @@ import java.util.*
 
 class StudioTreeView(style: Style) :
     TreeView<Transform>(StudioFileImporter, true, style) {
+
+    companion object {
+        private val LOGGER = LogManager.getLogger(StudioTreeView::class)
+
+        fun zoomToObject(obj: Transform): Boolean {
+            // instead of asking for the name, move the camera towards the target
+            // todo also zoom in/out correctly to match the object...
+            // identify the currently used camera
+            val camera = lastTouchedCamera ?: nullCamera ?: return false
+            val time = RemsStudio.editorTime
+            // calculate the movement, which would be necessary
+            val cameraToWorld = camera.parent?.getGlobalTransform(time)
+            val objectToWorld = obj.getGlobalTransform(time)
+            val objectWorldPosition = objectToWorld.transformPosition(Vector3f(0f, 0f, 0f))
+
+            @Suppress("IfThenToElvis")
+            val objectCameraPosition = if (cameraToWorld == null) objectWorldPosition else
+                cameraToWorld.invert().transformPosition(objectWorldPosition)
+            LOGGER.info(objectCameraPosition)
+            // apply this movement
+            RemsStudio.largeChange("Move Camera to Object") {
+                camera.position.addKeyframe(camera.lastLocalTime, objectCameraPosition)
+            }
+            return true
+        }
+
+        fun openAddMenu(baseTransform: Transform) {
+            fun add(action: (Transform) -> Transform): () -> Unit = { Selection.selectTransform(action(baseTransform)) }
+            val options = DefaultConfig["createNewInstancesList"] as? StringMap
+            if (options != null) {
+                val extras = ArrayList<MenuOption>()
+                if (baseTransform.parent != null) {
+                    extras += Menu.menuSeparator1
+                    extras += MenuOption(
+                        NameDesc(
+                            "Add Mask",
+                            "Creates a mask component, which can be used for many effects",
+                            "ui.objects.addMask"
+                        )
+                    ) {
+                        val parent = baseTransform.parent!!
+                        val i = parent.children.indexOf(baseTransform)
+                        if (i < 0) throw RuntimeException()
+                        val mask = MaskLayer.create(listOf(Rectangle.create()), listOf(baseTransform))
+                        mask.isFullscreen = true
+                        parent.setChildAt(mask, i)
+                    }
+                }
+                val additional = baseTransform.getAdditionalChildrenOptions().map { option ->
+                    MenuOption(option.nameDesc) {
+                        RemsStudio.largeChange("Added ${option.nameDesc.name}") {
+                            val new = option.generator()
+                            baseTransform.addChild(new)
+                            Selection.selectTransform(new)
+                        }
+                    }
+                }
+                if (additional.isNotEmpty()) {
+                    extras += Menu.menuSeparator1
+                    extras += additional
+                }
+                val ws = defaultWindowStack
+                Menu.openMenu(
+                    defaultWindowStack,
+                    ws.mouseX, ws.mouseY, NameDesc("Add Child", "", "ui.objects.add"),
+                    options.entries
+                        .sortedBy { (key, _) -> key.lowercase(Locale.getDefault()) }
+                        .map { (key, value) ->
+                            val sample = if (value is Transform) value.clone() else value.toString().toTransform()
+                            MenuOption(NameDesc(key, sample?.defaultDisplayName ?: "", ""), add {
+                                val newT = if (value is Transform) value.clone() else value.toString().toTransform()
+                                newT!!
+                                it.addChild(newT)
+                                newT
+                            })
+                        } + extras
+                )
+            } else LOGGER.warn(Dict["Reset the config to enable this menu!", "config.warn.needsReset.forMenu"])
+        }
+    }
 
     override fun listRoots(): List<Transform> {
         val nc = nullCamera
@@ -47,7 +131,10 @@ class StudioTreeView(style: Style) :
     override fun stringifyForCopy(element: Transform) = JsonStringWriter.toText(element, InvalidRef)
     override fun getSymbol(element: Transform) = element.symbol
     override fun isCollapsed(element: Transform) = element.isCollapsed
-    override fun getName(element: Transform) = element.name.ifBlank { element.defaultDisplayName }
+    override fun getName(element: Transform): String {
+        return element.name.ifBlank { element.defaultDisplayName }
+    }
+
     override fun getParent(element: Transform) = element.parent
     override fun getChildren(element: Transform) = element.children
 
@@ -128,6 +215,16 @@ class StudioTreeView(style: Style) :
         }
     }
 
+    private val paddingAtBottom =
+        SpacerPanel(0, 12, style)
+            .makeBackgroundTransparent()
+
+    override fun onUpdate() {
+        list.remove(paddingAtBottom)
+        super.onUpdate()
+        list.add(paddingAtBottom)
+    }
+
     /**
      * returns true on success
      * */
@@ -140,86 +237,6 @@ class StudioTreeView(style: Style) :
     }
 
     override fun isValidElement(element: Any?) = element is Transform
-
-    companion object {
-
-        fun zoomToObject(obj: Transform): Boolean {
-            // instead of asking for the name, move the camera towards the target
-            // todo also zoom in/out correctly to match the object...
-            // identify the currently used camera
-            val camera = lastTouchedCamera ?: nullCamera ?: return false
-            val time = RemsStudio.editorTime
-            // calculate the movement, which would be necessary
-            val cameraToWorld = camera.parent?.getGlobalTransform(time)
-            val objectToWorld = obj.getGlobalTransform(time)
-            val objectWorldPosition = objectToWorld.transformPosition(Vector3f(0f, 0f, 0f))
-
-            @Suppress("IfThenToElvis")
-            val objectCameraPosition = if (cameraToWorld == null) objectWorldPosition else
-                cameraToWorld.invert().transformPosition(objectWorldPosition)
-            LOGGER.info(objectCameraPosition)
-            // apply this movement
-            RemsStudio.largeChange("Move Camera to Object") {
-                camera.position.addKeyframe(camera.lastLocalTime, objectCameraPosition)
-            }
-            return true
-        }
-
-        private val LOGGER = LogManager.getLogger(StudioTreeView::class)
-        fun openAddMenu(baseTransform: Transform) {
-            fun add(action: (Transform) -> Transform): () -> Unit = { Selection.selectTransform(action(baseTransform)) }
-            val options = DefaultConfig["createNewInstancesList"] as? StringMap
-            if (options != null) {
-                val extras = ArrayList<MenuOption>()
-                if (baseTransform.parent != null) {
-                    extras += Menu.menuSeparator1
-                    extras += MenuOption(
-                        NameDesc(
-                            "Add Mask",
-                            "Creates a mask component, which can be used for many effects",
-                            "ui.objects.addMask"
-                        )
-                    ) {
-                        val parent = baseTransform.parent!!
-                        val i = parent.children.indexOf(baseTransform)
-                        if (i < 0) throw RuntimeException()
-                        val mask = MaskLayer.create(listOf(Rectangle.create()), listOf(baseTransform))
-                        mask.isFullscreen = true
-                        parent.setChildAt(mask, i)
-                    }
-                }
-                val additional = baseTransform.getAdditionalChildrenOptions().map { option ->
-                    MenuOption(option.nameDesc) {
-                        RemsStudio.largeChange("Added ${option.nameDesc.name}") {
-                            val new = option.generator()
-                            baseTransform.addChild(new)
-                            Selection.selectTransform(new)
-                        }
-                    }
-                }
-                if (additional.isNotEmpty()) {
-                    extras += Menu.menuSeparator1
-                    extras += additional
-                }
-                val ws = defaultWindowStack
-                Menu.openMenu(
-                    defaultWindowStack,
-                    ws.mouseX, ws.mouseY, NameDesc("Add Child", "", "ui.objects.add"),
-                    options.entries
-                        .sortedBy { (key, _) -> key.lowercase(Locale.getDefault()) }
-                        .map { (key, value) ->
-                            val sample = if (value is Transform) value.clone() else value.toString().toTransform()
-                            MenuOption(NameDesc(key, sample?.defaultDisplayName ?: "", ""), add {
-                                val newT = if (value is Transform) value.clone() else value.toString().toTransform()
-                                newT!!
-                                it.addChild(newT)
-                                newT
-                            })
-                        } + extras
-                )
-            } else LOGGER.warn(Dict["Reset the config to enable this menu!", "config.warn.needsReset.forMenu"])
-        }
-    }
 
     override fun moveChange(callback: () -> Unit) {
         RemsStudio.largeChange("Moved Component", callback)

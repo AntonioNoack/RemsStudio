@@ -66,28 +66,24 @@ object GFXx3Dv2 {
 
     fun shader3DUniforms(
         shader: Shader, stack: Matrix4fArrayList,
-        w: Int, h: Int,
-        tiling: Vector4f?, filtering: TexFiltering,
+        w: Int, h: Int, tiling: Vector4f?, filtering: TexFiltering,
         uvProjection: UVProjection?
     ) {
 
-        stack.pushMatrix()
-
-        val doScale2 = (uvProjection?.doScale ?: true) && w != h
-        if (doScale2) {
+        val shallScale = (uvProjection?.doScale ?: true) && w != h
+        if (shallScale) {
+            stack.pushMatrix()
             val scale = getScale(w, h)
             val sx = w * scale
             val sy = h * scale
-            stack.scale(sx, -sy, 1f)
-        } else {
-            stack.scale(1f, -1f, 1f)
+            stack.scale(sx, sy, 1f)
         }
 
         GFXx3D.transformUniform(shader, stack)
         shader.v1i("filtering", filtering.id)
         shader.v2f("textureDeltaUV", 1f / w, 1f / h)
 
-        stack.popMatrix()
+        if (shallScale) stack.popMatrix()
 
         if (tiling != null) shader.v4f("tiling", tiling)
         else shader.v4f("tiling", 1f, 1f, 0f, 0f)

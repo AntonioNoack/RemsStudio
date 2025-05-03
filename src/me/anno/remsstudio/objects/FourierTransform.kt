@@ -105,7 +105,7 @@ class FourierTransform : Transform() {
     fun getIndexAndSize(child: Transform, parent: Transform): Int {
         val index = child.indexInParent
         val size = parent.drawnChildCount
-        return getSize(kotlin.math.max(index, 0), size)
+        return getSize(max(index, 0), size)
     }
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {

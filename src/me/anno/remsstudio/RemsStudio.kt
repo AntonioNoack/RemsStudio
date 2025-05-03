@@ -45,10 +45,6 @@ import me.anno.utils.hpc.ProcessingQueue
 import kotlin.math.abs
 import kotlin.math.min
 
-// todo bugs:
-//  - video files cannot be properly deleted, because files can't be deleted when reading them
-//  - treeview needs padding: last item cannot be properly selected
-
 // to do morphing: up/down/left/right
 // to do morphing: rect/hexagon shape?, rotate it?
 // to do hexagon/triangle/rectangle pixelation: rotate it?

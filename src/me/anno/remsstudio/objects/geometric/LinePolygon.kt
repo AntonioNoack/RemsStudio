@@ -165,7 +165,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
                 // get interpolated color
                 stack.next {
                     stack.mul(localTransform)
-                    c0.drawDirectly(stack, time, color, getColor(index + fraction))
+                    c0.drawWithParentTransformAndColor(stack, time, color, getColor(index + fraction))
                 }
             }
 

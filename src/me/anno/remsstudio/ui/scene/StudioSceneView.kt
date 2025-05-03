@@ -58,7 +58,6 @@ import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.Color.black
 import me.anno.utils.Color.convertARGB2ABGR
 import me.anno.utils.structures.lists.Lists.firstInstanceOrNull2
-import me.anno.utils.types.Booleans.toInt
 import me.anno.utils.types.Floats.toRadians
 import org.apache.logging.log4j.LogManager
 import org.joml.*
@@ -321,7 +320,8 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     "[${idBuffer.joinToString { it.toUInt().toString(16) }}], " +
                     "[${depthBuffer.joinToString()}]"
         )
-        LOGGER.debug("Available IDs: ${
+        LOGGER.debug(
+            "Available IDs: ${
             root.listOfAll.toList()
                 .joinToString { it.clickId.toUInt().toString(16) }
         }")
@@ -708,7 +708,6 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     }
                 }
             }
-
             "Cam5" -> {// switch between orthographic and perspective
                 camera.putValue(camera.orthographicness, 1f - camera.orthographicness[cameraTime], true)
             }
@@ -723,7 +722,6 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     Vector3f(0f, -15f, 0f)
                 }
             )
-
             "Cam6" -> rotateCamera(
                 if (isShiftDown) {// right
                     Vector3f(0f, 0f, +15f)
@@ -731,16 +729,15 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     Vector3f(0f, +15f, 0f)
                 }
             )
-
             "Cam8" -> rotateCamera(Vector3f(-15f, 0f, 0f)) // up
             "Cam2" -> rotateCamera(Vector3f(+15f, 0f, 0f)) // down
             "Cam9" -> rotateCamera(Vector3f(0f, 180f, 0f)) // look at back; rotate by 90 degrees on y-axis
-            "MoveLeft" -> this.inputDx--
-            "MoveRight" -> this.inputDx++
-            "MoveUp" -> this.inputDy++
-            "MoveDown" -> this.inputDy--
-            "MoveForward" -> this.inputDz--
-            "MoveBackward", "MoveBack" -> this.inputDz++
+            "MoveLeft" -> inputDx--
+            "MoveRight" -> inputDx++
+            "MoveUp" -> inputDy++
+            "MoveDown" -> inputDy--
+            "MoveForward" -> inputDz--
+            "MoveBackward", "MoveBack" -> inputDz++
             "Turn" -> turn(dx, dy)
             "TurnLeft" -> turn(-1f, 0f)
             "TurnRight" -> turn(1f, 0f)

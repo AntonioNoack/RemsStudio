@@ -422,7 +422,7 @@ open class Transform() : Saveable(),
         return dst
     }
 
-    fun applyTransformLT(transform: Matrix4f, time: Double) {
+    fun applyTransform(transform: Matrix4f, time: Double) {
 
         val position = position[time]
         val scale = scale[time]
@@ -462,26 +462,22 @@ open class Transform() : Saveable(),
         }
     }
 
-    fun applyTransformPT(transform: Matrix4f, parentTime: Double) =
-        applyTransformLT(transform, getLocalTime(parentTime))
-
     /**
      * stack with camera already included
      * */
     fun draw(stack: Matrix4fArrayList, parentTime: Double, parentColor: Vector4f) {
         val time = getLocalTime(parentTime)
         val color = getLocalColor(parentColor, time, tmp0)
-        onDraw(stack, time, parentColor, color)
+        if (color.w <= minAlpha || !visibility.isVisible) return
+
+        applyTransform(stack, time)
+        drawWithParentTransformAndColor(stack, time, parentColor, color)
     }
 
-    fun onDraw(stack: Matrix4fArrayList, time: Double, parentColor: Vector4f, color: Vector4f) {
-        if (color.w > minAlpha && visibility.isVisible) {
-            applyTransformLT(stack, time)
-            drawDirectly(stack, time, parentColor, color)
-        }
-    }
-
-    fun drawDirectly(stack: Matrix4fArrayList, time: Double, parentColor: Vector4f, color: Vector4f) {
+    fun drawWithParentTransformAndColor(
+        stack: Matrix4fArrayList, time: Double,
+        parentColor: Vector4f, color: Vector4f
+    ) {
 
         val doBlending = when (GFXState.currentRenderer) {
             Renderer.colorRenderer, Renderer.colorSqRenderer -> true
@@ -522,7 +518,7 @@ open class Transform() : Saveable(),
     fun drawChild(stack: Matrix4fArrayList, time: Double, color: Vector4f, child: Transform?) {
         if (child != null) {
             stack.next {
-                child.onDraw(stack, time, color)
+                child.draw(stack, time, color)
             }
         }
     }
@@ -622,7 +618,7 @@ open class Transform() : Saveable(),
             if (reference === parent) Matrix4f() to globalTime
             else parent?.getGlobalTransformTime(globalTime) ?: (Matrix4f() to globalTime)
         val localTime = getLocalTime(parentTime)
-        applyTransformLT(parentTransform, localTime)
+        applyTransform(parentTransform, localTime)
         return parentTransform
     }
 
@@ -638,14 +634,14 @@ open class Transform() : Saveable(),
             if (reference === parent) Matrix4f() to globalTime
             else parent?.getGlobalTransformTime(globalTime) ?: (Matrix4f() to globalTime)
         val localTime = getLocalTime(parentTime)
-        applyTransformLT(parentTransform, localTime)
+        applyTransform(parentTransform, localTime)
         return parentTransform to localTime
     }
 
     fun getGlobalTransform(globalTime: Double): Matrix4f {
         val (parentTransform, parentTime) = parent?.getGlobalTransformTime(globalTime) ?: (Matrix4f() to globalTime)
         val localTime = getLocalTime(parentTime)
-        applyTransformLT(parentTransform, localTime)
+        applyTransform(parentTransform, localTime)
         return parentTransform
     }
 
@@ -657,7 +653,7 @@ open class Transform() : Saveable(),
     fun getGlobalTransformTime(globalTime: Double, dst: Matrix4f = Matrix4f()): Pair<Matrix4f, Double> {
         val (parentTransform, parentTime) = parent?.getGlobalTransformTime(globalTime, dst) ?: (dst to globalTime)
         val localTime = getLocalTime(parentTime)
-        applyTransformLT(parentTransform, localTime)
+        applyTransform(parentTransform, localTime)
         return parentTransform to localTime
     }
 
