@@ -322,9 +322,9 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         )
         LOGGER.debug(
             "Available IDs: ${
-            root.listOfAll.toList()
-                .joinToString { it.clickId.toUInt().toString(16) }
-        }")
+                root.listOfAll.toList()
+                    .joinToString { it.clickId.toUInt().toString(16) }
+            }")
 
         val bestResult = Screenshots.getClosestId(diameter, idBuffer, depthBuffer)
         // find the transform with the id to select it
@@ -369,7 +369,10 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
 
             val radius = camera.orbitRadius[cameraTime]
             val speed = if (radius == 0f) 1f else 0.1f + 0.9f * radius
-            val acceleration = Vector3f(inputDx, inputDy, inputDz).mul(speed)
+            val acceleration = Vector3f(inputDx, inputDy, inputDz)
+                .min(1f, 1f, 1f)
+                .max(-1f, -1f, -1f)
+                .mul(speed)
 
             velocity.mul(1f - dt)
             velocity.mulAdd(dt, acceleration)
