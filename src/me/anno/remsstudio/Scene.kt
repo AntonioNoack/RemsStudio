@@ -2,8 +2,10 @@ package me.anno.remsstudio
 
 import me.anno.config.DefaultConfig
 import me.anno.gpu.DepthMode
+import me.anno.gpu.FinalRendering.isFinalRendering
+import me.anno.gpu.FinalRendering.missingFrameException
+import me.anno.gpu.FinalRendering.onMissingResource
 import me.anno.gpu.GFX
-import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.GFXState
 import me.anno.gpu.GFXState.blendMode
 import me.anno.gpu.GFXState.depthMask
@@ -52,7 +54,6 @@ import me.anno.remsstudio.objects.effects.ToneMappers
 import me.anno.remsstudio.ui.editor.ISceneView
 import me.anno.ui.editor.sceneView.Gizmos.drawGizmo
 import me.anno.ui.editor.sceneView.Grid
-import me.anno.video.MissingFrameException
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector4f
@@ -82,7 +83,8 @@ object Scene {
 
         // add randomness against banding
 
-        sqrtToneMappingShader = BaseShader("sqrt/tone-mapping",
+        sqrtToneMappingShader = BaseShader(
+            "sqrt/tone-mapping",
             listOf(
                 Variable(GLSLType.V2F, "coords", VariableMode.ATTR),
                 Variable(GLSLType.V1F, "ySign"),
@@ -361,9 +363,12 @@ object Scene {
 
         val lutFile = camera.lut
         val needsLUT = !isFakeColorRendering && lutFile.exists && !lutFile.isDirectory
-        val lut = if (needsLUT) getLUT(lutFile, true, 20_000) else null
+        val lut = if (needsLUT) getLUT(lutFile, 20_000) else null
 
-        if (lut == null && needsLUT && isFinalRendering) throw MissingFrameException(lutFile.absolutePath)
+        if (lut == null && needsLUT && isFinalRendering) {
+            onMissingResource("Missing LUT", lutFile)
+            return
+        }
 
         if (buffer is Framebuffer && needsTemporaryBuffer) {
             renderPurely {

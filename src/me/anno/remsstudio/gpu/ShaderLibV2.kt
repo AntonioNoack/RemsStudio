@@ -8,6 +8,7 @@ import me.anno.gpu.shader.ShaderLib
 import me.anno.gpu.shader.ShaderLib.v3DMasked
 import me.anno.gpu.shader.ShaderLib.v3DlMasked
 import me.anno.gpu.shader.ShaderLib.y3DMasked
+import me.anno.gpu.shader.YUVHelper
 import me.anno.gpu.shader.builder.Variable
 import me.anno.gpu.shader.builder.VariableMode
 import me.anno.image.ImageCache
@@ -185,7 +186,7 @@ object ShaderLibV2 {
                 "uniform vec4 settings;\n" +
                 ShaderLib.brightness +
                 getForceFieldColor +
-                ShaderLib.rgb2uv +
+                YUVHelper.rgb2uv +
                 "float maxV3(vec3 rgb){return max(rgb.r, max(rgb.g, rgb.b));}\n" +
                 "float minV3(vec3 rgb){return min(rgb.r, min(rgb.g, rgb.b));}\n" +
                 "void main(){\n" +

@@ -3,7 +3,8 @@ package me.anno.remsstudio.objects.particles
 import me.anno.Time
 import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
-import me.anno.gpu.GFX.isFinalRendering
+import me.anno.gpu.FinalRendering.isFinalRendering
+import me.anno.gpu.FinalRendering.onMissingResource
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringWriter
@@ -33,7 +34,6 @@ import me.anno.utils.hpc.HeavyProcessing.processBalanced
 import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
-import me.anno.video.MissingFrameException
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
@@ -266,7 +266,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
             }
             val dist = selectedDistribution
             dist.update(time, Random())
-            dist.distribution.draw(stack, color)
+            dist.distribution.onDraw(stack, color)
         }
 
         sumWeight = children
@@ -277,7 +277,10 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
         if (step(time)) {
             drawParticles(stack, time, color)
         } else {
-            if (isFinalRendering) throw MissingFrameException(name)
+            if (isFinalRendering) {
+                onMissingResource("Computing Particles", null)
+                return
+            }
             drawLoadingCircle(stack, (Time.nanoTime * 1e-9f) % 1f)
             drawParticles(stack, time, color)
         }
@@ -397,7 +400,7 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
 
     }
 
-    override fun getAdditionalChildrenOptions(): List<Option> {
+    override fun getAdditionalChildrenOptions(): List<Option<Transform>> {
         return ForceField.getForceFields()
     }
 

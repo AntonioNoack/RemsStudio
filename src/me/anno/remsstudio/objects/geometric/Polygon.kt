@@ -4,7 +4,8 @@ import me.anno.cache.CacheSection
 import me.anno.config.DefaultConfig
 import me.anno.ecs.components.mesh.Mesh
 import me.anno.engine.inspector.Inspectable
-import me.anno.gpu.GFX
+import me.anno.gpu.FinalRendering.isFinalRendering
+import me.anno.gpu.FinalRendering.onMissingResource
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.TextureCache
 import me.anno.gpu.texture.TextureLib.whiteTexture
@@ -25,7 +26,6 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.types.Floats.toRadians
-import me.anno.video.MissingFrameException
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
@@ -52,8 +52,9 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val inset = clamp(starNess[time], 0f, 1f)
         val image = TextureCache[texture, 5000, true]
-        if (image == null && texture.hasValidName() && GFX.isFinalRendering) {
-            throw MissingFrameException(texture.toString())
+        if (image == null && texture != InvalidRef && isFinalRendering) {
+            onMissingResource("Missing texture", texture)
+            return
         }
         val texture = image ?: whiteTexture
         val count = vertexCount[time]//.roundToInt()

@@ -41,6 +41,7 @@ import me.anno.ui.custom.CustomList
 import me.anno.ui.debug.ConsoleOutputPanel.Companion.createConsoleWithStats
 import me.anno.ui.editor.OptionBar
 import me.anno.ui.editor.WelcomeUI
+import me.anno.ui.editor.config.ConfigType
 import me.anno.ui.editor.files.FileNames.toAllowedFilename
 import me.anno.utils.files.OpenFileExternally.openInBrowser
 import me.anno.utils.files.OpenFileExternally.openInExplorer
@@ -78,7 +79,7 @@ object RemsStudioUILayouts {
             openStylingWindow(windowStack)
         }
         options.addAction(configTitle, Dict["Keymap", "ui.top.config.keymap"]) {
-            openConfigWindow(windowStack, ActionManager, false)
+            openConfigWindow(windowStack, ActionManager, ConfigType.KEYMAP)
         }
 
         options.addAction(configTitle, Dict["BPM Snap Settings", "ui.top.config.bpmSnapping"]) {

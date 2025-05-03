@@ -1,11 +1,12 @@
 package me.anno.remsstudio.objects.video
 
 import me.anno.config.DefaultConfig
+import me.anno.io.files.InvalidRef
 import me.anno.remsstudio.objects.modes.VideoType
 
 object VideoSymbol {
     fun Video.getVideoSymbol(): String {
-        return when (if (file.hasValidName()) type else VideoType.VIDEO) {
+        return when (if (file != InvalidRef) type else VideoType.VIDEO) {
             VideoType.AUDIO -> DefaultConfig["ui.symbol.audio", "\uD83D\uDD09"]
             VideoType.IMAGE -> DefaultConfig["ui.symbol.image", "\uD83D\uDDBC️️"]
             VideoType.VIDEO -> DefaultConfig["ui.symbol.video", "\uD83C\uDF9E️"]

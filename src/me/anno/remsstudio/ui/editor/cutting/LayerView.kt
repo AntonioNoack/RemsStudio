@@ -3,15 +3,13 @@ package me.anno.remsstudio.ui.editor.cutting
 import me.anno.Time.gameTime
 import me.anno.cache.CacheData
 import me.anno.engine.EngineBase.Companion.dragged
-import me.anno.engine.EngineBase.Companion.shiftSlowdown
 import me.anno.engine.EngineBase.Companion.workspace
-import me.anno.gpu.GFX
 import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.input.Input
 import me.anno.input.Input.isControlDown
 import me.anno.input.Input.keysDown
 import me.anno.input.Input.mouseKeysDown
-import me.anno.input.Input.needsLayoutUpdate
+import me.anno.input.Input.shiftSlowdown
 import me.anno.input.Key
 import me.anno.io.files.FileReference
 import me.anno.io.json.saveable.JsonStringReader
@@ -20,7 +18,6 @@ import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.mix
 import me.anno.maths.Maths.sq
 import me.anno.remsstudio.RemsStudio
-import me.anno.remsstudio.RemsStudio.isPlaying
 import me.anno.remsstudio.Selection.select
 import me.anno.remsstudio.Selection.selectTransform
 import me.anno.remsstudio.Selection.selectedTransforms
@@ -90,17 +87,6 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
 
     var solution: LayerStripeSolution? = null
 
-    var visualStateCtr = 0
-    override fun getVisualState() =
-        Pair(
-            super.getVisualState(),
-            if ((isHovered && mouseKeysDown.isNotEmpty()) || isPlaying) visualStateCtr++
-            else if (isHovered) {
-                val window = window
-                if (window != null) getTransformAt(window.mouseX, window.mouseY) else null
-            } else null
-        )
-
     override fun onUpdate() {
         super.onUpdate()
         solution?.keepResourcesLoaded()
@@ -112,7 +98,7 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
     var lastTime = gameTime
 
     // calculation is fast, drawing is slow
-    override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
 
         drawnStrings.clear()
 
@@ -135,7 +121,7 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
                 isHovered ||
                 mouseKeysDown.isNotEmpty() ||
                 keysDown.isNotEmpty() ||
-                abs(this.lastTime - gameTime) > if (needsLayoutUpdate(GFX.activeWindow!!)) 5e7 else 1e9
+                abs(this.lastTime - gameTime) > 5e7
 
         if (needsUpdate && !computer.isCalculating) {
             lastTime = gameTime

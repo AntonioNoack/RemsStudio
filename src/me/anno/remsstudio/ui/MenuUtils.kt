@@ -82,10 +82,10 @@ object MenuUtils {
 
     fun Panel.drawTypeInCorner(type: String, fontColor: Int) {
         // draw in gray, that this is the file explorer
-        val color = Color.mixARGB(fontColor, backgroundColor, 0.8f)
+        val color = Color.mixARGB(fontColor, background.color, 0.8f)
         DrawTexts.drawSimpleTextCharByChar(
             x + width - 4, y + height, 0,
-            type, color, backgroundColor.withAlpha(0),
+            type, color, background.color.withAlpha(0),
             AxisAlignment.MAX, AxisAlignment.MAX
         )
     }

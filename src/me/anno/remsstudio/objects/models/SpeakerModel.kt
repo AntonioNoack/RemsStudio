@@ -1,7 +1,7 @@
 package me.anno.remsstudio.objects.models
 
 import me.anno.ecs.components.mesh.Mesh
-import me.anno.gpu.GFX
+import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.gpu.buffer.DrawMode
 import me.anno.maths.Maths
 import me.anno.maths.Maths.PIf
@@ -71,7 +71,7 @@ object SpeakerModel {
         is3D: Boolean,
         amplitude: Float
     ) {
-        if (GFX.isFinalRendering) return
+        if (isFinalRendering) return
         color.w = Maths.clamp(color.w * 0.5f * abs(amplitude), 0f, 1f)
         if (is3D) {
             val r = 0.85f

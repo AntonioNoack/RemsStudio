@@ -60,7 +60,6 @@ object SceneTabs : ScrollPanelX(DefaultConfig.style) {
                         panelChildren.removeAt(oldIndex)
                         panelChildren.add(newIndex, tab)
                     }
-                    invalidateLayout()
                 }// else done
                 dragged = null
             }

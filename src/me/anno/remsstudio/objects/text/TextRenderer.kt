@@ -4,8 +4,8 @@ import me.anno.fonts.FontManager
 import me.anno.fonts.PartResult
 import me.anno.fonts.mesh.TextMesh
 import me.anno.fonts.signeddistfields.algorithm.SignedDistanceField
-import me.anno.gpu.GFX
-import me.anno.gpu.texture.Texture2D
+import me.anno.gpu.FinalRendering.isFinalRendering
+import me.anno.gpu.FinalRendering.onMissingResource
 import me.anno.jvm.fonts.AWTFont
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.gpu.GFXx3Dv2
@@ -15,7 +15,6 @@ import me.anno.remsstudio.objects.text.Text.Companion.DEFAULT_FONT_HEIGHT
 import me.anno.ui.editor.sceneView.Grid
 import me.anno.utils.pooling.JomlPools
 import me.anno.utils.types.Strings.isBlank2
-import me.anno.video.MissingFrameException
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector3f
@@ -77,7 +76,7 @@ object TextRenderer {
         }
 
         val lineBreakWidth = element.lineBreakWidth
-        if (lineBreakWidth > 0f && !GFX.isFinalRendering && element in Selection.selectedTransforms) {
+        if (lineBreakWidth > 0f && !isFinalRendering && element in Selection.selectedTransforms) {
             // draw the borders
             // why 0.81? correct x-scale? (off by ca ~ x0.9)
             val x0 = dx + width * 0.5f
@@ -252,8 +251,9 @@ object TextRenderer {
         if (color.w + oc1.w + oc2.w + oc3.w <= 0f) return
         val sdf2 = element.getSDFTexture(key)
         if (sdf2 == null) {
-            if (GFX.isFinalRendering) throw MissingFrameException("Text-Texture (291) ${element.font}: '${element.text}'")
-            element.needsUpdate = true
+            if (isFinalRendering) {
+                onMissingResource("Text-Texture ${element.font}", element.text)
+            } else element.needsUpdate = true
             return
         }
 
@@ -267,7 +267,7 @@ object TextRenderer {
         sdf2.draw(startIndex, endIndex) { _, sdf, xOffset ->
 
             val texture = sdf?.texture
-            if (texture is Texture2D && texture.isCreated()) {
+            if (texture != null && texture.isCreated()) {
 
                 val baseScale =
                     TextMesh.DEFAULT_LINE_HEIGHT / sdfResolution / (exampleLayout.ascent + exampleLayout.descent)
@@ -324,14 +324,12 @@ object TextRenderer {
                     firstTimeDrawing = false
 
                 } else GFXx3Dv2.drawOutlinedText(stack, offset, scale, texture, hasUVAttractors)
-
-            } else if (sdf?.isValid != true) {
-
-                if (GFX.isFinalRendering) throw MissingFrameException("Text-Texture I '${element.font}': '${key.text}'")
-                element.needsUpdate = true
-
+            } else if (sdf == null || texture == null || !texture.isCreated()) {
+                if (isFinalRendering) {
+                    onMissingResource("Text-Texture I '${element.font}'", key.text)
+                } else element.needsUpdate = true
             }
-
+            false
         }
     }
 
@@ -344,8 +342,9 @@ object TextRenderer {
 
         val textMesh = element.getTextMesh(key)
         if (textMesh == null) {
-            if (GFX.isFinalRendering) throw MissingFrameException("Text-Mesh II '${element.font}': '${key.text}'")
-            element.needsUpdate = true
+            if (isFinalRendering) {
+                onMissingResource("Text-Mesh II '${element.font}'", key.text)
+            } else element.needsUpdate = true
             return
         }
 
@@ -358,6 +357,7 @@ object TextRenderer {
             } else {
                 GFXx3Dv2.draw3DTextWithOffset(buffer, offset)
             }
+            false
         }
     }
 }

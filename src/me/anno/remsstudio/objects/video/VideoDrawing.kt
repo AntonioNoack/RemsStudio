@@ -2,7 +2,7 @@ package me.anno.remsstudio.objects.video
 
 import me.anno.Time
 import me.anno.animation.LoopingState
-import me.anno.gpu.GFX.isFinalRendering
+import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.Texture2D
 import me.anno.gpu.texture.TextureCache

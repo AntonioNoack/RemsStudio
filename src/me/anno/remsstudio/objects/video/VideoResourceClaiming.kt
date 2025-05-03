@@ -1,7 +1,7 @@
 package me.anno.remsstudio.objects.video
 
 import me.anno.animation.LoopingState
-import me.anno.gpu.GFX.isFinalRendering
+import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.gpu.texture.TextureCache
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.mix
@@ -42,7 +42,8 @@ object VideoResourceClaiming {
                     // issues arise, when multiple frames should be interpolated together into one
                     // at this time, we chose the center frame only.
                     val videoFPS =
-                        if (isFinalRendering) sourceFPS else min(sourceFPS, editorVideoFPS.value.toDouble())
+                        if (isFinalRendering) sourceFPS
+                        else min(sourceFPS, editorVideoFPS.value.toDouble())
 
                     // calculate how many buffers are required from start to end
                     // clamp to max number of buffers, or maybe 20

@@ -17,7 +17,6 @@ class IsAnimatedWrapper(panel: Panel, val values: AnimatedProperty<*>) :
             if (field != value) {
                 field = value
                 padding.set(value.toInt())
-                invalidateLayout()
             }
         }
 
@@ -27,8 +26,8 @@ class IsAnimatedWrapper(panel: Panel, val values: AnimatedProperty<*>) :
     }
 
     private val color = getSelectionColor(style)
-    override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
-        super.onDraw(x0, y0, x1, y1)
+    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
+        super.draw(x0, y0, x1, y1)
         if (isAnimated) {
             drawBorder(x, y, width, height, color, padding.left)
         }

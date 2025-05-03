@@ -162,7 +162,7 @@ abstract class ForceField(val displayName: String, val descriptionI: String) : T
 
         const val visualForceScale = 0.1f
 
-        fun option(generator: () -> ForceField): Option {
+        fun option(generator: () -> ForceField): Option<ForceField> {
             val sample = generator()
             return Option(NameDesc(sample.displayName, sample.description, ""), generator)
         }

@@ -84,8 +84,6 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
             } else -1
         }
 
-    override fun getVisualState() = Triple(super.getVisualState(), centralValue, dvHalfHeight)
-
     fun normValue01(value: Float) = 0.5 - (value - centralValue) / dvHalfHeight * 0.5
 
     fun getValueAt(my: Float) = centralValue - dvHalfHeight * normAxis11(my, y, height)
@@ -128,7 +126,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
         val maxStepIndex = (maxValue / valueStep).toInt() + 1
 
         val fontColor = fontColor
-        val backgroundColor = backgroundColor and 0xffffff // transparent background
+        val backgroundColor = background.color and 0xffffff // transparent background
 
         for (stepIndex in maxStepIndex downTo minStepIndex) {
 
@@ -187,7 +185,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
     }
 
     var lastProperty: Any? = null
-    override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
 
         val dotSize = dotSize
 
@@ -286,7 +284,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
 
         // draw all values
         if (kfs.isNotEmpty() || property.drivers.any { it != null }) {
-            val backgroundColor = backgroundColor.withAlpha(0)
+            val backgroundColor = background.color.withAlpha(0)
             val batch = DrawCurves.lineBatch.start()
             for (i in valueColors.indices) {
                 val alpha = if (i.isChannelActive(activeChannels)) 0.3f else 0.1f
@@ -371,7 +369,6 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
         // only draw if we have something to animate
         drawBorder(x, y, width, height, selectionColor.withAlpha(selectionStrength), 1)
         if (!property.isAnimated) {
-            if (selectionStrength > 0.01f) invalidateDrawing()
             selectionStrength *= dtTo10(IsSelectedWrapper.decaySpeed * Time.deltaTime).toFloat()
         }
     }
@@ -491,7 +488,6 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
             super.onKeyDown(x, y, key)
             return
         }
-        invalidateDrawing()
         val atCursor = getKeyframeAt(x, y)
         if (atCursor != null && selectedKeyframes.size > 1 && atCursor.first in selectedKeyframes) {
             draggedKeyframe = atCursor.first
@@ -515,7 +511,6 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
                 }
             }
         }
-        invalidateDrawing()
     }
 
     // todo always show the other properties, too???
@@ -528,7 +523,6 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
                 selectedKeyframes += getAllKeyframes(select0.x, x, select0.y, y)
                 isSelecting = false
             }
-            invalidateDrawing()
         } else super.onKeyUp(x, y, key)
     }
 
@@ -622,7 +616,6 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
         val selectedProperty = selectedProperties.firstOrNull()
         if (isSelecting) {
             // select new elements, update the selected keyframes?
-            invalidateDrawing()
         } else if (draggedKeyframe != null && selectedProperty != null) {
             // dragging
             val time = getTimeAt(x)
@@ -666,7 +659,6 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
                 }
                 selectedProperty.sort()
             }
-            invalidateDrawing()
         } else {
             if (shouldScrub()) {
                 // scrubbing
@@ -678,7 +670,6 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
                 clampTime()
                 clampValues()
             }
-            invalidateDrawing()
         }
     }
 
@@ -759,7 +750,6 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
             selectedKeyframes.clear()
             selectedKeyframes.addAll(kf)
         }
-        invalidateDrawing()
     }
 
     override fun onMouseClicked(x: Float, y: Float, button: Key, long: Boolean) {
@@ -776,7 +766,6 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
                                     for (kf in selectedKeyframes) {
                                         kf.interpolation = mode
                                     }
-                                    invalidateDrawing()
                                 }
                             }
                         })

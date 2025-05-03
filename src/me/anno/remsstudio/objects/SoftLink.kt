@@ -2,7 +2,8 @@ package me.anno.remsstudio.objects
 
 import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
-import me.anno.gpu.GFX.isFinalRendering
+import me.anno.gpu.FinalRendering.onMissingResource
+import me.anno.gpu.FinalRendering.runFinalRendering
 import me.anno.gpu.GFXState.useFrame
 import me.anno.gpu.framebuffer.DepthBufferType
 import me.anno.gpu.framebuffer.FBStack
@@ -131,15 +132,17 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
         val size = resolution[time]
         val w = StrictMath.max(size.x.roundToInt(), 4)
         val h = StrictMath.max(size.y.roundToInt(), 4)
-        val wasFinalRendering = isFinalRendering
-        isFinalRendering = true // todo isn't this crash-prone???
-        Scene.draw(
-            camera, softChild,
-            0, 0, w, h,
-            time, true,
-            Renderer.colorRenderer, null
-        )
-        isFinalRendering = wasFinalRendering
+        val error = runFinalRendering {
+            Scene.draw(
+                camera, softChild,
+                0, 0, w, h,
+                time, true,
+                Renderer.colorRenderer, null
+            )
+        }
+        if (error != null) {
+            onMissingResource(error, file)
+        }
     }
 
     override fun drawChildrenAutomatically(): Boolean = false

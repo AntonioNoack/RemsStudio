@@ -26,7 +26,7 @@ class SimplePanel(
     var py = 0
 
     init {
-        drawable.backgroundColor = 0
+        drawable.makeBackgroundTransparent()
         drawable.width = sizeX
         drawable.height = sizeY
         drawable.minW = sizeX

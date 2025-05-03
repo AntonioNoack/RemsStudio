@@ -5,8 +5,8 @@ import me.anno.audio.openal.AudioTasks.addAudioTask
 import me.anno.config.DefaultConfig
 import me.anno.ecs.annotations.Range
 import me.anno.engine.inspector.Inspectable
-import me.anno.gpu.GFX.isFinalRendering
-import me.anno.remsstudio.video.UVProjection
+import me.anno.gpu.FinalRendering.isFinalRendering
+import me.anno.gpu.FinalRendering.onMissingResource
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.TextureCache
 import me.anno.gpu.texture.TextureReader.Companion.imageTimeout
@@ -41,6 +41,7 @@ import me.anno.remsstudio.objects.video.VideoSerialization.needSuperSetProperty
 import me.anno.remsstudio.objects.video.VideoSerialization.save1
 import me.anno.remsstudio.objects.video.VideoSymbol.getVideoSymbol
 import me.anno.remsstudio.objects.video.VideoUpdate.videoUpdate
+import me.anno.remsstudio.video.UVProjection
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
@@ -49,7 +50,6 @@ import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefaultFunc
 import me.anno.utils.structures.maps.BiMap
 import me.anno.video.ImageSequenceMeta
-import me.anno.video.MissingFrameException
 import me.anno.video.VideoCache
 import me.anno.video.formats.gpu.GPUFrame
 import org.apache.logging.log4j.LogManager
@@ -87,8 +87,6 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
         val framesPerContainer = 128
 
         val editorFPS = intArrayOf(1, 2, 3, 5, 10, 24, 30, 60, 90, 120, 144, 240, 300, 360)
-
-        private val LOGGER = LogManager.getLogger(Video::class)
 
         val forceAutoScale get() = DefaultConfig["rendering.video.forceAutoScale", true]
         val forceFullScale get() = DefaultConfig["rendering.video.forceFullScale", false]
@@ -241,8 +239,9 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
     }
 
     fun onMissingImageOrFrame(frame: Int) {
-        if (isFinalRendering) throw MissingFrameException("$file, $frame/${meta?.videoFrameCount}")
-        else needsImageUpdate = true
+        if (isFinalRendering) {
+            onMissingResource("Missing frame $frame/${meta?.videoFrameCount}", file)
+        } else needsImageUpdate = true
     }
 
     var lastFrame: GPUFrame? = null
@@ -285,7 +284,7 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
 
     fun update() {
         val file = file
-        videoUpdate(file, file.hasValidName())
+        videoUpdate(file, file != InvalidRef)
     }
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
@@ -293,7 +292,7 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
         needsImageUpdate = false
 
         val file = file
-        if (file.hasValidName()) {
+        if (file != InvalidRef) {
             videoUpdate(file, true)
             val meta = meta
             when (type) {
@@ -336,7 +335,7 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
     override val defaultDisplayName: String
         get() {
             // file can be null
-            return (if (file != InvalidRef && file.hasValidName()) file.name
+            return (if (file != InvalidRef && file != InvalidRef) file.name
             else Dict["Video", "obj.video"])
         }
 

@@ -25,14 +25,10 @@ class ScenePreview(style: Style) : PanelList(null, style.getChild("sceneView")),
 
     init {
         weight = 1f
-        backgroundColor = 0
+        background.color = 0
     }
 
     val camera = nullCamera ?: Camera()
-
-    // never the same :D
-    var visualStateCtr = 0
-    override fun getVisualState() = visualStateCtr++
 
     override val usesFPBuffers: Boolean get() = false
     override val isLocked2D get() = (System.currentTimeMillis() % 30000) > 25000
@@ -72,7 +68,7 @@ class ScenePreview(style: Style) : PanelList(null, style.getChild("sceneView")),
     }
 
     private val mutingColor = style.getColor("welcome.mutingColor", 0x55777777)
-    override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
         updatePosition()
         drawRect(x0, y0, x1 - x0, y1 - y0, black)
         Scene.draw(

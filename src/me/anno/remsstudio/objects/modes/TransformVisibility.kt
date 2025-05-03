@@ -1,6 +1,6 @@
 package me.anno.remsstudio.objects.modes
 
-import me.anno.gpu.GFX.isFinalRendering
+import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.language.translation.NameDesc
 
 enum class TransformVisibility(val id: Int, val naming: NameDesc){

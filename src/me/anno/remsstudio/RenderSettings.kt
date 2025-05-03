@@ -150,15 +150,6 @@ object RenderSettings : Transform() {
         )
         samples.setChangeListener { _, index, _ ->
             project.targetSamples = 1 shl index
-            // invalidate rendering as a preview
-            // currently, this value affects editor rendering, too for wysiwyg
-            for (window in GFX.windows) {
-                for (window1 in window.windowStack) {
-                    window1.panel.forAllVisiblePanels {
-                        if (it is StudioSceneView) it.invalidateDrawing()
-                    }
-                }
-            }
             save()
         }
         list += samples

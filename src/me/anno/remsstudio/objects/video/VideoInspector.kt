@@ -4,6 +4,7 @@ import me.anno.audio.openal.AudioManager
 import me.anno.audio.openal.AudioTasks.addAudioTask
 import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.texture.Texture2D
+import me.anno.io.files.InvalidRef
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio.isPaused
 import me.anno.remsstudio.RemsStudio.nullCamera
@@ -133,16 +134,6 @@ object VideoInspector {
 
         fun invalidateTimeline() {
             AudioManager.requestUpdate()
-            // todo this needs multiple frames of invalidation, probably...
-            /*addEvent { // needs a little timeout
-                for (window in GFX.windows) {
-                    for (window1 in window.windowStack) {
-                        window1.panel.forAllVisiblePanels {
-                            if (it is LayerView) it.invalidateLayout()
-                        }
-                    }
-                }
-            }*/
         }
 
         val time = getGroup(NameDesc("Time", "", "obj.time"))
@@ -251,13 +242,13 @@ object VideoInspector {
         var lastState = -1
         list += SpyPanel(style) {
             val meta = lastMeta
-            val isValid = file.hasValidName() && meta != null
-            val hasAudio = isValid && meta?.hasAudio == true
+            val isValid = file != InvalidRef && meta != null
+            val hasAudio = isValid && meta.hasAudio
             val hasImage = isValid && type != VideoType.AUDIO
             val hasVideo = isValid && when (type) {
                 VideoType.IMAGE_SEQUENCE, VideoType.VIDEO -> true
                 else -> false
-            } && meta?.hasVideo == true
+            } && meta.hasVideo
             val hasImSeq = isValid && type == VideoType.IMAGE_SEQUENCE
             val state = hasAudio.toInt(1) + hasImage.toInt(2) + hasVideo.toInt(4) + hasImSeq.toInt(8)
             if (state != lastState) {
@@ -265,7 +256,6 @@ object VideoInspector {
                 for (p in audioPanels) p.isVisible = hasAudio
                 for (p in videoPanels) p.isVisible = hasVideo
                 for (p in imagePanels) p.isVisible = hasImage
-                list.invalidateLayout()
             }
         }
     }

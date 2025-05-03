@@ -2,6 +2,7 @@ package me.anno.remsstudio.ui.editor
 
 import me.anno.config.DefaultStyle
 import me.anno.fonts.FontManager
+import me.anno.fonts.FontStats
 import me.anno.fonts.keys.TextCacheKey
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.DrawRectangles
@@ -29,7 +30,6 @@ import me.anno.ui.Style
 import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
-import me.anno.ui.custom.CustomContainer.Companion.isCross
 import me.anno.utils.Color.black
 import me.anno.utils.Color.mixARGB
 import me.anno.utils.Color.mulAlpha
@@ -45,16 +45,11 @@ import kotlin.math.sqrt
 @Suppress("MemberVisibilityCanBePrivate")
 open class TimelinePanel(style: Style) : Panel(style) {
 
-    data class VisState(val dt: Double, val ct: Double, val et: Double, val td: Double)
-
-    override fun getVisualState(): Any? =
-        VisState(dtHalfLength, centralTime, editorTime, targetDuration)
-
     var drawnStrings = ArrayList<TextCacheKey>(64)
 
     val accentColor = style.getColor("accentColor", black)
 
-    override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
         drawnStrings.clear()
         drawBackground(x0, y0, x1, y1)
         drawTimeAxis(x0, y0, x1, y1, true)
@@ -67,13 +62,12 @@ open class TimelinePanel(style: Style) : Panel(style) {
     fun drawCurrentTime() {
         GFX.loadTexturesSync.push(true)
         val text = getTimeString(editorTime, 0.0)
-        val color = mixARGB(fontColor, backgroundColor, 0.8f)
-        drawSimpleTextCharByChar(x + width / 2, y + height / 2, 0, text, color, backgroundColor, AxisAlignment.CENTER)
+        val color = mixARGB(fontColor, background.color, 0.8f)
+        drawSimpleTextCharByChar(x + width / 2, y + height / 2, 0, text, color, background.color, AxisAlignment.CENTER)
         GFX.loadTexturesSync.pop()
     }
 
     override fun onPropertiesChanged() {
-        invalidateDrawing()
     }
 
     companion object {
@@ -241,7 +235,7 @@ open class TimelinePanel(style: Style) : Panel(style) {
 
         val fontSize = font.sizeInt
         val fontColor = fontColor
-        val backgroundColor = backgroundColor and black.inv()
+        val backgroundColor = background.color and black.inv()
 
         val lineY = y0 + 2 + fontSize
         val lineH = y1 - y0 - 4 - fontSize
@@ -290,9 +284,19 @@ open class TimelinePanel(style: Style) : Panel(style) {
         return timeFractions.minByOrNull { abs(it - time) }!!.toDouble()
     }
 
+    fun getCrossSize(style: Style): Int {
+        val fontSize = style.getSize("text.fontSize", FontStats.getDefaultFontSize())
+        return style.getSize("customizable.crossSize", fontSize)
+    }
+
+    fun isCursorOnCross(x: Float, y: Float, crossSize: Int = getCrossSize(style)): Boolean {
+        val crossSize1 = crossSize + 4f // +4f for 2*padding
+        return x - (this.x + width - crossSize1) in 0f..crossSize1 && y - this.y in 0f..crossSize1
+    }
+
     override fun onMouseClicked(x: Float, y: Float, button: Key, long: Boolean) {
         when {
-            isCross(x, y) -> super.onMouseClicked(x, y, button, long)
+            isCursorOnCross(x, y) -> super.onMouseClicked(x, y, button, long)
             button == Key.BUTTON_LEFT -> jumpToX(x)
             else -> {
                 val options = listOf(
@@ -341,7 +345,6 @@ open class TimelinePanel(style: Style) : Panel(style) {
             centralTime -= dt
             clampTime()
         }
-        invalidateDrawing()
     }
 
     override fun onMouseWheel(x: Float, y: Float, dx: Float, dy: Float, byMouse: Boolean) {

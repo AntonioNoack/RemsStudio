@@ -19,7 +19,7 @@ class VideoPreviewPanel(
     val width1 = height1 * video.lastW / video.lastH
 
     init {
-        backgroundColor = 0xff777777.toInt()
+        background.color = 0xff777777.toInt()
     }
 
     override val onMovementHideTooltip get() = false
@@ -29,7 +29,7 @@ class VideoPreviewPanel(
         minH = height1
     }
 
-    override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
         val meta = video.meta ?: return
         val window = window ?: return
         val time = getTime(window.mouseX)

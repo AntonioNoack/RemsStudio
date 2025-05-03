@@ -2,8 +2,8 @@ package me.anno.remsstudio.objects.effects
 
 import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
+import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.gpu.GFX
-import me.anno.gpu.GFX.isFinalRendering
 import me.anno.gpu.GFXState.renderDefault
 import me.anno.gpu.GFXState.useFrame
 import me.anno.gpu.framebuffer.DepthBufferType

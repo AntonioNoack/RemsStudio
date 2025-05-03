@@ -12,12 +12,12 @@ class ColorInputV2(
     title: NameDesc, visibilityKey: String,
     oldValue: Vector4f, withAlpha: Boolean, val property: AnimatedProperty<*>, style: Style
 ) : ColorInput(title, visibilityKey, oldValue, withAlpha, style, ColorChooserV2(style, withAlpha, property)) {
-    override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
         if (RemsStudio.hideUnusedProperties) {
-            val focused1 = titleView.isInFocus || contentView.listOfAll.any { it.isInFocus }
-            val focused2 = focused1 || (property in Selection.selectedProperties)
-            contentView.isVisible = focused2
+            val focused1 = titleView.isAnyChildInFocus || base.isAnyChildInFocus
+            val focused2 = focused1 || property in Selection.selectedProperties
+            base.isVisible = focused2
         }
-        super.onDraw(x0, y0, x1, y1)
+        super.draw(x0, y0, x1, y1)
     }
 }

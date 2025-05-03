@@ -40,7 +40,6 @@ class PatternRecorderCore(val tp: TextInput) : Panel(style) {
     override fun onUpdate() {
         super.onUpdate()
         level *= pow(0.1f, Time.deltaTime.toFloat())
-        if (level > 0.01f) invalidateDrawing()
     }
 
     override fun calculateSize(w: Int, h: Int) {
@@ -50,9 +49,9 @@ class PatternRecorderCore(val tp: TextInput) : Panel(style) {
         minH = s
     }
 
-    override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
-        backgroundColor = black
-        super.onDraw(x0, y0, x1, y1)
+    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
+        background.color = black
+        super.draw(x0, y0, x1, y1)
         // draw record button
         val s = min(width, height)
         val xc = x + width / 2
@@ -82,7 +81,6 @@ class PatternRecorderCore(val tp: TextInput) : Panel(style) {
                     onTimesChange()
                     ensurePlaying()
                     isRecording = true
-                    invalidateDrawing()
                     requestFocus()
                 },
                 MenuOption(
@@ -92,7 +90,6 @@ class PatternRecorderCore(val tp: TextInput) : Panel(style) {
                     )
                 ) {
                     isRecording = false
-                    invalidateDrawing()
                     RemsStudio.editorTimeDilation = 0.0 // pause :)
                 }
             )
@@ -126,7 +123,6 @@ class PatternRecorderCore(val tp: TextInput) : Panel(style) {
             onTimesChange()
             ensurePlaying()
             level = 1f
-            invalidateDrawing()
         } else super.onKeyDown(x, y, key)
     }
 

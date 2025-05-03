@@ -4,7 +4,6 @@ import me.anno.config.DefaultConfig.style
 import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.engine.Events.addEvent
 import me.anno.gpu.GFX
-import me.anno.io.saveable.Saveable
 import me.anno.io.config.ConfigBasics
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
@@ -12,6 +11,7 @@ import me.anno.io.json.generic.JsonReader
 import me.anno.io.json.generic.JsonWriter
 import me.anno.io.json.saveable.JsonStringReader
 import me.anno.io.json.saveable.JsonStringWriter
+import me.anno.io.saveable.Saveable
 import me.anno.io.utils.StringMap
 import me.anno.language.Language
 import me.anno.remsstudio.RemsStudio.editorTime
@@ -211,32 +211,33 @@ class Project(var name: String, val file: FileReference) : Saveable() {
     }
 
     fun saveUILayout(name: String = uiFile.nameWithoutExtension) {
-        getUILayoutFile(name).outputStream().use { fos ->
-            val writer = JsonWriter(fos)
-            val cdc = mainUI as CustomList
-            fun write(c: Panel, w: Float) {
-                when (c) {
-                    is CustomContainer -> write(c.child, w)
-                    is CustomList -> {
-                        writer.beginArray()
-                        writer.write(if (c.isY) "CustomListY" else "CustomListX")
-                        writer.write((w * 1000f).roundToInt())
-                        val weightSum = c.children.sumOf { it.weight.toDouble() }.toFloat()
-                        for (chi in c.children) {
-                            write(chi, chi.weight / weightSum)
+        getUILayoutFile(name).outputStream()
+            .bufferedWriter().use { fos ->
+                val writer = JsonWriter(fos)
+                val cdc = mainUI as CustomList
+                fun write(c: Panel, w: Float) {
+                    when (c) {
+                        is CustomContainer -> write(c.child, w)
+                        is CustomList -> {
+                            writer.beginArray()
+                            writer.write(if (c.isY) "CustomListY" else "CustomListX")
+                            writer.write((w * 1000f).roundToInt())
+                            val weightSum = c.children.sumOf { it.weight.toDouble() }.toFloat()
+                            for (chi in c.children) {
+                                write(chi, chi.weight / weightSum)
+                            }
+                            writer.endArray()
                         }
-                        writer.endArray()
-                    }
-                    else -> {
-                        writer.beginArray()
-                        writer.write(c.className)
-                        writer.write((w * 1000f).roundToInt())
-                        writer.endArray()
+                        else -> {
+                            writer.beginArray()
+                            writer.write(c.className)
+                            writer.write((w * 1000f).roundToInt())
+                            writer.endArray()
+                        }
                     }
                 }
+                write(cdc, 1f)
             }
-            write(cdc, 1f)
-        }
     }
 
     // do we need multiple targets per project? maybe... soft links!

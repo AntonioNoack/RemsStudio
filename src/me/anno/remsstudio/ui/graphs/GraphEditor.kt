@@ -73,7 +73,6 @@ class GraphEditor(style: Style) : PanelListY(style) {
             for (kf in body.selectedKeyframes) {
                 kf.interpolation = type
             }
-            body.invalidateDrawing()
         }
     }
 

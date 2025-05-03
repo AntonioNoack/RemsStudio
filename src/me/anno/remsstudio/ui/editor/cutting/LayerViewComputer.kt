@@ -117,7 +117,6 @@ class LayerViewComputer(private val view: LayerView) {
         addEvent {
             this.calculated = transforms
             view.solution = solution
-            view.invalidateDrawing()
         }
 
     }

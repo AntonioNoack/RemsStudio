@@ -48,13 +48,13 @@ class FloatVectorInputV2(
             ?: super.onPaste(x, y, data, type)
     }
 
-    override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
         val focused1 = titleView?.isInFocus == true
         if (RemsStudio.hideUnusedProperties) {
             val focused2 = focused1 || owningProperty in Selection.selectedProperties
             valueList.isVisible = focused2
         }
-        super.onDraw(x0, y0, x1, y1)
+        super.draw(x0, y0, x1, y1)
     }
 
     override fun onCopyRequested(x: Float, y: Float) = owningProperty.toString()

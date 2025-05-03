@@ -4,7 +4,7 @@ import me.anno.cache.ICacheData
 import me.anno.config.DefaultConfig
 import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.engine.inspector.Inspectable
-import me.anno.gpu.GFX.isFinalRendering
+import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.gpu.GFXState
 import me.anno.gpu.blending.BlendMode
 import me.anno.gpu.drawing.GFXx3D
@@ -57,7 +57,6 @@ import me.anno.utils.types.Casting.castToDouble
 import me.anno.utils.types.Casting.castToDouble2
 import me.anno.utils.types.Floats.toRadians
 import me.anno.utils.types.Strings.isBlank2
-import me.anno.video.MissingFrameException
 import org.apache.logging.log4j.LogManager
 import org.joml.*
 import java.util.concurrent.atomic.AtomicInteger
@@ -472,10 +471,10 @@ open class Transform() : Saveable(),
     fun draw(stack: Matrix4fArrayList, parentTime: Double, parentColor: Vector4f) {
         val time = getLocalTime(parentTime)
         val color = getLocalColor(parentColor, time, tmp0)
-        draw(stack, time, parentColor, color)
+        onDraw(stack, time, parentColor, color)
     }
 
-    fun draw(stack: Matrix4fArrayList, time: Double, parentColor: Vector4f, color: Vector4f) {
+    fun onDraw(stack: Matrix4fArrayList, time: Double, parentColor: Vector4f, color: Vector4f) {
         if (color.w > minAlpha && visibility.isVisible) {
             applyTransformLT(stack, time)
             drawDirectly(stack, time, parentColor, color)
@@ -523,7 +522,7 @@ open class Transform() : Saveable(),
     fun drawChild(stack: Matrix4fArrayList, time: Double, color: Vector4f, child: Transform?) {
         if (child != null) {
             stack.next {
-                child.draw(stack, time, color)
+                child.onDraw(stack, time, color)
             }
         }
     }
@@ -868,11 +867,7 @@ open class Transform() : Saveable(),
         }
     }
 
-    fun checkFinalRendering() {
-        if (isFinalRendering) throw MissingFrameException(toString())
-    }
-
-    open fun getAdditionalChildrenOptions(): List<Option> = emptyList()
+    open fun getAdditionalChildrenOptions(): List<Option<Transform>> = emptyList()
 
     open val areChildrenImmutable: Boolean = false
 

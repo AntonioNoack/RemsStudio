@@ -2,7 +2,7 @@ package me.anno.remsstudio.objects
 
 import me.anno.animation.LoopingState
 import me.anno.engine.inspector.Inspectable
-import me.anno.gpu.GFX.isFinalRendering
+import me.anno.gpu.FinalRendering.onMissingResource
 import me.anno.gpu.drawing.GFXx2D.getSize
 import me.anno.gpu.drawing.GFXx2D.getSizeX
 import me.anno.gpu.drawing.GFXx2D.getSizeY
@@ -28,7 +28,6 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.NumberType
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.structures.Collections.filterIsInstance2
-import me.anno.video.MissingFrameException
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
@@ -238,8 +237,10 @@ class FourierTransform : Transform() {
         getTime: (Int) -> Time
     ): Pair<FloatArray, FloatArray>? {
         val data = AudioFXCache2.getBuffer0(meta, getKey(getTime), false)
-        if (isFinalRendering && data == null) throw MissingFrameException(file.absolutePath)
-        if (data == null) return null
+        if (data == null) {
+            onMissingResource("Missing audio buffer", file)
+            return null
+        }
         return data.getBuffersOfDomain(Domain.FREQUENCY_DOMAIN)
     }
 
@@ -250,10 +251,11 @@ class FourierTransform : Transform() {
         super.createInspector(inspected, list, style, getGroup)
         val c = inspected.filterIsInstance2(FourierTransform::class)
         val fourier = getGroup(NameDesc("Fourier Transform", "", "obj.fourier"))
-        list.addChild(vi(
-            inspected, "Audio File", "Source file, which gets used as an input into the FFT", "fourier.sourceFile",
-            null, file, style
-        ) { it, _ -> for (x in c) x.file = it })
+        list.addChild(
+            vi(
+                inspected, "Audio File", "Source file, which gets used as an input into the FFT", "fourier.sourceFile",
+                null, file, style
+            ) { it, _ -> for (x in c) x.file = it })
         fourier.addChild(
             vi(
                 inspected, "Sample Rate", "What the highest frequency should be", "fourier.sampleRate",

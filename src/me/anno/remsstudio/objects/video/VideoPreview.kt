@@ -1,7 +1,7 @@
 package me.anno.remsstudio.objects.video
 
 import me.anno.animation.LoopingState
-import me.anno.gpu.GFX.isFinalRendering
+import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.io.MediaMetadata
 import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.objects.video.VideoSize.getCacheableZoomLevel

@@ -7,6 +7,7 @@ import me.anno.ecs.EntityQuery.hasComponent
 import me.anno.ecs.components.anim.*
 import me.anno.ecs.components.anim.BoneData.uploadJointMatrices
 import me.anno.ecs.components.mesh.Mesh
+import me.anno.ecs.components.mesh.MeshComponent
 import me.anno.ecs.components.mesh.MeshComponentBase
 import me.anno.ecs.components.mesh.material.Materials
 import me.anno.ecs.prefab.PrefabCache
@@ -14,14 +15,12 @@ import me.anno.engine.inspector.Inspectable
 import me.anno.engine.ui.render.ECSShaderLib
 import me.anno.engine.ui.render.Renderers.previewRenderer
 import me.anno.gpu.DitherMode
-import me.anno.gpu.GFX
+import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.gpu.GFXState
-import me.anno.gpu.pipeline.Pipeline
 import me.anno.gpu.shader.Shader
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.texture.ITexture2D
 import me.anno.gpu.texture.TextureLib.whiteTexture
-import me.anno.image.thumbs.AssetThumbHelper.warnMissingMesh
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
@@ -43,10 +42,15 @@ import me.anno.ui.input.EnumInput
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.pooling.JomlPools
 import me.anno.utils.structures.Collections.filterIsInstance2
+import org.apache.logging.log4j.LogManager
 import org.joml.*
 
 @Suppress("MemberVisibilityCanBePrivate")
 class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(parent) {
+
+    companion object {
+        private val LOGGER = LogManager.getLogger(MeshTransform::class)
+    }
 
     // todo lerp animations
 
@@ -100,7 +104,8 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         val result = HashMap<String, Animation>()
         entity.forAll {
             if (it is AnimMeshComponent) {
-                val skeleton = SkeletonCache[it.skeleton]
+                val mesh = it.getMesh()
+                val skeleton = SkeletonCache[mesh?.skeleton]
                 if (skeleton != null) {
                     for ((name, anim) in skeleton.animations) {
                         result[name] = AnimationCache[anim] ?: continue
@@ -120,7 +125,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
 
         val animationName = animation[time]
 
-        val drawSkeletons = !GFX.isFinalRendering
+        val drawSkeletons = !isFinalRendering
         val shader = ECSShaderLib.pbrModelShader.value
         shader.use()
         whiteTexture.bindTrulyNearest(shader, "reflectionPlane")
@@ -163,12 +168,12 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         val localTransform = Matrix4x3fArrayList()
 
         if (normalizeScale) {
-            val scale = getScaleFromAABB(entity.getBounds())
+            val scale = getScaleFromAABB(entity.getGlobalBounds())
             localTransform.scale(scale)
         }
 
         if (centerMesh) {
-            MeshUtils.centerStackFromAABB(localTransform, entity.getBounds())
+            MeshUtils.centerStackFromAABB(localTransform, entity.getGlobalBounds())
         }
 
         drawHierarchy(
@@ -200,15 +205,15 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         localTransform.pushMatrix()
 
         val transform = entity.transform
-        val local = transform.localTransform
+        val local = transform.getLocalTransform(Matrix4x3())
 
         // this moves the engine parts correctly, but ruins the rotation of the ghost
         // and scales it totally incorrectly
         localTransform.mul(
             Matrix4x3f(
-                local.m00.toFloat(), local.m01.toFloat(), local.m02.toFloat(),
-                local.m10.toFloat(), local.m11.toFloat(), local.m12.toFloat(),
-                local.m20.toFloat(), local.m21.toFloat(), local.m22.toFloat(),
+                local.m00, local.m01, local.m02,
+                local.m10, local.m11, local.m12,
+                local.m20, local.m21, local.m22,
                 local.m30.toFloat(), local.m31.toFloat(), local.m32.toFloat(),
             )
         )
@@ -231,7 +236,6 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             entity.forAllComponents(MeshComponentBase::class) { comp ->
                 val mesh = comp.getMesh() as? Mesh
                 if (mesh?.positions != null) {
-                    mesh.checkCompleteness()
                     mesh.ensureBuffer()
                     val materialOverrides = comp.materials
                     val materials = mesh.materials
@@ -243,7 +247,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                         animTexture?.bindTrulyNearest(shader, "animTexture")
                         mesh.draw(null, shader, index)
                     }
-                } else warnMissingMesh(comp, mesh)
+                } else LOGGER.warn("Missing mesh ${(comp as? MeshComponent)?.meshFile}")
             }
         }
 

@@ -89,11 +89,11 @@ class SceneTab(var file: FileReference, var scene: Transform, history: History?)
 
     fun close() = SceneTabs.close(this)
 
-    private val bg = backgroundColor
+    private val bg get() = background.originalColor
     private val bgLight = mixARGB(bg, 0xff777777.toInt(), 0.5f)
-    override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
-        backgroundColor = if (this === currentTab) bgLight else bg
-        super.onDraw(x0, y0, x1, y1)
+    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
+        background.color = if (this === currentTab) bgLight else bg
+        super.draw(x0, y0, x1, y1)
     }
 
     fun save(dst: FileReference, onSuccess: () -> Unit) {

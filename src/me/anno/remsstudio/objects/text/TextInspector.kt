@@ -17,6 +17,7 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.color.spaces.HSLuv
 import me.anno.ui.input.BooleanInput
 import me.anno.ui.input.TextInputML
+import me.anno.utils.assertions.assertTrue
 import me.anno.utils.structures.Collections.filterIsInstance2
 import org.joml.Vector3f
 import org.joml.Vector4f

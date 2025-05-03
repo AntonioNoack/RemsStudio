@@ -38,22 +38,15 @@ class SoundPipeline() : Saveable(), Inspectable {
         getGroup: (nameDesc: NameDesc) -> SettingCategory
     ) {
         val effectsGroup = getGroup(NameDesc("Audio Effects", "Audio Effects", "obj.audio-fx"))
-        effectsGroup += object : StackPanel(
+        effectsGroup += object : StackPanel<SoundEffect>(
             "Effects Stack",
             "Effects can be added with RMB, are applied one after another",
-            options.map { gen ->
-                option { gen().apply { audio = this@SoundPipeline.audio } }
-            },
-            effects,
-            {
-                if (it is SoundEffect) {
-                    option { it }
-                } else null
-            },
-            style
+            options.map { gen -> option { gen().apply { audio = this@SoundPipeline.audio } } },
+            effects, style
         ) {
 
-            override fun setValue(newValue: List<Inspectable>, mask: Int, notify: Boolean): Panel {
+            override fun getOption(component: SoundEffect) = option { component }
+            override fun setValue(newValue: List<SoundEffect>, mask: Int, notify: Boolean): Panel {
                 if (newValue !== effects) {
                     effects.clear()
                     effects.addAll(newValue.filterIsInstance2(SoundEffect::class))
@@ -61,11 +54,10 @@ class SoundPipeline() : Saveable(), Inspectable {
                 return this
             }
 
-            override val value: List<Inspectable>
+            override val value: List<SoundEffect>
                 get() = effects
 
-            override fun onAddComponent(component: Inspectable, index: Int) {
-                component as SoundEffect
+            override fun onAddComponent(component: SoundEffect, index: Int) {
                 RemsStudio.largeChange("Add ${component.displayName}") {
                     if (index >= effects.size) {
                         effects.add(component)
@@ -75,8 +67,7 @@ class SoundPipeline() : Saveable(), Inspectable {
                 }
             }
 
-            override fun onRemoveComponent(component: Inspectable) {
-                component as SoundEffect
+            override fun onRemoveComponent(component: SoundEffect) {
                 RemsStudio.largeChange("Remove ${component.displayName}") {
                     effects.remove(component)
                 }
@@ -170,7 +161,7 @@ class SoundPipeline() : Saveable(), Inspectable {
             )*/
         }
 
-        fun option(generator: () -> SoundEffect): Option {
+        fun option(generator: () -> SoundEffect): Option<SoundEffect> {
             val sample = generator()
             return Option(NameDesc(sample.displayName, sample.description, ""), generator)
         }

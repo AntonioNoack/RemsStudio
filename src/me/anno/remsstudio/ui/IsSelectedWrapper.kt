@@ -29,7 +29,6 @@ class IsSelectedWrapper(panel: Panel, val getIsSelected: () -> Boolean) :
                 field = value
                 padding.set(value.toInt(1))
                 strength = value.toInt().toFloat()
-                invalidateLayout()
             }
         }
 
@@ -38,11 +37,10 @@ class IsSelectedWrapper(panel: Panel, val getIsSelected: () -> Boolean) :
         isSelected = getIsSelected()
     }
 
-    override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
-        super.onDraw(x0, y0, x1, y1)
+    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
+        super.draw(x0, y0, x1, y1)
         if (isSelected) {
             DrawRectangles.drawBorder(x, y, width, height, color.withAlpha(strength), padding.left)
-            if (strength > 0.01f) invalidateDrawing()
             strength *= dtTo10(decaySpeed * Time.deltaTime).toFloat()
         }
     }

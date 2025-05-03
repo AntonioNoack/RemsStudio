@@ -2,6 +2,7 @@ package me.anno.remsstudio.objects
 
 import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
+import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.Perspective.setPerspective
 import me.anno.io.base.BaseWriter
@@ -228,7 +229,7 @@ class Camera(parent: Transform? = null) : Transform(parent) {
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
-        if (GFX.isFinalRendering) return
+        if (isFinalRendering) return
         if (this === currentlyDrawnCamera) return
 
         val offset = getEffectiveOffset(time)

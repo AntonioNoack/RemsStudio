@@ -2,7 +2,6 @@ package me.anno.remsstudio.gpu
 
 import me.anno.ecs.components.mesh.Mesh
 import me.anno.gpu.GFX
-import me.anno.gpu.GFXState
 import me.anno.gpu.buffer.SimpleBuffer
 import me.anno.gpu.drawing.GFXx3D
 import me.anno.gpu.drawing.GFXx3D.circleParams
@@ -34,7 +33,6 @@ import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.video.UVProjection
 import me.anno.utils.Color.white4
 import me.anno.video.formats.gpu.GPUFrame
-import ofx.mio.OpticalFlow
 import org.joml.*
 import org.lwjgl.BufferUtils
 import java.nio.FloatBuffer
@@ -143,41 +141,6 @@ object GFXx3Dv2 {
         GFX.check()
     }
 
-    fun draw3DVideo(
-        video: GFXTransform, time: Double,
-        stack: Matrix4fArrayList, v0: GPUFrame, v1: GPUFrame, interpolation: Float, color: Vector4f,
-        filtering: TexFiltering, clamping: Clamping, tiling: Vector4f?, uvProjection: UVProjection,
-        cornerRadius: Vector4f
-    ) {
-
-        if (!v0.isCreated || !v1.isCreated) throw RuntimeException("Frame must be loaded to be rendered!")
-
-        val t0 = v0.getTextures()
-        val t1 = v1.getTextures()
-
-        val lambda = 0.01f
-        val blurAmount = 0.05f
-
-        GFXState.renderPurely {
-            // interpolate all textures
-            val interpolated = t0.zip(t1).map { (x0, x1) -> OpticalFlow.run(lambda, blurAmount, interpolation, x0, x1) }
-            // bind them
-            v0.bind2(0, filtering.convert(), clamping, interpolated)
-        }
-
-        val shader0 = get3DShader(v0)
-        val shader = shader0.value
-        shader.use()
-        defineAdvancedGraphicalFeatures(shader, video, time, uvProjection != UVProjection.Planar)
-        shader3DUniforms(shader, stack, v0.width, v0.height, color, tiling, filtering, uvProjection)
-        colorGradingUniforms(video as? Video, time, shader)
-        cornerRadius(shader, cornerRadius, v0.width, v0.height)
-        v0.bindUVCorrection(shader)
-        uvProjection.mesh.draw(null, shader, 0)
-        GFX.check()
-
-    }
-
     private fun cornerRadius(shader: Shader, cornerRadius: Vector4f, w: Int, h: Int) {
         shader.v4f("cornerRadius", cornerRadius)
         shader.v2f("cornerSize", 2f * w.toFloat() / h.toFloat(), 2f)
@@ -226,7 +189,7 @@ object GFXx3Dv2 {
         that: GFXTransform, time: Double,
         stack: Matrix4fArrayList,
         offset: Vector2f, scale: Vector2f,
-        texture: Texture2D,
+        texture: ITexture2D,
         color: Vector4f, colorCount: Int, colors: Array<Vector4f>,
         distances: FloatArray, smoothness: FloatArray, depth: Float,
         hasUVAttractors: Boolean
@@ -280,7 +243,7 @@ object GFXx3Dv2 {
         stack: Matrix4fArrayList,
         offset: Vector2f,
         scale: Vector2f,
-        texture: Texture2D,
+        texture: ITexture2D,
         hasUVAttractors: Boolean
     ) {
         val shader = ShaderLibV2.shaderSDFText.value

@@ -177,7 +177,6 @@ object Rendering {
             time,
             targetOutputFile
         ).start(callback)
-
     }
 
     private fun findCamera(scene: Transform): Camera {

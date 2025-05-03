@@ -4,7 +4,8 @@ import me.anno.cache.instances.PDFCache
 import me.anno.cache.instances.PDFCache.getTexture
 import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
-import me.anno.gpu.GFX.isFinalRendering
+import me.anno.gpu.FinalRendering.isFinalRendering
+import me.anno.gpu.FinalRendering.onMissingResource
 import me.anno.gpu.GFX.viewportHeight
 import me.anno.gpu.GFX.viewportWidth
 import me.anno.gpu.texture.Clamping
@@ -109,8 +110,8 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
         val file = file
         val ref = meta
         if (ref == null) {
-            super.onDraw(stack, time, color)
-            return checkFinalRendering()
+            onMissingResource("Missing document", file)
+            return
         }
 
         val doc = ref.doc
@@ -140,7 +141,8 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
                     if (isVisible(stack, x)) {
                         var texture = getTexture(file, doc, quality, pageNumber)
                         if (texture == null) {
-                            checkFinalRendering()
+                            onMissingResource("Missing texture", file)
+                            if (isFinalRendering) return@next
                             texture = colorShowTexture
                         }
                         // find out the correct size for the image

@@ -22,8 +22,8 @@ class TimeControlsPanel(style: Style) : PanelListX(style) {
 
     init {
         val showButton = TextButton(NameDesc("Show Time Controls"), style)
-        val bg = showButton.backgroundColor
-        backgroundColor = Color.mixARGB(backgroundColor, bg, 0.3f)
+        val bg = showButton.background.color
+        background.color = Color.mixARGB(background.color, bg, 0.3f)
         fun space(): Panel {
             return SpacerPanel(1, 1, style).apply {
                 makeBackgroundTransparent()

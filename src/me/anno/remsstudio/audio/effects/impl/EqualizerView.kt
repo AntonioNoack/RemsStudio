@@ -86,8 +86,8 @@ class EqualizerView(val self: EqualizerEffect, style: Style) : Panel(style) {
         else null
     }
 
-    override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
-        super.onDraw(x0, y0, x1, y1)
+    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
+        super.draw(x0, y0, x1, y1)
 
         // draw axes with legend (+/- 12dB)
         val numLines = 24
@@ -102,14 +102,14 @@ class EqualizerView(val self: EqualizerEffect, style: Style) : Panel(style) {
             drawRect(x0l, y, max(x1l - x0l, 0), 1, color.withAlpha(alpha))
         }
 
-        val bg0 = backgroundColor.withAlpha(0)
+        val bg0 = background.color.withAlpha(0)
 
         val time = global2Kf(editorTime)
         for (i in 1 until frequencies.size) {
             drawLine(
                 x + (unitX * (i + 0.75f)), y + (height * (1f - self.sliders[i - 1][time])),
                 x + (unitX * (i + 1.75f)), y + (height * (1f - self.sliders[i][time])),
-                1f, color.withAlpha(127), backgroundColor, false, 1f
+                1f, color.withAlpha(127), background.color, false, 1f
             )
         }
 

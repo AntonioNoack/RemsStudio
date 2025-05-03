@@ -3,8 +3,8 @@ package me.anno.remsstudio.objects.video
 import me.anno.Engine
 import me.anno.animation.LoopingState
 import me.anno.cache.ICacheData
+import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.gpu.GFX
-import me.anno.gpu.GFX.isFinalRendering
 import me.anno.input.Input
 import me.anno.io.files.FileReference
 import me.anno.maths.Maths.ceilDiv

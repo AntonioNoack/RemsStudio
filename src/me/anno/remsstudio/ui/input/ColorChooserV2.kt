@@ -33,7 +33,7 @@ class ColorChooserV2(style: Style, withAlpha: Boolean, val property: AnimatedPro
     @NotSerializedProperty
     private var lastTime = RemsStudio.editorTime
 
-    override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
         if (lastTime != RemsStudio.editorTime) {
             lastTime = RemsStudio.editorTime
             when (val c = property[RemsStudio.editorTime]) {
@@ -42,7 +42,7 @@ class ColorChooserV2(style: Style, withAlpha: Boolean, val property: AnimatedPro
                 else -> throw RuntimeException()
             }
         }
-        super.onDraw(x0, y0, x1, y1)
+        super.draw(x0, y0, x1, y1)
     }
 
     override fun clone(): ColorChooserV2 {

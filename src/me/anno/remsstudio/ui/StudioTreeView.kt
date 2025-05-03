@@ -53,22 +53,18 @@ class StudioTreeView(style: Style) :
 
     override fun removeChild(parent: Transform, child: Transform) {
         parent.removeChild(child)
-        invalidateLayout()
     }
 
     override fun setCollapsed(element: Transform, collapsed: Boolean) {
         element.isCollapsedI.value = collapsed
-        invalidateLayout()
     }
 
     override fun setName(element: Transform, name: String) {
         element.nameI.value = name
-        invalidateLayout()
     }
 
     override fun destroy(element: Transform) {
         element.destroy()
-        invalidateLayout()
     }
 
     override fun canBeInserted(parent: Transform, element: Transform, index: Int): Boolean {
@@ -195,7 +191,7 @@ class StudioTreeView(style: Style) :
                 val additional = baseTransform.getAdditionalChildrenOptions().map { option ->
                     MenuOption(option.nameDesc) {
                         RemsStudio.largeChange("Added ${option.nameDesc.name}") {
-                            val new = option.generator() as Transform
+                            val new = option.generator()
                             baseTransform.addChild(new)
                             Selection.selectTransform(new)
                         }
@@ -225,8 +221,8 @@ class StudioTreeView(style: Style) :
         }
     }
 
-    override fun moveChange(run: () -> Unit) {
-        RemsStudio.largeChange("Moved Component", run)
+    override fun moveChange(callback: () -> Unit) {
+        RemsStudio.largeChange("Moved Component", callback)
     }
 
     override fun addChild(element: Transform, child: Any, type: Char, index: Int): Boolean {

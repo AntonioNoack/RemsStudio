@@ -1,6 +1,7 @@
 package me.anno.remsstudio.objects.particles
 
 import me.anno.cache.CacheData
+import me.anno.engine.inspector.Inspectable
 import me.anno.fonts.FontManager
 import me.anno.fonts.FontManager.TextCache
 import me.anno.fonts.PartResult
@@ -8,14 +9,14 @@ import me.anno.fonts.mesh.TextMesh
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringWriter
-import me.anno.remsstudio.objects.text.TextSegmentKey
-import me.anno.remsstudio.objects.text.Text
-import me.anno.engine.inspector.Inspectable
 import me.anno.jvm.fonts.AWTFont
 import me.anno.language.translation.NameDesc
+import me.anno.remsstudio.objects.text.Text
+import me.anno.remsstudio.objects.text.TextSegmentKey
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
+import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.types.Strings.joinChars
 import org.joml.Vector3f
 import kotlin.streams.toList
@@ -33,7 +34,8 @@ class TextParticles : ParticleSystem() {
         getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
-        text.createInspectorWithoutSuper(inspected, list, style, getGroup)
+        val inspected2 = inspected.filterIsInstance2(TextParticles::class).map { it.text }
+        text.createInspectorWithoutSuper(inspected2, list, style, getGroup)
     }
 
     override fun createParticle(index: Int, time: Double): Particle? {

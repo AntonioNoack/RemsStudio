@@ -48,7 +48,7 @@ class NumberInputComponentV2(
         super.onMouseMoved(x, y, dx, dy)
     }
 
-    override fun onDraw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
         val editorTime = RemsStudio.editorTime
         if (lastTime != editorTime && owningProperty.isAnimated) {
             lastTime = editorTime
@@ -67,7 +67,7 @@ class NumberInputComponentV2(
                 setText(value, true)
             }
         }
-        super.onDraw(x0, y0, x1, y1)
+        super.draw(x0, y0, x1, y1)
     }
 
     override fun onEmpty(x: Float, y: Float) {
