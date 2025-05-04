@@ -100,7 +100,7 @@ class EqualizerTest {
             audio.pipeline.effects.add(effect)
             val (left, _) = getBuffer(audio)
             if (false) ImageWriter.writeImageCurve(
-                2048 * 4, 512, true, -1, 0,
+                2048 * 4, 512, true, true, -1, 0,
                 1, (0 until bufferSize).map {
                     Vector2f(240f * it, left[it])
                 } + (0 until bufferSize).map {

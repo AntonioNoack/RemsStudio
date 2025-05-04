@@ -6,11 +6,11 @@ import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.geometric.Circle
 import me.anno.remsstudio.objects.geometric.Polygon
 import me.anno.remsstudio.objects.particles.ParticleSystem
 import me.anno.remsstudio.objects.text.Text
+import me.anno.remsstudio.objects.video.Video
 import me.anno.utils.OS
 import org.apache.logging.log4j.LogManager
 import java.io.*
@@ -49,7 +49,7 @@ fun main() {
     )
 
     // load all files into the cache
-    candidates.forEach { it.save(BinaryWriter(DataOutputStream(ByteArrayOutputStream()))) }
+    candidates.forEach { it.save(BinaryWriter(DataOutputStream(ByteArrayOutputStream()), InvalidRef)) }
 
     val file = OS.desktop.getChild("raw.bin")
 
@@ -60,7 +60,7 @@ fun main() {
     for (i in 0 until 100) {
         bos = ByteArrayOutputStream(4096)
         DataOutputStream(bos).use { dos ->
-            val writer = BinaryWriter(dos)
+            val writer = BinaryWriter(dos, InvalidRef)
             candidates.forEach { writer.add(it) }
             writer.writeAllInList()
         }
@@ -96,7 +96,7 @@ fun main() {
     DataInputStream(ByteArrayInputStream(binaryValue)).use { dis ->
         val reader = BinaryReader(dis)
         reader.readAllInList()
-        val content = reader.sortedContent
+        val content = reader.allInstances
         for (c in content) logger.info(c.className)
     }
 

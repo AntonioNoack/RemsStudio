@@ -28,7 +28,7 @@ fun main() {
         }
     }
     ImageWriter.writeImageCurve(
-        steps, steps, true,
+        steps, steps, true, true,
         -1, 0, 1, pts, "test"
     )
 }

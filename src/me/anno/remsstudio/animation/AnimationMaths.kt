@@ -74,29 +74,4 @@ object AnimationMaths {
             else -> throw RuntimeException("don't know how to mul $a")
         }
     }
-
-    /**
-     * a * (1-f) + f * b
-     * */
-    fun mix(a: Any?, b: Any?, f: Double, type: NumberType): Any {
-        val g = 1.0 - f
-        return when (type) {
-            NumberType.INT,
-            NumberType.INT_PLUS -> ((a as Int) * g + f * (b as Int)).roundToInt()
-            NumberType.LONG -> ((a as Long) * g + f * (b as Long)).toLong()
-            NumberType.FLOAT,
-            NumberType.FLOAT_01, NumberType.FLOAT_01_EXP,
-            NumberType.FLOAT_PLUS -> ((a as Float) * g + f * (b as Float)).toFloat()
-            NumberType.DOUBLE -> (a as Double) * g + f * (b as Double)
-            NumberType.SKEW_2D -> (a as Vector2f).lerp(b as Vector2f, f.toFloat(), Vector2f())
-            NumberType.POSITION,
-            NumberType.ROT_YXZ,
-            NumberType.SCALE -> (a as Vector3f).lerp(b as Vector3f, f.toFloat(), Vector3f())
-            NumberType.COLOR, NumberType.TILING -> (a as Vector4f).lerp(b as Vector4f, f.toFloat(), Vector4f())
-            NumberType.QUATERNION -> (a as Quaternionf).slerp(b as Quaternionf, f.toFloat())
-            NumberType.STRING -> StringMixer.mix(a.toString(), b.toString(), f)
-            else -> throw RuntimeException("don't know how to linearly interpolate $a and $b")
-        }
-    }
-
 }

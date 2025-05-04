@@ -20,7 +20,6 @@ import me.anno.remsstudio.Rendering.renderFrame
 import me.anno.remsstudio.Rendering.renderPart
 import me.anno.remsstudio.Rendering.renderSetPercent
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.ui.scene.StudioSceneView
 import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY

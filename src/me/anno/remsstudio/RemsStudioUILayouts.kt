@@ -9,8 +9,10 @@ import me.anno.gpu.GFX
 import me.anno.input.ActionManager
 import me.anno.input.Key
 import me.anno.io.config.ConfigBasics
+import me.anno.language.Language
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
+import me.anno.remsstudio.ProjectSettings.save
 import me.anno.remsstudio.RemsStudio.defaultWindowStack
 import me.anno.remsstudio.RemsStudio.project
 import me.anno.remsstudio.RemsStudio.root
@@ -105,8 +107,12 @@ object RemsStudioUILayouts {
          * Project options
          * */
         options.addAction(projectTitle, Dict["Change Language", ""]) {
-            val panel = ProjectSettings.createSpellcheckingPanel(style)
-            openMenuByPanels(windowStack, NameDesc("Change Project Language"), listOf(panel))
+            openMenu(windowStack, NameDesc("Change Project Language"), Language.entries.map {
+                MenuOption(it.naming) {
+                    project?.language = it
+                    save()
+                }
+            })
         }
         options.addAction(projectTitle, Dict["Save", "ui.top.project.save"]) {
             RemsStudio.save()
