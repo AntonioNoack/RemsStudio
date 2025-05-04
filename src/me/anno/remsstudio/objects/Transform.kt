@@ -43,6 +43,7 @@ import me.anno.ui.input.NumberType
 import me.anno.ui.input.TextInput
 import me.anno.ui.input.TextInputML
 import me.anno.utils.Color.mulARGB
+import me.anno.utils.pooling.JomlPools
 import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.structures.Hierarchical
 import me.anno.utils.structures.ValueWithDefault
@@ -375,29 +376,19 @@ open class Transform() : Saveable(),
         return localTime0
     }
 
-    fun getLocalColor(dst: Vector4f = Vector4f()): Vector4f {
-        return getLocalColor(
-            parent?.getLocalColor(dst),
-            lastLocalTime, dst
-        )
+    fun getLocalColor(dst: Vector4f): Vector4f {
+        val parentColor = JomlPools.vec4f.create().set(1f)
+        parent?.getLocalColor(parentColor)
+        getLocalColor(parentColor, lastLocalTime, dst)
+        JomlPools.vec4f.sub(1)
+        return dst
     }
 
     fun updateLocalColor(parentColor: Vector4f, localTime: Double) {
         lastLocalColor = getLocalColor(parentColor, localTime, lastLocalColor)
     }
 
-    fun getLocalAlpha(parentAlpha: Float, localTime: Double, tmp: Vector4f): Float {
-        var col = color.getValueAt(localTime, tmp).w
-        val fadeIn = fadeIn[localTime]
-        val fadeOut = fadeOut[localTime]
-        val m1 = clamp((localTime - getStartTime()) / fadeIn, 0.0, 1.0)
-        val m2 = clamp((getEndTime() - localTime) / fadeOut, 0.0, 1.0)
-        val fading = (m1 * m2).toFloat()
-        col *= parentAlpha * fading
-        return col
-    }
-
-    fun getLocalColor(parentColor: Vector4f?, localTime: Double, dst: Vector4f = Vector4f()): Vector4f {
+    fun getLocalColor(parentColor: Vector4f?, localTime: Double, dst: Vector4f): Vector4f {
         // we would need a temporary value for the parent color, as may be parentColor == dst
         var px = 1f
         var py = 1f
@@ -424,10 +415,10 @@ open class Transform() : Saveable(),
 
     fun applyTransform(transform: Matrix4f, time: Double) {
 
-        val position = position[time]
-        val scale = scale[time]
-        val euler = rotationYXZ[time]
-        val skew = skew[time]
+        val position = position[time, JomlPools.vec3f.create()]
+        val scale = scale[time, JomlPools.vec3f.create()]
+        val euler = rotationYXZ[time, JomlPools.vec3f.create()]
+        val skew = skew[time, JomlPools.vec2f.create()]
         val alignWithCamera = alignWithCamera[time]
 
         if (position.x != 0f || position.y != 0f || position.z != 0f) {
@@ -446,12 +437,14 @@ open class Transform() : Saveable(),
             transform.alignWithCamera(alignWithCamera)
         }
 
+        JomlPools.vec3f.sub(3)
+        JomlPools.vec2f.sub(1)
     }
 
     fun Matrix4f.alignWithCamera(alignWithCamera: Float) {
         // lerp rotation instead of full transform?
         if (alignWithCamera != 0f) {
-            val local = Scene.lGCTInverted
+            val local = Scene.lastGlobalCameraTransformInverted
             val up = local.transformDirection(Vector3f(0f, 1f, 0f))
             val forward = local.transformDirection(Vector3f(0f, 0f, -1f))
             if (alignWithCamera == 1f) {
@@ -613,36 +606,32 @@ open class Transform() : Saveable(),
         return this
     }
 
-    fun getLocalTransform(globalTime: Double, reference: Transform?): Matrix4f {
-        val (parentTransform, parentTime) =
-            if (reference === parent) Matrix4f() to globalTime
-            else parent?.getGlobalTransformTime(globalTime) ?: (Matrix4f() to globalTime)
-        val localTime = getLocalTime(parentTime)
-        applyTransform(parentTransform, localTime)
-        return parentTransform
+    fun getLocalTransform(globalTime: Double, reference: Transform?, dst: Matrix4f): Matrix4f {
+        val parent = parent
+        if (parent != null && parent !== reference) {
+            val (parentTransform, parentTime) = parent.getGlobalTransformTime(globalTime, dst)
+            val localTime = getLocalTime(parentTime)
+            applyTransform(parentTransform, localTime)
+            return parentTransform
+        } else {
+            val localTime = getLocalTime(globalTime)
+            applyTransform(dst.identity(), localTime)
+            return dst
+        }
     }
 
-    fun getLocalTime(globalTime: Double, reference: Transform?): Double {
-        val parentTime =
-            if (reference === parent) globalTime
-            else parent?.getGlobalTime(globalTime) ?: globalTime
-        return getLocalTime(parentTime)
-    }
-
-    fun getLocalTransformTime(globalTime: Double, reference: Transform?): Pair<Matrix4f, Double> {
-        val (parentTransform, parentTime) =
-            if (reference === parent) Matrix4f() to globalTime
-            else parent?.getGlobalTransformTime(globalTime) ?: (Matrix4f() to globalTime)
-        val localTime = getLocalTime(parentTime)
-        applyTransform(parentTransform, localTime)
-        return parentTransform to localTime
-    }
-
-    fun getGlobalTransform(globalTime: Double): Matrix4f {
-        val (parentTransform, parentTime) = parent?.getGlobalTransformTime(globalTime) ?: (Matrix4f() to globalTime)
-        val localTime = getLocalTime(parentTime)
-        applyTransform(parentTransform, localTime)
-        return parentTransform
+    fun getGlobalTransform(globalTime: Double, dst: Matrix4f): Matrix4f {
+        val parent = parent
+        if (parent != null) {
+            val (parentTransform, parentTime) = parent.getGlobalTransformTime(globalTime, dst)
+            val localTime = getLocalTime(parentTime)
+            applyTransform(parentTransform, localTime)
+            return parentTransform
+        } else {
+            val localTime = getLocalTime(globalTime)
+            applyTransform(dst.identity(), localTime)
+            return dst
+        }
     }
 
     fun getGlobalTime(globalTime: Double): Double {
@@ -650,11 +639,12 @@ open class Transform() : Saveable(),
         return getLocalTime(parentTime)
     }
 
-    fun getGlobalTransformTime(globalTime: Double, dst: Matrix4f = Matrix4f()): Pair<Matrix4f, Double> {
-        val (parentTransform, parentTime) = parent?.getGlobalTransformTime(globalTime, dst) ?: (dst to globalTime)
+    fun getGlobalTransformTime(globalTime: Double, dst: Matrix4f): TransformTime {
+        val (parentTransform, parentTime) = parent?.getGlobalTransformTime(globalTime, dst)
+            ?: TransformTime(dst, globalTime)
         val localTime = getLocalTime(parentTime)
         applyTransform(parentTransform, localTime)
-        return parentTransform to localTime
+        return TransformTime(parentTransform, localTime)
     }
 
     override fun isDefaultValue() = false

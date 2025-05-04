@@ -9,13 +9,13 @@ import me.anno.remsstudio.Selection.selectedTransforms
 import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.SoundEffect
 import me.anno.remsstudio.audio.effects.Time
-import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Camera
+import me.anno.remsstudio.objects.video.Video
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.NumberType
-import org.joml.Vector3f
+import me.anno.utils.pooling.JomlPools
 
 abstract class Falloff(var halfDistance: Float = 1f) : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAIN) {
 
@@ -28,19 +28,23 @@ abstract class Falloff(var halfDistance: Float = 1f) : SoundEffect(Domain.TIME_D
     }
 
     fun getAmplitude(source: Video, destination: Camera, globalTime: Double): Float {
-        val position = source.getGlobalTransformTime(globalTime).first.transformPosition(Vector3f())
-        val camera = destination.getGlobalTransformTime(globalTime).first.transformPosition(Vector3f())
+        val tmpMatrix = JomlPools.mat4f.create()
+        val position = source
+            .getGlobalTransform(globalTime, tmpMatrix)
+            .transformPosition(JomlPools.vec3f.create())
+        val camera = destination
+            .getGlobalTransform(globalTime, tmpMatrix)
+            .transformPosition(JomlPools.vec3f.create())
         val distance = camera.distance(position)
+        JomlPools.vec3f.sub(2)
+        JomlPools.mat4f.sub(1)
         return getAmplitude(distance / halfDistance)
     }
 
     override fun apply(
-        getDataSrc: (Int) -> FloatArray,
-        dataDst: FloatArray,
-        source: Video,
-        destination: Camera,
-        time0: Time,
-        time1: Time
+        getDataSrc: (Int) -> FloatArray, dataDst: FloatArray,
+        source: Video, destination: Camera,
+        time0: Time, time1: Time
     ) {
         val dataSrc = getDataSrc(0)
         val amplitude0 = getAmplitude(source, destination, time0.globalTime)
@@ -67,12 +71,13 @@ abstract class Falloff(var halfDistance: Float = 1f) : SoundEffect(Domain.TIME_D
         inspected: List<Inspectable>, list: PanelListY, style: Style,
         getGroup: (NameDesc) -> SettingCategory
     ) {
-        list.add(audio.vi(
-            selectedTransforms, "Half Distance",
-            "Distance, where the amplitude is 50%",
-            "falloff.halfDistance",
-            NumberType.FLOAT_PLUS_EXP, halfDistance, style
-        ) { it, _ -> halfDistance = it })
+        list.add(
+            audio.vi(
+                selectedTransforms, "Half Distance",
+                "Distance, where the amplitude is 50%",
+                "falloff.halfDistance",
+                NumberType.FLOAT_PLUS_EXP, halfDistance, style
+            ) { it, _ -> halfDistance = it })
     }
 
 }

@@ -6,6 +6,7 @@ import me.anno.remsstudio.RemsStudio.targetHeight
 import me.anno.remsstudio.RemsStudio.targetWidth
 import me.anno.remsstudio.Scene
 import me.anno.utils.Clipping
+import me.anno.utils.pooling.JomlPools
 import org.joml.Matrix4f
 import org.joml.Vector4f
 import kotlin.math.log2
@@ -29,14 +30,14 @@ object VideoSize {
         val sx = w / avgSize
         val sy = h / avgSize
 
-        fun getPoint(x: Float, y: Float): Vector4f {
-            return matrix.transformProject(Vector4f(x * sx, y * sy, 0f, 1f))
+        fun getPoint(x: Float, y: Float, dst: Vector4f): Vector4f {
+            return matrix.transformProject(dst.set(x * sx, y * sy, 0f, 1f))
         }
 
-        val v00 = getPoint(-1f, -1f)
-        val v01 = getPoint(-1f, +1f)
-        val v10 = getPoint(+1f, -1f)
-        val v11 = getPoint(+1f, +1f)
+        val v00 = getPoint(-1f, -1f, JomlPools.vec4f.create())
+        val v01 = getPoint(-1f, +1f, JomlPools.vec4f.create())
+        val v10 = getPoint(+1f, -1f, JomlPools.vec4f.create())
+        val v11 = getPoint(+1f, +1f, JomlPools.vec4f.create())
 
         // check these points by drawing them on the screen
         // they were correct as of 12th July 2020, 9:18 am
@@ -48,16 +49,9 @@ object VideoSize {
         }
         */
 
-        val zRange = Clipping.getZ(v00, v01, v10, v11) ?: return null
-
-        // calculate the depth based on the z value
-        fun unmapZ(z: Float): Float {
-            val n = Scene.nearZ
-            val f = Scene.farZ
-            val top = 2 * f * n
-            val bottom = (z * (f - n) - (f + n))
-            return -top / bottom // the usual z is negative -> invert it :)
-        }
+        val zRange = Clipping.getZ(v00, v01, v10, v11)
+        JomlPools.vec4f.sub(4)
+        zRange ?: return null
 
         val closestDistance = min(unmapZ(zRange.first), unmapZ(zRange.second))
 
@@ -67,6 +61,15 @@ object VideoSize {
 
         return max(1, availableRedundancy.toInt())
 
+    }
+
+    // calculate the depth based on the z value
+    private fun unmapZ(z: Float): Float {
+        val n = Scene.nearZ
+        val f = Scene.farZ
+        val top = 2 * f * n
+        val bottom = (z * (f - n) - (f + n))
+        return -top / bottom // the usual z is negative -> invert it :)
     }
 
     fun getCacheableZoomLevel(level: Int): Int {

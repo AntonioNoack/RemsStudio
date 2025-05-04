@@ -20,6 +20,7 @@ import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
+import me.anno.utils.pooling.JomlPools
 import me.anno.utils.structures.Collections.filterIsInstance2
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
@@ -127,35 +128,34 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
             drawChild(stack, time, color, children[0])
         } else {
 
-            val transforms = points.map { it.getLocalTransform(time, this) }
-            val positions = transforms.map { getPosition(it) }
-
-            val times = points.map { it.getLocalTime(time) }
-            val colors = points.mapIndexed { index, it -> it.getLocalColor(color, times[index]) }
+            val transforms = points.map { point -> point.getLocalTransform(time, this, JomlPools.mat4f.create()) }
+            val positions = transforms.map { transform -> getPosition(transform, JomlPools.vec3f.create()) }
+            val times = points.map { point -> point.getLocalTime(time) }
+            val colors = points.mapIndexed { index, point ->
+                point.getLocalColor(color, times[index], JomlPools.vec4f.create())
+            }
 
             val lineStrength = lineStrength[time] * 0.5f
 
-            val scales = points.mapIndexed { index, it ->
-                val s = it.scale[times[index]]
+            val tmpScale = JomlPools.vec3f.create()
+            val scales = points.mapIndexed { index, point ->
+                val s = point.scale[times[index], tmpScale]
                 (s.x + s.y) * lineStrength
             }
 
-            fun getPosition(i0: Int) = positions[i0]
-            fun getPosition(f0: Float): Vector3f {
+            fun getPosition(f0: Float, dst: Vector3f): Vector3f {
                 val i0 = clamp(floor(f0).toInt(), 0, positions.size - 2)
-                return Vector3f(getPosition(i0)).lerp(getPosition(i0 + 1), f0 - i0)
+                return positions[i0].lerp(positions[i0 + 1], f0 - i0, dst)
             }
 
-            fun getScale(i0: Int) = scales[i0]
             fun getScale(f0: Float): Float {
                 val i0 = clamp(floor(f0).toInt(), 0, scales.size - 2)
-                return Maths.mix(getScale(i0), getScale(i0 + 1), f0 - i0)
+                return Maths.mix(scales[i0], scales[i0 + 1], f0 - i0)
             }
 
-            fun getColor(i0: Int) = colors[i0]
-            fun getColor(f0: Float): Vector4f {
+            fun getColor(f0: Float, dst: Vector4f): Vector4f {
                 val i0 = clamp(floor(f0).toInt(), 0, colors.size - 2)
-                return Vector4f(getColor(i0)).lerp(getColor(i0 + 1), f0 - i0)
+                return colors[i0].lerp(colors[i0 + 1], f0 - i0, dst)
             }
 
             fun drawChild(index: Int, fraction: Float) {
@@ -165,7 +165,9 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
                 // get interpolated color
                 stack.next {
                     stack.mul(localTransform)
-                    c0.drawWithParentTransformAndColor(stack, time, color, getColor(index + fraction))
+                    val color1 = getColor(index + fraction, JomlPools.vec4f.create())
+                    c0.drawWithParentTransformAndColor(stack, time, color, color1)
+                    JomlPools.vec4f.sub(1)
                 }
             }
 
@@ -208,25 +210,39 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
             // todo if angle < 90°, use the projected, correct positions
 
             // todo use correct forward direction
-            val forward = Vector3f(0f, 0f, 1f)
+            val forward = JomlPools.vec3f.create()
+                .set(0f, 0f, 1f)
 
             val shader = linePolygonShader.value
 
+            val c0 = JomlPools.vec4f.create()
+            val c1 = JomlPools.vec4f.create()
+
+            val p0 = JomlPools.vec3f.create()
+            val p1 = JomlPools.vec3f.create()
+            val dx = JomlPools.vec3f.create()
+            val d0 = JomlPools.vec3f.create()
+            val d1 = JomlPools.vec3f.create()
+            val a0 = JomlPools.vec3f.create()
+            val a1 = JomlPools.vec3f.create()
+            val b0 = JomlPools.vec3f.create()
+            val b1 = JomlPools.vec3f.create()
+
             fun drawSegment(i0: Float, i1: Float, alpha: Float) {
-                val p0 = getPosition(i0)
-                val p1 = getPosition(i1)
-                val delta = p1 - p0
-                val deltaNorm = Vector3f(delta).normalize()
-                val dx = deltaNorm.cross(forward)
-                val d0 = dx * (getScale(i0) * alpha)
-                val d1 = dx * (getScale(i1) * alpha)
+                getPosition(i0, p0)
+                getPosition(i1, p1)
+                p1.sub(p0, dx) // dx = normalize(p1-p0) x forward
+                    .cross(forward)
+                    .safeNormalize()
+                dx.mul(getScale(i0) * alpha, d0)
+                dx.mul(getScale(i1) * alpha, d1)
+                getColor(i0, c0).mulAlpha(alpha, c0)
+                getColor(i1, c1).mulAlpha(alpha, c1)
                 drawSegment(
                     shader,
-                    Vector3f(p0).add(d0), Vector3f(p0).sub(d0),
-                    Vector3f(p1).add(d1), Vector3f(p1).sub(d1),
-                    getColor(i0).mulAlpha(alpha),
-                    getColor(i1).mulAlpha(alpha),
-                    stack
+                    p0.add(d0, a0), p0.sub(d0, a1),
+                    p1.add(d1, b0), p1.sub(d1, b1),
+                    c0, c1, stack
                 )
             }
 
@@ -242,6 +258,10 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
             if (isClosed > 0f && mappedIndices.size > 2) {
                 drawSegment(mappedIndices.first(), mappedIndices.last(), isClosed)
             }
+
+            JomlPools.vec4f.sub(colors.size + 2) // colors, tmp0, tmp1
+            JomlPools.vec3f.sub(positions.size + 10 + 1) // positions, p0,p1,d,d0,d1,a0,a1,b0,b1, tmpScale
+            JomlPools.mat4f.sub(transforms.size) // transforms
 
             for (i in mappedIndices) {
                 val ii = clamp(i.toInt(), 0, positions.size - 1)
@@ -281,7 +301,7 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
         GFX.check()
     }
 
-    private fun getPosition(m0: Matrix4f) = m0.getTranslation(Vector3f())
+    private fun getPosition(matrix: Matrix4f, dst: Vector3f) = matrix.getTranslation(dst)
 
     override fun drawChildrenAutomatically(): Boolean = false
 }

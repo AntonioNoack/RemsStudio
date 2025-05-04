@@ -3,8 +3,8 @@ package me.anno.remsstudio.animation
 import me.anno.Time
 import me.anno.animation.Interpolation
 import me.anno.gpu.GFX.glThread
-import me.anno.io.saveable.Saveable
 import me.anno.io.base.BaseWriter
+import me.anno.io.saveable.Saveable
 import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.RemsStudio.root
 import me.anno.remsstudio.animation.AnimationMaths.mul
@@ -13,6 +13,7 @@ import me.anno.remsstudio.animation.Keyframe.Companion.getWeights
 import me.anno.remsstudio.animation.drivers.AnimationDriver
 import me.anno.remsstudio.utils.WrongClassType
 import me.anno.ui.input.NumberType
+import me.anno.utils.pooling.JomlPools
 import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.structures.lists.UnsafeArrayList
 import me.anno.utils.types.AnyToDouble.getDouble
@@ -129,7 +130,7 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
                 lastChanged = Time.nanoTime
                 return newFrame
             } else {
-                if (keyframes.size >= 1) {
+                if (keyframes.isNotEmpty()) {
                     keyframes[0].value = value
                     lastChanged = Time.nanoTime
                     return keyframes[0]
@@ -175,18 +176,24 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
         else emptyList()
     }
 
+    private fun copyInto(src: V, dst: V?): V {
+        @Suppress("UNCHECKED_CAST")
+        return when (val v = src) {
+            is Vector2f -> AnimationMaths.v2(dst).set(v) as V
+            is Vector3f -> AnimationMaths.v3(dst).set(v) as V
+            is Vector4f -> AnimationMaths.v4(dst).set(v) as V
+            is Quaternionf -> AnimationMaths.q4(dst).set(v) as V
+            else -> v
+        }
+    }
+
     fun getAnimatedValue(time: Double, dst: V? = null): V {
         synchronized(this) {
             val size = keyframes.size
+
             @Suppress("UNCHECKED_CAST")
-            return when {
-                size == 0 -> return when (val v = defaultValue) {
-                    is Vector2f -> AnimationMaths.v2(dst).set(v) as V
-                    is Vector3f -> AnimationMaths.v3(dst).set(v) as V
-                    is Vector4f -> AnimationMaths.v4(dst).set(v) as V
-                    is Quaternionf -> AnimationMaths.q4(dst).set(v) as V
-                    else -> v
-                }
+            val value = when {
+                size == 0 -> defaultValue
                 size == 1 || !isAnimated -> keyframes[0].value
                 else -> {
 
@@ -201,16 +208,25 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
                     val t2 = frame2.time
 
                     val f = (time - t1) / max(t2 - t1, 1e-16)
-                    val w = getWeights(frame0, frame1, frame2, frame3, f)
+                    val weights = JomlPools.vec4d.create()
+                    getWeights(frame0, frame1, frame2, frame3, f, weights)
 
                     // LOGGER.info("weights: ${w.print()}, values: ${frame0.value}, ${frame1.value}, ${frame2.value}, ${frame3.value}")
 
                     var valueSum: Any? = null
                     var weightSum = 0.0
-                    fun addMaybe(value: V, weight: Double) {
+                    for (i in 0 until 4) {
+                        val frameI = when (i) {
+                            0 -> frame0
+                            1 -> frame1
+                            2 -> frame2
+                            else -> frame3
+                        }
+                        val value = frameI.value
+                        val weight = weights.getComp(i)
                         if (weightSum == 0.0) {
                             valueSum = toCalc(value)
-                            if (weight != 1.0) valueSum = mul(valueSum!!, weight, dst)
+                            if (weight != 1.0) valueSum = mul(valueSum, weight, dst)
                             weightSum = weight
                         } else if (weight != 0.0) {
                             // add value with weight...
@@ -219,24 +235,25 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
                         }// else done
                     }
 
-                    addMaybe(frame0.value, w.x)
-                    addMaybe(frame1.value, w.y)
-                    addMaybe(frame2.value, w.z)
-                    addMaybe(frame3.value, w.w)
+                    JomlPools.vec4d.sub(1) // weights
 
-                    return clamp(fromCalc(valueSum!!))
+                    clamp(fromCalc(valueSum!!))
 
                 }
             }
+            return copyInto(value, dst)
         }
     }
 
     operator fun get(time: Double, dst: V? = null): V = getValueAt(time, dst)
 
-    fun getValueAt(time: Double, dst: Any? = null): V {
+    fun getValueAt(time: Double, dst: V? = null): V {
         val hasDrivers = drivers.any { it != null }
-        val animatedValue = getAnimatedValue(time)
-        if (!hasDrivers) return animatedValue
+        val animatedValue = getAnimatedValue(time, dst)
+        return if (hasDrivers) getDriverValueAt(time, animatedValue, dst) else animatedValue
+    }
+
+    fun getDriverValueAt(time: Double, animatedValue: V, dst: Any?): V {
         val v = animatedValue ?: defaultValue ?: 0.0
         val v0 = getDouble(v, 0, 0.0)
         val v1 = getDouble(v, 1, 0.0)
@@ -366,7 +383,7 @@ class AnimatedProperty<V>(var type: NumberType, var defaultValue: V) : Saveable(
         }
     }
 
-    private fun warnDroppedKeyframe(vi: Keyframe<*>){
+    private fun warnDroppedKeyframe(vi: Keyframe<*>) {
         LOGGER.warn("Dropped keyframe!, incompatible type ${vi.value} for $type")
     }
 

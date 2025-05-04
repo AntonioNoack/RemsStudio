@@ -1,8 +1,8 @@
 package me.anno.remsstudio.animation
 
 import me.anno.animation.Interpolation
-import me.anno.io.saveable.Saveable
 import me.anno.io.base.BaseWriter
+import me.anno.io.saveable.Saveable
 import me.anno.ui.input.NumberType
 import me.anno.utils.types.AnyToFloat
 import org.joml.*
@@ -29,7 +29,7 @@ class Keyframe<V>(var time: Double, var value: V, var interpolation: Interpolati
     }
 
     override fun setProperty(name: String, value: Any?) {
-        when(name){
+        when (name) {
             "mode" -> interpolation = Interpolation.getType(value as? Int ?: return)
             "time" -> time = value as? Double ?: return
             "value" -> {
@@ -46,7 +46,7 @@ class Keyframe<V>(var time: Double, var value: V, var interpolation: Interpolati
 
     @Suppress("useless_cast")
     fun setValue(index: Int, v: Float, type: NumberType) {
-        val tmp: Any= type.clamp(
+        val tmp: Any = type.clamp(
             when (val value = value) {
                 is Int -> v.toInt()
                 is Long -> v.toLong()
@@ -82,9 +82,12 @@ class Keyframe<V>(var time: Double, var value: V, var interpolation: Interpolati
     }
 
     companion object {
-        fun getWeights(f0: Keyframe<*>, f1: Keyframe<*>, f2: Keyframe<*>, f3: Keyframe<*>, t0: Double): Vector4d {
+        fun getWeights(
+            f0: Keyframe<*>, f1: Keyframe<*>, f2: Keyframe<*>, f3: Keyframe<*>,
+            t0: Double, dst: Vector4d
+        ): Vector4d {
             val interpolation = (if (t0 > 1.0) f2 else f1).interpolation
-            return interpolation.getWeights(f0.time, f1.time, f2.time, f3.time, t0)
+            return interpolation.getWeights(f0.time, f1.time, f2.time, f3.time, t0, dst)
         }
     }
 

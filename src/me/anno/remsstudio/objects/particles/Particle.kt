@@ -1,11 +1,10 @@
 package me.anno.remsstudio.objects.particles
 
-import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.gpu.FinalRendering.onMissingResource
-import me.anno.gpu.GFX
 import me.anno.maths.Maths
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.particles.forces.ForceField
+import me.anno.utils.pooling.JomlPools
 import me.anno.utils.structures.lists.UnsafeArrayList
 import me.anno.utils.types.Floats.f2
 import me.anno.utils.types.Floats.toRadians
@@ -105,10 +104,12 @@ class Particle(
 
                     // normalize time for calculated functions?
                     // node editor? like in Blender or Unreal Engine
-                    val particleColor = Vector4f(this.color).mul(color)
+                    val particleColor = JomlPools.vec4f.create()
+                    this.color.mul(color, particleColor)
                     type.draw(stack, particleTime, particleColor)
+                    JomlPools.vec4f.sub(1)
 
-                } catch (e: IndexOutOfBoundsException) {
+                } catch (_: IndexOutOfBoundsException) {
                     onMissingResource("Particles computing", null)
                 }
             }

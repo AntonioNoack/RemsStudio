@@ -43,13 +43,17 @@ import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.pooling.JomlPools
 import me.anno.utils.structures.Collections.filterIsInstance2
 import org.apache.logging.log4j.LogManager
-import org.joml.*
+import org.joml.Matrix4f
+import org.joml.Matrix4fArrayList
+import org.joml.Matrix4x3fArrayList
+import org.joml.Vector4f
 
 @Suppress("MemberVisibilityCanBePrivate")
 class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(parent) {
 
     companion object {
         private val LOGGER = LogManager.getLogger(MeshTransform::class)
+        private val localTransformTmp = Matrix4x3fArrayList()
     }
 
     // todo lerp animations
@@ -165,7 +169,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             shader.v1b("hasAnimation", false)
         }
 
-        val localTransform = Matrix4x3fArrayList()
+        val localTransform = localTransformTmp.clear()
 
         if (normalizeScale) {
             val scale = getScaleFromAABB(entity.getGlobalBounds())
@@ -177,13 +181,8 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         }
 
         drawHierarchy(
-            shader,
-            cameraMatrix,
-            localTransform,
-            color,
-            entity,
-            drawSkeletons,
-            animTexture
+            shader, cameraMatrix, localTransform,
+            color, entity, drawSkeletons, animTexture
         )
 
         // todo line mode: draw every mesh as lines
@@ -205,12 +204,11 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         localTransform.pushMatrix()
 
         val transform = entity.transform
-        val local = transform.getLocalTransform(Matrix4x3())
-
+        val local = transform.getLocalTransform(JomlPools.mat4x3m.borrow())
         // this moves the engine parts correctly, but ruins the rotation of the ghost
         // and scales it totally incorrectly
         localTransform.mul(
-            Matrix4x3f(
+            JomlPools.mat4x3f.borrow().set(
                 local.m00, local.m01, local.m02,
                 local.m10, local.m11, local.m12,
                 local.m20, local.m21, local.m22,

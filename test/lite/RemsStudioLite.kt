@@ -89,7 +89,7 @@ fun flatten(self0: Transform, globalTime: Double): List<Transform> {
     val list = ArrayList<Transform>()
     fun process(self: Transform, m: Matrix4f, c: Vector4f) {
         m.mul(self.getLocalTransform(globalTime, self.parent)) // correct order?
-        c.mul(self.getLocalColor()) // ok? todo without fade-in/out
+        c.mul(self.getLocalColor(Vector4f())) // ok? todo without fade-in/out
         val clone = self.clone()
         if (self !is MaskLayer) {
             for (child in self.children) {
@@ -100,9 +100,9 @@ fun flatten(self0: Transform, globalTime: Double): List<Transform> {
         clone.position.clear()
         clone.position.set(m.getTranslation(Vector3f()))
         clone.rotationYXZ.clear()
-        val q = m.getUnnormalizedRotation(Quaterniond())
+        val q = m.getUnnormalizedRotation(Quaternionf())
         // todo is eulerAngleDegrees correct???
-        clone.rotationYXZ.set(Vector3f(q.toEulerAnglesDegrees(Vector3d())))
+        clone.rotationYXZ.set(Vector3f(q.toEulerAnglesDegrees(Vector3f())))
         clone.scale.clear()
         clone.scale.set(m.getScale(Vector3f()))
         list.add(clone)

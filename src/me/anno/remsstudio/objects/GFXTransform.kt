@@ -106,14 +106,14 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                 var bi = 0
                 for (morphing in morphings) {
                     val localTime = morphing.lastLocalTime
-                    val position = transformLocally(morphing.position[localTime], time)
+                    val position = transformLocally(morphing.position[localTime, tmpVec3], time)
                     buffer[bi++] = (position.x * 0.5f + 0.5f)
                     buffer[bi++] = (position.y * 0.5f + 0.5f)
                     if (is3D) {
                         buffer[bi++] = (position.z)
                         buffer[bi++] = (0f)
                     } else {
-                        buffer[bi++] = (morphing.swirlStrength[localTime])
+                        buffer[bi++] = morphing.swirlStrength[localTime]
                         buffer[bi++] = (1f / morphing.swirlPower[localTime])
                     }
                 }
@@ -128,7 +128,7 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                     val localTime = morphing.lastLocalTime
                     val weight = morphing.lastInfluence
                     val sharpness = morphing.sharpness[localTime]
-                    val scale = morphing.scale[localTime]
+                    val scale = morphing.scale[localTime, tmpVec3]
                     buffer[bi++] = (sqrt(sy / sx) * weight * scale.z / scale.x)
                     buffer[bi++] = (sqrt(sx / sy) * weight * scale.z / scale.y)
                     buffer[bi++] = (10f / (scale.z * weight * weight))
@@ -141,7 +141,7 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                 for (bi in morphings.indices) {
                     val morphing = morphings[bi]
                     val localTime = morphing.lastLocalTime
-                    buffer[bi] = (morphing.chromatic[localTime])
+                    buffer[bi] = morphing.chromatic[localTime]
                 }
                 shader.v1fs(loc3, buffer)
             }
@@ -174,12 +174,12 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
 
         shader.v1i("forceFieldColorCount", attractors.size)
         if (attractors.isNotEmpty()) {
-            shader.v4f("forceFieldBaseColor", attractorBaseColor[time])
+            shader.v4f("forceFieldBaseColor", attractorBaseColor[time, tmpColor])
             val buffer = colorForceFieldBuffer
             buffer.position(0)
             for (attractor in attractors) {
                 val localTime = attractor.lastLocalTime
-                val color = attractor.color[localTime]
+                val color = attractor.color[localTime, tmpColor]
                 val colorM = attractor.colorMultiplier[localTime]
                 buffer.put(color.x * colorM)
                 buffer.put(color.y * colorM)
@@ -191,7 +191,7 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
             buffer.position(0)
             for (attractor in attractors) {
                 val localTime = attractor.lastLocalTime
-                val position = transformLocally(attractor.position[localTime], time)
+                val position = transformLocally(attractor.position[localTime, tmpVec3], time)
                 val weight = attractor.lastInfluence
                 buffer.put(position.x).put(position.y).put(position.z).put(weight)
             }
@@ -202,7 +202,7 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
             val sy = if (this is Video) 1f / lastH else 1f
             for (attractor in attractors) {
                 val localTime = attractor.lastLocalTime
-                val scale = attractor.scale[localTime]
+                val scale = attractor.scale[localTime, tmpVec3]
                 val power = attractor.sharpness[localTime]
                 buffer.put(abs(sy / sx / scale.x))
                 buffer.put(abs(sx / sy / scale.y))
@@ -216,6 +216,10 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
     }
 
     companion object {
+
+        private val tmpVec3 = Vector3f()
+        private val tmpColor = Vector4f()
+
         fun uploadAttractors(transform: GFXTransform?, shader: Shader, time: Double, is3D: Boolean) {
             transform?.uploadAttractors(shader, time, is3D) ?: uploadAttractors0(shader)
         }

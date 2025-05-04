@@ -31,6 +31,7 @@ import me.anno.ui.Style
 import me.anno.ui.base.SpyPanel
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
+import me.anno.utils.pooling.JomlPools
 import me.anno.utils.structures.Collections.filterIsInstance2
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
@@ -215,8 +216,7 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
         val w = GFX.viewportWidth
         val h = GFX.viewportHeight
 
-        val offset0 = effectOffset[time]
-        val offset = Vector2f(offset0)
+        val offset = effectOffset[time, JomlPools.vec2f.create()]
 
         val settings = if (type == MaskType.GREEN_SCREEN) greenScreenSettings(time)
         else transitionSettings(time)
@@ -257,7 +257,7 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
                 val src0Tex = src0.getTexture0() as Texture2D
                 src0.bindTexture0(0, src0Tex.filtering, src0Tex.clamping)
                 val srcBuffer = (src0 as Framebuffer).ssBuffer ?: src0
-                BokehBlur.draw(srcBuffer.textures!![0], temp, pixelSize, Scene.usesFPBuffers)
+                BokehBlur.draw(srcBuffer.textures[0], temp, pixelSize, Scene.usesFPBuffers)
 
                 temp.bindTexture0(2, Filtering.TRULY_NEAREST, Clamping.CLAMP)
                 masked.bindTexture0(1, Filtering.TRULY_NEAREST, Clamping.CLAMP)
@@ -312,6 +312,8 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
 
             }
         }
+
+        JomlPools.vec2f.sub(1) // offset
     }
 
     override fun createInspector(

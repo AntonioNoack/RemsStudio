@@ -111,12 +111,13 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
     }
 
     private val tmpMatrix0 = Matrix4f()
+    private val tmpMatrix1 = Matrix4f()
     fun drawScene(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         updateCache()
         val camera = lastCamera
         if (camera != null) {
-            val cameraTransform = camera.getLocalTransform(time, this)
-            val inv = tmpMatrix0.set(cameraTransform).invert()
+            val cameraTransform = camera.getLocalTransform(time, this, tmpMatrix0)
+            val inv = cameraTransform.invert(tmpMatrix1)
             stack.next {
                 stack.mul(inv)
                 drawChild(stack, time, color, softChild)

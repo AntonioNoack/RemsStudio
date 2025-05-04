@@ -12,9 +12,9 @@ import me.anno.gpu.texture.TextureReader.Companion.imageTimeout
 import me.anno.image.svg.SVGMeshCache
 import me.anno.io.MediaMetadata
 import me.anno.maths.Maths.clamp
+import me.anno.remsstudio.gpu.DrawSVGv2
 import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.remsstudio.gpu.GFXx3Dv2.draw3DVideo
-import me.anno.remsstudio.gpu.DrawSVGv2
 import me.anno.remsstudio.gpu.TexFiltering
 import me.anno.remsstudio.objects.video.Video.Companion.forceAutoScale
 import me.anno.remsstudio.objects.video.Video.Companion.forceFullScale
@@ -24,6 +24,7 @@ import me.anno.remsstudio.objects.video.VideoSize.calculateSize
 import me.anno.remsstudio.objects.video.VideoSize.getCacheableZoomLevel
 import me.anno.ui.editor.files.FileExplorerEntry.Companion.drawLoadingCircle
 import me.anno.utils.Clipping
+import me.anno.utils.pooling.JomlPools
 import me.anno.video.VideoCache
 import me.anno.video.VideoCache.getVideoFrameWithoutGenerator
 import me.anno.video.ffmpeg.FrameReader.Companion.isFFMPEGOnlyExtension
@@ -43,6 +44,11 @@ object VideoDrawing {
     fun Video.drawImage(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val file = file
         val ext = file.lcExtension
+        val tiling = tiling[time, JomlPools.vec4f.create()]
+        val cornerRadius = cornerRadius[time, JomlPools.vec4f.create()]
+        val filtering = filtering.value
+        val clamping = clampMode.value
+        val projection = uvProjection.value
         when {
             ext == "svg" -> {
                 val bufferData = SVGMeshCache[file, imageTimeout, true]
@@ -51,12 +57,11 @@ object VideoDrawing {
                     DrawSVGv2.draw3DSVG(
                         this, time,
                         stack, bufferData, TextureLib.whiteTexture,
-                        color, TexFiltering.NEAREST, clampMode.value, tiling[time]
+                        color, filtering, clamping, tiling
                     )
                 }
             }
             ext.isFFMPEGOnlyExtension() -> {
-                val tiling = tiling[time]
                 // calculate required scale? no, without animation, we don't need to scale it down ;)
                 val texture = VideoCache.getVideoFrame(file, 1, 0, 1, 1.0, imageTimeout, true)
                 if (texture == null || !texture.isCreated) onMissingImageOrFrame(0)
@@ -65,13 +70,11 @@ object VideoDrawing {
                     lastH = texture.height
                     draw3DVideo(
                         this, time, stack, texture, color,
-                        filtering.value, clampMode.value, tiling, uvProjection.value,
-                        cornerRadius[time]
+                        filtering, clamping, tiling, projection, cornerRadius
                     )
                 }
             }
             else -> {// some image
-                val tiling = tiling[time]
                 val texture = TextureCache[file, imageTimeout, true]
                 if (texture == null || !texture.isCreated()) onMissingImageOrFrame(0)
                 else {
@@ -80,12 +83,12 @@ object VideoDrawing {
                     lastH = texture.height
                     draw3DVideo(
                         this, time, stack, texture, color,
-                        filtering.value, clampMode.value, tiling, uvProjection.value,
-                        cornerRadius[time]
+                        filtering, clamping, tiling, projection, cornerRadius
                     )
                 }
             }
         }
+        JomlPools.vec4f.sub(2)
     }
 
     /**
@@ -191,7 +194,7 @@ object VideoDrawing {
                     lastH = meta.videoHeight
                     draw3DVideo(
                         this, time, stack, frame0, color, filtering, clamp,
-                        tiling[time], uvProjection.value, cornerRadius[time]
+                        tiling[time, Vector4f()], uvProjection.value, cornerRadius[time, Vector4f()]
                     )
                     if (frame0.frameIndex != frameIndex) {
                         drawLoadingCircle(stack, (Time.nanoTime * 1e-9f) % 1f)

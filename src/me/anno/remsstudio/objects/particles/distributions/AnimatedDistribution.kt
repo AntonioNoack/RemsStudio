@@ -1,7 +1,7 @@
 package me.anno.remsstudio.objects.particles.distributions
 
-import me.anno.io.saveable.Saveable
 import me.anno.io.base.BaseWriter
+import me.anno.io.saveable.Saveable
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.inspectable.InspectableVector
@@ -9,6 +9,7 @@ import me.anno.remsstudio.ui.ComponentUIV2
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.input.NumberType
+import me.anno.utils.pooling.JomlPools
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
 import org.joml.Vector2f
@@ -102,11 +103,24 @@ class AnimatedDistribution(
         if (lastDist !== distribution) update()
         for (index in properties.indices) {
             val property = properties[index]
+            @Suppress("UNCHECKED_CAST")
             when (type.numComponents) {
                 1 -> property.value.set(channels[index][time] as Float)
-                2 -> property.value.set(channels[index][time] as Vector2f)
-                3 -> property.value.set(channels[index][time] as Vector3f)
-                4 -> property.value.set(channels[index][time] as Vector4f)
+                2 -> {
+                    val pool = JomlPools.vec2f
+                    property.value.set((channels[index] as AnimatedProperty<Vector2f>)[time, pool.create()])
+                    pool.sub(1)
+                }
+                3 -> {
+                    val pool = JomlPools.vec3f
+                    property.value.set((channels[index] as AnimatedProperty<Vector3f>)[time, pool.create()])
+                    pool.sub(1)
+                }
+                4 -> {
+                    val pool = JomlPools.vec4f
+                    property.value.set((channels[index] as AnimatedProperty<Vector4f>)[time, pool.create()])
+                    pool.sub(1)
+                }
             }
         }
     }

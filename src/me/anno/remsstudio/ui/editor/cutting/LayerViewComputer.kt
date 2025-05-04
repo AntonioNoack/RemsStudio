@@ -6,7 +6,7 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.utils.Color.white4
-import org.joml.Vector4f
+import me.anno.utils.pooling.JomlPools
 
 class LayerViewComputer(private val view: LayerView) {
 
@@ -48,7 +48,7 @@ class LayerViewComputer(private val view: LayerView) {
 
             // hashmaps are slower, but thread safe
             val localTime = DoubleArray(size)
-            val localColor = Array(size) { Vector4f() }
+            val localColor = Array(size) { JomlPools.vec4f.create() }
 
             val parentIndices = IntArray(size)
             val transformMap = HashMap<Transform, Int>()
@@ -74,7 +74,7 @@ class LayerViewComputer(private val view: LayerView) {
 
                 val rootTime = root.getLocalTime(globalTime)
                 localTime[0] = rootTime
-                localColor[0] = root.getLocalColor(white, rootTime)
+                root.getLocalColor(white, rootTime, localColor[0])
 
                 for (index in 1 until size) {
                     val parent = parentIndices[index]
@@ -108,6 +108,8 @@ class LayerViewComputer(private val view: LayerView) {
                     }
                 }
             }
+
+            JomlPools.vec4f.sub(localColor.size) // for local colors
         }
 
         for (stripe in stripes) {

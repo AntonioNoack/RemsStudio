@@ -88,10 +88,10 @@ object TextRenderer {
             Grid.drawLine(stack, color, Vector3f(maxX, y0, 0f), Vector3f(maxX, y1, 0f))
         }
 
-        val shadowColor = element.shadowColor[time]
+        val shadowColor = element.shadowColor[time, Vector4f()]
         if (shadowColor.w >= 1f / 255f) {
             val shadowSmoothness = element.shadowSmoothness[time]
-            val shadowOffset = element.shadowOffset[time] * (1f / DEFAULT_FONT_HEIGHT)
+            val shadowOffset = element.shadowOffset[time, Vector3f()] * (1f / DEFAULT_FONT_HEIGHT)
             stack.next {
                 stack.translate(shadowOffset)
                 val tintedShadowColor = JomlPools.vec4f.create()
@@ -150,18 +150,18 @@ object TextRenderer {
         if (useExtraColors && drawSDFTexture) {
             val parentColor = element.parent?.getLocalColor(tmp0)
             if (parentColor != null) {
-                oc0.set(parentColor).mul(element.outlineColor0[time])
-                oc1.set(parentColor).mul(element.outlineColor1[time])
-                oc2.set(parentColor).mul(element.outlineColor2[time])
+                element.outlineColor0[time, oc0].mul(parentColor)
+                element.outlineColor1[time, oc1].mul(parentColor)
+                element.outlineColor2[time, oc2].mul(parentColor)
             } else {
-                oc0.set(element.outlineColor0[time])
-                oc1.set(element.outlineColor1[time])
-                oc2.set(element.outlineColor2[time])
+                element.outlineColor0[time, oc0]
+                element.outlineColor1[time, oc1]
+                element.outlineColor2[time, oc2]
             }
         } else {
-            color.mulAlpha(element.outlineColor0[time].w, oc0)
-            color.mulAlpha(element.outlineColor1[time].w, oc1)
-            color.mulAlpha(element.outlineColor2[time].w, oc2)
+            color.mulAlpha(element.outlineColor0[time, oc0].w, oc0)
+            color.mulAlpha(element.outlineColor1[time, oc1].w, oc1)
+            color.mulAlpha(element.outlineColor2[time, oc2].w, oc2)
         }
 
         correctColors(color, oc0, oc1, oc2)
@@ -237,7 +237,9 @@ object TextRenderer {
 
     var firstTimeDrawing = false
 
-    private val scale0 = Vector2f()
+    private val tmpScale = Vector2f()
+    private val tmpOffset = Vector2f()
+
     private fun drawSDFTexture(
         element: Text,
         key: TextSegmentKey, time: Double, stack: Matrix4fArrayList,
@@ -274,7 +276,6 @@ object TextRenderer {
 
                 val scaleX = 0.5f * texture.width * baseScale
                 val scaleY = 0.5f * texture.height * baseScale
-                val scale = scale0
 
                 val sdfOffset = sdf.offset
 
@@ -291,25 +292,25 @@ object TextRenderer {
                 val sdfX = sdfOffset.x * scaleX
                 val sdfY = sdfOffset.y * scaleY
 
-                val offset = Vector2f(charAlignOffsetX + sdfX, charAlignOffsetY + sdfY)
-                scale.set(scaleX, scaleY)
+                val tmpOffset = tmpOffset.set(charAlignOffsetX + sdfX, charAlignOffsetY + sdfY)
+                val tmpScale = tmpScale.set(scaleX, scaleY)
 
                 if (firstTimeDrawing) {
 
-                    val outline = element.outlineWidths[time] * sdfResolution
+                    val outline = element.outlineWidths[time, Vector4f()].mul(sdfResolution)
                     outline.y = max(0f, outline.y) + outline.x
                     outline.z = max(0f, outline.z) + outline.y
                     outline.w = max(0f, outline.w) + outline.z
 
-                    val s0 = Vector4f(extraSmoothness).add(element.outlineSmoothness[time])
-
-                    val smoothness = s0 * sdfResolution
+                    val smoothness = element.outlineSmoothness[time, Vector4f()]
+                        .add(extraSmoothness, extraSmoothness, extraSmoothness, extraSmoothness)
+                        .mul(sdfResolution)
 
                     val outlineDepth = element.outlineDepth[time]
 
                     GFXx3Dv2.drawOutlinedText(
                         element, time,
-                        stack, offset, scale,
+                        stack, tmpOffset, tmpScale,
                         texture, color, 5,
                         arrayOf(// is only created once -> don't worry too much about it
                             color, oc1, oc2, oc3,
@@ -323,7 +324,7 @@ object TextRenderer {
 
                     firstTimeDrawing = false
 
-                } else GFXx3Dv2.drawOutlinedText(stack, offset, scale, texture, hasUVAttractors)
+                } else GFXx3Dv2.drawOutlinedText(stack, tmpOffset, tmpScale, texture, hasUVAttractors)
             } else if (sdf == null || texture == null || !texture.isCreated()) {
                 if (isFinalRendering) {
                     onMissingResource("Text-Texture I '${element.font}'", key.text)
@@ -332,6 +333,8 @@ object TextRenderer {
             false
         }
     }
+
+    private val offset = Vector2f()
 
     private fun drawMesh(
         element: Text,
@@ -350,7 +353,7 @@ object TextRenderer {
 
         textMesh.draw(startIndex, endIndex) { buffer, _, xOffset ->
             buffer!!
-            val offset = Vector3f(lineDeltaX + xOffset, lineDeltaY, 0f)
+            val offset = offset.set(lineDeltaX + xOffset, lineDeltaY)
             if (firstTimeDrawing) {
                 GFXx3Dv2.draw3DText(element, time, offset, stack, buffer, color)
                 firstTimeDrawing = false

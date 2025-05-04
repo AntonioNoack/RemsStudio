@@ -3,8 +3,10 @@ package me.anno.remsstudio.ui.editor.cutting
 import me.anno.gpu.drawing.DrawRectangles
 import me.anno.io.MediaMetadata
 import me.anno.io.files.FileReference
+import me.anno.io.files.InvalidRef
 import me.anno.remsstudio.objects.video.Video
 import me.anno.utils.Color.black
+import me.anno.utils.hpc.threadLocal
 import me.anno.video.VideoCache
 import me.anno.video.VideoFramesKey
 import me.anno.video.VideoSlice
@@ -26,6 +28,8 @@ enum class Status(val color: Int) {
 
     companion object {
 
+        private val tmpStatus = threadLocal { VideoFramesKey(InvalidRef, 1, 0, 0, 0.0) }
+
         private fun drawStatus(x: Int, y: Int, w: Int, h: Int, status: Status) {
             DrawRectangles.drawRect(x, y, w, h, status.color)
         }
@@ -39,10 +43,14 @@ enum class Status(val color: Int) {
             if (scale < 1) return INVALID_SCALE
             val bufferIndex = frameIndex / bufferLength
             val localIndex = frameIndex % bufferLength
-            val videoData = VideoCache.getEntryWithoutGenerator(
-                VideoFramesKey(file, scale, bufferIndex, bufferLength, fps)
-            ) as? VideoSlice
-                ?: return MISSING
+            val key = tmpStatus.get()
+            key.file = file
+            key.scale = scale
+            key.bufferIndex = bufferIndex
+            key.bufferLength = bufferLength
+            key.fps = fps
+            val videoData = VideoCache.getEntryWithoutGenerator(key)
+                    as? VideoSlice ?: return MISSING
             val frame = videoData.frames.getOrNull(localIndex)
             return when {
                 frame == null -> BUFFER_LOADING

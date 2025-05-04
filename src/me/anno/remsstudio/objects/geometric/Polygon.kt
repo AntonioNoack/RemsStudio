@@ -24,6 +24,7 @@ import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.utils.files.LocalFile.toGlobalFile
+import me.anno.utils.pooling.JomlPools
 import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.types.Floats.toRadians
 import org.joml.Matrix4fArrayList
@@ -56,10 +57,14 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
             onMissingResource("Missing texture", texture)
             return
         }
+
         val texture = image ?: whiteTexture
-        val count = vertexCount[time]//.roundToInt()
-        if (inset == 1f && count % 2 == 0) return// invisible
-        val selfDepth = scale[time].z
+        val count = vertexCount[time]
+        if (inset == 1f && count % 2 == 0) return // invisible
+
+        val selfDepth = scale[time, JomlPools.vec3f.create()].z
+        JomlPools.vec3f.sub(1)
+
         stack.next {
             if (autoAlign) {
                 stack.rotateZ((if (count == 4) 45f else 90f).toRadians())

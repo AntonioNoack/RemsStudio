@@ -16,9 +16,10 @@ import me.anno.io.MediaMetadata
 import me.anno.io.files.FileReference
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.mix
-import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.objects.video.Video
 import me.anno.utils.Sleep.waitUntil
+import me.anno.utils.pooling.JomlPools
 import me.anno.utils.structures.tuples.ShortPair
 import me.anno.video.ffmpeg.FFMPEGStream.Companion.getAudioSequence
 import org.joml.Vector3f
@@ -52,7 +53,10 @@ class AudioStreamRaw2(
 
     fun localAmplitude(time: Double): Float {
         if (source == null) return 1f
-        return source.amplitude[time] * clamp(source.color[time].w, 0f, 1f)
+        val tmpColor = source.color[time, JomlPools.vec4f.create()]
+        val w = clamp(tmpColor.w, 0f, 1f)
+        JomlPools.vec4f.sub(1)
+        return source.amplitude[time] * w
     }
 
     val ffmpegSampleRate = meta.audioSampleRate
@@ -118,8 +122,8 @@ class AudioStreamRaw2(
         }
     }
 
-    private val v0 = Vector3f()
-    private val v1 = Vector3f()
+    private val tmp0 = Vector3f()
+    private val tmp1 = Vector3f()
 
     private fun calculateLoudness(globalTime: Double, t0: SimpleTransfer): AudioTransfer {
 
@@ -138,13 +142,14 @@ class AudioStreamRaw2(
         source!!
         destination!!
 
-        val (dstLocal2Global, _) = destination.getGlobalTransformTime(globalTime)
-        val (srcLocal2Global, _) = source.getGlobalTransformTime(globalTime)
-        val dstGlobalPos = dstLocal2Global.transformPosition(Vector3f())
-        val srcGlobalPos = srcLocal2Global.transformPosition(Vector3f())
-        val dirGlobal = dstGlobalPos.sub(srcGlobalPos).normalize() // in global space
-        val leftDirGlobal = dstLocal2Global.transformDirection(v0.set(+1f, 0f, -0.1f)).normalize()
-        val rightDirGlobal = dstLocal2Global.transformDirection(v1.set(-1f, 0f, -0.1f)).normalize()
+        val dstLocal2Global = destination.getGlobalTransform(globalTime, JomlPools.mat4f.create())
+        val srcLocal2Global = source.getGlobalTransform(globalTime, JomlPools.mat4f.create())
+        val dstGlobalPos = dstLocal2Global.transformPosition(tmp0.set(0f))
+        val srcGlobalPos = srcLocal2Global.transformPosition(tmp1.set(0f))
+        val dirGlobal = dstGlobalPos.sub(srcGlobalPos).safeNormalize() // in global space
+        val leftDirGlobal = dstLocal2Global.transformDirection(tmp0.set(+1f, 0f, -0.1f)).safeNormalize()
+        val rightDirGlobal = dstLocal2Global.transformDirection(tmp1.set(-1f, 0f, -0.1f)).safeNormalize()
+        JomlPools.mat4f.sub(2)
         // val distance = camGlobalPos.distance(srcGlobalPos)
 
         val left1 = leftDirGlobal.dot(dirGlobal) * 0.48f + 0.52f

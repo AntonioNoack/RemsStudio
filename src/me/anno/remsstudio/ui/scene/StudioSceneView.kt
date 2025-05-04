@@ -35,6 +35,7 @@ import me.anno.remsstudio.RemsStudio.lastTouchedCamera
 import me.anno.remsstudio.RemsStudio.nullCamera
 import me.anno.remsstudio.RemsStudio.project
 import me.anno.remsstudio.Scene
+import me.anno.remsstudio.Scene.lastGlobalCameraTransformInverted
 import me.anno.remsstudio.Selection.select
 import me.anno.remsstudio.Selection.selectTransform
 import me.anno.remsstudio.Selection.selectedTransforms
@@ -57,6 +58,7 @@ import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.Color.black
 import me.anno.utils.Color.convertARGB2ABGR
+import me.anno.utils.pooling.JomlPools
 import me.anno.utils.structures.lists.Lists.firstInstanceOrNull2
 import me.anno.utils.types.Floats.toRadians
 import org.apache.logging.log4j.LogManager
@@ -315,6 +317,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
 
         convertARGB2ABGR(idBuffer)
 
+        val listOfAll = root.listOfAll
         LOGGER.debug(
             "ResolveClick: " +
                     "[${idBuffer.joinToString { it.toUInt().toString(16) }}], " +
@@ -322,7 +325,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         )
         LOGGER.debug(
             "Available IDs: ${
-                root.listOfAll.toList()
+                listOfAll.toList()
                     .joinToString { it.clickId.toUInt().toString(16) }
             }")
 
@@ -330,7 +333,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         // find the transform with the id to select it
         if (bestResult > 0) {
 
-            var transform = root.listOfAll.firstOrNull { it.clickId == bestResult }
+            var transform = listOfAll.firstOrNull { it.clickId == bestResult }
             if (transform == null) {// transformed, so it works without project as well
                 val nullCamera = project?.nullCamera
                 if (nullCamera != null && nullCamera.clickId == bestResult) {
@@ -365,7 +368,8 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
 
         val camera = camera
         if (!camera.lockTransform) {
-            val (cameraTransform, cameraTime) = camera.getGlobalTransformTime(editorTime)
+            val (cameraTransform, cameraTime) =
+                camera.getGlobalTransformTime(editorTime, Matrix4f())
 
             val radius = camera.orbitRadius[cameraTime]
             val speed = if (radius == 0f) 1f else 0.1f + 0.9f * radius
@@ -435,7 +439,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                         }
                     }
 
-                    val (_, time) = camera.getGlobalTransformTime(editorTime)
+                    val time = camera.getGlobalTime(editorTime)
                     val old = camera.rotationYXZ[time]
                     val rotationSpeed = -10f
                     if (!isLocked2D) {
@@ -484,10 +488,12 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         if (!mayControlCamera || selected.lockTransform) return
         if (dx0 == 0f && dy0 == 0f) return
 
-        val (target2global, localTime) = (selected.parent ?: selected).getGlobalTransformTime(editorTime)
+        val (target2global, localTime) =
+            (selected.parent ?: selected).getGlobalTransformTime(editorTime, Matrix4f())
 
         val camera = camera
-        val (camera2global, cameraTime) = camera.getGlobalTransformTime(editorTime)
+        val (camera2global, cameraTime) =
+            camera.getGlobalTransformTime(editorTime, Matrix4f())
 
         global2normUI.clear()
         camera.applyTransform(cameraTime, camera2global, global2normUI)
@@ -678,7 +684,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
         }
     }
 
-    val cameraTime get() = camera.getGlobalTransformTime(editorTime).second
+    val cameraTime get() = camera.getGlobalTime(editorTime)
     val firstCamera get() = root.listOfAll.firstInstanceOrNull2(Camera::class)
 
     fun rotateCameraTo(rotation: Vector3f) {
@@ -705,7 +711,7 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
                     camera.resetTransform(true)
                 } else {
                     // copy the transform
-                    val firstCameraTime = firstCamera.getGlobalTransformTime(editorTime).second
+                    val firstCameraTime = firstCamera.getGlobalTime(editorTime)
                     RemsStudio.largeChange("Reset Camera") {
                         camera.cloneTransform(firstCamera, firstCameraTime)
                     }
@@ -800,21 +806,65 @@ open class StudioSceneView(style: Style) : PanelList(null, style.getChild("scene
             }
 
             if (!isProcessed && wasInFocus) {
-                resolveClick(x, y) { tr ->
-                    if (isShiftDown || isControlDown) {
-                        // todo if(isShiftDown) select all in-between...
-                        if (tr != null) {
-                            val newList = if (tr in selectedTransforms) {
-                                selectedTransforms.filter { it != tr }
-                            } else {
-                                selectedTransforms + tr
-                            }
-                            select(newList, emptyList())
-                        }
-                    } else selectTransform(tr)
+                if (isShiftDown) {
+                    resolveRectangleSelect(x, y)
+                } else {
+                    resolveClickSelect(x, y)
                 }
             }
         } else super.onMouseClicked(x, y, button, long)
+    }
+
+    // todo test this
+    private fun getProjectedCoordinates(transform: Transform, dst: Vector4f): Boolean {
+        val globalTransform = transform.getGlobalTransform(editorTime, JomlPools.mat4f.create())
+        globalTransform.transform(dst.set(0f, 0f, 0f, 1f))
+        lastGlobalCameraTransformInverted.transform(dst)
+        println("${transform.name}: $dst")
+        JomlPools.mat4f.sub(1)
+        if (dst.w <= 0f) return false
+        dst.set(dst.x / dst.w, dst.y / dst.w, dst.z / dst.w, dst.w)
+        return true
+    }
+
+    private fun resolveRectangleSelect(x: Float, y: Float) {
+        val mainEntry = selectedTransforms.lastOrNull()
+        if (mainEntry == null) return resolveClickSelect(x, y)
+
+        val tmp = Vector4f()
+        getProjectedCoordinates(mainEntry, tmp)
+
+        val bounds = AABBf()
+        bounds.union((x - this.x) / this.width, (y - this.y) / this.height, 0f)
+        bounds.union(tmp.x, tmp.y, 0f)
+
+        val root = RemsStudio.root
+        val alreadySelected = selectedTransforms.toSet()
+        val toSelect = root.listOfAll.filter { transform ->
+            transform !in alreadySelected &&
+                    getProjectedCoordinates(transform, tmp) &&
+                    bounds.testPoint(tmp.x, tmp.y, 0f)
+        }
+
+        select(selectedTransforms + toSelect, emptyList())
+    }
+
+    private fun resolveClickSelect(x: Float, y: Float) {
+        resolveClick(x, y) { tr ->
+            when {
+                isControlDown -> {
+                    if (tr != null) {
+                        val newList = if (tr in selectedTransforms) {
+                            selectedTransforms.filter { it != tr }
+                        } else {
+                            selectedTransforms + tr
+                        }
+                        select(newList, emptyList())
+                    }
+                }
+                else -> selectTransform(tr)
+            }
+        }
     }
 
     override fun onPaste(x: Float, y: Float, data: String, type: String) {

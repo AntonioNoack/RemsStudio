@@ -3,7 +3,6 @@ package me.anno.remsstudio
 import me.anno.config.DefaultConfig
 import me.anno.gpu.DepthMode
 import me.anno.gpu.FinalRendering.isFinalRendering
-import me.anno.gpu.FinalRendering.missingFrameException
 import me.anno.gpu.FinalRendering.onMissingResource
 import me.anno.gpu.GFX
 import me.anno.gpu.GFXState
@@ -54,9 +53,8 @@ import me.anno.remsstudio.objects.effects.ToneMappers
 import me.anno.remsstudio.ui.editor.ISceneView
 import me.anno.ui.editor.sceneView.Gizmos.drawGizmo
 import me.anno.ui.editor.sceneView.Grid
-import org.joml.Matrix4f
-import org.joml.Matrix4fArrayList
-import org.joml.Vector4f
+import me.anno.utils.pooling.JomlPools
+import org.joml.*
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -200,9 +198,9 @@ object Scene {
         return next
     }
 
-    var lastCameraTransform = Matrix4f()
-    var lastGlobalCameraTransform = Matrix4f()
-    var lGCTInverted = Matrix4f()
+    val lastCameraTransform = Matrix4f()
+    val lastGlobalCameraTransform = Matrix4f()
+    val lastGlobalCameraTransformInverted = Matrix4f()
     var usesFPBuffers = false
 
     val mayUseMSAA
@@ -243,18 +241,20 @@ object Scene {
 
         RemsStudio.currentlyDrawnCamera = camera
 
-        val (cameraTransform, cameraTime) = camera.getGlobalTransformTime(time)
-        lastGlobalCameraTransform.set(cameraTransform)
-        lGCTInverted.set(cameraTransform).invert()
+        val (cameraTransform, cameraTime) =
+            camera.getGlobalTransformTime(time, Matrix4f())
 
-        val distortion = camera.distortion[cameraTime]
+        lastGlobalCameraTransform.set(cameraTransform)
+        cameraTransform.invert(lastGlobalCameraTransformInverted)
+
+        val distortion = camera.distortion[cameraTime, Vector3f()]
         val vignetteStrength = camera.vignetteStrength[cameraTime]
         val chromaticAberration = camera.chromaticAberration[cameraTime]
         val toneMapping = camera.toneMapping
 
-        val cgOffset = camera.cgOffsetAdd[cameraTime] - camera.cgOffsetSub[cameraTime]
-        val cgSlope = camera.cgSlope[cameraTime]
-        val cgPower = camera.cgPower[cameraTime]
+        val cgOffset = camera.cgOffsetAdd[cameraTime, Vector3f()] - camera.cgOffsetSub[cameraTime, Vector3f()]
+        val cgSlope = camera.cgSlope[cameraTime, Vector4f()]
+        val cgPower = camera.cgPower[cameraTime, Vector4f()]
         val cgSaturation = camera.cgSaturation[cameraTime]
 
         val bloomIntensity = camera.bloomIntensity[cameraTime]
@@ -310,7 +310,7 @@ object Scene {
                     camera.applyTransform(cameraTime, cameraTransform, stack)
 
                     // val white = Vector4f(1f, 1f, 1f, 1f)
-                    val white = Vector4f(camera.color[cameraTime])
+                    val white = camera.color[cameraTime, Vector4f()]
                     val whiteMultiplier = camera.colorMultiplier[cameraTime]
                     val whiteAlpha = white.w
                     white.mul(whiteMultiplier)
@@ -481,16 +481,13 @@ object Scene {
         w: Int, h: Int
     ) {
 
-        val distortion = camera.distortion[cameraTime]
-        val distortionOffset = camera.distortionOffset[cameraTime]
+        val vec2 = JomlPools.vec2f
+        val vec3 = JomlPools.vec3f
+        val vec4 = JomlPools.vec4f
+
         val vignetteStrength = camera.vignetteStrength[cameraTime]
         val chromaticAberration = camera.chromaticAberration[cameraTime]
         val toneMapping = camera.toneMapping
-
-        val cgOffset = camera.cgOffsetAdd[cameraTime] - camera.cgOffsetSub[cameraTime]
-        val cgSlope = camera.cgSlope[cameraTime]
-        val cgPower = camera.cgPower[cameraTime]
-        val cgSaturation = camera.cgSaturation[cameraTime]
 
         val rel = sqrt(w * h.toFloat())
         val fxScaleX = 1f * w / rel
@@ -500,31 +497,45 @@ object Scene {
         val chromaticScale = 0.01f
         if (!isFakeColorRendering) {
             val ca = chromaticAberration * chromaticScale
-            val cao = camera.chromaticOffset[cameraTime] * chromaticScale
+            val cao = camera.chromaticOffset[cameraTime, vec2.create()] * chromaticScale
             val angle = (camera.chromaticAngle[cameraTime] * 2 * Math.PI).toFloat()
             shader.v2f("chromaticAberration", cos(angle) * ca / fxScaleX, sin(angle) * ca / fxScaleY)
             shader.v2f("chromaticOffset", cao)
+            vec2.sub(1)
         }
 
         // avg brightness: exp avg(log (luminance + offset4black)) (Reinhard tone mapping paper)
         // middle gray = 0.18?
 
         // distortion
+        val distortion = camera.distortion[cameraTime, vec3.create()]
+        val distortionOffset = camera.distortionOffset[cameraTime, vec2.create()]
         shader.v3f("fxScale", fxScaleX, fxScaleY, 1f + distortion.z)
         shader.v2f("distortion", distortion.x, distortion.y)
         shader.v2f("distortionOffset", distortionOffset)
+        vec2.sub(1)
+        vec3.sub(1)
+
         if (!isFakeColorRendering) {
+
             // vignette
             shader.v1f("vignetteStrength", DEFAULT_VIGNETTE_STRENGTH * vignetteStrength)
-            shader.v3f("vignetteColor", camera.vignetteColor[cameraTime])
+            shader.v3f("vignetteColor", camera.vignetteColor[cameraTime, vec3.create()])
+            vec3.sub(1)
+
             // randomness against banding
             // tone mapping
             shader.v1i("toneMapper", toneMapping.id)
+
             // color grading
+            val cgOffset = camera.cgOffsetAdd[cameraTime, vec3.create()]
+                .sub(camera.cgOffsetSub[cameraTime, vec3.create()])
             shader.v3f("cgOffset", cgOffset)
-            shader.v3X("cgSlope", cgSlope)
-            shader.v3X("cgPower", cgPower)
-            shader.v1f("cgSaturation", cgSaturation)
+            shader.v3X("cgSlope", camera.cgSlope[cameraTime, vec4.create()])
+            shader.v3X("cgPower",  camera.cgPower[cameraTime, vec4.create()])
+            shader.v1f("cgSaturation", camera.cgSaturation[cameraTime])
+            vec3.sub(2)
+            vec4.sub(2)
         }
 
     }
@@ -547,11 +558,13 @@ object Scene {
             if (!isFinalRendering && !isFakeColorRendering && selectedTransform != camera) { // seeing the own camera is irritating xD
                 val stack = stack
                 renderDefault {
-                    val (transform, _) = selectedTransform.getGlobalTransformTime(time)
+                    val transform = selectedTransform
+                        .getGlobalTransform(time, JomlPools.mat4f.create())
                     stack.next {
                         stack.mul(transform)
                         drawSelectionRing(stack)
                     }
+                    JomlPools.mat4f.sub(1)
                 }
             }
         }

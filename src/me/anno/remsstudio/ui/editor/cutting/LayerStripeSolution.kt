@@ -23,6 +23,7 @@ import me.anno.remsstudio.ui.editor.cutting.LayerView.Companion.maxLines
 import me.anno.remsstudio.ui.editor.cutting.Status.Companion.drawLoadingStatus
 import me.anno.utils.Color.black
 import me.anno.utils.Color.mixARGB
+import me.anno.utils.pooling.JomlPools
 import org.joml.Vector4f
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -297,7 +298,7 @@ class LayerStripeSolution(
                 // draw frame
                 drawRectGradient(
                     x0, y, x1 - x0, h, c0, c1, frame,
-                    Vector4f(f0, 0f, f1, 1f)
+                    JomlPools.vec4f.borrow().set(f0, 0f, f1, 1f)
                 )
             }
         }

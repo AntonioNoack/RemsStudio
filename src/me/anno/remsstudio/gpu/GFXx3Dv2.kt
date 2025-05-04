@@ -102,22 +102,22 @@ object GFXx3Dv2 {
     }
 
     fun draw3DText(
-        that: GFXTransform, time: Double, offset: Vector3f,
+        that: GFXTransform, time: Double, offset: Vector2f,
         stack: Matrix4fArrayList, mesh: Mesh, color: Vector4f
     ) {
         val shader = shader3DText.value
         shader.use()
         shader3DUniforms(shader, stack, color)
-        shader.v3f("offset", offset)
+        shader.v3f("offset", offset.x, offset.y, 0f)
         GFXTransform.uploadAttractors(that, shader, time, false)
         mesh.draw(null, shader, 0)
         GFX.check()
     }
 
-    fun draw3DTextWithOffset(mesh: Mesh, offset: Vector3f) {
+    fun draw3DTextWithOffset(mesh: Mesh, offset: Vector2f) {
         val shader = shader3DText.value
         shader.use()
-        shader.v3f("offset", offset)
+        shader.v3f("offset", offset.x, offset.y, 0f)
         mesh.draw(null, shader, 0)
     }
 

@@ -28,6 +28,7 @@ import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.editor.treeView.TreeView
 import me.anno.utils.Color.black
 import me.anno.utils.Color.toARGB
+import me.anno.utils.pooling.JomlPools
 import me.anno.utils.types.Strings.camelCaseToTitle
 import org.apache.logging.log4j.LogManager
 import org.joml.Vector3f
@@ -45,21 +46,27 @@ class StudioTreeView(style: Style) :
             // todo also zoom in/out correctly to match the object...
             // identify the currently used camera
             val camera = lastTouchedCamera ?: nullCamera ?: return false
-            val time = RemsStudio.editorTime
-            // calculate the movement, which would be necessary
-            val cameraToWorld = camera.parent?.getGlobalTransform(time)
-            val objectToWorld = obj.getGlobalTransform(time)
-            val objectWorldPosition = objectToWorld.transformPosition(Vector3f(0f, 0f, 0f))
-
-            @Suppress("IfThenToElvis")
-            val objectCameraPosition = if (cameraToWorld == null) objectWorldPosition else
-                cameraToWorld.invert().transformPosition(objectWorldPosition)
-            LOGGER.info(objectCameraPosition)
+            val objectCameraPosition = calculateObjectCameraPosition(camera, obj)
+            LOGGER.info("ObjectToCamera: $objectCameraPosition")
             // apply this movement
             RemsStudio.largeChange("Move Camera to Object") {
                 camera.position.addKeyframe(camera.lastLocalTime, objectCameraPosition)
             }
             return true
+        }
+
+        private fun calculateObjectCameraPosition(camera: Camera, obj: Transform): Vector3f {
+            val time = RemsStudio.editorTime
+            // calculate the movement, which would be necessary
+            val cameraToWorld = camera.parent?.getGlobalTransform(time, JomlPools.mat4f.create())
+            val objectToWorld = obj.getGlobalTransform(time, JomlPools.mat4f.create())
+            val objectWorldPosition = objectToWorld.transformPosition(Vector3f(0f, 0f, 0f))
+
+            @Suppress("IfThenToElvis")
+            val objectCameraPosition = if (cameraToWorld == null) objectWorldPosition else
+                cameraToWorld.invert().transformPosition(objectWorldPosition)
+            JomlPools.mat4f.sub(2)
+            return objectCameraPosition
         }
 
         fun openAddMenu(baseTransform: Transform) {

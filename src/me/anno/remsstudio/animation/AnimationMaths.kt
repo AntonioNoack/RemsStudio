@@ -1,7 +1,7 @@
 package me.anno.remsstudio.animation
 
-import me.anno.ui.input.NumberType
 import me.anno.remsstudio.utils.StringMixer
+import me.anno.ui.input.NumberType
 import org.joml.Quaternionf
 import org.joml.Vector2f
 import org.joml.Vector3f
@@ -11,10 +11,10 @@ import kotlin.math.roundToInt
 object AnimationMaths {
 
     // to save allocations
-    fun v2(dst: Any?) = dst as? Vector2f ?: Vector2f()
-    fun v3(dst: Any?) = dst as? Vector3f ?: Vector3f()
-    fun v4(dst: Any?) = dst as? Vector4f ?: Vector4f()
-    fun q4(dst: Any?) = dst as? Quaternionf ?: Quaternionf()
+    fun v2(dst: Any?): Vector2f = dst as? Vector2f ?: Vector2f()
+    fun v3(dst: Any?): Vector3f = dst as? Vector3f ?: Vector3f()
+    fun v4(dst: Any?): Vector4f = dst as? Vector4f ?: Vector4f()
+    fun q4(dst: Any?): Quaternionf = dst as? Quaternionf ?: Quaternionf()
 
     /**
      * b + a * f
