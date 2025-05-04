@@ -303,8 +303,6 @@ obj.particles.spawnRate.desc: How many particles are spawned per second
 obj.particles.weight: Weight
 obj.particles.weight.desc: For particle systems
 obj.polygon: Polygon
-obj.polygon.autoAlign: Auto-Align
-obj.polygon.autoAlign.desc: Rotate 45°/90, and scale a bit; for rectangles
 obj.polygon.extrusion: Extrude
 obj.polygon.extrusion.desc: Makes it 3D
 obj.polygon.pattern: Pattern Texture

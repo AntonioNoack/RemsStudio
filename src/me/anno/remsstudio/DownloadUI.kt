@@ -66,7 +66,7 @@ object DownloadUI {
                     return line.split('\'')[1]
                 }
             }
-        } catch (ignored: IOException) {
+        } catch (_: IOException) {
         }
         return null
     }

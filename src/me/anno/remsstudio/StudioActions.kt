@@ -16,7 +16,11 @@ import me.anno.io.utils.StringMap
 import me.anno.language.translation.Dict
 import me.anno.remsstudio.RemsStudio.hoveredPanel
 import me.anno.remsstudio.objects.modes.TransformVisibility
+import me.anno.remsstudio.ui.StudioPropertyInspector
+import me.anno.remsstudio.ui.StudioTreeView
+import me.anno.remsstudio.ui.TimeControlsPanel
 import me.anno.remsstudio.ui.editor.TimelinePanel
+import me.anno.remsstudio.ui.scene.StudioSceneView
 import me.anno.ui.Panel
 import me.anno.ui.WindowStack.Companion.printLayout
 import me.anno.ui.input.components.TitlePanel
@@ -29,14 +33,16 @@ object StudioActions {
 
     private val LOGGER = LogManager.getLogger(StudioActions::class)
 
-    fun nextFrame() {
+    fun nextFrame(): Boolean {
         RemsStudio.editorTime = (round(RemsStudio.editorTime * RemsStudio.targetFPS) + 1) / RemsStudio.targetFPS
         RemsStudio.updateAudio()
+        return true
     }
 
-    fun previousFrame() {
+    fun previousFrame(): Boolean {
         RemsStudio.editorTime = (round(RemsStudio.editorTime * RemsStudio.targetFPS) - 1) / RemsStudio.targetFPS
         RemsStudio.updateAudio()
+        return true
     }
 
     private fun isInputInFocus(): Boolean {
@@ -74,40 +80,48 @@ object StudioActions {
         RemsStudio.updateAudio()
     }
 
+    /***
+     * Only execute our actions, if the editor window is the window in focus.
+     * This may not be the case, e.g., if a file is being selected.
+     * */
+    fun isFocussed(): Boolean {
+        val window = GFX.focusedWindow ?: return false
+        val rootPanel: Panel = window.windowStack.lastOrNull()?.panel ?: return false
+        return rootPanel.listOfVisible.any2 { panelI ->
+            when (panelI) {
+                is StudioSceneView, is TimelinePanel, is StudioTreeView,
+                is StudioPropertyInspector, is TimeControlsPanel -> true
+                else -> false
+            }
+        }
+    }
+
     fun register() {
 
         val actions = listOf(
-            "Play" to { setEditorTimeDilation(1.0) },
-            "Pause" to { setEditorTimeDilation(0.0) },
-            "PlaySlow" to { setEditorTimeDilation(0.2) },
-            "PlayReversed" to { setEditorTimeDilation(-1.0) },
-            "PlayReversedSlow" to { setEditorTimeDilation(-0.2) },
+            "Play" to { isFocussed() && setEditorTimeDilation(1.0) },
+            "Pause" to { isFocussed() && setEditorTimeDilation(0.0) },
+            "PlaySlow" to { isFocussed() && setEditorTimeDilation(0.2) },
+            "PlayReversed" to { isFocussed() && setEditorTimeDilation(-1.0) },
+            "PlayReversedSlow" to { isFocussed() && setEditorTimeDilation(-0.2) },
             "ToggleFullscreen" to { GFX.someWindow.toggleFullscreen(); true },
             "PrintLayout" to { printLayout();true },
             "PrintDictDefaults" to { Dict.printDefaults();true },
-            "NextFrame" to {
-                nextFrame()
-                true
-            },
-            "PreviousFrame" to {
-                previousFrame()
-                true
-            },
-            "NextStep" to {
-                TimelinePanel.moveRight(1f)
-                true
-            },
-            "PreviousStep" to {
-                TimelinePanel.moveRight(-1f)
-                true
-            },
+            "NextFrame" to { isFocussed() && nextFrame() },
+            "PreviousFrame" to { isFocussed() && previousFrame() },
+            "NextStep" to { isFocussed() && TimelinePanel.moveRight(1f) },
+            "PreviousStep" to { isFocussed() && TimelinePanel.moveRight(-1f) },
             "Jump2Start" to {
-                jumpToStart()
-                true
+                if (isFocussed()) {
+                    jumpToStart()
+                    true
+                } else false
             },
             "Jump2End" to {
-                jumpToEnd()
-                true
+                if (isFocussed()) {
+                    jumpToEnd()
+                    true
+                } else false
             },
             "DragEnd" to {
                 val dragged = dragged
@@ -147,7 +161,7 @@ object StudioActions {
                 true
             },
             "ShowAllObjects" to {
-                if (RemsStudio.root.listOfAll.any { it.visibility == TransformVisibility.VIDEO_ONLY }) {
+                if (isFocussed() && RemsStudio.root.listOfAll.any { it.visibility == TransformVisibility.VIDEO_ONLY }) {
                     RemsStudio.largeChange("Show all objects") {
                         for (panel in RemsStudio.root.listOfAll) {
                             if (panel.visibility == TransformVisibility.VIDEO_ONLY) {
@@ -160,7 +174,7 @@ object StudioActions {
             },
             "ToggleHideObject" to {
                 val transforms = Selection.selectedTransforms
-                if (transforms.isNotEmpty()) {
+                if (isFocussed() && transforms.isNotEmpty()) {
                     RemsStudio.largeChange("Toggle Visibility") {
                         val newVis = when (transforms.firstOrNull()?.visibility) {
                             TransformVisibility.VISIBLE -> TransformVisibility.VIDEO_ONLY

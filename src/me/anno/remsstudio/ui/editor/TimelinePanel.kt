@@ -34,7 +34,6 @@ import me.anno.utils.Color.black
 import me.anno.utils.Color.mixARGB
 import me.anno.utils.Color.mulAlpha
 import me.anno.utils.types.Strings.formatTime
-import kotlin.collections.set
 import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.roundToInt
@@ -136,12 +135,13 @@ open class TimelinePanel(style: Style) : Panel(style) {
                 else 1e-6
             }
 
-        fun moveRight(sign: Float) {
+        fun moveRight(sign: Float): Boolean {
             val delta = sign * dtHalfLength * 0.05f
             editorTime += delta
             updateAudio()
             centralTime += delta
             clampTime()
+            return true
         }
 
         data class TimestampKey(val time: Double, val step: Double)

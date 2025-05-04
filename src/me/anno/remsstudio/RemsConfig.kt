@@ -83,7 +83,6 @@ object RemsConfig {
             "Cube" to run {
                 val cube = Polygon()
                 cube.name = "Cube"
-                cube.autoAlign = true
                 cube.is3D = true
                 cube.vertexCount.set(4)
                 cube

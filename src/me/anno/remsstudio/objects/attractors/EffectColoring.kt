@@ -13,6 +13,7 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.utils.structures.Collections.filterIsInstance2
 import org.joml.Vector4f
 
+// todo when dragging them, they are 2x too slow for some reason :/
 class EffectColoring : Transform() {
 
     var lastInfluence = 0f

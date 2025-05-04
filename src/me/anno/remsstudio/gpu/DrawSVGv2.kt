@@ -20,7 +20,10 @@ object DrawSVGv2 {
         shader.use()
         shader3DUniforms(shader, stack, texture.width, texture.height, color, filtering, null)
         texture.bind(0, filtering.convert(), clamping)
-        defineAdvancedGraphicalFeatures(shader, video, time, false)
+        defineAdvancedGraphicalFeatures(
+            shader, video, time, false,
+            false, true
+        ) // todo check if flipY is correct
         DrawSVGs.draw(stack, buffer, clamping, tiling, shader)
     }
 }

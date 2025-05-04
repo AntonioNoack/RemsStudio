@@ -78,7 +78,8 @@ import kotlin.math.tan
 //  then press enter to apply the change
 
 @Suppress("MemberVisibilityCanBePrivate")
-open class StudioSceneView(style: Style) : PanelList(null, style.getChild("sceneView")), ISceneView {
+open class StudioSceneView(style: Style) :
+    PanelList(null, style.getChild("sceneView")), ISceneView {
 
     companion object {
         private val LOGGER = LogManager.getLogger(StudioSceneView::class)

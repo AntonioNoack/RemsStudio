@@ -8,7 +8,6 @@ object Rectangle {
         val quad = Polygon(null)
         quad.name = Dict["Rectangle", "obj.rectangle"]
         quad.vertexCount.set(4)
-        quad.autoAlign = true
         return quad
     }
 }

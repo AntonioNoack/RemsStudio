@@ -878,7 +878,7 @@ open class Transform() : Saveable(),
 
         fun String.toTransform() = try {
             JsonStringReader.readFirstOrNull(this, workspace, Transform::class)
-        } catch (e: InvalidFormatException) {
+        } catch (_: InvalidFormatException) {
             null
         }
 

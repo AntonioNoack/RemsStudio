@@ -66,12 +66,15 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
         return pos
     }
 
-    fun uploadAttractors(shader: Shader, time: Double, is3D: Boolean) {
-        uploadUVAttractors(shader, time, is3D)
-        uploadColorAttractors(shader, time)
+    fun uploadAttractors(
+        shader: Shader, time: Double, is3D: Boolean,
+        flipUVAttractors: Boolean, flipColorAttractors: Boolean
+    ) {
+        uploadUVAttractors(shader, time, is3D, flipUVAttractors)
+        uploadColorAttractors(shader, time, flipColorAttractors) // always true? ok...
     }
 
-    fun uploadUVAttractors(shader: Shader, time: Double, is3D: Boolean) {
+    private fun uploadUVAttractors(shader: Shader, time: Double, is3D: Boolean, flipY: Boolean) {
 
         // has no ability to display them
         if (shader["forceFieldUVCount"] < 0) return
@@ -107,11 +110,12 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
                 for (morphing in morphings) {
                     val localTime = morphing.lastLocalTime
                     val position = transformLocally(morphing.position[localTime, tmpVec3], time)
+                    if (flipY) position.y = -position.y
                     buffer[bi++] = (position.x * 0.5f + 0.5f)
                     buffer[bi++] = (position.y * 0.5f + 0.5f)
                     if (is3D) {
-                        buffer[bi++] = (position.z)
-                        buffer[bi++] = (0f)
+                        buffer[bi++] = position.z
+                        buffer[bi++] = 0f
                     } else {
                         buffer[bi++] = morphing.swirlStrength[localTime]
                         buffer[bi++] = (1f / morphing.swirlPower[localTime])
@@ -149,7 +153,7 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
 
     }
 
-    fun uploadColorAttractors(shader: Shader, time: Double) {
+    private fun uploadColorAttractors(shader: Shader, time: Double, flipY: Boolean) {
 
         // has no ability to display them
         if (shader["forceFieldColorCount"] < 0) return
@@ -192,6 +196,7 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
             for (attractor in attractors) {
                 val localTime = attractor.lastLocalTime
                 val position = transformLocally(attractor.position[localTime, tmpVec3], time)
+                if (flipY) position.y = -position.y
                 val weight = attractor.lastInfluence
                 buffer.put(position.x).put(position.y).put(position.z).put(weight)
             }
@@ -220,8 +225,12 @@ abstract class GFXTransform(parent: Transform?) : Transform(parent) {
         private val tmpVec3 = Vector3f()
         private val tmpColor = Vector4f()
 
-        fun uploadAttractors(transform: GFXTransform?, shader: Shader, time: Double, is3D: Boolean) {
-            transform?.uploadAttractors(shader, time, is3D) ?: uploadAttractors0(shader)
+        fun uploadAttractors(
+            transform: GFXTransform?, shader: Shader, time: Double, is3D: Boolean,
+            flipUVAttractors: Boolean, flipColorAttractors: Boolean
+        ) {
+            transform?.uploadAttractors(shader, time, is3D, flipUVAttractors, flipColorAttractors)
+                ?: uploadAttractors0(shader)
         }
 
         fun uploadAttractors0(shader: Shader) {

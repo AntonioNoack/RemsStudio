@@ -14,6 +14,7 @@ import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
+import me.anno.maths.Maths.TAUf
 import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.gpu.GFXx3Dv2.draw3DPolygon
@@ -23,16 +24,17 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
+import me.anno.ui.input.NumberType
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.pooling.JomlPools
 import me.anno.utils.structures.Collections.filterIsInstance2
-import me.anno.utils.types.Floats.toRadians
+import me.anno.utils.types.Casting
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
 import kotlin.math.cos
+import kotlin.math.max
 import kotlin.math.sin
-import kotlin.math.sqrt
 
 @Suppress("MemberVisibilityCanBePrivate")
 open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
@@ -43,11 +45,11 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
     override fun getDocumentationURL() = "https://remsstudio.phychi.com/?s=learn/geometry"
 
     var texture: FileReference = InvalidRef
-    var autoAlign = false
     var filtering = TexFiltering.LINEAR
 
     var is3D = false
-    var vertexCount = AnimatedProperty.intPlus(5)
+
+    var vertexCount = AnimatedProperty(NUM_EDGES_TYPE, 5)
     var starNess = AnimatedProperty.float01(0f)
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
@@ -66,12 +68,7 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
         JomlPools.vec3f.sub(1)
 
         stack.next {
-            if (autoAlign) {
-                stack.rotateZ((if (count == 4) 45f else 90f).toRadians())
-                stack.scale(sqrt2, sqrt2, if (is3D) 1f else 0f)
-            } else if (!is3D) {
-                stack.scale(1f, 1f, 0f)
-            }
+            if (!is3D) stack.scale(1f, 1f, 0f)
             draw3DPolygon(
                 this, time, stack, getBuffer(count, selfDepth > 0f), texture, color,
                 inset, filtering, Clamping.CLAMP
@@ -81,15 +78,8 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
     }
 
     override fun transformLocally(pos: Vector3f, time: Double): Vector3f {
-        val count = vertexCount[time]
         val z = if (is3D) pos.z else 0f
-        return if (autoAlign) {
-            if (count == 4) {
-                Vector3f(0.5f * (pos.x + pos.y), 0.5f * (pos.x - pos.y), z)
-            } else {
-                Vector3f(sqrt2, -sqrt2, z)
-            }
-        } else Vector3f(pos.x, -pos.y, z)
+        return Vector3f(pos.x, -pos.y, z)
     }
 
     override fun createInspector(
@@ -108,11 +98,6 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
             c, "Star-ness", "Works best with even vertex count", "polygon.star-ness", c.map { it.starNess },
             style
         )
-        geo += vi(
-            inspected, "Auto-Align",
-            "Rotate 45°/90, and scale a bit; for rectangles", "polygon.autoAlign",
-            null, autoAlign, style
-        ) { it, _ -> for (x in c) x.autoAlign = it }
         geo += vi(
             inspected, "Extrude", "Makes it 3D", "polygon.extrusion", null, is3D, style
         ) { it, _ -> for (x in c) x.is3D = it }
@@ -136,7 +121,6 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
         super.save(writer)
         writer.writeObject(this, "vertexCount", vertexCount)
         writer.writeObject(this, "inset", starNess)
-        writer.writeBoolean("autoAlign", autoAlign)
         writer.writeBoolean("is3D", is3D)
         writer.writeInt("filtering", filtering.id, true)
         writer.writeFile("texture", texture)
@@ -148,7 +132,6 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
             "vertexCount" -> vertexCount.copyFrom(value)
             "inset" -> starNess.copyFrom(value)
             "filtering" -> filtering = filtering.find(value as? Int ?: return)
-            "autoAlign" -> autoAlign = value == true
             "is3D" -> is3D = value == true
             else -> super.setProperty(name, value)
         }
@@ -170,9 +153,13 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
 
     companion object {
 
+        val NUM_EDGES_TYPE = NumberType(
+            0, 1, 1f, hasLinear = true, hasExponential = true,
+            { max(Casting.castToInt2(it), minEdges) }, Casting::castToInt
+        )
+
         val PolygonCache = CacheSection("PolygonCache")
 
-        val sqrt2 = sqrt(2f)
         val meshTimeout = 1000L
         private const val minEdges = 3
         private val maxEdges by lazy { DefaultConfig["objects.polygon.maxEdges", 1000] }
@@ -192,17 +179,15 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
             val sideCount = n * 6
             val vertexCount = if (hasDepth) frontCount * 2 + sideCount else frontCount
 
-            val angles = FloatArray(n + 1) { i -> (i * Math.PI * 2.0 / n).toFloat() }
-            val sin = angles.map { +sin(it) }
-            val cos = angles.map { -cos(it) }
-
-            val d1 = -1f
-            val d2 = +1f
+            val angle0 = if (n == 4) 0.5f else n * 0.5f
 
             val outline = ArrayList<Vector4f>()
             for (i in 0 until n) {
                 val inset = if (i % 2 == 0) 1f else 0f
-                outline.add(Vector4f(sin[i], cos[i], inset, 1f))
+                val angle = (i + angle0) * TAUf / n
+                val sin = +sin(angle)
+                val cos = -cos(angle)
+                outline.add(Vector4f(sin, cos, inset, 1f))
             }
 
             outline.add(outline.first())
@@ -232,6 +217,9 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
                     put(outline[k + 1], depth)
                 }
             }
+
+            val d1 = -1f
+            val d2 = +1f
 
             if (hasDepth) {
                 putFront(d1)

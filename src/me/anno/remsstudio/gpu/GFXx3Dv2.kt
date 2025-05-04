@@ -26,6 +26,7 @@ import me.anno.remsstudio.gpu.ShaderLibV2.hasForceFieldColor
 import me.anno.remsstudio.gpu.ShaderLibV2.shader3DCircle
 import me.anno.remsstudio.gpu.ShaderLibV2.shader3DText
 import me.anno.remsstudio.objects.GFXTransform
+import me.anno.remsstudio.objects.GFXTransform.Companion.uploadAttractors
 import me.anno.remsstudio.objects.GFXTransform.Companion.uploadAttractors0
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.geometric.Polygon
@@ -41,12 +42,15 @@ import kotlin.math.min
 @Suppress("MemberVisibilityCanBePrivate")
 object GFXx3Dv2 {
 
-    fun defineAdvancedGraphicalFeatures(shader: Shader, transform: Transform?, time: Double, is3D: Boolean) {
-        (transform as? GFXTransform)?.uploadAttractors(shader, time, is3D) ?: uploadAttractors0(shader)
+    fun defineAdvancedGraphicalFeatures(
+        shader: Shader, transform: Transform?, time: Double, is3D: Boolean,
+        flipUVAttractors: Boolean, flipColorAttractors: Boolean
+    ) {
+        (transform as? GFXTransform)?.uploadAttractors(shader, time, is3D, flipUVAttractors, flipColorAttractors)
+            ?: uploadAttractors0(shader)
         shader.v4f("finalId", transform?.clickId ?: -1)
         colorGradingUniforms(transform as? Video, time, shader)
     }
-
 
     fun getScale(w: Int, h: Int): Float = getScale(w.toFloat(), h.toFloat())
     private fun getScale(w: Float, h: Float): Float {
@@ -109,7 +113,10 @@ object GFXx3Dv2 {
         shader.use()
         shader3DUniforms(shader, stack, color)
         shader.v3f("offset", offset.x, offset.y, 0f)
-        GFXTransform.uploadAttractors(that, shader, time, false)
+        uploadAttractors(
+            that, shader, time, false,
+            false, false
+        ) // flipping is correct
         mesh.draw(null, shader, 0)
         GFX.check()
     }
@@ -129,7 +136,10 @@ object GFXx3Dv2 {
     ) {
         val shader = get3DShader(GPUFrame.swizzleStage0).value
         shader.use()
-        defineAdvancedGraphicalFeatures(shader, video, time, uvProjection != UVProjection.Planar)
+        defineAdvancedGraphicalFeatures(
+            shader, video, time, uvProjection != UVProjection.Planar,
+            true, true
+        ) // flipping is correct
         shader3DUniforms(shader, stack, texture.width, texture.height, color, tiling, filtering, uvProjection)
         cornerRadius(shader, cornerRadius, texture.width, texture.height)
         texture.bind(0, filtering.convert(), clamping)
@@ -152,7 +162,10 @@ object GFXx3Dv2 {
         val shader0 = get3DShader(texture)
         val shader = shader0.value
         shader.use()
-        defineAdvancedGraphicalFeatures(shader, video, time, uvProjection != UVProjection.Planar)
+        defineAdvancedGraphicalFeatures(
+            shader, video, time, uvProjection != UVProjection.Planar,
+            false, true
+        ) // flipping is correct
         shader3DUniforms(shader, stack, texture.width, texture.height, color, tiling, filtering, uvProjection)
         colorGradingUniforms(video as? Video, time, shader)
         cornerRadius(shader, cornerRadius, texture.width, texture.height)
@@ -172,7 +185,7 @@ object GFXx3Dv2 {
         val shader = ShaderLibV2.shader3DPolygon.value
         shader.use()
         shader.v4f("finalId", polygon.clickId)
-        polygon.uploadAttractors(shader, time, false)
+        polygon.uploadAttractors(shader, time, false, false, true) // flipping is correct
         shader3DUniforms(shader, stack, texture.width, texture.height, color, null, filtering, null)
         shader.v1f("inset", inset)
         texture.bind(0, filtering.convert(), clamping)
@@ -199,7 +212,10 @@ object GFXx3Dv2 {
         val shader = ShaderLibV2.shaderSDFText.value
         shader.use()
 
-        defineAdvancedGraphicalFeatures(shader, that, time, false)
+        defineAdvancedGraphicalFeatures(
+            shader, that, time, false,
+            false, false
+        )
 
         shader.v4f("tint", color)
 
@@ -232,7 +248,6 @@ object GFXx3Dv2 {
         shader.v1f("depth", depth * 0.00001f)
 
         drawOutlinedText(stack, offset, scale, texture, hasUVAttractors)
-
     }
 
     fun drawOutlinedText(
@@ -296,7 +311,10 @@ object GFXx3Dv2 {
     ) {
         val shader = shader3DCircle.value
         shader.use()
-        defineAdvancedGraphicalFeatures(shader, that, time, false)
+        defineAdvancedGraphicalFeatures(
+            shader, that, time, false,
+            false, true
+        ) // flipping is correct, todo fix: uv-attractors aren't supported
         shader3DUniforms(shader, stack, 1, 1, color, null, TexFiltering.NEAREST, null)
         circleParams(innerRadius, startDegrees, endDegrees, shader)
         circleData.draw(null, shader, 0)

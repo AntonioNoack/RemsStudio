@@ -247,7 +247,11 @@ class LinePolygon(parent: Transform? = null) : GFXTransform(parent) {
             }
 
             shader.use()
-            uploadAttractors(shader, time, false)
+            uploadAttractors(
+                shader, time, false,
+                false, true
+            ) // todo check if flipY is correct
+
             for (i in 1 until mappedIndices.size) {
                 val i0 = mappedIndices[i - 1]
                 val i1 = mappedIndices[i]
