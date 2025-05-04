@@ -58,7 +58,8 @@ class StudioTreeView(style: Style) :
         private fun calculateObjectCameraPosition(camera: Camera, obj: Transform): Vector3f {
             val time = RemsStudio.editorTime
             // calculate the movement, which would be necessary
-            val cameraToWorld = camera.parent?.getGlobalTransform(time, JomlPools.mat4f.create())
+            val tmp = JomlPools.mat4f.create()
+            val cameraToWorld = camera.parent?.getGlobalTransform(time, tmp)
             val objectToWorld = obj.getGlobalTransform(time, JomlPools.mat4f.create())
             val objectWorldPosition = objectToWorld.transformPosition(Vector3f(0f, 0f, 0f))
 

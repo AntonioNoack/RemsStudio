@@ -372,7 +372,7 @@ object GFXx3Dv2 {
     fun get3DShader(key: ShaderStage): BaseShader {
         return shaderMap3d.getOrPut(key) {
             ShaderLib.createShader(
-                "3dx-$javaClass", ShaderLib.v3Dl, ShaderLib.v3D, ShaderLib.y3D,
+                "3dx-GFXx3Dv2", ShaderLib.v3Dl, ShaderLib.v3D, ShaderLib.y3D,
                 key.variables.filter { !it.isOutput } +
                         getForceFieldColorUniforms + getTextureLibUniforms + listOf(
                     Variable(GLSLType.V4F, "cornerRadius"),

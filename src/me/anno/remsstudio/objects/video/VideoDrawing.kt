@@ -81,6 +81,7 @@ object VideoDrawing {
                     (texture as? Texture2D)?.rotation?.apply(stack)
                     lastW = texture.width
                     lastH = texture.height
+                    flipTilingY(tiling)
                     draw3DVideo(
                         this, time, stack, texture, color,
                         filtering, clamping, tiling, projection, cornerRadius
@@ -111,16 +112,21 @@ object VideoDrawing {
                 // draw the current texture
                 val localTime = isLooping[time, duration]
 
+
                 val frame = TextureCache[meta.getImage(localTime), 5L, true]
                 if (frame == null || !frame.isCreated()) onMissingImageOrFrame((localTime * 1000).toInt())
                 else {
                     lastW = frame.width
                     lastH = frame.height
+                    val tiling = tiling[time, JomlPools.vec4f.create()]
+                    val cornerRadius = cornerRadius[time, JomlPools.vec4f.create()]
+                    flipTilingY(tiling)
                     draw3DVideo(
                         this, time,
                         stack, frame, color, filtering.value, clampMode.value,
-                        tiling[time], uvProjection.value, cornerRadius[time]
+                        tiling, uvProjection.value, cornerRadius
                     )
+                    JomlPools.vec4f.sub(2)
                     wasDrawn = true
                 }
 
@@ -129,13 +135,19 @@ object VideoDrawing {
         }
 
         if (!wasDrawn && !isFinalRendering) {
+            val color1 = JomlPools.vec4f.create()
             GFXx3Dv2.draw3D(
                 stack, colorShowTexture, 16, 9,
-                Vector4f(0.5f, 0.5f, 0.5f, 1f).mul(color),
+                color1.set(0.5f, 0.5f, 0.5f, 1f).mul(color),
                 TexFiltering.NEAREST, Clamping.REPEAT, tiling16x9, uvProjection.value
             )
+            JomlPools.vec4f.sub(1)
         }
 
+    }
+
+    fun flipTilingY(tiling: Vector4f) {
+        tiling.y = -tiling.y
     }
 
     fun Video.drawVideo(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
@@ -192,10 +204,13 @@ object VideoDrawing {
                 if (frame0 != null) {
                     lastW = meta.videoWidth
                     lastH = meta.videoHeight
+                    val tiling = tiling[time, JomlPools.vec4f.create()]
+                    val cornerRadius = cornerRadius[time, JomlPools.vec4f.create()]
                     draw3DVideo(
                         this, time, stack, frame0, color, filtering, clamp,
-                        tiling[time, Vector4f()], uvProjection.value, cornerRadius[time, Vector4f()]
+                        tiling, uvProjection.value, cornerRadius
                     )
+                    JomlPools.vec4f.sub(2)
                     if (frame0.frameIndex != frameIndex) {
                         drawLoadingCircle(stack, (Time.nanoTime * 1e-9f) % 1f)
                     }
@@ -206,11 +221,13 @@ object VideoDrawing {
         }
 
         if (!wasDrawn) {
+            val color1 = JomlPools.vec4f.create()
             GFXx3Dv2.draw3D(
                 stack, colorShowTexture, 16, 9,
-                Vector4f(0.5f, 0.5f, 0.5f, 1f).mul(color),
+                color1.set(0.5f, 0.5f, 0.5f, 1f).mul(color),
                 TexFiltering.NEAREST, Clamping.REPEAT, tiling16x9, uvProjection.value
             )
+            JomlPools.vec4f.sub(1)
         }
     }
 
