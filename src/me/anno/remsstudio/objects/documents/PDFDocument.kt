@@ -110,7 +110,9 @@ open class PDFDocument(var file: FileReference, parent: Transform?) : GFXTransfo
         val file = file
         val ref = meta
         if (ref == null) {
-            onMissingResource("Missing document", file)
+            if (file.exists) {
+                onMissingResource("Missing document", file)
+            } // else just ignored
             return
         }
 

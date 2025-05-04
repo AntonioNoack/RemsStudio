@@ -3,6 +3,7 @@ package me.anno.remsstudio.objects.text
 import me.anno.fonts.FontManager
 import me.anno.fonts.PartResult
 import me.anno.fonts.mesh.TextMesh
+import me.anno.fonts.signeddistfields.TextSDF
 import me.anno.fonts.signeddistfields.algorithm.SignedDistanceField
 import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.gpu.FinalRendering.onMissingResource
@@ -255,7 +256,7 @@ object TextRenderer {
         if (sdf2 == null) {
             if (isFinalRendering) {
                 onMissingResource("Text-Texture ${element.font}", element.text)
-            } else element.needsUpdate = true
+            }
             return
         }
 
@@ -326,9 +327,9 @@ object TextRenderer {
 
                 } else GFXx3Dv2.drawOutlinedText(stack, tmpOffset, tmpScale, texture, hasUVAttractors)
             } else if (sdf == null || texture == null || !texture.isCreated()) {
-                if (isFinalRendering) {
+                if (isFinalRendering && sdf !== TextSDF.empty) {
                     onMissingResource("Text-Texture I '${element.font}'", key.text)
-                } else element.needsUpdate = true
+                }
             }
             false
         }
@@ -347,7 +348,7 @@ object TextRenderer {
         if (textMesh == null) {
             if (isFinalRendering) {
                 onMissingResource("Text-Mesh II '${element.font}'", key.text)
-            } else element.needsUpdate = true
+            }
             return
         }
 

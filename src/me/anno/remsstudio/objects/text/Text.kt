@@ -117,14 +117,6 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
             )
         }
 
-    var needsUpdate = false
-    override fun claimLocalResources(lTime0: Double, lTime1: Double) {
-        if (needsUpdate) {
-            invalidateUI(false)
-            needsUpdate = false
-        }
-    }
-
     open fun splitSegments(text: String): PartResult? {
         if (text.isEmpty()) return null
         val awtFont = FontManager.getFont(font) as AWTFont
@@ -202,10 +194,6 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
                 super.onDraw(stack, time, color)
             }
         }
-    }
-
-    fun invalidate() {
-        needsUpdate = true
     }
 
     override fun save(writer: BaseWriter) {
@@ -299,7 +287,6 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
             "endCursor" -> endCursor.copyFrom(value)
             else -> super.setProperty(name, value)
         }
-        invalidate()
     }
 
     override fun createInspector(

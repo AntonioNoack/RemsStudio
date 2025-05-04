@@ -168,7 +168,7 @@ open class StudioSceneView(style: Style) :
             val w = stableSize.stableWidth
             val h = stableSize.stableHeight
             Screenshots.takeScreenshot(w, h, renderer) {
-                Scene.draw(camera, RemsStudio.root, 0, 0, w, h, editorTime, true, renderer, this)
+                Scene.draw(camera, RemsStudio.root, 0, 0, w, h, editorTime, false, renderer, this)
             }
         }
     }

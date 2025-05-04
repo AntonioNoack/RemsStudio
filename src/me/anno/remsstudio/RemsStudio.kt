@@ -152,7 +152,7 @@ object RemsStudio : EngineBase(NameDesc("Rem's Studio"), 10302, true), WelcomeUI
         root.children.clear()
         Text("Rem's Studio", root).apply {
             relativeCharSpacing = 0.12f
-            invalidate()
+            invalidateUI(false)
         }
         return background
     }

@@ -17,7 +17,6 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.ui.editor.color.spaces.HSLuv
 import me.anno.ui.input.BooleanInput
 import me.anno.ui.input.TextInputML
-import me.anno.utils.assertions.assertTrue
 import me.anno.utils.structures.Collections.filterIsInstance2
 import org.joml.Vector3f
 import org.joml.Vector4f
@@ -51,7 +50,6 @@ fun Text.createInspectorWithoutSuperImpl(
                 e.font = e.font.withName(it)
             }
         }
-        invalidate()
     }.setIsSelectedListener { show(t, null) }
 
     fontGroup += BooleanInput(
@@ -64,7 +62,6 @@ fun Text.createInspectorWithoutSuperImpl(
                     e.font = e.font.withItalic(it)
                 }
             }
-            invalidate()
         }
         .setIsSelectedListener { show(t, null) }
     fontGroup += BooleanInput(
@@ -77,7 +74,6 @@ fun Text.createInspectorWithoutSuperImpl(
                     e.font = e.font.withBold(it)
                 }
             }
-            invalidate()
         }
         .setIsSelectedListener { show(t, null) }
     fontGroup += BooleanInput(
@@ -92,7 +88,6 @@ fun Text.createInspectorWithoutSuperImpl(
                 e.smallCaps = it
             }
         }
-        invalidate()
     }.setIsSelectedListener { show(t, null) }
 
     val alignGroup = getGroup(NameDesc("Alignment", "", "obj.alignment"))
@@ -122,7 +117,6 @@ fun Text.createInspectorWithoutSuperImpl(
         null, relativeCharSpacing, style
     ) { it, _ ->
         RemsStudio.incrementalChange("char space") { for (x in c) x.relativeCharSpacing = it }
-        invalidate()
     }
     spaceGroup += vis(
         c, "Line Spacing", "How much lines are apart from each other",
@@ -135,7 +129,6 @@ fun Text.createInspectorWithoutSuperImpl(
         Text.tabSpaceType, relativeTabSize, style
     ) { it, _ ->
         RemsStudio.incrementalChange("tab size") { for (x in c) x.relativeTabSize = it }
-        invalidate()
     }
     spaceGroup += vi(
         inspected, "Line Break Width",
@@ -143,7 +136,6 @@ fun Text.createInspectorWithoutSuperImpl(
         Text.lineBreakType, lineBreakWidth, style
     ) { it, _ ->
         RemsStudio.incrementalChange("line break width") { for (x in c) x.lineBreakWidth = it }
-        invalidate()
     }
 
     // val ops = getGroup("Operations", "", "operations")
@@ -228,7 +220,6 @@ fun Text.createInspectorWithoutSuperImpl(
         null, roundSDFCorners, style
     ) { it, _ ->
         for (x in c) x.roundSDFCorners = it
-        invalidate()
     }
 
     val shadows = getGroup(NameDesc("Shadow", "Built-in Shadow", "obj.shadow"))
