@@ -13,10 +13,10 @@ import me.anno.remsstudio.audio.effects.impl.EqualizerEffect
 import me.anno.remsstudio.audio.effects.impl.EqualizerEffect.Companion.frequencies
 import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Camera
+import me.anno.utils.assertions.assertEquals
 import org.joml.Vector2f
 import org.junit.jupiter.api.Test
 import kotlin.math.*
-import kotlin.test.assertEquals
 
 class EqualizerTest {
 

@@ -53,8 +53,12 @@ import me.anno.remsstudio.objects.effects.ToneMappers
 import me.anno.remsstudio.ui.editor.ISceneView
 import me.anno.ui.editor.sceneView.Gizmos.drawGizmo
 import me.anno.ui.editor.sceneView.Grid
+import me.anno.utils.assertions.assertSame
 import me.anno.utils.pooling.JomlPools
-import org.joml.*
+import org.joml.Matrix4f
+import org.joml.Matrix4fArrayList
+import org.joml.Vector3f
+import org.joml.Vector4f
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -198,6 +202,7 @@ object Scene {
         return next
     }
 
+    val lastBackgroundColor = Vector4f()
     val lastCameraTransform = Matrix4f()
     val lastGlobalCameraTransform = Matrix4f()
     val lastGlobalCameraTransformInverted = Matrix4f()
@@ -293,12 +298,14 @@ object Scene {
 
                 useFrame(x, y, w, h, buffer) {
 
-                    val color = camera.backgroundColor.getValueAt(RemsStudio.editorTime, Vector4f())
+                    val backgroundColor = camera.backgroundColor.getValueAt(RemsStudio.editorTime, lastBackgroundColor)
+                    assertSame(backgroundColor, lastBackgroundColor)
+
                     buffer.clearDepth()
                     blendMode.use(null) {
                         depthMask.use(false) {
                             depthMode.use(DepthMode.ALWAYS) {
-                                drawRect(x, y, w, h, color)
+                                drawRect(x, y, w, h, backgroundColor)
                             }
                         }
                     }
@@ -532,7 +539,7 @@ object Scene {
                 .sub(camera.cgOffsetSub[cameraTime, vec3.create()])
             shader.v3f("cgOffset", cgOffset)
             shader.v3X("cgSlope", camera.cgSlope[cameraTime, vec4.create()])
-            shader.v3X("cgPower",  camera.cgPower[cameraTime, vec4.create()])
+            shader.v3X("cgPower", camera.cgPower[cameraTime, vec4.create()])
             shader.v1f("cgSaturation", camera.cgSaturation[cameraTime])
             vec3.sub(2)
             vec4.sub(2)

@@ -3,10 +3,14 @@ package me.anno.remsstudio.objects.transitions
 import me.anno.animation.Interpolation
 import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
+import me.anno.gpu.Blitting.copyColorAndDepth
+import me.anno.gpu.Blitting.copyDepth
 import me.anno.gpu.GFXState
+import me.anno.gpu.GFXState.renderPurely
 import me.anno.gpu.GFXState.useFrame
 import me.anno.gpu.buffer.SimpleBuffer.Companion.flat01
 import me.anno.gpu.framebuffer.FBStack
+import me.anno.gpu.framebuffer.IFramebuffer
 import me.anno.gpu.framebuffer.TargetType
 import me.anno.gpu.shader.BaseShader
 import me.anno.gpu.shader.GLSLType
@@ -31,7 +35,6 @@ import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.structures.lists.Lists.firstOrNull2
-import me.anno.utils.structures.lists.Lists.mapFirstNotNull
 import me.anno.utils.structures.maps.LazyMap
 import me.anno.utils.types.AnyToBool
 import me.anno.utils.types.AnyToFloat
@@ -223,7 +226,7 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
             else defaultTime
         }
 
-        fun getActiveRange(child: Transform?): TimeRange? {
+        fun <V : Transform> getActiveRange(child: V?): TimeRange<V>? {
             if (child == null) return null
 
             var minTime = child.getStartTime()
@@ -244,16 +247,22 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
             } else null
         }
 
+        /**
+         * extend range to prevent small overlaps from appearing for an unwanted frame
+         * */
+        val extraLength = 0.25
+
         fun renderTransitions(parent: Transform, stack: Matrix4fArrayList, time: Double, color: Vector4f) {
 
-            parent.drawnChildCount = parent.children.size
+            val children = parent.children
+            parent.drawnChildCount = children.size
 
-            val transition = parent.children.mapFirstNotNull { child ->
+            val transition = children.mapNotNull { child ->
                 if (child is Transition && child.visibility.isVisible) {
                     val range = getActiveRange(child)
-                    if (range != null && time in range.min..range.max) range else null
+                    if (range != null && time in range.min - extraLength..range.max + extraLength) range else null
                 } else null
-            }
+            }.minByOrNull { abs(time - it.center) }
 
             if (transition == null) {
                 return parent.drawChildren2(stack, time, color)
@@ -275,30 +284,37 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
             val tex1 = render(parent, after, stack, time, color)
 
             val progress = transition.getProgress(time)
-            (transition.child as Transition).render(tex0, tex1, progress)
+            val texI = if (progress > 0.5f) tex1 else tex0
+            // render depth of what was drawn in the mean-time
+            copyDepth(texI.depthTexture!!, texI.depthMask)
+            renderPurely {
+                GFXState.depthMask.use(false) {
+                    transition.child.render(tex0.getTexture0(), tex1.getTexture0(), progress)
+                }
+            }
         }
 
         fun render(
             parent: Transform,
-            children: List<TimeRange>,
+            children: List<TimeRange<*>>,
             stack: Matrix4fArrayList,
             time: Double,
             color: Vector4f
-        ): ITexture2D {
+        ): IFramebuffer {
             val base = GFXState.currentBuffer
             val target = FBStack["transition", base.width, base.height, // todo is the target-type ok?
                 TargetType.Float16x4, base.samples, base.depthBufferType]
             useFrame(target) {
-                // todo what should we clear to???
-                target.clearColor(0, depth = true)
-
+                renderPurely { // restore what was drawn previously
+                    copyColorAndDepth(base.getTexture0(), base.depthTexture!!, base.depthMask, true)
+                }
                 for (i in children.indices) {
                     val child = children[i].child
                     child.indexInParent = parent.children.indexOf(child)
                     parent.drawChild(stack, time, color, child)
                 }
             }
-            return target.getTexture0()
+            return target
         }
     }
 }
