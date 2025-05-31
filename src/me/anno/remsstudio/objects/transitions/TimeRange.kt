@@ -6,11 +6,11 @@ import me.anno.remsstudio.objects.Transform
 import kotlin.math.max
 import kotlin.math.min
 
-data class TimeRange(val child: Transform, val min: Double, val max: Double) {
+data class TimeRange<V: Transform>(val child: V, var min: Double, var max: Double) {
 
     val center get() = (min + max) * 0.5
 
-    fun overlaps(other: TimeRange): Boolean {
+    fun overlaps(other: TimeRange<*>): Boolean {
         return max(min, other.min) < min(max, other.max)
     }
 
