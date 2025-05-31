@@ -41,13 +41,10 @@ import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.WelcomeUI
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.OS
+import me.anno.utils.async.Callback
 import me.anno.utils.hpc.ProcessingQueue
 import kotlin.math.abs
 import kotlin.math.min
-
-// to do morphing: up/down/left/right
-// to do morphing: rect/hexagon shape?, rotate it?
-// to do hexagon/triangle/rectangle pixelation: rotate it?
 
 // todo make music x times calmer, if another audio line (voice) is on as an optional feature
 
@@ -157,12 +154,12 @@ object RemsStudio : EngineBase(NameDesc("Rem's Studio"), 10302, true), WelcomeUI
         return background
     }
 
-    override fun loadProject(name: String, folder: FileReference): Pair<String, FileReference> {
+    override fun loadProject(name: String, folder: FileReference, callback: Callback<Pair<String, FileReference>>) {
         val project = Project(name.trim(), folder)
         RemsStudio.project = project
         project.open()
         GFX.someWindow.title = "Rem's Studio: ${project.name}"
-        return Pair(project.name, project.file)
+        callback.ok(project.name to project.file)
     }
 
     override fun createProjectUI() {

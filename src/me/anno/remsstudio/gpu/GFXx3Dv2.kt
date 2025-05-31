@@ -29,6 +29,7 @@ import me.anno.remsstudio.objects.GFXTransform
 import me.anno.remsstudio.objects.GFXTransform.Companion.uploadAttractors
 import me.anno.remsstudio.objects.GFXTransform.Companion.uploadAttractors0
 import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.objects.effects.MaskType
 import me.anno.remsstudio.objects.geometric.Polygon
 import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.video.UVProjection
@@ -324,7 +325,7 @@ object GFXx3Dv2 {
     fun draw3DMasked(
         stack: Matrix4fArrayList,
         color: Vector4f,
-        maskType: Int,
+        maskType: MaskType,
         useMaskColor: Float,
         pixelSize: Float,
         offset: Vector2f,
@@ -333,13 +334,12 @@ object GFXx3Dv2 {
         isFullscreen: Boolean,
         settings: Vector4f
     ) {
-        val shader = ShaderLibV2.shader3DMasked.value
+        val shader = ShaderLibV2.shader3DMasked[maskType].value
         shader.use()
         shader3DUniforms(shader, stack, color)
         shader.v1f("useMaskColor", useMaskColor)
         shader.v1b("invertMask1", isInverted1)
         shader.v1b("invertMask2", isInverted2)
-        shader.v1i("maskType", maskType)
         shader.v2f("pixelating", pixelSize * GFX.viewportHeight / GFX.viewportWidth, pixelSize)
         shader.v4f("settings", settings)
         shader.v2f("offset", offset)

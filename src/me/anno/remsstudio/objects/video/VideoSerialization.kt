@@ -42,7 +42,7 @@ object VideoSerialization {
             "uvProjection" -> uvProjection.value = UVProjection.entries.firstOrNull { it.id == value } ?: return false
             "editorVideoFPS" -> editorVideoFPS.value = clamp(AnyToInt.getInt(value), 1, 1000)
             "cornerRadius" -> cornerRadius.copyFrom(value)
-            "isLooping" -> isLooping.value = LoopingState.getState(AnyToInt.getInt(value))
+            "isLooping" -> isLooping.value = LoopingState.getById(AnyToInt.getInt(value))
             "amplitude" -> amplitude.copyFrom(value)
             "effects" -> pipeline = value as? SoundPipeline ?: return false
             "src", "file", "path" -> file =

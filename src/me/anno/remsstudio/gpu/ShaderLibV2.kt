@@ -9,8 +9,8 @@ import me.anno.gpu.shader.builder.Variable
 import me.anno.gpu.shader.builder.VariableMode
 import me.anno.remsstudio.objects.effects.MaskType
 import me.anno.remsstudio.video.UVProjection
-import me.anno.utils.OS.res
 import me.anno.utils.pooling.ByteBufferPool
+import me.anno.utils.structures.maps.LazyMap
 import java.nio.FloatBuffer
 import kotlin.math.PI
 
@@ -151,19 +151,7 @@ object ShaderLibV2 {
      * */
     const val maxOutlineColors = 6
 
-    private fun case(case: Int, path: String): String {
-        return res.getChild(path).readTextSync()
-            .trim().run {
-                replace("\r", "")
-            }.run {
-                "case $case:\n" + substring(indexOf('\n') + 1, lastIndexOf('\n')) + "\nbreak;\n"
-            }
-    }
-
-    lateinit var shader3DMasked: BaseShader
-
-    fun init() {
-
+    val shader3DMasked = LazyMap { key: MaskType ->
         val f3DMasked = "" +
                 "precision highp float;\n" +
                 "uniform sampler2D maskTex, tex, tex2;\n" +
@@ -171,7 +159,6 @@ object ShaderLibV2 {
                 "uniform bool invertMask1, invertMask2;\n" +
                 "uniform vec2 pixelating;\n" +
                 "uniform vec2 windowSize, offset;\n" +
-                "uniform int maskType;\n" +
                 "uniform float maxSteps;\n" +
                 "uniform vec4 settings;\n" +
                 ShaderLib.brightness +
@@ -185,56 +172,28 @@ object ShaderLibV2 {
                 "   vec4 mask = texture(maskTex, uv2);\n" +
                 "   vec4 color;\n" +
                 "   float effect = 0.0, inverseEffect;\n" +
-                "   switch(maskType){\n" +
-                case(MaskType.MASKING.id, "shader/mask-effects/Masking.glsl") +
-                case(MaskType.TRANSITION.id, "shader/mask-effects/Transition.glsl") +
-                case(MaskType.QUAD_PIXELATION.id, "shader/mask-effects/QuadPixelating.glsl") +
-                case(MaskType.TRI_PIXELATION.id, "shader/mask-effects/TriPixelating.glsl") +
-                case(MaskType.HEX_PIXELATION.id, "shader/mask-effects/HexPixelating.glsl") +
-                case(MaskType.VORONOI_PIXELATION.id, "shader/mask-effects/VoronoiPixelating.glsl") +
-                case(MaskType.RADIAL_BLUR_1.id, "shader/mask-effects/RadialBlur1.glsl") +
-                case(MaskType.RADIAL_BLUR_2.id, "shader/mask-effects/RadialBlur2.glsl") +
-                case(MaskType.GREEN_SCREEN.id, "shader/mask-effects/GreenScreen.glsl") +
-                "       case ${MaskType.GAUSSIAN_BLUR.id}:\n" +
-                "       case ${MaskType.BOKEH_BLUR.id}:\n" +
-                "       case ${MaskType.BLOOM.id}:\n" + // just mix two images
-                "           effect = mix(mask.a, dot(vec3(0.3), mask.rgb), useMaskColor);\n" +
-                "           if(invertMask1) effect = 1.0 - effect;\n" +
-                "           color = mix(texture(tex, uv2), texture(tex2, uv2), effect);\n" +
-                "           break;\n" +
-                "       case ${MaskType.UV_OFFSET.id}:\n" +
-                "           vec2 offset = (mask.rg-mask.gb) * pixelating;\n" +
-                "           color = texture(tex, uv2 + offset);\n" +
-                "           break;\n" +
-                "       default:" +
-                "           color = vec4(1.0,0.0,1.0,1.0);\n" +
-                "           break;\n" +
-                "   }\n" +
+                key.shaderString +
                 "   if(color.a <= 0.001) discard;\n" +
                 "   if($hasForceFieldColor) color *= getForceFieldColor(finalPosition);\n" +
                 "   finalColor = color.rgb;\n" +
                 "   finalAlpha = min(color.a, 1.0);\n" +
                 "}"
-        shader3DMasked =
-            BaseShader(
-                "3d-masked", v3DlMasked, v3DMasked, y3DMasked, listOf(
-                    Variable(GLSLType.V3F, "finalColor", VariableMode.OUT),
-                    Variable(GLSLType.V1F, "finalAlpha", VariableMode.OUT)
-                ) + getForceFieldColorUniforms, f3DMasked
-            )
-        shader3DMasked.setTextureIndices(listOf("maskTex", "tex", "tex2"))
-        init2()
-
+        BaseShader(
+            "3d-masked-${key.id}", v3DlMasked, v3DMasked, y3DMasked, listOf(
+                Variable(GLSLType.V3F, "finalColor", VariableMode.OUT),
+                Variable(GLSLType.V1F, "finalAlpha", VariableMode.OUT)
+            ) + getForceFieldColorUniforms, f3DMasked
+        ).apply { setTextureIndices(listOf("maskTex", "tex", "tex2")) }
     }
 
     val lineShader3D = BaseShader(
         "3d-lines", listOf(
-            Variable(GLSLType.V3F, "coords", VariableMode.ATTR),
+            Variable(GLSLType.V3F, "positions", VariableMode.ATTR),
             Variable(GLSLType.M4x4, "transform")
         ),
         "" +
                 "void main(){" +
-                "   gl_Position = matMul(transform, vec4(coords, 1.0));\n" +
+                "   gl_Position = matMul(transform, vec4(positions, 1.0));\n" +
                 "}", emptyList(),
         listOf(
             Variable(GLSLType.V4F, "color"),
@@ -251,15 +210,15 @@ object ShaderLibV2 {
         ShaderLib.createShader(
             "3d-polygon",
             listOf(
-                Variable(GLSLType.V3F, "coords", VariableMode.ATTR),
+                Variable(GLSLType.V3F, "positions", VariableMode.ATTR),
                 Variable(GLSLType.V2F, "uvs", VariableMode.ATTR),
                 Variable(GLSLType.V1F, "inset"),
                 Variable(GLSLType.M4x4, "transform")
             ), "" +
                     "void main(){\n" +
-                    "   vec2 betterUV = coords.xy;\n" +
+                    "   vec2 betterUV = positions.xy;\n" +
                     "   betterUV *= mix(1.0, uvs.r, inset);\n" +
-                    "   finalPosition = vec3(betterUV, coords.z);\n" +
+                    "   finalPosition = vec3(betterUV, positions.z);\n" +
                     "   gl_Position = matMul(transform, vec4(finalPosition, 1.0));\n" +
                     ShaderLib.flatNormal +
                     "   uv = uvs.yx;\n" +
@@ -278,13 +237,13 @@ object ShaderLibV2 {
 
     val shader3DCircle = ShaderLib.createShader(
         "3dCircle", listOf(
-            Variable(GLSLType.V2F, "coords", VariableMode.ATTR),// angle, inner/outer
+            Variable(GLSLType.V2F, "positions", VariableMode.ATTR),// angle, inner/outer
             Variable(GLSLType.M4x4, "transform"),
             Variable(GLSLType.V3F, "circleParams"), // 1 - inner r, start, end
         ), "" +
                 "void main(){\n" +
-                "   float angle = mix(circleParams.y, circleParams.z, coords.x);\n" +
-                "   vec2 betterUV = vec2(cos(angle), -sin(angle)) * (1.0 - circleParams.x * coords.y);\n" +
+                "   float angle = mix(circleParams.y, circleParams.z, positions.x);\n" +
+                "   vec2 betterUV = vec2(cos(angle), -sin(angle)) * (1.0 - circleParams.x * positions.y);\n" +
                 "   finalPosition = vec3(betterUV, 0.0);\n" +
                 "   gl_Position = matMul(transform, vec4(finalPosition, 1.0));\n" +
                 ShaderLib.flatNormal +
@@ -304,10 +263,10 @@ object ShaderLibV2 {
             Variable(GLSLType.V3F, "offset")
         ), getForceFieldUVs +
                 "void main(){\n" +
-                "   vec3 localPos0 = coords + offset;\n" +
+                "   vec3 localPos0 = positions + offset;\n" +
                 // to do enable chroma separation for this? (probably impossible like that)
                 "   vec2 pseudoUV2 = getForceFieldUVs(localPos0.xy*.5+.5, 0.0);\n" +
-                "   finalPosition = $hasForceFieldUVs ? vec3(pseudoUV2*2.0-1.0, coords.z + offset.z) : localPos0;\n" +
+                "   finalPosition = $hasForceFieldUVs ? vec3(pseudoUV2*2.0-1.0, positions.z + offset.z) : localPos0;\n" +
                 "   gl_Position = matMul(transform, vec4(finalPosition, 1.0));\n" +
                 ShaderLib.flatNormal +
                 "   vertexId = gl_VertexID;\n" +
@@ -326,15 +285,15 @@ object ShaderLibV2 {
 
     val shaderSDFText = ShaderLib.createShader(
         "3d-text-withOutline", listOf(
-            Variable(GLSLType.V3F, "coords", VariableMode.ATTR),
+            Variable(GLSLType.V3F, "positions", VariableMode.ATTR),
             Variable(GLSLType.M4x4, "transform"),
             Variable(GLSLType.V2F, "offset"),
             Variable(GLSLType.V2F, "scale"),
         ),
         getForceFieldUVs +
                 "void main(){\n" +
-                "   uv = coords.xy * 0.5 + 0.5;\n" +
-                "   vec2 localPos0 = coords.xy * scale + offset;\n" +
+                "   uv = positions.xy * 0.5 + 0.5;\n" +
+                "   vec2 localPos0 = positions.xy * scale + offset;\n" +
                 // to do enable chroma separation for this? (probably impossible like that)
                 "   vec2 pseudoUV2 = getForceFieldUVs(localPos0*.5+.5, 0.0);\n" +
                 "   finalPosition = vec3($hasForceFieldUVs ? pseudoUV2*2.0-1.0 : localPos0, 0);\n" +
@@ -379,7 +338,7 @@ object ShaderLibV2 {
                 "}", listOf("tex")
     )
 
-    fun init2() {
+    fun init() {
 
         // with texture
         // somehow becomes dark for large |steps|-values
@@ -478,7 +437,7 @@ object ShaderLibV2 {
     val linePolygonShader = BaseShader(
         // todo uniforms + attributes to variables
         "linePolygon", listOf(
-            Variable(GLSLType.V3F, "coords", VariableMode.ATTR),
+            Variable(GLSLType.V3F, "positions", VariableMode.ATTR),
             Variable(GLSLType.V2F, "uvs", VariableMode.ATTR),
             Variable(GLSLType.M4x4, "transform"),
             Variable(GLSLType.V4F, "tiling"),
@@ -488,12 +447,12 @@ object ShaderLibV2 {
             Variable(GLSLType.V1F, "zDistance", VariableMode.OUT)
         ), "" +
                 "void main(){\n" +
-                "   vec2 att = coords.xy*0.5+0.5;\n" +
+                "   vec2 att = positions.xy*0.5+0.5;\n" +
                 "   vec3 localPosition = mix(mix(pos0, pos1, att.x), mix(pos2, pos3, att.x), att.y);\n" +
                 "   gl_Position = transform * vec4(localPosition, 1.0);\n" +
                 ShaderLib.flatNormal +
                 "   uv = uvs;\n" +
-                "   uvw = coords;\n" +
+                "   uvw = positions;\n" +
                 "   colX = mix(col0, col1, att.y);\n" +
                 "}", ShaderLib.y3D + Variable(GLSLType.V4F, "colX"),
         getForceFieldColorUniforms + getTextureLibUniforms, "" +

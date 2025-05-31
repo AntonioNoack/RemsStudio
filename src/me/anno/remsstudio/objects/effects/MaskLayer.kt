@@ -34,7 +34,6 @@ import me.anno.ui.editor.SettingCategory
 import me.anno.utils.pooling.JomlPools
 import me.anno.utils.structures.Collections.filterIsInstance2
 import org.joml.Matrix4fArrayList
-import org.joml.Vector2f
 import org.joml.Vector4f
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -241,7 +240,7 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
 
                 draw3DMasked(
                     stack, color,
-                    type.id, useMaskColor[time],
+                    type, useMaskColor[time],
                     pixelSize, offset,
                     isInverted, isInverted2,
                     isFullscreen,
@@ -265,7 +264,7 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
 
                 draw3DMasked(
                     stack, color,
-                    type.id, useMaskColor[time],
+                    type, useMaskColor[time],
                     0f, offset,
                     isInverted, isInverted2,
                     isFullscreen,
@@ -303,7 +302,7 @@ open class MaskLayer(parent: Transform? = null) : GFXTransform(parent) {
                 GFX.check()
                 draw3DMasked(
                     stack, color,
-                    type.id, useMaskColor[time],
+                    type, useMaskColor[time],
                     pixelSize, offset,
                     isInverted, isInverted2,
                     isFullscreen,

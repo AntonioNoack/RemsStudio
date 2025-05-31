@@ -24,3 +24,6 @@ hs_err_pid*
 /opencv-4.5.2/
 /jbox2d/
 test.bat
+yt-dlp
+progress
+out

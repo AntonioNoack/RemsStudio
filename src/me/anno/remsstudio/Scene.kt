@@ -84,14 +84,14 @@ object Scene {
         sqrtToneMappingShader = BaseShader(
             "sqrt/tone-mapping",
             listOf(
-                Variable(GLSLType.V2F, "coords", VariableMode.ATTR),
+                Variable(GLSLType.V2F, "positions", VariableMode.ATTR),
                 Variable(GLSLType.V1F, "ySign"),
             ),
             "" +
                     "void main(){" +
-                    "   vec2 coords1 = coords*2.0-1.0;\n" +
+                    "   vec2 coords1 = positions*2.0-1.0;\n" +
                     "   gl_Position = vec4(coords1.x, coords1.y * ySign, 0.0, 1.0);\n" +
-                    "   uv = coords;\n" +
+                    "   uv = positions;\n" +
                     "}", uvList, listOf(
                 Variable(GLSLType.S2D, "tex"),
                 Variable(GLSLType.V2F, "chromaticAberration"),

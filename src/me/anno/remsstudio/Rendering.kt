@@ -14,12 +14,13 @@ import me.anno.remsstudio.RemsStudio.root
 import me.anno.remsstudio.RemsStudio.shutterPercentage
 import me.anno.remsstudio.RemsStudio.targetOutputFile
 import me.anno.remsstudio.RemsStudio.targetTransparency
+import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.audio.AudioCreatorV2
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.video.FrameTaskV2
-import me.anno.remsstudio.video.videoAudioCreatorV2
+import me.anno.remsstudio.video.VideoBackgroundTaskV2
 import me.anno.ui.base.menu.Menu.ask
 import me.anno.ui.base.menu.Menu.msg
 import me.anno.ui.base.progress.ProgressBar
@@ -29,6 +30,7 @@ import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.structures.lists.Lists.firstInstanceOrNull2
 import me.anno.utils.types.Strings
 import me.anno.utils.types.Strings.getImportTypeByExtension
+import me.anno.video.VideoAudioCreator
 import me.anno.video.VideoCreator
 import me.anno.video.VideoCreator.Companion.defaultQuality
 import me.anno.video.ffmpeg.FFMPEGEncodingBalance
@@ -339,5 +341,33 @@ object Rendering {
         }
         return targetOutputFile
     }
+
+    private fun videoAudioCreatorV2(
+        videoCreator: VideoCreator,
+        samples: Int,
+        scene: Transform,
+        camera: Camera,
+        durationSeconds: Double,
+        sampleRate: Int,
+        audioSources: List<Video>,
+        motionBlurSteps: AnimatedProperty<Int>,
+        shutterPercentage: AnimatedProperty<Float>,
+        output: FileReference,
+        progress: ProgressBar
+    ) = VideoAudioCreator(
+        videoCreator,
+        VideoBackgroundTaskV2(videoCreator, samples, scene, camera, motionBlurSteps, shutterPercentage, progress),
+        object : AudioCreatorV2(scene, camera, audioSources, durationSeconds, sampleRate, progress) {
+            override fun hasStreams(): Boolean {// will be starting
+                val answer = super.hasStreams()
+                if (answer && !progress.isCancelled) {// this is hacky :/
+                    progress.progress = 0.0
+                    progress.total = durationSeconds * sampleRate
+                }
+                return answer
+            }
+        },
+        output
+    )
 
 }

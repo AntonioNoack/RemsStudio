@@ -1,5 +1,6 @@
 package me.anno.remsstudio.ui
 
+import me.anno.ecs.annotations.ExtendableEnum
 import me.anno.engine.inspector.Inspectable
 import me.anno.gpu.blending.BlendMode
 import me.anno.gpu.blending.BlendMode.Companion.blendModes
@@ -24,6 +25,7 @@ import me.anno.utils.Color.toVecRGBA
 import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefaultFunc
+import me.anno.utils.types.Strings.camelCaseToTitle
 import org.joml.Quaternionf
 import org.joml.Vector2f
 import org.joml.Vector3f
@@ -178,6 +180,19 @@ object ComponentUIV2 {
             is Enum<*> -> {
                 val values = EnumInput.getEnumConstants(value.javaClass)
                 EnumInput.createInput(title, value, style)
+                    .setChangeListener { name, index, _ ->
+                        RemsStudio.incrementalChange("Set $title to $name") {
+                            setValue(values[index] as V, -1)
+                        }
+                    }
+                    .setIsSelectedListener { self.show(t, null) }
+                    .setTooltip(ttt)
+            }
+            is ExtendableEnum -> {
+                val values = value.values
+                val ttt = value::class.simpleName?.camelCaseToTitle() ?: "?"
+                val valueName = value.nameDesc
+                EnumInput(NameDesc(title, ttt, ""), valueName, values.map { it.nameDesc }, style)
                     .setChangeListener { name, index, _ ->
                         RemsStudio.incrementalChange("Set $title to $name") {
                             setValue(values[index] as V, -1)
