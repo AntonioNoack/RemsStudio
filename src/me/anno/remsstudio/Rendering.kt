@@ -145,13 +145,25 @@ object Rendering {
             isRendering = false
             progress.finish()
             callback()
-            tmpFile.invalidate()
+            deleteFile(tmpFile)
             targetOutputFile.invalidate()
         }
 
         videoCreator.init()
         videoAudioCreator.start()
 
+    }
+
+    private fun deleteFile(tmpFile: FileReference) {
+        tmpFile.invalidate()
+        if (!tmpFile.delete()) {
+            addEvent(1000) { // a little arbitrary :/
+                if (!tmpFile.delete()) {
+                    LOGGER.warn("Failed to delete temporary file $tmpFile")
+                    tmpFile.deleteOnExit()
+                }
+            }
+        }
     }
 
     private fun getTmpFile(file: FileReference) =
