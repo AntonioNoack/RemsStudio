@@ -115,9 +115,6 @@ class LayerStripeSolution(
 
                 if (hasVideo) {
 
-                    video!!
-                    meta!!
-
                     val frameWidth = (h * (1f + relativeVideoBorder) * meta.videoWidth / meta.videoHeight).roundToInt()
 
                     var frameOffset = timeOffset % frameWidth
@@ -179,7 +176,7 @@ class LayerStripeSolution(
 
                 if (hasAudio) {
 
-                    val audio = video!!
+                    val audio = video
 
                     // todo get auto levels for pixels, which equal ranges of audio frames -> min, max, avg?, with weight?
                     val identifier = audio.toString()

@@ -25,6 +25,7 @@ import me.anno.remsstudio.RemsStudio.editorTime
 import me.anno.remsstudio.Scene
 import me.anno.remsstudio.Selection.select
 import me.anno.remsstudio.animation.AnimatedProperty
+import me.anno.remsstudio.objects.transitions.Transition
 import me.anno.remsstudio.objects.modes.TransformVisibility
 import me.anno.remsstudio.objects.particles.ParticleSystem
 import me.anno.remsstudio.ui.ComponentUIV2
@@ -49,6 +50,7 @@ import me.anno.utils.structures.Hierarchical
 import me.anno.utils.structures.ValueWithDefault
 import me.anno.utils.structures.ValueWithDefault.Companion.writeMaybe
 import me.anno.utils.structures.ValueWithDefaultFunc
+import me.anno.utils.structures.lists.Lists.any2
 import me.anno.utils.types.AnyToBool
 import me.anno.utils.types.AnyToDouble
 import me.anno.utils.types.AnyToFloat
@@ -141,8 +143,6 @@ open class Transform() : Saveable(),
 
     open fun isVisible(localTime: Double) = true
 
-    val rightPointingTriangle = "▶"
-    val bottomPointingTriangle = "▼"
     val folder = "\uD83D\uDCC1"
 
     override fun addChild(index: Int, child: Transform) {
@@ -376,6 +376,11 @@ open class Transform() : Saveable(),
         return localTime0
     }
 
+    fun toGlobalTime(localTime:Double): Double {
+        // todo try to support animated time
+        return localTime / timeDilation.value + timeOffset.value
+    }
+
     fun getLocalColor(dst: Vector4f): Vector4f {
         val parentColor = JomlPools.vec4f.create().set(1f)
         parent?.getLocalColor(parentColor)
@@ -459,6 +464,7 @@ open class Transform() : Saveable(),
      * stack with camera already included
      * */
     fun draw(stack: Matrix4fArrayList, parentTime: Double, parentColor: Vector4f) {
+
         val time = getLocalTime(parentTime)
         val color = getLocalColor(parentColor, time, tmp0)
         if (color.w <= minAlpha || !visibility.isVisible) return
@@ -472,20 +478,27 @@ open class Transform() : Saveable(),
         parentColor: Vector4f, color: Vector4f
     ) {
 
-        val doBlending = when (GFXState.currentRenderer) {
+        val allowBlending = when (GFXState.currentRenderer) {
             Renderer.colorRenderer, Renderer.colorSqRenderer -> true
             else -> false
         }
 
-        if (doBlending) {
-            GFXState.blendMode.use(if (blendMode == NO_BLENDING) null else blendMode) {
-                onDraw(stack, time, color)
-                drawChildren(stack, time, color, parentColor)
+        val blendMode = if (!allowBlending || blendMode == NO_BLENDING) null else blendMode
+        if (GFXState.blendMode != blendMode) {
+            GFXState.blendMode.use(blendMode) {
+                drawWithParentTransformAndColor2(stack, time, parentColor, color)
             }
         } else {
-            onDraw(stack, time, color)
-            drawChildren(stack, time, color, parentColor)
+            drawWithParentTransformAndColor2(stack, time, parentColor, color)
         }
+    }
+
+    fun drawWithParentTransformAndColor2(
+        stack: Matrix4fArrayList, time: Double,
+        parentColor: Vector4f, color: Vector4f
+    ) {
+        onDraw(stack, time, color)
+        drawChildren(stack, time, color, parentColor)
     }
 
     fun drawChildren(stack: Matrix4fArrayList, time: Double, color: Vector4f, parentColor: Vector4f) {
@@ -499,6 +512,13 @@ open class Transform() : Saveable(),
     open fun drawChildrenAutomatically() = true
 
     fun drawChildren(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
+        val children = children
+        if (children.any2 { it is Transition }) Transition.renderTransitions(this, stack, time, color)
+        else drawChildren2(stack, time, color)
+    }
+
+    fun drawChildren2(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
+        val children = children
         val size = children.size
         drawnChildCount = size
         for (i in 0 until size) {

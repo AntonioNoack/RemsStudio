@@ -239,7 +239,6 @@ object VideoInspector {
             }
             .setTooltip("Listen to the audio separated from the rest"))
 
-        var lastState = -1
         list += SpyPanel(style) {
             val meta = lastMeta
             val isValid = file != InvalidRef && meta != null
@@ -249,14 +248,9 @@ object VideoInspector {
                 VideoType.IMAGE_SEQUENCE, VideoType.VIDEO -> true
                 else -> false
             } && meta.hasVideo
-            val hasImSeq = isValid && type == VideoType.IMAGE_SEQUENCE
-            val state = hasAudio.toInt(1) + hasImage.toInt(2) + hasVideo.toInt(4) + hasImSeq.toInt(8)
-            if (state != lastState) {
-                lastState = state
-                for (p in audioPanels) p.isVisible = hasAudio
-                for (p in videoPanels) p.isVisible = hasVideo
-                for (p in imagePanels) p.isVisible = hasImage
-            }
+            for (p in audioPanels) p.isVisible = hasAudio
+            for (p in videoPanels) p.isVisible = hasVideo
+            for (p in imagePanels) p.isVisible = hasImage
         }
     }
 }

@@ -7,6 +7,7 @@ import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.documents.PDFDocument
 import me.anno.remsstudio.objects.geometric.LinePolygon
 import me.anno.remsstudio.objects.text.Chapter
+import me.anno.remsstudio.objects.transitions.Transition
 
 class RemsVersionFeatures(oldVersion: Int) : VersionFeatures(oldVersion) {
 
@@ -17,11 +18,10 @@ class RemsVersionFeatures(oldVersion: Int) : VersionFeatures(oldVersion) {
         list[name, value]
     }
 
+    /**
+     * When new stuff is added, it can be forced upon the user
+     * */
     override fun addNewPackages(config: StringMap) {
-
-        // when new stuff is added, it can be forced upon the user
-        // DefaultConfig["createNewInstancesList"].removeAll { it is NewType }
-        // DefaultConfig["createNewInstancesList"].add("newName" to NewType())
 
         addVersion(10002) {
             addInstance(config, "PDF Document", PDFDocument())
@@ -37,6 +37,10 @@ class RemsVersionFeatures(oldVersion: Int) : VersionFeatures(oldVersion) {
 
         addVersion(10106) {
             addInstance(config, "Chapter", Chapter())
+        }
+
+        addVersion(10400) {
+            addInstance(config, "Transition", Transition())
         }
 
         config["version"] = RemsStudio.versionNumber
