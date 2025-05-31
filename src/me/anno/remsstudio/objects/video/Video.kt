@@ -277,7 +277,7 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
             invalidateUI(true)
             needsImageUpdate = false
         }
-        streamManager.update()
+        streamManager.destroyIfUnused()
     }
 
     var lastAddedEndKeyframesFile: FileReference? = null

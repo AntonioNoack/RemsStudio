@@ -64,8 +64,8 @@ class VideoStreamManager(val video: Video) : ICacheData {
     private var stream: VideoStream? = null
     private var timeoutNanos = 0L
 
-    fun update() {
-        if (stream != null && timeoutNanos < Time.nanoTime) {
+    fun destroyIfUnused() {
+        if (stream != null && timeoutNanos < Time.frameTimeNanos) {
             destroy()
         }
     }
@@ -83,11 +83,10 @@ class VideoStreamManager(val video: Video) : ICacheData {
             )
             lastScale = scale
             lastFPS = videoFPS
-            val startTime = (frameIndex) / videoFPS
-            stream.start(startTime)
+            stream.start(frameIndex / videoFPS)
             this.stream = stream
         }
-        timeoutNanos = Time.nanoTime + timeoutMillis * MILLIS_TO_NANOS
+        timeoutNanos = Time.frameTimeNanos + timeoutMillis * MILLIS_TO_NANOS
         val stream = stream!!
         // 6 is the number of extra frames needed for blank-frame removal; use 7 just to be sure
         val frame = stream.getFrame(frameIndex, 7)
