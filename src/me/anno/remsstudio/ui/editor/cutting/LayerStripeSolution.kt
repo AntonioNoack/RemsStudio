@@ -24,64 +24,34 @@ import me.anno.remsstudio.ui.editor.cutting.Status.Companion.drawLoadingStatus
 import me.anno.utils.Color.black
 import me.anno.utils.Color.mixARGB
 import me.anno.utils.pooling.JomlPools
-import org.joml.Vector4f
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
 class LayerStripeSolution(
-    val x0: Int,
-    var y0: Int,
-    val x1: Int,
-    var y1: Int,
+    val x0: Int, var y0: Int, val x1: Int, var y1: Int,
     private val referenceTime: Double
 ) {
-
-    private val stripeStride = 5
+    companion object {
+        private val stripeStride = 5
+        private val relativeVideoBorder = 0.1f
+        private val stripeColorSelected = 0x33ffffff
+        private val stripeColorError = 0xffff7777.toInt()
+    }
 
     val w = x1 - x0
     val lines = Array(maxLines) {
         ArrayList<LayerViewGradient>(w / 2)
     }
 
-    private val relativeVideoBorder = 0.1f
-    private val stripeColorSelected = 0x33ffffff
-    private val stripeColorError = 0xffff7777.toInt()
-
     // draw a stripe of the current image, or a symbol or sth...
     // done shader for the stripes (less draw calls)
     // if video, draw a few frames in small
     // if audio, draw audio levels
 
+
     fun draw(selectedTransform: List<Transform>, draggedTransform: Transform?) {
-        iteratorOverGradients(selectedTransform, draggedTransform, true, ::drawStripes, ::drawGradient, ::drawVideo)
-    }
-
-    fun keepResourcesLoaded() {
-        iteratorOverGradients(
-            emptyList(),
-            null,
-            false,
-            { _, _, _, _, _, _ -> },
-            { _, _, _, _, _, _ -> },
-            ::keepFrameLoaded
-        )
-    }
-
-    private fun iteratorOverGradients(
-        selectedTransform: List<Transform>, draggedTransform: Transform?,
-        drawAudio: Boolean,
-        drawStripes: (x0: Int, x1: Int, y: Int, h: Int, offset: Int, color: Int) -> Unit,
-        drawGradient: (x0: Int, x1: Int, y: Int, h: Int, c0: Int, c1: Int) -> Unit,
-        drawVideo: (
-            x0: Int, x1: Int, y: Int, h: Int,
-            c0: Int, c1: Int,
-            frameOffset: Int, frameWidth: Int,
-            video: Video, meta: MediaMetadata,
-            fract0: Float, fract1: Float
-        ) -> Unit
-    ) {
 
         val y = y0
         val h = y1 - y0
@@ -89,6 +59,7 @@ class LayerStripeSolution(
         val xTimeCorrection = ((referenceTime - centralTime) * w / (dtHalfLength * 2)).roundToInt()
         val timeOffset = (-centralTime / (2f * dtHalfLength) * w).toInt()
 
+        val toStringCache = HashMap<Transform, String>()
         for (lineIndex in lines.indices) {
             val gradients = lines[lineIndex]
 
@@ -97,166 +68,200 @@ class LayerStripeSolution(
 
             for (j in gradients.indices) {
                 val gradient = gradients[j]
-                val tr = gradient.owner as? Transform
-                val isStriped = selectedTransform === tr || draggedTransform === tr
-
-                val video = tr as? Video
-                val meta = video?.meta
-
-                val hasAudio = meta?.hasAudio ?: false
-                val hasVideo = meta?.hasVideo ?: false
-
-                val c0 = gradient.c0
-                val c1 = gradient.c1
-
-                // bind gradients to edge, because often the stripe continues
-                val ix0 = if (gradient.x0 == x0) x0 else gradient.x0 + xTimeCorrection
-                val ix1 = if (gradient.x1 + 1 >= x1) x1 else gradient.x1 + xTimeCorrection + 1
-
-                if (hasVideo) {
-
-                    val frameWidth = (h * (1f + relativeVideoBorder) * meta.videoWidth / meta.videoHeight).roundToInt()
-
-                    var frameOffset = timeOffset % frameWidth
-                    if (frameOffset < 0) frameOffset += frameWidth
-
-                    val frameIndex0 = floor((ix0 - frameOffset).toFloat() / frameWidth).toInt()
-                    val frameIndex1 = floor((ix1 - frameOffset).toFloat() / frameWidth).toInt()
-
-                    fun getFraction(x: Int, allow0: Boolean): Float {
-                        var lx = (x + frameWidth - frameOffset) % frameWidth
-                        if (lx > frameWidth) lx -= frameWidth
-                        if (lx < 0) lx += frameWidth
-                        if (lx == 0 && !allow0) return 1f
-                        return lx.toFloat() / frameWidth
-                    }
-
-                    fun getLerpedColor(x: Int) =
-                        mixARGB(c0, c1, (x - ix0).toFloat() / gradient.w)
-
-                    if (frameIndex0 != frameIndex1) {
-                        // split into multiple frames
-
-                        // middle frames
-                        for (frameIndex in frameIndex0 + 1 until frameIndex1) {
-                            val x0 = frameWidth * frameIndex + frameOffset
-                            val x1 = x0 + frameWidth
-                            val c0x = getLerpedColor(x0)
-                            val c1x = getLerpedColor(x1)
-                            drawVideo(x0, x1, y0, h0, c0x, c1x, frameOffset, frameWidth, video, meta, 0f, 1f)
-                        }
-
-                        // first frame
-                        val x1 = (frameIndex0 + 1) * frameWidth + frameOffset
-                        if (x1 > ix0) {
-                            val f0 = getFraction(ix0, true)
-                            val lerpedC1 = getLerpedColor(x1 - 1)
-                            drawVideo(ix0, x1, y0, h0, c0, lerpedC1, frameOffset, frameWidth, video, meta, f0, 1f)
-                        }
-
-                        // last frame
-                        val x0 = frameIndex1 * frameWidth + frameOffset
-                        if (x0 < ix1) {
-                            val lerpedC0 = getLerpedColor(x0)
-                            val f1 = getFraction(ix1, false)
-                            drawVideo(x0, ix1, y0, h0, lerpedC0, c1, frameOffset, frameWidth, video, meta, 0f, f1)
-                        }
-
-                    } else {
-
-                        val f0 = getFraction(ix0, true)
-                        val f1 = getFraction(ix1, false)
-                        drawVideo(ix0, ix1, y0, h0, c0, c1, frameOffset, frameWidth, video, meta, f0, f1)
-
-                    }
-
-                } else {
-                    drawGradient(ix0, ix1, y0, h0, c0, c1)
-                }
-
-                if (hasAudio) {
-
-                    val audio = video
-
-                    // todo get auto levels for pixels, which equal ranges of audio frames -> min, max, avg?, with weight?
-                    val identifier = audio.toString()
-
-                    val camera = RemsStudio.currentCamera
-
-                    val color = if (hasVideo) 0xaa777777.toInt() else 0xff777777.toInt()
-                    val mix = 0.5f
-                    val fineColor = mixARGB(color, 0x77ff77, mix) or black
-                    val okColor = mixARGB(color, 0xffff77, mix) or black
-                    val criticalColor = mixARGB(color, 0xff7777, mix) or black
-
-                    val offset = (if (hasVideo) 0.75f else 0.5f) * h
-                    val scale = if (hasVideo) h / 128e3f else h / 65e3f
-
-                    val tStart = getTimeAt(ix0)
-                    val dt = getTimeAt(ix0 + SPLITS) - tStart
-
-                    val timeStartIndex = floor(tStart / dt).toLong()
-                    val timeEndIndex = ceil(getTimeAt(ix1) / dt).toLong()
-
-                    val b = DrawRectangles.startBatch()
-                    for (timeIndex in timeStartIndex until timeEndIndex) {
-
-                        val t0 = timeIndex * dt
-                        val t1 = (timeIndex + 1) * dt
-                        val xi = getXAt(t0).roundToInt()
-
-                        // get min, max, avg, of audio at this time point
-                        // time0: Time,
-                        // time1: Time,
-                        // speed: Double,
-                        // domain: Domain,
-                        // async: Boolean
-                        val range = AudioFXCache2.getRange(bufferSize, t0, t1, identifier, audio, camera)
-                        if (range != null && drawAudio) {
-                            for (dx in 0 until SPLITS) {
-                                val x = xi + dx
-                                if (x in ix0 until ix1) {
-                                    val minV = range[dx * 2 + 0]
-                                    val maxV = range[dx * 2 + 1]
-                                    val amplitude = max(abs(minV.toInt()), abs(maxV.toInt()))
-                                    val colorMask = when {
-                                        amplitude < 5000 -> black
-                                        amplitude < 28000 -> fineColor
-                                        amplitude < 32000 -> okColor
-                                        else -> criticalColor
-                                    }
-                                    val min = minV * scale + offset
-                                    val max = maxV * scale + offset
-                                    if (max >= min) {
-                                        val y01 = this.y0 + min.toInt()
-                                        val y11 = this.y0 + max.toInt()
-                                        DrawRectangles.drawRect(x, y01, 1, y11 + 1 - y01, colorMask)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    DrawRectangles.finishBatch(b)
-                }
-
-                val hasError = tr?.lastWarning != null
-                if (isStriped || hasError) {
-                    // check if the video element has an error
-                    // if so, add red stripes
-                    val color = if (hasError) stripeColorError else stripeColorSelected
-                    drawStripes(ix0, ix1, y0, h0, timeOffset, color)
-                }
-
+                drawGradient(
+                    gradient, selectedTransform, draggedTransform,
+                    xTimeCorrection, h, y0, h0, timeOffset, toStringCache
+                )
             }
         }
     }
 
-    private fun drawGradient(x0: Int, x1: Int, y: Int, h: Int, c0: Int, c1: Int) {
-        drawRectGradient(x0, y, x1 - x0, h, c0, c1)
+    private fun drawGradient(
+        gradient: LayerViewGradient,
+        selectedTransform: List<Transform>, draggedTransform: Transform?,
+        xTimeCorrection: Int, h: Int, y0: Int, h0: Int, timeOffset: Int, toStringCache: HashMap<Transform, String>
+    ) {
+
+        val tr = gradient.owner as? Transform
+        val isStriped = selectedTransform === tr || draggedTransform === tr
+
+        val video = tr as? Video
+        val meta = video?.meta
+
+        val hasAudio = meta?.hasAudio ?: false
+        val hasVideo = meta?.hasVideo ?: false
+
+        val c0 = gradient.c0
+        val c1 = gradient.c1
+
+        // bind gradients to edge, because often the stripe continues
+        val ix0 = if (gradient.x0 == x0) x0 else gradient.x0 + xTimeCorrection
+        val ix1 = if (gradient.x1 + 1 >= x1) x1 else gradient.x1 + xTimeCorrection + 1
+
+        if (hasVideo) {
+            drawVideo(
+                video, meta, gradient,
+                h, y0, h0, timeOffset, ix0, ix1, c0, c1
+            )
+        } else {
+            drawRectGradient(ix0, y0, ix1 - ix0, h, c0, c1)
+        }
+
+        if (hasAudio) {
+            drawAudio(video, hasVideo, h, ix0, ix1, toStringCache)
+        }
+
+        val hasError = tr?.lastWarning != null
+        if (isStriped || hasError) {
+            // check if the video element has an error
+            // if so, add red stripes
+            val color = if (hasError) stripeColorError else stripeColorSelected
+            drawRectStriped(ix0, y0, ix1 - ix0, h0, timeOffset, stripeStride, color)
+        }
     }
 
-    private fun drawStripes(x0: Int, x1: Int, y: Int, h: Int, offset: Int, color: Int) {
-        drawRectStriped(x0, y, x1 - x0, h, offset, stripeStride, color)
+    private fun drawVideo(
+        video: Video, meta: MediaMetadata, gradient: LayerViewGradient,
+        h: Int, y0: Int, h0: Int, timeOffset: Int, ix0: Int, ix1: Int, c0: Int, c1: Int
+    ) {
+
+        val frameWidth = (h * (1f + relativeVideoBorder) * meta.videoWidth / meta.videoHeight).roundToInt()
+
+        var frameOffset = timeOffset % frameWidth
+        if (frameOffset < 0) frameOffset += frameWidth
+
+        val frameIndex0 = floor((ix0 - frameOffset).toFloat() / frameWidth).toInt()
+        val frameIndex1 = floor((ix1 - frameOffset).toFloat() / frameWidth).toInt()
+
+        fun getFraction(x: Int, allow0: Boolean): Float {
+            var lx = (x + frameWidth - frameOffset) % frameWidth
+            if (lx > frameWidth) lx -= frameWidth
+            if (lx < 0) lx += frameWidth
+            if (lx == 0 && !allow0) return 1f
+            return lx.toFloat() / frameWidth
+        }
+
+        fun getLerpedColor(x: Int) =
+            mixARGB(c0, c1, (x - ix0).toFloat() / gradient.w)
+
+        if (frameIndex0 != frameIndex1) {
+            // split into multiple frames
+
+            // middle frames
+            for (frameIndex in frameIndex0 + 1 until frameIndex1) {
+                val x0 = frameWidth * frameIndex + frameOffset
+                val x1 = x0 + frameWidth
+                val c0x = getLerpedColor(x0)
+                val c1x = getLerpedColor(x1)
+                drawVideoImpl(
+                    x0, x1, y0, h0, c0x, c1x,
+                    frameOffset, frameWidth, video, meta, 0f, 1f
+                )
+            }
+
+            // first frame
+            val x1 = (frameIndex0 + 1) * frameWidth + frameOffset
+            if (x1 > ix0) {
+                val f0 = getFraction(ix0, true)
+                val lerpedC1 = getLerpedColor(x1 - 1)
+                drawVideoImpl(
+                    ix0, x1, y0, h0, c0, lerpedC1,
+                    frameOffset, frameWidth, video, meta, f0, 1f
+                )
+            }
+
+            // last frame
+            val x0 = frameIndex1 * frameWidth + frameOffset
+            if (x0 < ix1) {
+                val lerpedC0 = getLerpedColor(x0)
+                val f1 = getFraction(ix1, false)
+                drawVideoImpl(
+                    x0, ix1, y0, h0, lerpedC0, c1,
+                    frameOffset, frameWidth, video, meta, 0f, f1
+                )
+            }
+
+        } else {
+            val f0 = getFraction(ix0, true)
+            val f1 = getFraction(ix1, false)
+            drawVideoImpl(
+                ix0, ix1, y0, h0, c0, c1,
+                frameOffset, frameWidth, video, meta, f0, f1
+            )
+        }
+    }
+
+    private fun drawAudio(
+        audio: Video, hasVideo: Boolean,
+        h: Int, ix0: Int, ix1: Int, toStringCache: HashMap<Transform, String>,
+    ) {
+
+        // todo get auto levels for pixels, which equal ranges of audio frames -> min, max, avg?, with weight?
+        val identifier = toStringCache.getOrPut(audio) { audio.toString() }
+
+        val camera = RemsStudio.currentCamera
+
+        val color = if (hasVideo) 0xaa777777.toInt() else 0xff777777.toInt()
+        val mix = 0.5f
+        val fineColor = mixARGB(color, 0x77ff77, mix) or black
+        val okColor = mixARGB(color, 0xffff77, mix) or black
+        val criticalColor = mixARGB(color, 0xff7777, mix) or black
+
+        val offset = (if (hasVideo) 0.75f else 0.5f) * h
+        val scale = if (hasVideo) h / 128e3f else h / 65e3f
+
+        val tStart = getTimeAt(ix0)
+        val dt = getTimeAt(ix0 + SPLITS) - tStart
+
+        val timeStartIndex = floor(tStart / dt).toLong()
+        val timeEndIndex = ceil(getTimeAt(ix1) / dt).toLong()
+
+        val b = DrawRectangles.startBatch()
+        for (timeIndex in timeStartIndex until timeEndIndex) {
+
+            val t0 = timeIndex * dt
+            val t1 = (timeIndex + 1) * dt
+            val xi = getXAt(t0).roundToInt()
+
+            // get min, max, avg, of audio at this time point
+            // time0: Time,
+            // time1: Time,
+            // speed: Double,
+            // domain: Domain,
+            // async: Boolean
+            val range = AudioFXCache2.getRange(bufferSize, t0, t1, identifier, audio, camera)
+                ?: continue
+            drawAudioBuffer(ix0, ix1, xi, range, fineColor, okColor, criticalColor, scale, offset)
+        }
+        DrawRectangles.finishBatch(b)
+    }
+
+    private fun drawAudioBuffer(
+        ix0: Int, ix1: Int, xi: Int,
+        range: ShortArray,
+        fineColor: Int, okColor: Int, criticalColor: Int,
+        scale: Float, offset: Float
+    ) {
+        // todo get auto levels for pixels, which equal ranges of audio frames -> min, max, avg?, with weight?
+        for (dx in 0 until SPLITS) {
+            val x = xi + dx
+            if (x !in ix0 until ix1) continue
+            val minV = range[dx * 2 + 0]
+            val maxV = range[dx * 2 + 1]
+            val amplitude = max(abs(minV.toInt()), abs(maxV.toInt()))
+            val colorMask = when {
+                amplitude < 5000 -> black
+                amplitude < 28000 -> fineColor
+                amplitude < 32000 -> okColor
+                else -> criticalColor
+            }
+            val min = minV * scale + offset
+            val max = maxV * scale + offset
+            if (max < min) continue
+            val y01 = this.y0 + min.toInt()
+            val y11 = this.y0 + max.toInt()
+            DrawRectangles.drawRect(x, y01, 1, y11 + 1 - y01, colorMask)
+        }
     }
 
     private fun getTimeAt(x: Int) = centralTime + dtHalfLength * ((x - x0).toDouble() / w * 2.0 - 1.0)
@@ -270,7 +275,7 @@ class LayerStripeSolution(
     private fun getCenterX(x0: Int, frameOffset: Int, frameWidth: Int) =
         x0 - nonNegativeModulo(x0 - frameOffset, frameWidth) + frameWidth / 2
 
-    private fun drawVideo(
+    private fun drawVideoImpl(
         x0: Int, x1: Int, y: Int, h: Int,
         c0: Int, c1: Int,
         frameOffset: Int, frameWidth: Int,

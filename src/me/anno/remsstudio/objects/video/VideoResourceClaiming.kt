@@ -28,42 +28,40 @@ object VideoResourceClaiming {
             return
         }
 
-        val meta = meta
-        if (meta != null) {
+        val meta = meta ?: return
 
-            val sourceFPS = meta.videoFPS
-            val duration = meta.videoDuration
-            val isLooping = isLooping.value
+        val sourceFPS = meta.videoFPS
+        val duration = meta.videoDuration
+        val isLooping = isLooping.value
 
-            if (sourceFPS > 0.0) {
-                if (maxT >= 0.0 && (stayVisibleAtEnd || isLooping != LoopingState.PLAY_ONCE || minT < duration)) {
+        if (sourceFPS > 0.0) {
+            if (maxT >= 0.0 && (stayVisibleAtEnd || isLooping != LoopingState.PLAY_ONCE || minT < duration)) {
 
-                    // use full fps when rendering to correctly render at max fps with time dilation
-                    // issues arise, when multiple frames should be interpolated together into one
-                    // at this time, we chose the center frame only.
-                    val videoFPS =
-                        if (isFinalRendering) sourceFPS
-                        else min(sourceFPS, editorVideoFPS.value.toDouble())
+                // use full fps when rendering to correctly render at max fps with time dilation
+                // issues arise, when multiple frames should be interpolated together into one
+                // at this time, we chose the center frame only.
+                val videoFPS =
+                    if (isFinalRendering) sourceFPS
+                    else min(sourceFPS, editorVideoFPS.value.toDouble())
 
-                    // calculate how many buffers are required from start to end
-                    // clamp to max number of buffers, or maybe 20
-                    val buff0 = (minT * videoFPS).toInt()
-                    val buff1 = (maxT * videoFPS).toInt()
-                    val steps = clamp(2 + (buff1 - buff0) / framesPerContainer, 2, 20)
+                // calculate how many buffers are required from start to end
+                // clamp to max number of buffers, or maybe 20
+                val buff0 = (minT * videoFPS).toInt()
+                val buff1 = (maxT * videoFPS).toInt()
+                val steps = clamp(2 + (buff1 - buff0) / framesPerContainer, 2, 20)
 
-                    val frameCount = max(1, (duration * videoFPS).roundToInt())
+                val frameCount = max(1, (duration * videoFPS).roundToInt())
 
-                    var lastBuffer = -1
-                    for (step in 0 until steps) {
-                        val f0 = mix(minT, maxT, step / (steps - 1.0))
-                        val localTime0 = isLooping[f0, duration]
-                        val frameIndex = (localTime0 * videoFPS).toInt()
-                        if (frameIndex < 0 || frameIndex >= frameCount) continue
-                        val buffer = frameIndex / framesPerContainer
-                        if (buffer != lastBuffer) {
-                            lastBuffer = buffer
-                            getVideoFrame(max(1, zoomLevel), frameIndex, videoFPS)
-                        }
+                var lastBuffer = -1
+                for (step in 0 until steps) {
+                    val f0 = mix(minT, maxT, step / (steps - 1.0))
+                    val localTime0 = isLooping[f0, duration]
+                    val frameIndex = (localTime0 * videoFPS).toInt()
+                    if (frameIndex < 0 || frameIndex >= frameCount) continue
+                    val buffer = frameIndex / framesPerContainer
+                    if (buffer != lastBuffer) {
+                        lastBuffer = buffer
+                        getVideoFrame(max(1, zoomLevel), frameIndex, videoFPS)
                     }
                 }
             }

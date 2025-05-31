@@ -87,11 +87,6 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
 
     var solution: LayerStripeSolution? = null
 
-    override fun onUpdate() {
-        super.onUpdate()
-        solution?.keepResourcesLoaded()
-    }
-
     override val canDrawOverBorders: Boolean
         get() = true
 

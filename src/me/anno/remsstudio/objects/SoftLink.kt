@@ -175,9 +175,9 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
         }
     }
 
-    override fun claimResources(pTime0: Double, pTime1: Double, pAlpha0: Float, pAlpha1: Float) {
-        super.claimResources(pTime0, pTime1, pAlpha0, pAlpha1)
-        softChild.claimResources(pTime0, pTime1, pAlpha0, pAlpha1)
+    override fun claimResources(pTime0: Double, pTime1: Double) {
+        super.claimResources(pTime0, pTime1)
+        softChild.claimResources(pTime0, pTime1)
     }
 
     override fun createInspector(

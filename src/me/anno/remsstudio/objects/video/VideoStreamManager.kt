@@ -1,12 +1,13 @@
 package me.anno.remsstudio.objects.video
 
-import me.anno.Engine
+import me.anno.Time
 import me.anno.animation.LoopingState
 import me.anno.cache.ICacheData
 import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.gpu.GFX
 import me.anno.input.Input
 import me.anno.io.files.FileReference
+import me.anno.maths.Maths.MILLIS_TO_NANOS
 import me.anno.maths.Maths.ceilDiv
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.ui.editor.TimelinePanel
@@ -17,6 +18,10 @@ import kotlin.math.max
 import kotlin.math.sign
 
 class VideoStreamManager(val video: Video) : ICacheData {
+
+    companion object {
+        private var timeoutMillis = 250L
+    }
 
     fun hasSimpleTime(): Boolean {
         return video.allInHierarchy {
@@ -41,7 +46,7 @@ class VideoStreamManager(val video: Video) : ICacheData {
 
     fun isCacheableVideo(): Boolean {
         val meta = video.meta ?: return false // ?? what do we answer here?
-        return meta.videoFrameCount < 100 // what do we set here??
+        return meta.videoFrameCount < 50 // what do we set here??
     }
 
     fun isScrubbing(): Boolean {
@@ -57,24 +62,23 @@ class VideoStreamManager(val video: Video) : ICacheData {
     private var lastScale = 0
     private var lastFPS = 0.0
     private var stream: VideoStream? = null
-    private var wasFinalRendering: Boolean? = null
+    private var timeoutNanos = 0L
+
+    fun update() {
+        if (stream != null && timeoutNanos < Time.nanoTime) {
+            destroy()
+        }
+    }
 
     fun getFrame(scale: Int, frameIndex: Int, videoFPS: Double): GPUFrame? {
         val meta = video.meta ?: return null
-        if (wasFinalRendering != null) {
-            if (wasFinalRendering != isFinalRendering) {
-                Engine.requestShutdown()
-                throw IllegalStateException("Changed from $wasFinalRendering to $isFinalRendering")
-            }
-        }
-        wasFinalRendering = isFinalRendering
-        if (lastFile != video.file || lastScale != scale || lastFPS != videoFPS) {
+        if (lastFile != meta.file || lastScale != scale || lastFPS != videoFPS) {
             stream?.destroy()
             // create new stream
             // is ceilDiv correct?? roundDiv instead???
             val maxSize = ceilDiv(max(meta.videoWidth, meta.videoHeight), scale)
             val stream = VideoStream(
-                video.file, meta, false,
+                meta.file, meta, false,
                 LoopingState.PLAY_LOOP, videoFPS, maxSize
             )
             lastScale = scale
@@ -83,6 +87,7 @@ class VideoStreamManager(val video: Video) : ICacheData {
             stream.start(startTime)
             this.stream = stream
         }
+        timeoutNanos = Time.nanoTime + timeoutMillis * MILLIS_TO_NANOS
         val stream = stream!!
         // 6 is the number of extra frames needed for blank-frame removal; use 7 just to be sure
         val frame = stream.getFrame(frameIndex, 7)

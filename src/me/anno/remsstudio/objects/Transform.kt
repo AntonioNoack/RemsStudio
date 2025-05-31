@@ -25,9 +25,9 @@ import me.anno.remsstudio.RemsStudio.editorTime
 import me.anno.remsstudio.Scene
 import me.anno.remsstudio.Selection.select
 import me.anno.remsstudio.animation.AnimatedProperty
-import me.anno.remsstudio.objects.transitions.Transition
 import me.anno.remsstudio.objects.modes.TransformVisibility
 import me.anno.remsstudio.objects.particles.ParticleSystem
+import me.anno.remsstudio.objects.transitions.Transition
 import me.anno.remsstudio.ui.ComponentUIV2
 import me.anno.remsstudio.ui.IsAnimatedWrapper
 import me.anno.remsstudio.ui.editor.TimelinePanel
@@ -205,17 +205,14 @@ open class Transform() : Saveable(),
     }
 
     private val tmp0 = Vector4f()
-    private val tmp1 = Vector4f()
-    open fun claimResources(pTime0: Double, pTime1: Double, pAlpha0: Float, pAlpha1: Float) {
+    open fun claimResources(pTime0: Double, pTime1: Double) {
         val lTime0 = getLocalTime(pTime0)
-        val lAlpha0 = getLocalColor(tmp0.set(0f, 0f, 0f, pAlpha0), lTime0, tmp0).w
         val lTime1 = getLocalTime(pTime1)
-        val lAlpha1 = getLocalColor(tmp1.set(0f, 0f, 0f, pAlpha1), lTime0, tmp1).w
-        if (lAlpha0 > minAlpha || lAlpha1 > minAlpha) {
-            claimLocalResources(lTime0, lTime1)
-            children.forEach {
-                it.claimResources(lTime0, lTime1, lAlpha0, lAlpha1)
-            }
+        claimLocalResources(lTime0, lTime1)
+        val children = children
+        for(i in children.indices) {
+            val child = children[i]
+            child.claimResources(lTime0, lTime1)
         }
     }
 
@@ -376,7 +373,7 @@ open class Transform() : Saveable(),
         return localTime0
     }
 
-    fun toGlobalTime(localTime:Double): Double {
+    fun toGlobalTime(localTime: Double): Double {
         // todo try to support animated time
         return localTime / timeDilation.value + timeOffset.value
     }

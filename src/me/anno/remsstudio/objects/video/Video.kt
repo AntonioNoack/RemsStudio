@@ -52,7 +52,6 @@ import me.anno.utils.structures.maps.BiMap
 import me.anno.video.ImageSequenceMeta
 import me.anno.video.VideoCache
 import me.anno.video.formats.gpu.GPUFrame
-import org.apache.logging.log4j.LogManager
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
@@ -278,6 +277,7 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
             invalidateUI(true)
             needsImageUpdate = false
         }
+        streamManager.update()
     }
 
     var lastAddedEndKeyframesFile: FileReference? = null
