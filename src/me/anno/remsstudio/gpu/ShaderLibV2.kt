@@ -1,31 +1,21 @@
 package me.anno.remsstudio.gpu
 
 import me.anno.config.DefaultConfig
-import me.anno.gpu.shader.BaseShader
-import me.anno.gpu.shader.GLSLType
-import me.anno.gpu.shader.ShaderFuncLib
-import me.anno.gpu.shader.ShaderLib
+import me.anno.gpu.shader.*
 import me.anno.gpu.shader.ShaderLib.v3DMasked
 import me.anno.gpu.shader.ShaderLib.v3DlMasked
 import me.anno.gpu.shader.ShaderLib.y3DMasked
-import me.anno.gpu.shader.YUVHelper
 import me.anno.gpu.shader.builder.Variable
 import me.anno.gpu.shader.builder.VariableMode
-import me.anno.image.ImageCache
-import me.anno.io.files.Signature
 import me.anno.remsstudio.objects.effects.MaskType
 import me.anno.remsstudio.video.UVProjection
-import me.anno.utils.OS.desktop
 import me.anno.utils.OS.res
 import me.anno.utils.pooling.ByteBufferPool
-import org.apache.logging.log4j.LogManager
 import java.nio.FloatBuffer
 import kotlin.math.PI
 
 @Suppress("MemberVisibilityCanBePrivate")
 object ShaderLibV2 {
-
-    private val LOGGER = LogManager.getLogger(ShaderLibV2::class)
 
     // https://en.wikipedia.org/wiki/ASC_CDL
     // color grading with asc cdl standard
