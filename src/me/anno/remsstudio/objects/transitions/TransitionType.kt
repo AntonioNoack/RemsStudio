@@ -75,6 +75,10 @@ class TransitionType(
             10, NameDesc("Spin", "Rotates first image out, second image in. Center should be any of the corners.", ""),
             load("Spin")
         )
+        val ROTATE3D = TransitionType(
+            21, NameDesc("Rotate 3D", "Rotates in 3D. Image switches when it's rotated exactly 90°.", ""),
+            load("Rotate3D")
+        )
         val LUMA_FADE = TransitionType(
             11, NameDesc("Luma Fade", "Fades based on brightness of first or second texture", ""),
             load("LumaFade")

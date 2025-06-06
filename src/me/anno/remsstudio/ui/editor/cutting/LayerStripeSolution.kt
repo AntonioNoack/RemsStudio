@@ -8,6 +8,9 @@ import me.anno.gpu.drawing.DrawGradients.drawRectGradient
 import me.anno.gpu.drawing.DrawRectangles
 import me.anno.gpu.drawing.DrawStriped.drawRectStriped
 import me.anno.io.MediaMetadata
+import me.anno.io.files.InvalidRef
+import me.anno.io.json.saveable.JsonStringWriter
+import me.anno.io.saveable.Saveable
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.max
 import me.anno.maths.Maths.nonNegativeModulo
@@ -38,6 +41,16 @@ class LayerStripeSolution(
         private val relativeVideoBorder = 0.1f
         private val stripeColorSelected = 0x33ffffff
         private val stripeColorError = 0xffff7777.toInt()
+
+        private val strBuilder = JsonStringWriter(16, InvalidRef)
+        private fun toString(saveable: Saveable): String {
+            synchronized(strBuilder) {
+                strBuilder.clear()
+                strBuilder.add(saveable)
+                strBuilder.writeAllInList()
+                return strBuilder.toString()
+            }
+        }
     }
 
     val w = x1 - x0
@@ -197,7 +210,7 @@ class LayerStripeSolution(
     ) {
 
         // todo get auto levels for pixels, which equal ranges of audio frames -> min, max, avg?, with weight?
-        val identifier = toStringCache.getOrPut(audio) { audio.toString() }
+        val identifier = toStringCache.getOrPut(audio) { toString(audio) }
 
         val camera = RemsStudio.currentCamera
 

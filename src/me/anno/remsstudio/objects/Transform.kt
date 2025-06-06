@@ -63,6 +63,7 @@ import me.anno.utils.types.Strings.isBlank2
 import org.apache.logging.log4j.LogManager
 import org.joml.*
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.math.min
 
 @Suppress("MemberVisibilityCanBePrivate")
 open class Transform() : Saveable(),
@@ -104,8 +105,8 @@ open class Transform() : Saveable(),
     var color = AnimatedProperty.color(Vector4f(1f))
     var colorMultiplier = AnimatedProperty.floatPlus(1f)
 
-    val fadeIn = AnimatedProperty.floatPlus(0.1f)
-    val fadeOut = AnimatedProperty.floatPlus(0.1f)
+    val fadeIn = ValueWithDefault(0.1f)
+    val fadeOut = ValueWithDefault(0.1f)
 
     open fun getStartTime(): Double = Double.NEGATIVE_INFINITY
     open fun getEndTime(): Double = Double.POSITIVE_INFINITY
@@ -205,18 +206,27 @@ open class Transform() : Saveable(),
     }
 
     private val tmp0 = Vector4f()
-    open fun claimResources(pTime0: Double, pTime1: Double) {
+    open fun claimResources(pTime0: Double, pTime1: Double, pMaxAlpha: Float) {
+        // todo we should get min and max time, not just the border values
         val lTime0 = getLocalTime(pTime0)
         val lTime1 = getLocalTime(pTime1)
-        claimLocalResources(lTime0, lTime1)
+        val lMaxAlpha = getMaxAlpha(lTime0, lTime1, pMaxAlpha)
+        claimLocalResources(lTime0, lTime1, lMaxAlpha)
         val children = children
-        for(i in children.indices) {
+        for (i in children.indices) {
             val child = children[i]
-            child.claimResources(lTime0, lTime1)
+            child.claimResources(lTime0, lTime1, lMaxAlpha)
         }
     }
 
-    open fun claimLocalResources(lTime0: Double, lTime1: Double) {
+    private fun getMaxAlpha(lTime0: Double, lTime1: Double, parentAlpha: Float): Float {
+        // todo we should get min and max alpha, not just the border values
+        var alpha = getLocalAlpha(parentAlpha, lTime0)
+        alpha = max(alpha, getLocalAlpha(parentAlpha, lTime1))
+        return alpha
+    }
+
+    open fun claimLocalResources(lTime0: Double, lTime1: Double, lMaxAlpha: Float) {
         // here is nothing to claim
         // only for things using video textures
     }
@@ -323,18 +333,18 @@ open class Transform() : Saveable(),
         val ufd = usesFadingDifferently()
         if (ufd || getStartTime().isFinite()) {
             timeGroup += vis(
-                c,
-                "Fade In",
+                c,"Fade In",
                 "Transparency at the start, in seconds",
                 "time.fadeIn",
+                NumberType.FLOAT_PLUS,
                 c.map { it.fadeIn },
                 style
             )
             timeGroup += vis(
-                c,
-                "Fade Out",
+                c,"Fade Out",
                 "Transparency at the end, in seconds",
                 "time.fadeOut",
+                NumberType.FLOAT_PLUS,
                 c.map { it.fadeOut },
                 style
             )
@@ -404,8 +414,8 @@ open class Transform() : Saveable(),
         }
         val col = color.getValueAt(localTime, dst)
         val mul = colorMultiplier[localTime]
-        val fadeIn = fadeIn[localTime]
-        val fadeOut = fadeOut[localTime]
+        val fadeIn = fadeIn.value
+        val fadeOut = fadeOut.value
         val m1 = clamp((localTime - getStartTime()) / fadeIn, 0.0, 1.0)
         val m2 = clamp((getEndTime() - localTime) / fadeOut, 0.0, 1.0)
         val fading = (m1 * m2).toFloat()
@@ -413,6 +423,19 @@ open class Transform() : Saveable(),
         if (parentColor != null) dst.mul(px, py, pz, pw)
         dst.mul(mul, mul, mul, fading)
         return dst
+    }
+
+    fun getLocalAlpha(parentAlpha: Float, localTime: Double): Float {
+        val pw = parentAlpha
+        val tmp = JomlPools.vec4f.create()
+        val col = color.getValueAt(localTime, tmp).w
+        JomlPools.vec4f.sub(1)
+        val fadeIn = fadeIn.value
+        val fadeOut = fadeOut.value
+        val m1 = clamp((localTime - getStartTime()) / fadeIn, 0.0, 1.0)
+        val m2 = clamp((getEndTime() - localTime) / fadeOut, 0.0, 1.0)
+        val fading = (m1 * m2).toFloat()
+        return fading * pw * col
     }
 
     fun applyTransform(transform: Matrix4f, time: Double) {
@@ -557,8 +580,8 @@ open class Transform() : Saveable(),
         writer.writeObject(this, "timeAnimated", timeAnimated)
         writer.writeObject(this, "color", color)
         writer.writeObject(this, "colorMultiplier", colorMultiplier)
-        writer.writeObject(this, "fadeIn", fadeIn)
-        writer.writeObject(this, "fadeOut", fadeOut)
+        writer.writeFloat("fadeIn", fadeIn.value)
+        writer.writeFloat("fadeOut", fadeOut.value)
         if (blendMode !== BlendMode.INHERIT) writer.writeString("blendMode", blendMode.id)
         writer.writeObjectList(this, "children", children)
         writer.writeMaybe(this, "timelineSlot", timelineSlot)
@@ -576,14 +599,8 @@ open class Transform() : Saveable(),
             "timeDilation" -> timeDilation.value = AnyToDouble.getDouble(value, 1.0)
             "timeOffset" -> timeOffset.value = AnyToDouble.getDouble(value, 0.0)
             "lockTransform" -> lockTransform = AnyToBool.anyToBool(value)
-            "fadeIn" -> {
-                if (value is Double && value >= 0.0) fadeIn.set(value.toFloat())
-                else fadeIn.copyFrom(value)
-            }
-            "fadeOut" -> {
-                if (value is Double && value >= 0.0) fadeOut.set(value.toFloat())
-                else fadeOut.copyFrom(value)
-            }
+            "fadeIn" -> fadeIn.value = AnyToFloat.getFloat(value, fadeIn.default)
+            "fadeOut" -> fadeOut.value = AnyToFloat.getFloat(value, fadeOut.default)
             "name" -> this.name = value as? String ?: ""
             "comment" -> comment = value as? String ?: ""
             "tags" -> tags = value as? String ?: ""

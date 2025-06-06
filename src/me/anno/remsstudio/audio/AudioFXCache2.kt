@@ -36,6 +36,8 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
     // when the user is just scrolling through time
     private const val rangeRequestLimit = 8
 
+    var audioTimeoutMillis = 10000L
+
     val SPLITS = 256
 
     data class EffectKey(val effect: SoundEffect, val data: Any, val previous: EffectKey?)
@@ -354,7 +356,7 @@ object AudioFXCache2 : CacheSection("AudioFX-RS") {
         async: Boolean = true
     ): ShortArray? {
         val queue = if (async) rangingProcessing2 else null
-        val entry = getEntryLimited(RangeKey(index0, index1, identifier), 10000, queue, rangeRequestLimit) {
+        val entry = getEntryLimited(RangeKey(index0, index1, identifier), audioTimeoutMillis, queue, rangeRequestLimit) {
             val data = ShortData()
             rangingProcessing += {
                 val splits = SPLITS

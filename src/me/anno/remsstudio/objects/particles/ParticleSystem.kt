@@ -288,8 +288,8 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
     }
 
     private fun drawParticles(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
-        val fadeIn = fadeIn[time].toDouble()
-        val fadeOut = fadeOut[time].toDouble()
+        val fadeIn = fadeIn.value.toDouble()
+        val fadeOut = fadeOut.value.toDouble()
         val simulationStep = simulationStep
         for (p in particles) {
             p.draw(stack, time, color, simulationStep, fadeIn, fadeOut)

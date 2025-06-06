@@ -46,7 +46,7 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
     constructor() : this(InvalidRef)
 
     init {
-        timelineSlot.setDefault(0)
+        timelineSlot.default = 0
     }
 
     var softChild = Transform()
@@ -73,7 +73,7 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
     var renderToTexture = false
 
     init {
-        isCollapsedI.setDefault(true)
+        isCollapsedI.default = true
     }
 
     private var lastModified: Any? = null
@@ -175,9 +175,8 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
         }
     }
 
-    override fun claimResources(pTime0: Double, pTime1: Double) {
-        super.claimResources(pTime0, pTime1)
-        softChild.claimResources(pTime0, pTime1)
+    override fun claimLocalResources(lTime0: Double, lTime1: Double, lMaxAlpha: Float) {
+        softChild.claimResources(lTime0, lTime1, lMaxAlpha)
     }
 
     override fun createInspector(

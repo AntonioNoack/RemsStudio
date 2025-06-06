@@ -25,7 +25,7 @@ import kotlin.math.sqrt
 abstract class GFXTransform(parent: Transform?) : Transform(parent) {
 
     init {
-        timelineSlot.setDefault(0)
+        timelineSlot.default = 0
     }
 
     val attractorBaseColor = AnimatedProperty.color(Vector4f(1f))

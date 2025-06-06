@@ -320,7 +320,7 @@ object RemsStudio : EngineBase(NameDesc("Rem's Studio"), 10401, true), WelcomeUI
         // todo publish that project, and write an article for it
         // todo publish example projects for all wiki pages?
 
-        Build.isDebug = false
+        Build.isDebug = true
         Build.isShipped = !Build.isDebug
         Build.lock()
 

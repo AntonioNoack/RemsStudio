@@ -1,6 +1,6 @@
 package me.anno.remsstudio
 
-// todo fix: video files cannot be properly deleted, because files can't be deleted when reading them
+// todo bug: video files cannot be properly deleted, because files can't be deleted when reading them
 
 // todo tutorials for various effects:
 // todo tut play video/audio backwards effect

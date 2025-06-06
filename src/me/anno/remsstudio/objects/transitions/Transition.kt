@@ -62,7 +62,7 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
     override val className: String get() = "Transition"
 
     init {
-        timelineSlot.setDefault(1)
+        timelineSlot.default = 1
     }
 
     fun render(tex0: ITexture2D, tex1: ITexture2D, progress: Float) {
@@ -202,13 +202,41 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
                 ), "" +
                         "#define PI $PI\n" +
                         "#define TAU $TAU\n" +
+                        "vec2 rotate(vec2 uv, vec2 cosSin){\n" +
+                        "   return mat2(cosSin.x,cosSin.y,-cosSin.y,cosSin.x) * uv;" +
+                        "}\n" +
+                        "vec2 rotateInv(vec2 uv, vec2 cosSin){\n" +
+                        "   return rotate(uv,vec2(cosSin.x,-cosSin.y));\n" +
+                        "}\n" +
                         "bool isInside(vec2 uv){\n" +
                         "   return uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0;\n" +
                         "}\n" +
+                        "float smoothMix(float u, float bias){\n" +
+                        "   vec2 du = vec2(dFdx(u), dFdy(u));\n" +
+                        "   u = u / max(length(du),1e-6);\n" +
+                        "   return clamp(u + bias, 0.0, 1.0);\n" +
+                        "}\n" +
+                        "float isInsideF(float u){\n" +
+                        "   return smoothMix(0.5-abs(u-0.5), 0.5);\n" +
+                        "}\n" +
+                        "float isInsideF(vec2 uv){\n" +
+                        "   return min(isInsideF(uv.x), isInsideF(uv.y));\n" +
+                        "}\n" +
+                        "vec4 mixColor(vec4 color0, vec4 color1, float f){\n" +
+                        "   if(f <= 0.0) return color0;\n" +
+                        "   if(f >= 1.0) return color1;\n" +
+                        // sRGB-correct blending
+                        "   color0.rgb *= color0.rgb;\n" +
+                        "   color1.rgb *= color1.rgb;\n" +
+                        "   vec4 result = mix(color0,color1,f);\n" +
+                        "   result.rgb = sqrt(max(result.rgb,vec3(0.0)));\n" +
+                        "   return result;\n" +
+                        "}\n" +
+                        "vec4 mixColor2(vec4 color0, vec4 color1, float f){\n" +
+                        "   return mixColor(color0,color1,smoothMix(f,0.5));\n" +
+                        "}\n" +
                         "vec4 getInRect(sampler2D s, vec2 uv) {\n" +
-                        "   if(isInside(uv)) {\n" +
-                        "       return texture(s,uv);\n" +
-                        "   } else return fadeColor;\n" +
+                        "   return mixColor(fadeColor, texture(s,uv), isInsideF(uv));\n" +
                         "}\n" +
                         brightness +
                         key.shaderString.first +

@@ -6,7 +6,7 @@ import me.anno.gpu.texture.TextureCache
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.mix
 import me.anno.remsstudio.objects.video.Video.Companion.framesPerContainer
-import me.anno.remsstudio.objects.video.Video.Companion.videoFrameTimeout
+import me.anno.remsstudio.objects.video.VideoDrawing.imageTimeout
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -86,14 +86,14 @@ object VideoResourceClaiming {
 
                 if (index1 >= index0) {
                     for (i in index0..index1) {
-                        TextureCache[meta.getImage(i), videoFrameTimeout, true]
+                        TextureCache[meta.getImage(i), imageTimeout, true]
                     }
                 } else {
                     for (i in index1 until meta.matches.size) {
-                        TextureCache[meta.getImage(i), videoFrameTimeout, true]
+                        TextureCache[meta.getImage(i), imageTimeout, true]
                     }
                     for (i in 0 until index0) {
-                        TextureCache[meta.getImage(i), videoFrameTimeout, true]
+                        TextureCache[meta.getImage(i), imageTimeout, true]
                     }
                 }
             }

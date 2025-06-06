@@ -2,13 +2,13 @@ package me.anno.remsstudio.objects.video
 
 import me.anno.Time
 import me.anno.animation.LoopingState
+import me.anno.config.DefaultConfig
 import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.Texture2D
 import me.anno.gpu.texture.TextureCache
 import me.anno.gpu.texture.TextureLib
 import me.anno.gpu.texture.TextureLib.colorShowTexture
-import me.anno.gpu.texture.TextureReader.Companion.imageTimeout
 import me.anno.image.svg.SVGMeshCache
 import me.anno.io.MediaMetadata
 import me.anno.maths.Maths.clamp
@@ -40,6 +40,9 @@ import kotlin.math.roundToInt
 
 object VideoDrawing {
     private val LOGGER = LogManager.getLogger(VideoDrawing::class)
+
+    @JvmStatic
+    val imageTimeout get() = DefaultConfig["ui.video.frameTimeout", 50L]
 
     fun Video.drawImage(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val file = file

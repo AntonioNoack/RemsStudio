@@ -4,5 +4,5 @@ void main(){
     float dir = dot(direction, (uv-0.5)*2.0)*0.5+0.5;
     float maxLength = 1.0 / max(abs(direction.x), abs(direction.y));
     float progress2 = 1.0 - (1.0 - progress) * maxLength;
-    color = abs(dir - 0.5) > 0.5 - progress2 * 0.5 ? color1 : color0;
+    color = mixColor2(color0,color1,abs(dir - 0.5) - (0.5 - progress2 * 0.5));
 }

@@ -11,6 +11,7 @@ import me.anno.video.VideoCache
 import me.anno.video.VideoFramesKey
 import me.anno.video.VideoSlice
 import me.anno.video.formats.gpu.BlankFrameDetector
+import kotlin.math.max
 
 @Suppress("MemberVisibilityCanBePrivate")
 enum class Status(val color: Int) {
@@ -71,7 +72,7 @@ enum class Status(val color: Int) {
             x0: Int, y0: Int, x1: Int, y1: Int,
             file: FileReference, fps: Double = 0.0,
             blankFrameThreshold: Float,
-            timeMapper: (x: Int) -> Double,
+            timeMapper: I1D,
             bufferLength: Int = Video.framesPerContainer
         ) {
             val meta = MediaMetadata.getMeta(file, true)
@@ -91,11 +92,11 @@ enum class Status(val color: Int) {
                     var lastStatus = INVALID_SCALE
                     // from left to right query all video data
                     for (xi in x0 until x1) {
-                        val time = timeMapper(xi)
+                        val time = timeMapper.call(xi)
                         var bestStatus = MISSING
                         if (time >= 0.0) {
                             val frameIndex = (time * meta.videoFrameCount / meta.videoDuration)
-                                .toInt() % meta.videoFrameCount
+                                .toInt() % max(meta.videoFrameCount, 1)
                             // if frame index is same as previously, don't request again
                             if (frameIndex == lastFrameIndex) {
                                 bestStatus = lastStatus

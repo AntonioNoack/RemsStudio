@@ -230,7 +230,7 @@ open class StudioSceneView(style: Style) :
         val et = editorTime
         val loadedTimeSeconds = 3.0
         // load the next 3 seconds of data
-        RemsStudio.root.claimResources(et, et + loadedTimeSeconds * if (edt == 0.0) 1.0 else edt)
+        RemsStudio.root.claimResources(et, et + loadedTimeSeconds * if (edt == 0.0) 1.0 else edt, 1f)
     }
 
     override val canDrawOverBorders: Boolean

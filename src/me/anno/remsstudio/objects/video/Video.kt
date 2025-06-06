@@ -9,7 +9,6 @@ import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.gpu.FinalRendering.onMissingResource
 import me.anno.gpu.texture.Clamping
 import me.anno.gpu.texture.TextureCache
-import me.anno.gpu.texture.TextureReader.Companion.imageTimeout
 import me.anno.image.svg.SVGMeshCache
 import me.anno.io.MediaMetadata
 import me.anno.io.MediaMetadata.Companion.getMeta
@@ -32,6 +31,7 @@ import me.anno.remsstudio.objects.modes.VideoType
 import me.anno.remsstudio.objects.video.VideoDrawing.drawImage
 import me.anno.remsstudio.objects.video.VideoDrawing.drawImageSequence
 import me.anno.remsstudio.objects.video.VideoDrawing.drawVideo
+import me.anno.remsstudio.objects.video.VideoDrawing.imageTimeout
 import me.anno.remsstudio.objects.video.VideoInspector.createVideoInspector
 import me.anno.remsstudio.objects.video.VideoResourceClaiming.claimImage
 import me.anno.remsstudio.objects.video.VideoResourceClaiming.claimImageSequence
@@ -83,7 +83,7 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
 
     companion object {
 
-        val framesPerContainer = 128
+        val framesPerContainer = 32
 
         val editorFPS = intArrayOf(1, 2, 3, 5, 10, 24, 30, 60, 90, 120, 144, 240, 300, 360)
 
@@ -100,7 +100,6 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
             }
         }
 
-        val videoFrameTimeout get() = if (isFinalRendering) 2000L else 10000L
         val tiling16x9 = Vector4f(8f, 4.5f, 0f, 0f)
 
     }
@@ -191,7 +190,7 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
     }
 
     var zoomLevel = 0
-
+    var lastTexture: Any? = null
     var editorVideoFPS = ValueWithDefault(60)
 
     val cgOffsetAdd = AnimatedProperty.color3(Vector3f())
@@ -206,17 +205,20 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
     var lastW = 16
     var lastH = 9
 
-    override fun getEndTime(): Double = when (isLooping.value) {
-        LoopingState.PLAY_ONCE -> {
-            if (stayVisibleAtEnd) Double.POSITIVE_INFINITY
-            else when (type) {
-                VideoType.IMAGE_SEQUENCE -> imageSequenceMeta?.duration
-                VideoType.IMAGE -> Double.POSITIVE_INFINITY
-                VideoType.UNKNOWN -> Double.POSITIVE_INFINITY
-                else -> meta?.duration
-            } ?: Double.POSITIVE_INFINITY
+    override fun getEndTime(): Double {
+        val default = Double.POSITIVE_INFINITY
+        if (stayVisibleAtEnd || isLooping.value != LoopingState.PLAY_ONCE) return default
+        when (type) {
+            VideoType.IMAGE_SEQUENCE -> {
+                val meta = imageSequenceMeta ?: return default
+                return meta.duration
+            }
+            VideoType.IMAGE, VideoType.UNKNOWN -> return default
+            VideoType.VIDEO, VideoType.AUDIO -> {
+                val meta = meta ?: return default
+                return meta.duration
+            }
         }
-        else -> Double.POSITIVE_INFINITY
     }
 
     override fun isVisible(localTime: Double): Boolean {
@@ -259,15 +261,14 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
     }
 
     fun getVideoFrame(scale: Int, index: Int, fps: Double): GPUFrame? {
-        return VideoCache.getVideoFrame(file, scale, index, framesPerContainer, fps, videoFrameTimeout, true)
+        return VideoCache.getVideoFrame(file, scale, index, framesPerContainer, fps, imageTimeout, true)
     }
 
     var needsImageUpdate = false
-    var lastTexture: Any? = null
-    override fun claimLocalResources(lTime0: Double, lTime1: Double) {
+    override fun claimLocalResources(lTime0: Double, lTime1: Double, lMaxAlpha: Float) {
         val minT = min(lTime0, lTime1)
         val maxT = max(lTime0, lTime1)
-        when (type) {
+        if (lMaxAlpha > 1f / 255f) when (type) {
             VideoType.VIDEO -> claimVideo(minT, maxT)
             VideoType.IMAGE_SEQUENCE -> claimImageSequence(minT, maxT)
             VideoType.IMAGE -> claimImage()
