@@ -24,7 +24,6 @@ import org.joml.Vector3f
 object RemsConfig {
 
     fun init() {
-
         DefaultConfig.apply {
 
             // I'm not sure about that one ;)
@@ -50,9 +49,7 @@ object RemsConfig {
 
             newInstances()
         }
-
         RemsVersionFeatures(DefaultConfig).addNewPackages(DefaultConfig)
-
     }
 
     fun newInstances() {

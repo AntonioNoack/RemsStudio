@@ -56,7 +56,7 @@ open class TimelinePanel(style: Style) : Panel(style) {
 
     val font = style.getFont("tinyText")
     val fontColor = style.getColor("textColor", DefaultStyle.fontGray)
-    val endColor = style.getColor("endColor", mixARGB(fontColor, 0xffff0000.toInt(), 0.5f))
+    val endColor = style.getColor("endColor", mixARGB(fontColor, 0xff0000 or black, 0.5f))
 
     fun drawCurrentTime() {
         GFX.loadTexturesSync.push(true)
@@ -351,7 +351,6 @@ open class TimelinePanel(style: Style) : Panel(style) {
         if (Input.isControlDown) { // hack to allow scrolling the parent
             super.onMouseWheel(x, y, dy, -dx, byMouse)
         } else {
-
             val scale = pow(1.05f, dx)
             // set the center to the cursor
             // works great :D
@@ -359,7 +358,6 @@ open class TimelinePanel(style: Style) : Panel(style) {
             centralTime += normalizedX * dtHalfLength * (1f - scale)
             dtHalfLength *= scale
             centralTime += dtHalfLength * 20f * dy / width
-
             clampTime()
         }
     }

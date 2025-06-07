@@ -87,6 +87,10 @@ class TransitionType(
             12, NameDesc("Flash Bang", "Makes the image incredibly bright, then dims to the second", ""),
             load("FlashBang")
         )
+        val DIRECTIONAL_BLUR = TransitionType(
+            22, NameDesc("Directional Blur", "Blurs video along a direction", ""),
+            load("DirectionalBlur")
+        )
 
         // todo do we want to support all pixelation types, again? quad/tri/hex/voronoi
         val PIXELATION = TransitionType(

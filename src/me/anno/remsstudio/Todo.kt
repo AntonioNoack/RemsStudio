@@ -19,9 +19,3 @@ package me.anno.remsstudio
 // todo tut on noise reduction
 // todo tut on black frames
 // done tut pixelating a face or car sign
-
-// todo node editor...
-
-// todo give drivers access to global time and parent time?
-// todo give them access to the keyframes
-// todo give them access to all attributes XD

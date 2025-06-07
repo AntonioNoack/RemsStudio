@@ -45,6 +45,7 @@ import me.anno.ui.editor.OptionBar
 import me.anno.ui.editor.WelcomeUI
 import me.anno.ui.editor.config.ConfigType
 import me.anno.ui.editor.files.FileNames.toAllowedFilename
+import me.anno.utils.Color.black
 import me.anno.utils.files.OpenFileExternally.openInBrowser
 import me.anno.utils.files.OpenFileExternally.openInExplorer
 import org.apache.logging.log4j.LogManager
@@ -182,11 +183,12 @@ object RemsStudioUILayouts {
         options.addAction(windowTitle, Dict["Save Layout", "ui.top.saveUILayout"]) {
             askName(windowStack, NameDesc("Layout Name"), "ui", NameDesc("Save"), {
                 val trimmed = it.trim()
-                if (trimmed.toAllowedFilename() == trimmed) {
+                val color = if (trimmed.toAllowedFilename() == trimmed) {
                     if (Project.getUILayoutFile(trimmed).exists) {
                         0xffff00
                     } else 0x00ff00
                 } else 0xff0000
+                color or black
             }, {
                 val name = it.toAllowedFilename()
                 if (name != null) {
