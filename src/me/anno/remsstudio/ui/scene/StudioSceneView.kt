@@ -221,9 +221,9 @@ open class StudioSceneView(style: Style) :
         var dilation = editorTimeDilation
         if (dilation == 0.0 && !isScrubbing()) dilation = 1.0
         val startTime = editorTime
-        // load the next 3 seconds of data
-        val loadedTime = 3.0
-        val numSteps = if (dilation == 0.0) 1 else 10
+        // load the next two seconds of data
+        val loadedTime = 2.0
+        val numSteps = if (dilation == 0.0) 1 else 7
         val dt = loadedTime * dilation / numSteps
         val root = RemsStudio.root
         for (i in 0 until numSteps) {

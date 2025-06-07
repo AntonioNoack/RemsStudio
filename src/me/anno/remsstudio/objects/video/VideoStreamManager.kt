@@ -13,7 +13,9 @@ import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.video.Video.Companion.framesPerContainer
 import me.anno.remsstudio.ui.editor.TimelinePanel
+import me.anno.remsstudio.ui.editor.cutting.FrameStatus
 import me.anno.utils.structures.lists.Lists.any2
+import me.anno.utils.structures.lists.Lists.firstOrNull2
 import me.anno.video.VideoStream
 import me.anno.video.formats.gpu.GPUFrame
 import kotlin.math.max
@@ -30,6 +32,11 @@ class VideoStreamManager(val video: Video) : ICacheData {
                     Input.isControlDown &&
                     GFX.windows.any2 { it.windowStack.inFocus0 is TimelinePanel }
         }
+
+        // 6 is the number of extra frames needed for blank-frame removal; use 7 just to be sure
+        private val NUM_FRAMES_FOR_BLANK_FRAMES = 7
+        private val MAX_PRELOADED_FRAMES = 8 // symmetry :3
+        private val STREAM_CAPACITY = MAX_PRELOADED_FRAMES + NUM_FRAMES_FOR_BLANK_FRAMES
     }
 
     fun hasSimpleTime(): Boolean {
@@ -50,9 +57,9 @@ class VideoStreamManager(val video: Video) : ICacheData {
     fun isPlayingForward(): Boolean {
         val dilation = absoluteTimeDilation()
         return if (isFinalRendering) {
-            dilation >= 0.0
+            dilation > 0.0
         } else {
-            RemsStudio.editorTimeDilation * dilation >= 0.0
+            RemsStudio.editorTimeDilation * dilation > 0.0
         }
     }
 
@@ -79,14 +86,16 @@ class VideoStreamManager(val video: Video) : ICacheData {
 
     fun getFrame(scale: Int, frameIndex: Int, videoFPS: Double): GPUFrame? {
         val meta = video.meta ?: return null
-        if (lastFile != meta.file || lastScale != scale || lastFPS != videoFPS) {
+        var stream = stream
+        if (lastFile != meta.file || lastScale != scale || lastFPS != videoFPS || stream == null) {
             stream?.destroy()
             // create new stream
             // is ceilDiv correct?? roundDiv instead???
             val maxSize = ceilDiv(max(meta.videoWidth, meta.videoHeight), scale)
-            val stream = VideoStream(
+            stream = VideoStream(
                 meta.file, meta, false,
-                LoopingState.PLAY_LOOP, videoFPS, maxSize
+                LoopingState.PLAY_LOOP, videoFPS, maxSize,
+                STREAM_CAPACITY
             )
             lastScale = scale
             lastFPS = videoFPS
@@ -94,14 +103,26 @@ class VideoStreamManager(val video: Video) : ICacheData {
             this.stream = stream
         }
         timeoutNanos = Time.frameTimeNanos + timeoutMillis * MILLIS_TO_NANOS
-        val stream = stream!!
-        // 6 is the number of extra frames needed for blank-frame removal; use 7 just to be sure
-        val frame = stream.getFrame(frameIndex, 7)
+        val frame = stream.getFrame(frameIndex, NUM_FRAMES_FOR_BLANK_FRAMES)
         return when {
             frame == null -> null
             isFinalRendering && frameIndex != frame.frameIndex -> null
             !frame.isCreated -> null
             else -> frame
+        }
+    }
+
+    fun getFrameStatus(frameIndex: Int): FrameStatus {
+        val stream = stream ?: return FrameStatus.MISSING
+        val frames = stream.sortedFrames
+        val frame = synchronized(frames) {
+            frames.firstOrNull2 { it.frameIndex == frameIndex }
+        }
+        return when {
+            frame == null -> FrameStatus.MISSING
+            frame.isCreated -> FrameStatus.STREAM_READY
+            frame.isDestroyed -> FrameStatus.DESTROYED
+            else -> FrameStatus.STREAMED_AWAITING_WAITING_GPU_UPLOAD
         }
     }
 

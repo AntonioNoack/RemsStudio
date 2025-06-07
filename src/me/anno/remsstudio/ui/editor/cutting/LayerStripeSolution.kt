@@ -22,15 +22,12 @@ import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.video.VideoPreview.getFrameAtLocalTimeForPreview
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.centralTime
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.dtHalfLength
+import me.anno.remsstudio.ui.editor.cutting.FrameStatus.Companion.drawLoadingStatus
 import me.anno.remsstudio.ui.editor.cutting.LayerView.Companion.maxLines
-import me.anno.remsstudio.ui.editor.cutting.Status.Companion.drawLoadingStatus
 import me.anno.utils.Color.black
 import me.anno.utils.Color.mixARGB
 import me.anno.utils.pooling.JomlPools
-import kotlin.math.abs
-import kotlin.math.ceil
-import kotlin.math.floor
-import kotlin.math.roundToInt
+import kotlin.math.*
 
 class LayerStripeSolution(
     val x0: Int, var y0: Int, val x1: Int, var y1: Int,
@@ -322,10 +319,11 @@ class LayerStripeSolution(
 
         val size = frameStatusSize
         if (size <= 0) return
-        drawLoadingStatus(x0, y + h - size, x1, y + h, video.file, 0.0, video.blankFrameThreshold, { x ->
+        val fps = min(video.editorVideoFPS.value.toDouble(), meta.videoFPS)
+        drawLoadingStatus(x0, y + h - size, x1, y + h, fps, meta, video) { x ->
             val timeAtX = getTimeAt(x)
             clampTime(video.getLocalTimeFromRoot(timeAtX, false), video)
-        })
+        }
     }
 
 }
