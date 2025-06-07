@@ -20,6 +20,7 @@ import me.anno.gpu.shader.ShaderLib.uvList
 import me.anno.gpu.shader.builder.Variable
 import me.anno.gpu.shader.builder.VariableMode
 import me.anno.gpu.texture.ITexture2D
+import me.anno.gpu.texture.TextureLib
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.PIf
@@ -335,7 +336,8 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
                 TargetType.Float16x4, base.samples, base.depthBufferType]
             useFrame(target) {
                 renderPurely { // restore what was drawn previously
-                    copyColorAndDepth(base.getTexture0(), base.depthTexture!!, base.depthMask, true)
+                    val depth = base.depthTexture ?: TextureLib.depthTexture
+                    copyColorAndDepth(base.getTexture0(), depth, base.depthMask, true)
                 }
                 for (i in children.indices) {
                     val child = children[i].child

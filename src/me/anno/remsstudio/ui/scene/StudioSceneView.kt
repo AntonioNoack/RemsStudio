@@ -236,7 +236,7 @@ open class StudioSceneView(style: Style) :
     override val canDrawOverBorders: Boolean
         get() = true
 
-    private val tmpScene = Framebuffer("StudioSceneView", 1, 1, TargetType.UInt8x3)
+    private val tmpScene = Framebuffer("StudioSceneView", 1, 1, TargetType.UInt8x4, DepthBufferType.TEXTURE)
 
     override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
 
