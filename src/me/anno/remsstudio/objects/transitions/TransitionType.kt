@@ -17,6 +17,10 @@ class TransitionType(
         entries.add(this)
     }
 
+    override fun toString(): String {
+        return nameDesc.englishName
+    }
+
     @Suppress("unused")
     companion object {
 

@@ -305,8 +305,9 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
                 return
             }
 
-            val before = renderables.filter { it.center < time }
-            val after = renderables.filter { it.center >= time }
+            val transitionTime = transition.center
+            val before = renderables.filter { it.center < transitionTime }
+            val after = renderables.filter { it.center >= transitionTime }
 
             val tex0 = render(parent, before, stack, time, color)
             val tex1 = render(parent, after, stack, time, color)
