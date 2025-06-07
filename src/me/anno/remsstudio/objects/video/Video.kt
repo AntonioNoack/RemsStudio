@@ -115,7 +115,10 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
     val filtering = ValueWithDefaultFunc { DefaultConfig.getFiltering("default.video.filtering", TexFiltering.CUBIC) }
 
     // resolution
-    val videoScale = ValueWithDefaultFunc { DefaultConfig["default.video.scale", 1] }
+    val videoScale = ValueWithDefaultFunc { DefaultConfig["default.video.scale", 0] }
+
+    // use these closest of these, if the current frame isn't available; not applicable to streamManager
+    val lastXFrames = IntArray(10)
 
     var lastFile: FileReference? = null
     var lastMeta: MediaMetadata? = null
@@ -262,6 +265,11 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
 
     fun getVideoFrame(scale: Int, index: Int, fps: Double): GPUFrame? {
         return VideoCache.getVideoFrame(file, scale, index, framesPerContainer, fps, imageTimeout, true)
+    }
+
+    fun getVideoFrameWithoutGenerator(scale: Int, index: Int, fps: Double): GPUFrame? {
+        val bufferLength = framesPerContainer
+        return VideoCache.getVideoFrameWithoutGenerator(file, scale, index, index % bufferLength, bufferLength, fps)
     }
 
     var needsImageUpdate = false

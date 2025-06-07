@@ -22,7 +22,14 @@ import kotlin.math.sign
 class VideoStreamManager(val video: Video) : ICacheData {
 
     companion object {
+
         private var timeoutMillis = 250L
+
+        fun isScrubbing(): Boolean {
+            return !isFinalRendering &&
+                    Input.isControlDown &&
+                    GFX.windows.any2 { it.windowStack.inFocus0 is TimelinePanel }
+        }
     }
 
     fun hasSimpleTime(): Boolean {
@@ -52,11 +59,6 @@ class VideoStreamManager(val video: Video) : ICacheData {
     fun isCacheableVideo(): Boolean {
         val meta = video.meta ?: return false // ?? what do we answer here?
         return meta.videoFrameCount <= framesPerContainer
-    }
-
-    fun isScrubbing(): Boolean {
-        return !isFinalRendering &&
-                Input.isControlDown && GFX.windows.any2 { it.windowStack.inFocus0 is TimelinePanel }
     }
 
     fun canUseVideoStreaming(): Boolean {

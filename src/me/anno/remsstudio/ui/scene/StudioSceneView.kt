@@ -3,16 +3,16 @@ package me.anno.remsstudio.ui.scene
 import me.anno.Time.deltaTime
 import me.anno.config.DefaultConfig
 import me.anno.engine.EngineBase.Companion.dragged
+import me.anno.engine.ui.render.RenderSize
 import me.anno.gpu.Clipping
 import me.anno.gpu.GFX
 import me.anno.gpu.GFXState.renderDefault
+import me.anno.gpu.GFXState.useFrame
 import me.anno.gpu.GPUTasks.addGPUTask
 import me.anno.gpu.drawing.DrawRectangles
 import me.anno.gpu.drawing.DrawRectangles.drawBorder
-import me.anno.gpu.framebuffer.DepthBufferType
-import me.anno.gpu.framebuffer.FBStack
-import me.anno.gpu.framebuffer.Screenshots
-import me.anno.gpu.framebuffer.StableWindowSize
+import me.anno.gpu.drawing.DrawTextures.drawTexture
+import me.anno.gpu.framebuffer.*
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.shader.renderer.Renderer.Companion.colorRenderer
 import me.anno.gpu.shader.renderer.Renderer.Companion.colorSqRenderer
@@ -45,6 +45,7 @@ import me.anno.remsstudio.objects.effects.ToneMappers
 import me.anno.remsstudio.objects.particles.ParticleSystem
 import me.anno.remsstudio.objects.particles.distributions.CenterDistribution
 import me.anno.remsstudio.objects.particles.distributions.CenterSizeDistribution
+import me.anno.remsstudio.objects.video.VideoStreamManager.Companion.isScrubbing
 import me.anno.remsstudio.ui.StudioFileImporter.addChildFromFile
 import me.anno.remsstudio.ui.StudioTreeView.Companion.zoomToObject
 import me.anno.remsstudio.ui.editor.ISceneView
@@ -66,7 +67,6 @@ import org.joml.*
 import java.lang.Math.toDegrees
 import kotlin.math.atan2
 import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.tan
 
 // todo disable ui circles via some check-button at the top bar
@@ -103,6 +103,7 @@ open class StudioSceneView(style: Style) :
     val pad = (iconSize + 4) / 8
 
     val borderThickness = style.getSize("blackWhiteBorderThickness", 2)
+    val renderSize = RenderSize()
 
     override fun onPropertiesChanged() {
     }
@@ -165,8 +166,8 @@ open class StudioSceneView(style: Style) :
             iconSize
         ).setOnClickListener {
             val renderer = colorRenderer
-            val w = stableSize.stableWidth
-            val h = stableSize.stableHeight
+            val w = renderSize.renderWidth
+            val h = renderSize.renderHeight
             Screenshots.takeScreenshot(w, h, renderer) {
                 Scene.draw(camera, RemsStudio.root, 0, 0, w, h, editorTime, false, renderer, this)
             }
@@ -188,14 +189,6 @@ open class StudioSceneView(style: Style) :
         parseKeyInput()
         parseTouchInput()
         claimResources()
-        updateStableSize()
-    }
-
-    fun updateStableSize() {
-        stableSize.updateSize(
-            width - 2 * borderThickness, height - 2 * borderThickness,
-            if (camera.onlyShowTarget) RemsStudio.targetWidth else -1, RemsStudio.targetHeight
-        )
     }
 
     var mode = SceneDragMode.MOVE
@@ -225,18 +218,26 @@ open class StudioSceneView(style: Style) :
         else true
 
     fun claimResources() {
-        // this is expensive, so do it only when the time changed
-        val edt = editorTimeDilation
-        val et = editorTime
-        val loadedTimeSeconds = 3.0
+        var dilation = editorTimeDilation
+        if (dilation == 0.0 && !isScrubbing()) dilation = 1.0
+        val startTime = editorTime
         // load the next 3 seconds of data
-        RemsStudio.root.claimResources(et, et + loadedTimeSeconds * if (edt == 0.0) 1.0 else edt, 1f)
+        val loadedTime = 3.0
+        val numSteps = if (dilation == 0.0) 1 else 10
+        val dt = loadedTime * dilation / numSteps
+        val root = RemsStudio.root
+        for (i in 0 until numSteps) {
+            val t0 = startTime + i * dt
+            val t1 = t0 + dt
+            root.claimResources(t0, t1, 1f)
+        }
     }
 
     override val canDrawOverBorders: Boolean
         get() = true
 
-    private val stableSize = StableWindowSize()
+    private val tmpScene = Framebuffer("StudioSceneView", 1, 1, TargetType.UInt8x3)
+
     override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
 
         val mode = if (camera.toneMapping == ToneMappers.RAW8) colorRenderer else colorSqRenderer
@@ -244,12 +245,7 @@ open class StudioSceneView(style: Style) :
         GFX.check()
 
         val bt = borderThickness
-        val bth = bt / 2
-
-        updateStableSize()
-
-        val dx = stableSize.dx + bt
-        val dy = stableSize.dy + bt
+        val bth = bt shr 1
 
         val white = -1
         val b = DrawRectangles.startBatch()
@@ -258,20 +254,18 @@ open class StudioSceneView(style: Style) :
         // filled with scene background color anyway
         DrawRectangles.finishBatch(b)
 
-        val x00 = x + dx
-        val y00 = y + dy
-        val window = window ?: GFX.someWindow.windowStack.first()
-        val wx = min(stableSize.stableWidth, window.width - x00)
-        val wy = min(stableSize.stableHeight, window.height - y00)
-        val rw = min(wx, width - 2 * bt)
-        val rh = min(wy, height - 2 * bt)
-        if (rw > 0 && rh > 0) {
-            Scene.draw(
-                camera, RemsStudio.root,
-                x00, y00, wx, wy,
-                editorTime, false,
-                mode, this
-            )
+        renderSize.render(width - bt * 2, height - 2 * bt) { rw, rh ->
+            if (rw > 0 && rh > 0) {
+                useFrame(rw, rh, true, tmpScene) {
+                    Scene.draw(
+                        camera, RemsStudio.root,
+                        0, 0, rw, rh,
+                        editorTime, false,
+                        mode, this
+                    )
+                }
+                drawTexture(x + bt, y + bt, width - 2 * bt, height - 2 * bt, tmpScene.getTexture0())
+            }
         }
 
         Clipping.clip2(x0, y0, x1, y1) {
@@ -298,22 +292,17 @@ open class StudioSceneView(style: Style) :
         val diameter = 5
 
         val bt = borderThickness
-        val dx0 = stableSize.dx + bt
-        val dy0 = stableSize.dy + bt
-        val cXInt = clickX.toInt() - (this.x + dx0)
-        val cYInt = clickY.toInt() - (this.y + dy0)
+        val cXInt = clickX.toInt() - (this.x + bt)
+        val cYInt = clickY.toInt() - (this.y + bt)
 
         val root = RemsStudio.root
 
-        val dx = 0
-        val dy = 0
-
         val idBuffer = Screenshots.getU8RGBAPixels(diameter, cXInt, cYInt, buffer, Renderer.idRenderer) {
-            Scene.draw(camera, root, dx, dy, width, height, editorTime, false, Renderer.idRenderer, this)
+            Scene.draw(camera, root, 0, 0, width, height, editorTime, false, Renderer.idRenderer, this)
         }
 
         val depthBuffer = Screenshots.getFP32RPixels(diameter, cXInt, cYInt, buffer, Renderer.depthRenderer) {
-            Scene.draw(camera, root, dx, dy, width, height, editorTime, false, Renderer.depthRenderer, this)
+            Scene.draw(camera, root, 0, 0, width, height, editorTime, false, Renderer.depthRenderer, this)
         }
 
         convertARGB2ABGR(idBuffer)
@@ -759,8 +748,8 @@ open class StudioSceneView(style: Style) :
     }
 
     fun resolveClick(x: Float, y: Float, onClick: (Transform?) -> Unit) {
-        val w = stableSize.stableWidth
-        val h = stableSize.stableHeight
+        val w = renderSize.renderWidth
+        val h = renderSize.renderHeight
         addGPUTask("click", w, h) {
             try {
                 resolveClick(x, y, w, h, onClick)

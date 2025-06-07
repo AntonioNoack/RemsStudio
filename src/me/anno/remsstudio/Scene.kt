@@ -69,6 +69,9 @@ object Scene {
     var nearZ = 0.001f
     var farZ = 1000f
 
+    var nearZWOffset = 0.001f
+    var farZWOffset = 1000f
+
     // use a framebuffer, where we draw sq(color)
     // then we use a shader to draw sqrt(sq(color))
     // this should give correct color mixing <3

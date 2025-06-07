@@ -70,14 +70,13 @@ class ScenePreview(style: Style) : PanelList(null, style.getChild("sceneView")),
     private val mutingColor = style.getColor("welcome.mutingColor", 0x55777777)
     override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
         updatePosition()
-        drawRect(x0, y0, x1 - x0, y1 - y0, black)
         Scene.draw(
             camera, RemsStudio.root,
-            x0, y0, x1 - x0, y1 - y0,
+            0, 0, width, height,
             editorTime, false,
             Renderer.colorRenderer,
             this
         )
-        drawRect(x0, y0, x1 - x0, y1 - y0, mutingColor)
+        drawRect(0, 0, width, height, mutingColor)
     }
 }

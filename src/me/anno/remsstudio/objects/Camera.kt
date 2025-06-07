@@ -14,6 +14,8 @@ import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.pow
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.currentlyDrawnCamera
+import me.anno.remsstudio.Scene.farZWOffset
+import me.anno.remsstudio.Scene.nearZWOffset
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.effects.ToneMappers
 import me.anno.remsstudio.objects.models.CameraModel.drawCamera
@@ -343,6 +345,8 @@ class Camera(parent: Transform? = null) : Transform(parent) {
         val fov = getEffectiveFOV(time, offset)
         val near = getEffectiveNear(time, offset)
         val far = getEffectiveFar(time, offset)
+        nearZWOffset = near
+        farZWOffset = far
         val tmp0 = JomlPools.vec3f.create()
         val tmp1 = JomlPools.vec3f.create()
         val tmp2 = JomlPools.vec3f.create()

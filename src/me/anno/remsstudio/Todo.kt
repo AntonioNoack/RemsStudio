@@ -1,5 +1,10 @@
 package me.anno.remsstudio
 
+// todo alt+R is broken???
+
+// todo bug: sometimes a set time isn't loading frames at all :(,
+//   reproduce it: click somewhere (loading instantly), and then go back 1 frame using comma-key
+
 // todo bug: video files cannot be properly deleted, because files can't be deleted when reading them
 
 // todo tutorials for various effects:

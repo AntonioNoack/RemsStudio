@@ -20,29 +20,28 @@ import me.anno.remsstudio.objects.video.Video.Companion.forceAutoScale
 import me.anno.remsstudio.objects.video.Video.Companion.forceFullScale
 import me.anno.remsstudio.objects.video.Video.Companion.framesPerContainer
 import me.anno.remsstudio.objects.video.Video.Companion.tiling16x9
-import me.anno.remsstudio.objects.video.VideoSize.calculateSize
+import me.anno.remsstudio.objects.video.VideoSize.calculateZoomLevel
 import me.anno.remsstudio.objects.video.VideoSize.getCacheableZoomLevel
 import me.anno.ui.editor.files.FileExplorerEntry.Companion.drawLoadingCircle
 import me.anno.utils.Clipping
 import me.anno.utils.pooling.JomlPools
 import me.anno.video.VideoCache
 import me.anno.video.VideoCache.getVideoFrameWithoutGenerator
-import me.anno.video.ffmpeg.FrameReader.Companion.isFFMPEGOnlyExtension
 import me.anno.video.formats.gpu.BlankFrameDetector
 import me.anno.video.formats.gpu.GPUFrame
 import org.apache.logging.log4j.LogManager
 import org.joml.Matrix4fArrayList
 import org.joml.Vector4f
-import kotlin.math.floor
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
+import kotlin.math.*
 
 object VideoDrawing {
     private val LOGGER = LogManager.getLogger(VideoDrawing::class)
 
+    fun String.isFFMPEGOnlyExtension() = equals("webp", true)// || equals("jp2", true)
+
     @JvmStatic
-    val imageTimeout get() = DefaultConfig["ui.video.frameTimeout", 50L]
+    val imageTimeout: Long
+        get() = DefaultConfig["ui.video.frameTimeout", 50L]
 
     fun Video.drawImage(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val file = file
@@ -163,14 +162,15 @@ object VideoDrawing {
 
         val forceAuto = isFinalRendering && forceAutoScale
         val forceFull = isFinalRendering && forceFullScale
+        val videoScale = videoScale.value
         val zoomLevel = when {
             forceFull -> 1
-            (videoScale.value < 1 || forceAuto) && uvProjection.value.doScale -> {
-                val rawZoomLevel = calculateSize(stack, meta.videoWidth, meta.videoHeight) ?: return
+            (videoScale < 1 || forceAuto) && uvProjection.value.doScale -> {
+                val rawZoomLevel = calculateZoomLevel(stack, meta.videoWidth, meta.videoHeight) ?: return
                 getCacheableZoomLevel(rawZoomLevel)
             }
-            (videoScale.value < 1 || forceAuto) -> 1
-            else -> videoScale.value
+            (videoScale < 1 || forceAuto) -> 1
+            else -> videoScale
         }
 
         this.zoomLevel = zoomLevel
@@ -246,20 +246,25 @@ object VideoDrawing {
 
         val useStreaming = streamManager.canUseVideoStreaming()
         fun getFrame(frameIndex: Int): GPUFrame? {
-            return if (frameIndex in 0 until meta.videoFrameCount) {
-                val frame = if (useStreaming) {
-                    streamManager.getFrame(scale, frameIndex, videoFPS)
-                } else getVideoFrame(scale, frameIndex, videoFPS)
-                if (frame == null) onMissingImageOrFrame(frameIndex)
-                frame
-            } else null
+            if (frameIndex !in 0 until meta.videoFrameCount) return null
+            val frame = if (useStreaming) {
+                streamManager.getFrame(scale, frameIndex, videoFPS)
+            } else getVideoFrame(scale, frameIndex, videoFPS)
+            if (frame == null) onMissingImageOrFrame(frameIndex)
+            return frame
         }
 
         var frame0 = if (usesBlankFrameDetection()) {
             BlankFrameDetector.getFrame(blankFrameThreshold) { delta ->
                 getFrame(frameIndex + delta)
             }
-        } else getFrame(frameIndex)
+        } else if (useStreaming || isFinalRendering) {
+            getFrame(frameIndex).also {
+                insertLastFrame(frameIndex)
+            }
+        } else {
+            findClosestFrame(frameIndex, scale, videoFPS)
+        }
 
         if (frame0 == null || !frame0.isCreated || frame0.isDestroyed) {
             onMissingImageOrFrame(frameIndex)
@@ -270,6 +275,27 @@ object VideoDrawing {
         if (frame0 == null || !frame0.isCreated || frame0.isDestroyed) return null
         return frame0
 
+    }
+
+    private fun Video.findClosestFrame(frameIndex: Int, scale: Int, videoFPS: Double): GPUFrame? {
+        var bestFrame = getVideoFrame(scale, frameIndex, videoFPS)
+        if (bestFrame != null) return bestFrame
+        val lastFrames = lastXFrames
+        for (i in lastFrames.indices) {
+            if (bestFrame == null || abs(lastFrames[i] - frameIndex) < abs(bestFrame.frameIndex - frameIndex)) {
+                bestFrame = getVideoFrameWithoutGenerator(scale, frameIndex, videoFPS)
+            }
+        }
+        return bestFrame
+    }
+
+    private fun Video.insertLastFrame(frameIndex: Int) {
+        val lastFrames = lastXFrames
+        if (frameIndex in lastFrames) return // idk...
+        for (i in 0 until lastFrames.lastIndex) {
+            lastFrames[i] = lastFrames[i + 1]
+        }
+        lastFrames[lastFrames.lastIndex] = frameIndex
     }
 
 

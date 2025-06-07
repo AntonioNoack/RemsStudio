@@ -42,6 +42,8 @@ class LayerStripeSolution(
         private val stripeColorSelected = 0x33ffffff
         private val stripeColorError = 0xffff7777.toInt()
 
+        private val frameStatusSize = DefaultConfig["debug.ui.layerView.showFrameStatus", if (Build.isDebug) 4 else 0]
+
         private val strBuilder = JsonStringWriter(16, InvalidRef)
         private fun toString(saveable: Saveable): String {
             synchronized(strBuilder) {
@@ -317,34 +319,13 @@ class LayerStripeSolution(
                 )
             }
         }
-        val size = DefaultConfig["debug.ui.layerView.showFrameStatus", if (Build.isDebug) 4 else 0]
-        if (size > 0) {
-            drawLoadingStatus(x0, y + h - size, x1, y + h, video.file, 0.0, video.blankFrameThreshold, { x ->
-                val timeAtX = getTimeAt(x)
-                clampTime(video.getLocalTimeFromRoot(timeAtX, false), video)
-            })
-        }
-    }
 
-    @Suppress("unused_parameter")
-    private fun keepFrameLoaded(
-        x0: Int, x1: Int, y: Int, h: Int,
-        c0: Int, c1: Int,
-        frameOffset: Int, frameWidth: Int,
-        video: Video, meta: MediaMetadata,
-        fract0: Float, fract1: Float
-    ) {
-        val f0 = fract0 * (1f + relativeVideoBorder) - relativeVideoBorder * 0.5f
-        val f1 = fract1 * (1f + relativeVideoBorder) - relativeVideoBorder * 0.5f
-        if (f1 > 0f && f0 < 1f) {
-            // get time at frameIndex
-            val centerX = getCenterX(x0, frameOffset, frameWidth)
-            val timeAtX = getTimeAt(centerX)
-            val localTime = clampTime(video.getLocalTimeFromRoot(timeAtX, false), video)
-            // get frame at time
-            val videoWidth = (frameWidth / (1f + relativeVideoBorder)).toInt()
-            video.getFrameAtLocalTimeForPreview(localTime, videoWidth, meta)
-        }
+        val size = frameStatusSize
+        if (size <= 0) return
+        drawLoadingStatus(x0, y + h - size, x1, y + h, video.file, 0.0, video.blankFrameThreshold, { x ->
+            val timeAtX = getTimeAt(x)
+            clampTime(video.getLocalTimeFromRoot(timeAtX, false), video)
+        })
     }
 
 }
