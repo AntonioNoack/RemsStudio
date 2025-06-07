@@ -75,7 +75,7 @@ import kotlin.math.min
 // todo saturation/lightness controls by hue
 
 @Suppress("MemberVisibilityCanBePrivate")
-object RemsStudio : EngineBase(NameDesc("Rem's Studio"), 10401, true), WelcomeUI {
+object RemsStudio : EngineBase(NameDesc("Rem's Studio"), 10402, true), WelcomeUI {
 
     val defaultWindowStack get() = GFX.someWindow.windowStack
     var hideUnusedProperties = false
@@ -320,7 +320,7 @@ object RemsStudio : EngineBase(NameDesc("Rem's Studio"), 10401, true), WelcomeUI
         // todo publish that project, and write an article for it
         // todo publish example projects for all wiki pages?
 
-        Build.isDebug = true
+        Build.isDebug = false
         Build.isShipped = !Build.isDebug
         Build.lock()
 
