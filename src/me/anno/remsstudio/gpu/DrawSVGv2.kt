@@ -16,14 +16,20 @@ object DrawSVGv2 {
         stack: Matrix4fArrayList, buffer: StaticBuffer, texture: Texture2D, color: Vector4f,
         filtering: TexFiltering, clamping: Clamping, tiling: Vector4f?
     ) {
-        val shader = ShaderLibV2.shader3DSVG.value
-        shader.use()
-        shader3DUniforms(shader, stack, texture.width, texture.height, color, filtering, null)
-        texture.bind(0, filtering.convert(), clamping)
-        defineAdvancedGraphicalFeatures(
-            shader, video, time, false,
-            false, true
-        ) // todo check if flipY is correct
-        DrawSVGs.draw(stack, buffer, clamping, tiling, shader)
+        stack.next {
+            // flip Y
+            stack.scale(1f, -1f, 1f)
+            // todo how/where can we support color???
+            // todo support tiling...
+            val shader = ShaderLibV2.shader3DSVG.value
+            shader.use()
+            shader3DUniforms(shader, stack, texture.width, texture.height, tiling, filtering, null)
+            texture.bind(0, filtering.convert(), clamping)
+            defineAdvancedGraphicalFeatures(
+                shader, video, time, false,
+                false /* todo not used / affecting the mesh */, false /* is correct */
+            )
+            DrawSVGs.draw(stack, buffer, clamping, tiling, shader)
+        }
     }
 }
