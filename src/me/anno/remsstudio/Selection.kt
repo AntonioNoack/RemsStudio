@@ -44,12 +44,6 @@ object Selection {
         needsUpdate = true
     }
 
-    fun selectProperty(property: List<Saveable?>) {
-        if (selectedProperties == property) {
-            select(selectedTransforms, emptyList())
-        } else select(selectedTransforms, property)
-    }
-
     fun selectTransform(transform: List<Transform>) {
         select(transform, emptyList())
     }

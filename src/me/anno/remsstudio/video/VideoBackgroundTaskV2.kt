@@ -32,7 +32,7 @@ class VideoBackgroundTaskV2(
     override fun renderScene(time: Double, flipY: Boolean, renderer: Renderer) {
         isCancelled = progressBar.isCancelled
         progressBar.progress = min(time * creator.fps, progressBar.total * 0.999999)
-        // todo optimize this... we don't strictly need to claim any resources
+        // not optimizing this is fine, because we run it many times on regular frame updates
         scene.claimResources(time, time, 1f) // used for clearing Video-streams
         Scene.draw(
             camera, scene, 0, 0, creator.width, creator.height, time,

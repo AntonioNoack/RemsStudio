@@ -27,7 +27,7 @@ object ProjectSettings : Transform() {
         val project = project ?: return TextPanel("Project missing :/", style)
         val name = NameDesc("Language", "For Spellchecking", "")
         val values = Language.entries
-        return EnumInput(name, project.language.naming, values.map { it.naming }, style)
+        return EnumInput(name, project.language.nameDesc, values.map { it.nameDesc }, style)
             .setChangeListener { _, index, _ ->
                 project.language = values[index]; save()
             }

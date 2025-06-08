@@ -484,6 +484,7 @@ object ComponentUIV2 {
             // todo reset listener for text
             // .setResetListener { sampleValues.defaultValue.toString() }
             is Quaternionf -> FloatVectorInputV2(nd, visibilityKey, sampleValues, time, style)
+                .setResetListener { sampleValues.defaultValue }
                 .addChangeListener { x, y, z, w, _ ->
                     RemsStudio.incrementalChange("Set $title to ($x,$y,$z,$w)", title) {
                         for (i in values.indices) {

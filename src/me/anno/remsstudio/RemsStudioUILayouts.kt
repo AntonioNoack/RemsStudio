@@ -109,7 +109,7 @@ object RemsStudioUILayouts {
          * */
         options.addAction(projectTitle, Dict["Change Language", ""]) {
             openMenu(windowStack, NameDesc("Change Project Language"), Language.entries.map {
-                MenuOption(it.naming) {
+                MenuOption(it.nameDesc) {
                     project?.language = it
                     save()
                 }
