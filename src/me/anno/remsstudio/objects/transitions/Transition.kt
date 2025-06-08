@@ -120,65 +120,74 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
             inspected, "Type", "What kind of transition this is", "transition.type",
             null, type, style
         ) { it, _ -> for (x in c) x.type = it }
-
         transform += vi(
             inspected, "Style", "How quickly this animates", "transition.style",
             null, this.style, style
         ) { it, _ -> for (x in c) x.style = it }
 
-        // todo only show where applicable
-        transform += vis(
-            c, "Direction", "Rotation, if supported", "transition.direction",
-            c.map { it.direction }, style
-        )
-
-        // todo only show where applicable
-        transform += vis(
-            c, "Fade Color", "Fading color, if supported", "transition.fadeColor",
-            c.map { it.fadeColor }, style
-        )
-
-        // todo only show where applicable
-        transform += vi(
-            inspected, "Spin Corner", "For spin, which corner to rotate around.",
-            "transition.center",
-            null, spinCorner, style
-        ) { it, _ -> for (x in c) x.spinCorner = it }
-
-        // todo only show where applicable
-        transform += vis(
-            c, "Center", "Point around which transition is rotated or zoomed, if supported.",
-            "transition.center",
-            c.map { it.center }, style
-        )
-
-        // todo only show where applicable
-        transform += vis(
-            c, "Tiling", "Repeats the pattern", "transition.tiling",
-            c.map { it.tiling }, style
-        )
-
-        val lumaFade = ArrayList<Panel>()
-        lumaFade += vi(
-            inspected,
-            "LumaFade: First Texture", "Use first texture for luma-value.",
-            "transition.fadeFirstTex",
-            null, fadeFirstTex, style
-        ) { it, _ -> for (x in c) x.fadeFirstTex = it }
-        lumaFade += vi(
-            inspected,
-            "LumaFade: Black -> White", "Start blending black, blend white last.",
-            "transition.fadeBlackToWhite",
-            null, fadeBlackToWhite, style
-        ) { it, _ -> for (x in c) x.fadeBlackToWhite = it }
-
-        for (panel in lumaFade) transform += panel
-
-        list += SpyPanel(style) {
-            val visible = type == TransitionType.LUMA_FADE
-            for (panel in lumaFade) panel.isVisible = visible
+        fun showIf(panel: Panel, name: String) {
+            transform += panel
+            transform += SpyPanel {
+                val (lib, main) = type.shaderString
+                panel.isVisible = name in lib || name in main
+            }
         }
 
+        showIf(
+            vis(
+                c, "Direction",
+                "Rotation/direction. Use to map effect on x-axis to y-axis, and left->right to right->left and top->bottom to bottom->top",
+                "transition.direction", c.map { it.direction }, style
+            ), "direction"
+        )
+
+        showIf(
+            vis(
+                c, "Fade Color", "Fading color", "transition.fadeColor",
+                c.map { it.fadeColor }, style
+            ), "fadeColor"
+        )
+
+        showIf(
+            vi(
+                inspected, "Spin Corner", "For spin, which corner to rotate around.",
+                "transition.center",
+                null, spinCorner, style
+            ) { it, _ -> for (x in c) x.spinCorner = it }, "spinCorner"
+        )
+
+        showIf(
+            vis(
+                c, "Center", "Point around which transition is rotated or zoomed",
+                "transition.center",
+                c.map { it.center }, style
+            ), "center"
+        )
+
+        showIf(
+            vis(
+                c, "Tiling", "Repeats the pattern", "transition.tiling",
+                c.map { it.tiling }, style
+            ), "tiling"
+        )
+
+        showIf(
+            vi(
+                inspected,
+                "First Texture", "Use first texture for luma-value.",
+                "transition.fadeFirstTex",
+                null, fadeFirstTex, style
+            ) { it, _ -> for (x in c) x.fadeFirstTex = it }, "fadeFirstTex"
+        )
+
+        showIf(
+            vi(
+                inspected,
+                "Black -> White", "Start blending black, blend white last.",
+                "transition.fadeBlackToWhite",
+                null, fadeBlackToWhite, style
+            ) { it, _ -> for (x in c) x.fadeBlackToWhite = it }, "fadeBlackToWhite"
+        )
     }
 
     override val symbol: String
@@ -216,20 +225,25 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
 
     companion object {
 
-        private val transitionShaders = LazyMap { key: TransitionType ->
-            BaseShader(
-                key.nameDesc.englishName, emptyList(), coordsUVVertexShader, uvList,
-                listOf(
+        private val transitionShaders = LazyMap { type: TransitionType ->
 
-                    Variable(GLSLType.V1F, "progress"),
-                    Variable(GLSLType.V2F, "direction"),
+            val (lib, main) = type.shaderString
+            val extraUniforms = listOf(
+                Variable(GLSLType.V1F, "progress"),
+                Variable(GLSLType.V2F, "direction"),
+                Variable(GLSLType.V4F, "tiling"),
+                Variable(GLSLType.V2F, "center"),
+                Variable(GLSLType.V2F, "spinCorner"),
+                Variable(GLSLType.V2F, "aspect"),
+                Variable(GLSLType.V1B, "fadeFirstTex"),
+                Variable(GLSLType.V1B, "fadeBlackToWhite"),
+            ).filter { it.name in lib || it.name in main }
+
+            BaseShader(
+                type.nameDesc.englishName, emptyList(), coordsUVVertexShader, uvList,
+                extraUniforms + listOf(
+
                     Variable(GLSLType.V4F, "fadeColor"),
-                    Variable(GLSLType.V4F, "tiling"),
-                    Variable(GLSLType.V2F, "center"),
-                    Variable(GLSLType.V2F, "spinCorner"),
-                    Variable(GLSLType.V2F, "aspect"),
-                    Variable(GLSLType.V1B, "fadeFirstTex"),
-                    Variable(GLSLType.V1B, "fadeBlackToWhite"),
 
                     Variable(GLSLType.S2D, "tex0"),
                     Variable(GLSLType.S2D, "tex1"),
@@ -276,10 +290,10 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
                         "   return mixColor(fadeColor, texture(s,uv), isInsideF(uv));\n" +
                         "}\n" +
                         brightness +
-                        key.shaderString.first +
+                        lib +
                         "void main(){" +
                         "   vec4 color = vec4(0.0,0.0,0.0,1.0);\n" +
-                        key.shaderString.second + "\n" +
+                        main + "\n" +
                         "   finalColor = color.rgb;\n" +
                         "   finalAlpha = color.a;\n" +
                         "}\n"
@@ -369,7 +383,7 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
             color: Vector4f
         ): IFramebuffer {
             val base = GFXState.currentBuffer
-            val target = FBStack["transition", base.width, base.height, // todo is the target-type ok?
+            val target = FBStack["transition", base.width, base.height,
                 TargetType.Float16x4, base.samples, base.depthBufferType]
             useFrame(target) {
                 renderPurely { // restore what was drawn previously
