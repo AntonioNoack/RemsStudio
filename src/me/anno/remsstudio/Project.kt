@@ -41,11 +41,11 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 @Suppress("MemberVisibilityCanBePrivate")
-class Project(var name: String, val file: FileReference) : Saveable() {
+class Project(var name: String, val folder: FileReference, saveIfMissing: Boolean = false) : Saveable() {
 
-    val configFile = file.getChild("config.json")
+    val configFile = folder.getChild("config.json")
     val uiFile get() = getUILayoutFile("ui")
-    val tabsFile = file.getChild("tabs.json")
+    val tabsFile = folder.getChild("tabs.json")
 
     val config: StringMap
 
@@ -55,14 +55,10 @@ class Project(var name: String, val file: FileReference) : Saveable() {
         defaultConfig["target.width"] = 1920
         defaultConfig["target.height"] = 1080
         defaultConfig["target.fps"] = 30f
-        config = ConfigBasics.loadConfig(configFile, file, defaultConfig, true)
+        config = ConfigBasics.loadConfig(configFile, folder, defaultConfig, saveIfMissing)
     }
 
-    val scenes = file.getChild("Scenes")
-
-    init {
-        scenes.mkdirs()
-    }
+    val scenes = folder.getChild("Scenes")
 
     lateinit var mainUI: Panel
 
@@ -257,7 +253,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
     var targetWidth = config["target.width", 1920]
     var targetHeight = config["target.height", 1080]
     var targetFPS = config["target.fps", 30.0]
-    var targetOutputFile = config["target.output", file.getChild("output.mp4")]
+    var targetOutputFile = config["target.output", folder.getChild("output.mp4")]
     var targetVideoQuality = config["target.quality", 23]
     var targetSamples = config["target.samples", min(8, GFX.maxSamples)]
     var motionBlurSteps = config.getAnimated<Int>("target.motionBlur.steps", MotionBlurType)
@@ -314,7 +310,7 @@ class Project(var name: String, val file: FileReference) : Saveable() {
         }).apply {
             // higher far value to allow other far values to be seen
             farZ.defaultValue = 5000f
-            timeDilation.setDefault(0.0) // the camera has no time, so no motion can be recorded
+            timeDilation.default = 0.0 // the camera has no time, so no motion can be recorded
         }
     }
 

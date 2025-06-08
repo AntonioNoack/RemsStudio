@@ -150,8 +150,8 @@ obj.editor: Editor
 obj.editor.timelineSlot: Timeline Slot
 obj.editor.timelineSlot.desc: < 1 heißt unsichtbar
 obj.effect: Effekt
-obj.effect.chromaticAberration: Chromatic Aberration
-obj.effect.chromaticAberration.desc: Separates the effect for R/G/B channels; only works for video/images.
+obj.effect.chromaticAberration: Chromatische Aberration
+obj.effect.chromaticAberration.desc: Trennt rot/grün/blau auf; funktioniert nur für Videos und Bilder.
 obj.effect.colorSharpness: Schärfe
 obj.effect.colorSharpness.desc: Wie scharf oder weich der Rand vom Kreis ist
 obj.effect.colorStrength: Stärke
@@ -162,10 +162,10 @@ obj.effect.morphSharpness.desc: Wie scharf der Rand vom Linseneffekt ist
 obj.effect.morphStrength: Stärke
 obj.effect.morphStrength.desc: Wieviel Pixel verschoben werden
 obj.effect.morphing: Effect: Morphing
-obj.effect.swirlPower: Swirl Power
-obj.effect.swirlPower.desc: How badly it swirls; 1 ~ wobble, 20 ~ swirls (at 1 Swirl Strength)
-obj.effect.swirlStrength: Swirl Strength
-obj.effect.swirlStrength.desc: How badly/which way around it swirls
+obj.effect.swirlPower: Wirbelligkeit
+obj.effect.swirlPower.desc: Wie sehr es wirbelt; 1 ~ leicht gerührt, 20 ~ wirbel
+obj.effect.swirlStrength: Wirbelstärke
+obj.effect.swirlStrength.desc: Wie stark es wirbelt und wierum (negativ = andersrum)
 obj.effects: Effekte
 obj.effects.baseColor: Coloring: Grundfarbe
 obj.effects.baseColor.desc: Grundfarbe für Farbeffekte: Welche Farbe gewählt wird, wenn kein Farbeffekt in dem Gebiet aktiv ist
@@ -183,18 +183,18 @@ obj.force.global: Globales Kraftfeld
 obj.force.global.desc: Kostante Beschleunigung, z.B. Fallbeschleunigung auf der Erdoberfläche
 obj.force.lorentz: Lorentz Kraftfeld
 obj.force.lorentz.desc: Kreisbewegung nach Bewegungsrichtung und Richtung
-obj.force.lorentz.noisy: Noisy Lorentz Force
+obj.force.lorentz.noisy: Zufälliges Lorentz Kraftfeld
 obj.force.lorentz.noisy.desc: Kreisbewegung per Geschwindigkeit; zufällig je nach Position; z.B. für Windwirbel
 obj.force.tornado: Tornado
 obj.force.tornado.desc: Kreisbewegung um die Mitte
 obj.force.velocityFriction: Reibung
 obj.force.velocityFriction.desc: Umso schneller ein Partikel ist, umso mehr wird es abgebremst
 obj.geometry: Geometrie
-obj.geometry.circle.endDegrees: End Degrees
+obj.geometry.circle.endDegrees: Endwinkel in Grad
 obj.geometry.circle.endDegrees.desc: To cut a piece out of the circle
-obj.geometry.circle.innerRadius: Inner Radius
-obj.geometry.circle.innerRadius.desc: Relative size of hole in the middle
-obj.geometry.circle.startDegrees: Start Degrees
+obj.geometry.circle.innerRadius: Innerer Radius
+obj.geometry.circle.innerRadius.desc: Relative Größe des Loches in der Kreismitte
+obj.geometry.circle.startDegrees: Startwinkel in Grad
 obj.geometry.circle.startDegrees.desc: To cut a piece out of the circle
 obj.info: Info
 obj.info.desc: Dateiinformationen
@@ -248,7 +248,7 @@ obj.maskType.pixelOffset: Per-Pixel Verschiebung
 obj.maskType.pixelating: Quadratisches Verpixeln
 obj.maskType.radialBlur1: Radial Blur (1)
 obj.maskType.radialBlur2: Radial Blur (2)
-obj.maskType.transition: Transition
+obj.maskType.transition: Übergang
 obj.maskType.triPixelating: Dreieck-Verpixeln
 obj.maskType.voronoiPixelating: Voronoi-Verpixeln
 obj.mesh: Mesh
@@ -331,7 +331,7 @@ obj.text.lineSpacing: Zeilenabstand
 obj.text.lineSpacing.desc: Wie weit die Zeilen voneinander entfernt sind
 obj.text.renderingMode: Rendering Modus
 obj.text.renderingMode.desc: Mesh: Sharp, Signed Distance Fields: with outline
-obj.text.smallCaps: Small Caps
+obj.text.smallCaps: Kapitälchen
 obj.text.startCursor: Start Cursor
 obj.text.startCursor.desc: Der erste Buchstabe, der gerendert werden soll
 obj.text.tabSpacing: Tab-Größe
@@ -371,7 +371,7 @@ obj.transform.skew: Scherung
 obj.transform.skew.desc: Wendet eine Transformation an, die wie bei einer Schere ist
 obj.transition: Übergang
 obj.transition.desc: Typ muss ein Übergang sein
-obj.uvs: Texture
+obj.uvs: Textur
 obj.video: Video
 obj.video.blankFrameRemoval: Entferne schwarze Zwischenbilder
 obj.video.blankFrameRemoval.desc: Wenn ein konfigurierbarer Anteil von Pixeln innerhalb eines einzelnen Bildes hin- und zurück wechselt, kann dieses Bild durch den Vor- oder Nachgänger ersetzt werden\nHöher = mehr Bilder werden akzeptiert; 0 = deaktiviert\nMehr als zwei schwarze aufeinanderfolgende Bilder können nicht ordentlich entfernt werden
@@ -397,8 +397,10 @@ obj.vignette.strength: Vignette Stärke
 obj.vignette.strength.desc: Strength of colored border
 obj.visibility: Sichtbarkeit
 obj.visibility.desc: Ob das Objekt beim Rendern und Bearbeiten sichtbar ist
-ui.createNewProject: Erstelle Projekt
-ui.createNewProject.desc: Creates a new project
+ui.createNewProject: Projekt Erstellen
+ui.createNewProject.desc: Legt ein neues Projekt an
+ui.openExistingProject: Project Öffnen
+ui.openExistingProject.desc: Öffne ein Projekt, das bereits existiert
 ui.debug.ramUsage2: JVM/C/VRAM: %1/%3/%2 MB
 ui.fileExplorer.searchTerm.desc: Enter search terms, or paste a path, press enter to go there
 ui.general.search: Suche

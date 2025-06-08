@@ -1,7 +1,6 @@
 package me.anno.remsstudio
 
 // found out: alt+R is broken??? alt+shift+R works :)
-// todo layout bug: weird space on the right in drop-downs with search bar, e.g., Render-menu
 
 // todo bug: video files cannot be properly deleted, because files can't be deleted when reading them
 

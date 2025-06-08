@@ -333,7 +333,7 @@ open class Transform() : Saveable(),
         val ufd = usesFadingDifferently()
         if (ufd || getStartTime().isFinite()) {
             timeGroup += vis(
-                c,"Fade In",
+                c, "Fade In",
                 "Transparency at the start, in seconds",
                 "time.fadeIn",
                 NumberType.FLOAT_PLUS,
@@ -341,7 +341,7 @@ open class Transform() : Saveable(),
                 style
             )
             timeGroup += vis(
-                c,"Fade Out",
+                c, "Fade Out",
                 "Transparency at the end, in seconds",
                 "time.fadeOut",
                 NumberType.FLOAT_PLUS,
@@ -599,8 +599,16 @@ open class Transform() : Saveable(),
             "timeDilation" -> timeDilation.value = AnyToDouble.getDouble(value, 1.0)
             "timeOffset" -> timeOffset.value = AnyToDouble.getDouble(value, 0.0)
             "lockTransform" -> lockTransform = AnyToBool.anyToBool(value)
-            "fadeIn" -> fadeIn.value = AnyToFloat.getFloat(value, fadeIn.default)
-            "fadeOut" -> fadeOut.value = AnyToFloat.getFloat(value, fadeOut.default)
+            "fadeIn" -> {
+                var value = value
+                if (value is AnimatedProperty<*>) value = value[0.0]
+                fadeIn.value = AnyToFloat.getFloat(value, fadeIn.default)
+            }
+            "fadeOut" -> {
+                var value = value
+                if (value is AnimatedProperty<*>) value = value[0.0]
+                fadeOut.value = AnyToFloat.getFloat(value, fadeOut.default)
+            }
             "name" -> this.name = value as? String ?: ""
             "comment" -> comment = value as? String ?: ""
             "tags" -> tags = value as? String ?: ""

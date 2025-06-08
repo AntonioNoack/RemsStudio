@@ -93,7 +93,7 @@ object RemsStudioUILayouts {
             val tmp = Dict.selectLanguage(style) {
                 val project = project
                 if (project != null) {
-                    RemsStudio.openProject(RemsStudio, project.name, project.file)
+                    RemsStudio.openProject(RemsStudio, project.name, project.folder)
                 }
             }
             tmp.window = windowStack.peek()

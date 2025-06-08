@@ -401,6 +401,8 @@ obj.visibility: Visibility
 obj.visibility.desc: Whether the object is visible when rendering and/or when editing
 ui.createNewProject: Create Project
 ui.createNewProject.desc: Creates a new project
+ui.openExistingProject: Open Project
+ui.openExistingProject.desc: Open a project that already exists
 ui.debug.ramUsage2: JVM/C/VRAM: %1/%3/%2 MB
 ui.fileExplorer.searchTerm.desc: Enter search terms, or paste a path, press enter to go there
 ui.general.search: Search

@@ -12,6 +12,7 @@ import me.anno.engine.EngineBase
 import me.anno.engine.Events.addEvent
 import me.anno.engine.GFXSettings
 import me.anno.engine.OfficialExtensions
+import me.anno.engine.projects.ProjectHeader
 import me.anno.extensions.ExtensionLoader
 import me.anno.gpu.GFX
 import me.anno.gpu.OSWindow
@@ -154,12 +155,26 @@ object RemsStudio : EngineBase(NameDesc("Rem's Studio"), 10402, true), WelcomeUI
         return background
     }
 
-    override fun loadProject(name: String, folder: FileReference, callback: Callback<Pair<String, FileReference>>) {
-        val project = Project(name.trim(), folder)
+    override fun loadProject(name: String, folder: FileReference, callback: Callback<ProjectHeader>) {
+        val project = Project(name.trim(), folder, saveIfMissing = true)
+        project.scenes.mkdirs()
         RemsStudio.project = project
         project.open()
         GFX.someWindow.title = "Rem's Studio: ${project.name}"
-        callback.ok(project.name to project.file)
+        callback.ok(ProjectHeader(project.name, project.folder))
+    }
+
+    override fun loadProjectHeader(folder: FileReference, callback: Callback<ProjectHeader>) {
+        try {
+            val loadTest = Project(folder.name, folder, saveIfMissing = false)
+            if (loadTest.configFile.exists) {
+                callback.ok(ProjectHeader(loadTest.name, loadTest.folder))
+            } else {
+                callback.err(null)
+            }
+        } catch (e: Exception) {
+            callback.err(e)
+        }
     }
 
     override fun createProjectUI() {
@@ -186,7 +201,7 @@ object RemsStudio : EngineBase(NameDesc("Rem's Studio"), 10402, true), WelcomeUI
     }
 
     override fun getPersistentStorage(): FileReference {
-        return project?.file ?: super.getPersistentStorage()
+        return project?.folder ?: super.getPersistentStorage()
     }
 
     override fun importFile(file: FileReference) {
