@@ -1,5 +1,5 @@
 void main() {
-    float power = 1.0-abs(progress*2.0-1.0);
+    float power = clamp(1.0-abs(progress*2.0-1.0), 0.0, 1.0);
     float totalLength = abs(dot(textureSize(tex0,0),direction));
     float spread = 0.20 * totalLength * power;
     int maxNumSamples = 64;

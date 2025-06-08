@@ -25,6 +25,7 @@ import me.anno.io.base.BaseWriter
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.PIf
 import me.anno.maths.Maths.TAU
+import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.animation.Keyframe
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.GFXTransform
@@ -34,11 +35,11 @@ import me.anno.ui.Style
 import me.anno.ui.base.SpyPanel
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
+import me.anno.utils.pooling.JomlPools
 import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.structures.lists.Lists.firstOrNull2
 import me.anno.utils.structures.maps.LazyMap
 import me.anno.utils.types.AnyToBool
-import me.anno.utils.types.AnyToFloat
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector4f
@@ -49,10 +50,12 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
     var type: TransitionType = TransitionType.CROSS_FADE
     var style: Interpolation = Interpolation.CIRCLE_SYM
 
-    // todo make these animated
-    var direction = 0f
-    var fadeColor = Vector4f()
-    var center = Vector2f()
+    var spinCorner = SpinCorner.TOP_LEFT
+
+    val direction = AnimatedProperty.float(0f)
+    val fadeColor = AnimatedProperty.color(Vector4f(0f, 0f, 0f, 1f))
+    val center = AnimatedProperty.vec2(Vector2f(0.5f, 0.5f))
+    val tiling = AnimatedProperty.vec4(Vector4f(1f, 1f, 0f, 0f))
 
     var fadeFirstTex = false
     var fadeBlackToWhite = true
@@ -66,27 +69,40 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
         timelineSlot.default = 1
     }
 
-    fun render(tex0: ITexture2D, tex1: ITexture2D, progress: Float) {
+    private fun mapProgress(progress: Float): Float {
+        return if (progress in 0f..1f) style.getIn(progress)
+        else progress
+    }
+
+    fun render(tex0: ITexture2D, tex1: ITexture2D, progress: Float, time: Double) {
 
         // finally blend them, and render their result
         val shader = transitionShaders[type].value
         shader.use()
 
-        shader.v1f("progress", style.getIn(progress))
-        shader.v4f("fadeColor", fadeColor)
+        val tmp4 = JomlPools.vec4f.create()
+        val tmp2 = JomlPools.vec2f.create()
+
+        shader.v1f("progress", mapProgress(progress))
+        shader.v4f("fadeColor", fadeColor[time, tmp4])
 
         // direction also depends on aspect-ratio (like 45°)
-        val direction = -direction * PIf * 0.5f
+        val direction = -direction[time] * PIf * 0.5f
         val tmp = Vector2f(cos(direction), sin(direction))
             .mul(tex0.width.toFloat(), tex0.height.toFloat())
             .normalize()
         shader.v2f("direction", tmp)
         shader.v2f("aspect", tex0.width.toFloat() / tex0.height.toFloat(), 1f)
-        shader.v2f("center", center)
+        shader.v2f("center", center[time, tmp2])
+        shader.v2f("spinCorner", spinCorner.value)
         shader.v1b("fadeFirstTex", fadeFirstTex)
         shader.v1b("fadeBlackToWhite", fadeBlackToWhite)
+        shader.v4f("tiling", tiling[time, tmp4])
         tex0.bindTrulyLinear(shader, "tex0")
         tex1.bindTrulyLinear(shader, "tex1")
+
+        JomlPools.vec4f.sub(1)
+        JomlPools.vec2f.sub(1)
 
         flat01.draw(shader)
     }
@@ -110,23 +126,37 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
             null, this.style, style
         ) { it, _ -> for (x in c) x.style = it }
 
-        transform += vi(
-            inspected, "Direction", "Rotation, if supported", "transition.direction",
-            null, direction, style
-        ) { it, _ -> for (x in c) x.direction = it }
+        // todo only show where applicable
+        transform += vis(
+            c, "Direction", "Rotation, if supported", "transition.direction",
+            c.map { it.direction }, style
+        )
 
-        transform += vi(
-            inspected, "Fade Color", "Fading color, if supported", "transition.fadeColor",
-            null, fadeColor, style
-        ) { it, _ -> for (x in c) x.fadeColor.set(it) }
+        // todo only show where applicable
+        transform += vis(
+            c, "Fade Color", "Fading color, if supported", "transition.fadeColor",
+            c.map { it.fadeColor }, style
+        )
 
+        // todo only show where applicable
         transform += vi(
-            inspected,
-            "Center", "Point around which transition is rotated or zoomed, if supported.\n" +
-                    "Top-left: (0,1), top-right: (1,1), bottom-left: (0,0), bottom-right: (1,0), center: (0.5,0.5)",
+            inspected, "Spin Corner", "For spin, which corner to rotate around.",
             "transition.center",
-            null, center, style
-        ) { it, _ -> for (x in c) x.center.set(it) }
+            null, spinCorner, style
+        ) { it, _ -> for (x in c) x.spinCorner = it }
+
+        // todo only show where applicable
+        transform += vis(
+            c, "Center", "Point around which transition is rotated or zoomed, if supported.",
+            "transition.center",
+            c.map { it.center }, style
+        )
+
+        // todo only show where applicable
+        transform += vis(
+            c, "Tiling", "Repeats the pattern", "transition.tiling",
+            c.map { it.tiling }, style
+        )
 
         val lumaFade = ArrayList<Panel>()
         lumaFade += vi(
@@ -160,9 +190,11 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
         super.save(writer)
         writer.writeInt("type", type.id)
         writer.writeEnum("style", style)
-        writer.writeFloat("direction", direction)
-        writer.writeVector4f("fadeColor", fadeColor)
-        writer.writeVector2f("center", center)
+        writer.writeEnum("spinCorner", spinCorner)
+        writer.writeObject(this, "direction", direction)
+        writer.writeObject(this, "fadeColor", fadeColor)
+        writer.writeObject(this, "center", center)
+        writer.writeObject(this, "tiling", tiling)
         writer.writeBoolean("fadeFirstTex", fadeFirstTex)
         writer.writeBoolean("fadeBlackToWhite", fadeBlackToWhite)
     }
@@ -171,9 +203,11 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
         when (name) {
             "type" -> type = TransitionType.entries.firstOrNull2 { it.id == value } ?: return
             "style" -> style = Interpolation.getType(value as? Int ?: return)
-            "direction" -> direction = AnyToFloat.getFloat(value)
-            "fadeColor" -> fadeColor.set(value as? Vector4f ?: return)
-            "center" -> center.set(value as? Vector2f ?: return)
+            "spinCorner" -> spinCorner = SpinCorner.entries.firstOrNull2 { it.id == value } ?: return
+            "direction" -> direction.copyFrom(value)
+            "fadeColor" -> fadeColor.copyFrom(value)
+            "center" -> center.copyFrom(value)
+            "tiling" -> tiling.copyFrom(value)
             "fadeFirstTex" -> fadeFirstTex = AnyToBool.anyToBool(value)
             "fadeBlackToWhite" -> fadeBlackToWhite = AnyToBool.anyToBool(value)
             else -> super.setProperty(name, value)
@@ -190,7 +224,9 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
                     Variable(GLSLType.V1F, "progress"),
                     Variable(GLSLType.V2F, "direction"),
                     Variable(GLSLType.V4F, "fadeColor"),
+                    Variable(GLSLType.V4F, "tiling"),
                     Variable(GLSLType.V2F, "center"),
+                    Variable(GLSLType.V2F, "spinCorner"),
                     Variable(GLSLType.V2F, "aspect"),
                     Variable(GLSLType.V1B, "fadeFirstTex"),
                     Variable(GLSLType.V1B, "fadeBlackToWhite"),
@@ -319,7 +355,8 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
             copyDepth(texI.depthTexture!!, texI.depthMask)
             renderPurely {
                 GFXState.depthMask.use(false) {
-                    transition.child.render(tex0.getTexture0(), tex1.getTexture0(), progress)
+                    val localTime = transition.child.getLocalTime(time)
+                    transition.child.render(tex0.getTexture0(), tex1.getTexture0(), progress, localTime)
                 }
             }
         }

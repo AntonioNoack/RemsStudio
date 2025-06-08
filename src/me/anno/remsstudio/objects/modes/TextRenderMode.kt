@@ -2,8 +2,8 @@ package me.anno.remsstudio.objects.modes
 
 import me.anno.language.translation.NameDesc
 
-enum class TextRenderMode (val naming: NameDesc, val id: Int){
-    MESH(NameDesc("Mesh"), 0),
-    SDF(NameDesc("Signed Distance Field"), 1),
-    SDF_JOINED(NameDesc("Merged Signed Distance Field"), 2)
+enum class TextRenderMode(val id: Int, val nameDesc: NameDesc) {
+    MESH(0, NameDesc("Mesh")),
+    SDF(1, NameDesc("Signed Distance Field")),
+    SDF_JOINED(2, NameDesc("Merged Signed Distance Field"))
 }

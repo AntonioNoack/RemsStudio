@@ -1,5 +1,5 @@
 void main() {
-    float angle = progress * PI;
+    float angle = clamp(progress, 0.0, 1.0) * PI;
     vec2 uv2 = rotate(uv - 0.5, direction);
     float posX = cos(angle);
     float zFactor = (1.0 - 0.9 * sin(angle) * sign(posX) * uv2.x);

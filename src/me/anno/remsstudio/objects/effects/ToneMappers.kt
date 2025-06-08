@@ -4,7 +4,7 @@ import me.anno.language.translation.NameDesc
 
 @Suppress("unused")
 enum class ToneMappers(val id: Int,
-                       val naming: NameDesc,
+                       val nameDesc: NameDesc,
                        val glslFuncName: String){
     RAW8(4, NameDesc("None, 8 Bit"), ""),
     RAW(0, NameDesc("None, 32 Bit"), ""),

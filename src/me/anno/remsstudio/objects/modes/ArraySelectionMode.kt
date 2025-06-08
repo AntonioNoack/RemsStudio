@@ -3,7 +3,7 @@ package me.anno.remsstudio.objects.modes
 import me.anno.language.translation.NameDesc
 import java.util.*
 
-enum class ArraySelectionMode(val naming: NameDesc){
+enum class ArraySelectionMode(val nameDesc: NameDesc){
     ROUND_ROBIN(NameDesc("Round-Robin")){
         override operator fun get(index: Int, length: Int, random: Random): Int {
             return index % length

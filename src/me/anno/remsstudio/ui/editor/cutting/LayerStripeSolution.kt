@@ -6,6 +6,7 @@ import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
 import me.anno.config.DefaultConfig
 import me.anno.gpu.drawing.DrawGradients.drawRectGradient
 import me.anno.gpu.drawing.DrawRectangles
+import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.drawing.DrawStriped.drawRectStriped
 import me.anno.io.MediaMetadata
 import me.anno.io.files.InvalidRef
@@ -15,6 +16,7 @@ import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.max
 import me.anno.maths.Maths.nonNegativeModulo
 import me.anno.remsstudio.RemsStudio
+import me.anno.remsstudio.Selection
 import me.anno.remsstudio.audio.AudioFXCache2
 import me.anno.remsstudio.audio.AudioFXCache2.SPLITS
 import me.anno.remsstudio.objects.Transform
@@ -24,8 +26,10 @@ import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.centralTime
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.dtHalfLength
 import me.anno.remsstudio.ui.editor.cutting.FrameStatus.Companion.drawLoadingStatus
 import me.anno.remsstudio.ui.editor.cutting.LayerView.Companion.maxLines
+import me.anno.ui.UIColors
 import me.anno.utils.Color.black
 import me.anno.utils.Color.mixARGB
+import me.anno.utils.Color.withAlpha
 import me.anno.utils.pooling.JomlPools
 import kotlin.math.*
 
@@ -94,10 +98,10 @@ class LayerStripeSolution(
         xTimeCorrection: Int, h: Int, y0: Int, h0: Int, timeOffset: Int, toStringCache: HashMap<Transform, String>
     ) {
 
-        val tr = gradient.owner as? Transform
-        val isStriped = selectedTransform === tr || draggedTransform === tr
+        val transform = gradient.owner as? Transform
+        val isStriped = selectedTransform === transform || draggedTransform === transform
 
-        val video = tr as? Video
+        val video = transform as? Video
         val meta = video?.meta
 
         val hasAudio = meta?.hasAudio ?: false
@@ -123,12 +127,18 @@ class LayerStripeSolution(
             drawAudio(video, hasVideo, h, ix0, ix1, toStringCache)
         }
 
-        val hasError = tr?.lastWarning != null
+        val hasError = transform?.lastWarning != null
         if (isStriped || hasError) {
             // check if the video element has an error
             // if so, add red stripes
             val color = if (hasError) stripeColorError else stripeColorSelected
             drawRectStriped(ix0, y0, ix1 - ix0, h0, timeOffset, stripeStride, color)
+        }
+
+        if (transform in Selection.selectedTransforms) {
+            val selectColor = UIColors.greenYellow.withAlpha(90)
+            val h1 = if (hasVideo) h0 else h - 3
+            drawRect(ix0, y0, ix1 - ix0, h1, selectColor)
         }
     }
 

@@ -3,7 +3,7 @@ package me.anno.remsstudio.objects.modes
 import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.language.translation.NameDesc
 
-enum class TransformVisibility(val id: Int, val naming: NameDesc) {
+enum class TransformVisibility(val id: Int, val nameDesc: NameDesc) {
     VISIBLE(0, NameDesc("Visible")),
     EDITOR_ONLY(1, NameDesc("Editor Only")),
     VIDEO_ONLY(2, NameDesc("Video Only")),

@@ -8,7 +8,7 @@ import java.util.*
 /**
  * high-level texture filtering used in Rem's Studio
  * */
-enum class TexFiltering(private val baseIsNearest: Boolean, val id: Int, val naming: NameDesc) {
+enum class TexFiltering(private val baseIsNearest: Boolean, val id: Int, val nameDesc: NameDesc) {
     NEAREST(true, 0, NameDesc("Nearest")),
     LINEAR(false, 1, NameDesc("Linear")),
     CUBIC(false, 2, NameDesc("Cubic"));

@@ -5,7 +5,7 @@ void main(){
     color1.rgb *= color1.rgb;
     color0 = mix(color0,fadeColor,clamp(progress*2.0,0.0,1.0));
     color1 = mix(fadeColor,color1,clamp(progress*2.0-1.0,0.0,1.0));
-    color = mix(color0,color1,progress);
+    color = mix(color0,color1,clamp(progress,0.0,1.0));
     color.rgb = sqrt(max(color.rgb,vec3(0.0)));
     color.a = 1.0; // ok??
 }

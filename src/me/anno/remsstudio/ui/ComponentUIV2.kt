@@ -164,7 +164,7 @@ object ComponentUIV2 {
                 .setTooltip(ttt)
             is BlendMode -> {
                 val values = blendModes.values
-                val valueNames = values.map { it to it.naming }
+                val valueNames = values.map { it to it.nameDesc }
                 EnumInput(
                     nd, true, valueNames.first { it.first == value }.second,
                     valueNames.map { it.second }, style

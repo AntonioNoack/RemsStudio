@@ -1,6 +1,5 @@
 package me.anno.remsstudio.objects.transitions
 
-import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.unmix
 import me.anno.remsstudio.objects.Transform
 import kotlin.math.max
@@ -15,6 +14,6 @@ data class TimeRange<V: Transform>(val child: V, var min: Double, var max: Doubl
     }
 
     fun getProgress(time: Double): Float {
-        return clamp(unmix(min, max, time).toFloat())
+        return unmix(min, max, time).toFloat()
     }
 }
