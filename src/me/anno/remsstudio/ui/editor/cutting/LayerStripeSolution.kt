@@ -14,7 +14,7 @@ import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.io.saveable.Saveable
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.max
-import me.anno.maths.Maths.nonNegativeModulo
+import me.anno.maths.Maths.posMod
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.audio.AudioFXCache2
@@ -149,8 +149,7 @@ class LayerStripeSolution(
 
         val frameWidth = (h * (1f + relativeVideoBorder) * meta.videoWidth / meta.videoHeight).roundToInt()
 
-        var frameOffset = timeOffset % frameWidth
-        if (frameOffset < 0) frameOffset += frameWidth
+        val frameOffset = posMod(timeOffset, frameWidth)
 
         val frameIndex0 = floor((ix0 - frameOffset).toFloat() / frameWidth).toInt()
         val frameIndex1 = floor((ix1 - frameOffset).toFloat() / frameWidth).toInt()
@@ -295,7 +294,7 @@ class LayerStripeSolution(
     }
 
     private fun getCenterX(x0: Int, frameOffset: Int, frameWidth: Int) =
-        x0 - nonNegativeModulo(x0 - frameOffset, frameWidth) + frameWidth / 2
+        x0 - posMod(x0 - frameOffset, frameWidth) + frameWidth / 2
 
     private fun drawVideoImpl(
         x0: Int, x1: Int, y: Int, h: Int,
@@ -315,6 +314,8 @@ class LayerStripeSolution(
             val localTime = clampTime(video.getLocalTimeFromRoot(timeAtX, false), video)
             // get frame at time
             val videoWidth = (frameWidth / (1f + relativeVideoBorder)).toInt()
+            // todo only request this, if we everything else is loaded...
+            //  we shouldn't block the main video for this
             val frame = video.getFrameAtLocalTimeForPreview(localTime, videoWidth, meta)
             if (frame == null || !frame.isCreated) {
                 drawRectGradient(x0, y, x1 - x0, h, c0, c1)
