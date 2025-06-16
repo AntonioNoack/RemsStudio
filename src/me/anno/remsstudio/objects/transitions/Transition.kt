@@ -133,6 +133,14 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
             }
         }
 
+        fun showIf(panel: Panel, vararg names: String) {
+            transform += panel
+            transform += SpyPanel {
+                val (lib, main) = type.shaderString
+                panel.isVisible = names.any { name -> name in lib || name in main }
+            }
+        }
+
         showIf(
             vis(
                 c, "Direction",
@@ -145,7 +153,7 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
             vis(
                 c, "Fade Color", "Fading color", "transition.fadeColor",
                 c.map { it.fadeColor }, style
-            ), "fadeColor"
+            ), "fadeColor", "getInRect"
         )
 
         showIf(
