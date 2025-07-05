@@ -86,14 +86,14 @@ object VideoResourceClaiming {
 
                 if (index1 >= index0) {
                     for (i in index0..index1) {
-                        TextureCache[meta.getImage(i), imageTimeout, true]
+                        TextureCache[meta.getImage(i), imageTimeout]
                     }
                 } else {
                     for (i in index1 until meta.matches.size) {
-                        TextureCache[meta.getImage(i), imageTimeout, true]
+                        TextureCache[meta.getImage(i), imageTimeout]
                     }
                     for (i in 0 until index0) {
-                        TextureCache[meta.getImage(i), imageTimeout, true]
+                        TextureCache[meta.getImage(i), imageTimeout]
                     }
                 }
             }

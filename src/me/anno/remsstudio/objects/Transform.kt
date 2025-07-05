@@ -691,7 +691,8 @@ open class Transform() : Saveable(),
 
     override fun isDefaultValue() = false
 
-    fun clone() = clone(InvalidRef)
+    override fun clone() = clone(InvalidRef)
+
     open fun clone(workspace: FileReference): Transform {
         val asString = try {
             JsonStringWriter.toText(this, workspace)

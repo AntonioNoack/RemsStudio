@@ -21,7 +21,7 @@ import java.util.*
 import kotlin.math.atan2
 
 @Suppress("MemberVisibilityCanBePrivate")
-class ScenePreview(style: Style) : PanelList(null, style.getChild("sceneView")), ISceneView {
+class ScenePreview(style: Style) : PanelList(style.getChild("sceneView")), ISceneView {
 
     init {
         weight = 1f

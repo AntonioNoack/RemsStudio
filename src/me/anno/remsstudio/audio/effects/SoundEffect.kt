@@ -29,8 +29,6 @@ abstract class SoundEffect(val inputDomain: Domain, val outputDomain: Domain) : 
     abstract val displayName: String
     abstract val description: String
 
-    open fun clone() = JsonStringReader.read(toString(), workspace, true).first() as SoundEffect
-
     override val approxSize get() = 10
     override fun isDefaultValue() = false
 

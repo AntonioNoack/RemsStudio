@@ -1,7 +1,7 @@
 package me.anno.remsstudio.ui.editor.cutting
 
 import me.anno.Time.gameTime
-import me.anno.cache.CacheData
+import me.anno.cache.CacheSection
 import me.anno.engine.EngineBase.Companion.dragged
 import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.gpu.drawing.DrawRectangles.drawRect
@@ -35,12 +35,24 @@ import me.anno.ui.dragging.Draggable
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.Color.white4
 import me.anno.utils.hpc.ProcessingQueue
-import me.anno.video.VideoCache
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
 @Suppress("MemberVisibilityCanBePrivate")
 class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
+
+    companion object {
+        val minAlphaInt = 1
+        val minAlpha = minAlphaInt / 255f
+        val minDistSq = sq(3f / 255f)
+        val maxLines = 5
+        val defaultLayerCount = 8
+        val taskQueue = ProcessingQueue("LayerView::calculateSolution")
+
+        private data class VideoPreviewKey(val video: Video, val height1: Int, val file: FileReference)
+
+        private val vppCache = CacheSection<VideoPreviewKey, VideoPreviewPanel>("VideoPreviews")
+    }
 
     // todo display name?
 
@@ -52,12 +64,11 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
     override fun getTooltipPanel(x: Float, y: Float): Panel? {
         val video = getTransformAt(x, y) as? Video
         return if (video != null) {
-            val data = VideoCache.getEntry(Triple(video, height1, video.file), 1000, false) {
-                CacheData(VideoPreviewPanel(video, height1 * 2, style) {
-                    video.getLocalTimeFromRoot(getTimeAt(it), false)
-                })
-            } as CacheData<*>
-            data.value as VideoPreviewPanel
+            vppCache.getEntry(VideoPreviewKey(video, height1, video.file), 1000) { key, result ->
+                result.value = VideoPreviewPanel(key.video, key.height1 * 2, style) {
+                    key.video.getLocalTimeFromRoot(getTimeAt(it), false)
+                }
+            }.value
         } else null
     }
 
@@ -73,15 +84,6 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
 
     var hoveredTransform: Transform? = null
     var hoveredKeyframes: List<Keyframe<*>>? = null
-
-    companion object {
-        val minAlphaInt = 1
-        val minAlpha = minAlphaInt / 255f
-        val minDistSq = sq(3f / 255f)
-        val maxLines = 5
-        val defaultLayerCount = 8
-        val taskQueue = ProcessingQueue("LayerView::calculateSolution")
-    }
 
     var needsUpdate = false
 

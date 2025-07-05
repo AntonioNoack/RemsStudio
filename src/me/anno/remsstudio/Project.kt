@@ -103,6 +103,7 @@ class Project(var name: String, val folder: FileReference, saveIfMissing: Boolea
             if (tabsFile.exists) {
                 val loadedUIData = JsonStringReader
                     .read(tabsFile, workspace, true)
+                    .waitFor() ?: emptyList()
                 val sceneTabs = loadedUIData
                     .filterIsInstance2(SceneTabData::class)
                 if (sceneTabs.isEmpty()) {

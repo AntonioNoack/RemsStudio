@@ -120,18 +120,6 @@ class SoundPipeline() : Saveable(), Inspectable {
     override val approxSize get() = 100
     override fun isDefaultValue() = effects.isEmpty()
 
-    fun clone(): SoundPipeline {
-        val copy = SoundPipeline(audio)
-        copy.effects.addAll(
-            effects.map {
-                it.clone().apply {
-                    audio = this@SoundPipeline.audio
-                }
-            }
-        )
-        return copy
-    }
-
     companion object {
 
         init {

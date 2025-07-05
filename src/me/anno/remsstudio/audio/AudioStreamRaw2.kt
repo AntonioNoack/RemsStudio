@@ -10,7 +10,6 @@ import me.anno.audio.openal.SoundBuffer
 import me.anno.audio.streams.AudioStreamRaw.Companion.averageSamples
 import me.anno.audio.streams.AudioStreamRaw.Companion.ffmpegSliceSampleDuration
 import me.anno.audio.streams.StereoShortStream
-import me.anno.cache.AsyncCacheData
 import me.anno.cache.CacheSection
 import me.anno.io.MediaMetadata
 import me.anno.io.files.FileReference
@@ -18,7 +17,6 @@ import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.mix
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.video.Video
-import me.anno.utils.Sleep.waitUntil
 import me.anno.utils.pooling.JomlPools
 import me.anno.utils.structures.tuples.ShortPair
 import me.anno.video.ffmpeg.FFMPEGStream.Companion.getAudioSequence
@@ -42,7 +40,7 @@ class AudioStreamRaw2(
     // should be as short as possible for fast calculation
     // should be at least as long as the ffmpeg response time (0.3s for the start of a FHD video)
     companion object {
-        val AudioCache2 = CacheSection("Audio2")
+        val AudioCache2 = CacheSection<AudioSliceKey, SoundBuffer>("Audio2")
         val minPerceptibleAmplitude = 1f / 32500f
     }
 
@@ -94,12 +92,9 @@ class AudioStreamRaw2(
             val key = AudioSliceKey(file, sliceIndex)
             val timeout = (ffmpegSliceSampleDuration * 2 * 1000).toLong()
             val sliceTime = sliceIndex * ffmpegSliceSampleDuration
-            val soundBuffer = AudioCache2.getEntry(key, timeout, false) {
-                val sequence = getAudioSequence(file, sliceTime, ffmpegSliceSampleDuration, ffmpegSampleRate)
-                waitUntil(true) { sequence.hasValue }
-                sequence
-            } as AsyncCacheData<*>
-            val sv = soundBuffer.value as SoundBuffer
+            val sv = AudioCache2.getEntry(key, timeout) { key, result ->
+                getAudioSequence(file, sliceTime, ffmpegSliceSampleDuration, ffmpegSampleRate, result)
+            }.waitFor()!!
             lastSoundBuffer = sv
             lastSliceIndex = sliceIndex
             lastChannels = if (sv.isStereo) 2 else 1

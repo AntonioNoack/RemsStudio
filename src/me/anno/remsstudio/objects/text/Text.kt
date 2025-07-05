@@ -1,11 +1,10 @@
 package me.anno.remsstudio.objects.text
 
-import me.anno.cache.CacheData
+import me.anno.cache.CacheSection
 import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
 import me.anno.fonts.Font
 import me.anno.fonts.FontManager
-import me.anno.fonts.FontManager.TextCache
 import me.anno.fonts.PartResult
 import me.anno.fonts.mesh.TextMesh.Companion.DEFAULT_LINE_HEIGHT
 import me.anno.fonts.mesh.TextMeshGroup
@@ -22,7 +21,6 @@ import me.anno.remsstudio.objects.modes.TextRenderMode
 import me.anno.ui.Style
 import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.groups.PanelListY
-import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.NumberType
 import me.anno.utils.types.Strings.smallCaps
@@ -48,6 +46,10 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
         val lineBreakType = NumberType.FLOAT_PLUS.withDefaultValue(0f)
 
         val textMeshTimeout = 5000L
+
+        private val textSegmentCache = CacheSection<TextSegmentKey, TextMeshGroup>("TextSegmentCache")
+        private val textSDFCache = CacheSection<TextSegmentKey, TextSDFGroup>("TextSDFCache")
+        val textVisCache = CacheSection<VisState, Pair<PartResult, List<TextSegmentKey>>>("TextVisCache")
 
     }
 
@@ -106,8 +108,8 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
     val charSpacing get() = font.size * relativeCharSpacing
     var forceVariableBuffer = false
 
-    fun createKeys(lineSegmentsWithStyle: PartResult?) =
-        lineSegmentsWithStyle?.parts?.map {
+    fun createKeys(lineSegmentsWithStyle: PartResult) =
+        lineSegmentsWithStyle.parts.map {
             TextSegmentKey(
                 it.font,
                 font.isBold,
@@ -117,47 +119,38 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
             )
         }
 
-    open fun splitSegments(text: String): PartResult? {
-        if (text.isEmpty()) return null
+    open fun splitSegments(text: String): PartResult {
+        if (text.isEmpty()) return PartResult(emptyList(), 0f, font.size, 1)
         val awtFont = FontManager.getFont(font) as AWTFont
         val absoluteLineBreakWidth = lineBreakWidth * font.size * 2f / DEFAULT_LINE_HEIGHT
         val text2 = if (smallCaps) text.smallCaps() else text
         return awtFont.splitParts(text2, font.size, relativeTabSize, relativeCharSpacing, absoluteLineBreakWidth, -1f)
     }
 
-    data class VisState(
-        val rm: TextRenderMode,
-        val rsdf: Boolean,
-        val cs: Float,
-        val text: String,
-        val font: Font,
-        val sc: Boolean,
-        val lbw: Float,
-        val rts: Float
-    )
-
-    fun getVisualState(text: String): Any = VisState(
+    fun getVisualState(text: String) = VisState(
         renderingMode, roundSDFCorners, charSpacing,
         text, font, smallCaps, lineBreakWidth, relativeTabSize
     )
 
     private val shallLoadAsync get() = !forceVariableBuffer
     fun getTextMesh(key: TextSegmentKey): TextMeshGroup? {
-        return TextCache.getEntry(key, textMeshTimeout, shallLoadAsync) { keyInstance ->
-            TextMeshGroup(
+        return textSegmentCache.getEntry(key, textMeshTimeout) { keyInstance, result ->
+            result.value = TextMeshGroup(
                 (keyInstance.font as AWTFont).font,
                 keyInstance.text,
                 keyInstance.charSpacing,
                 forceVariableBuffer
             )
-        }
+        }.waitFor(shallLoadAsync)
     }
 
     fun getSDFTexture(key: TextSegmentKey): TextSDFGroup? {
-        val entry = TextCache.getEntry(key to 1, textMeshTimeout, false) { (keyInstance, _) ->
-            TextSDFGroup((keyInstance.font as AWTFont).font, keyInstance.text, keyInstance.charSpacing.toDouble())
-        } ?: return null
-        return entry
+        return textSDFCache.getEntry(key, textMeshTimeout) { keyInstance, result ->
+            result.value = TextSDFGroup(
+                (keyInstance.font as AWTFont).font, keyInstance.text,
+                keyInstance.charSpacing.toDouble()
+            )
+        }.value
     }
 
     fun getDrawDX(width: Float, time: Double): Float {
@@ -178,13 +171,11 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
     }
 
     fun getSegments(text: String): Pair<PartResult, List<TextSegmentKey>> {
-        val data = TextCache.getEntry(getVisualState(text), 1000L, false) {
+        return textVisCache.getEntry(getVisualState(text), 1000L) { key, result ->
             val segments = splitSegments(text)
             val keys = createKeys(segments)
-            CacheData(segments to keys)
-        } as CacheData<*>
-        @Suppress("UNCHECKED_CAST")
-        return data.value as Pair<PartResult, List<TextSegmentKey>>
+            result.value = segments to keys
+        }.waitFor()!!
     }
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {

@@ -53,7 +53,7 @@ object VideoDrawing {
         val projection = uvProjection.value
         when {
             ext == "svg" -> {
-                val bufferData = SVGMeshCache[file, imageTimeout, true]
+                val bufferData = SVGMeshCache[file, imageTimeout].value
                 if (bufferData == null) onMissingImageOrFrame(0)
                 else {
                     DrawSVGv2.draw3DSVG(
@@ -65,7 +65,7 @@ object VideoDrawing {
             }
             ext.isFFMPEGOnlyExtension() -> {
                 // calculate required scale? no, without animation, we don't need to scale it down ;)
-                val texture = VideoCache.getVideoFrame(file, 1, 0, 1, 1.0, imageTimeout, true)
+                val texture = VideoCache.getVideoFrame(file, 1, 0, 1, 1.0, imageTimeout).value
                 if (texture == null || !texture.isCreated) onMissingImageOrFrame(0)
                 else {
                     lastW = texture.width
@@ -77,7 +77,7 @@ object VideoDrawing {
                 }
             }
             else -> {// some image
-                val texture = TextureCache[file, imageTimeout, true]
+                val texture = TextureCache[file, imageTimeout].value
                 if (texture == null || !texture.isCreated()) onMissingImageOrFrame(0)
                 else {
                     (texture as? Texture2D)?.rotation?.apply(stack)
@@ -115,7 +115,7 @@ object VideoDrawing {
                 val localTime = isLooping[time, duration]
 
 
-                val frame = TextureCache[meta.getImage(localTime), 5L, true]
+                val frame = TextureCache[meta.getImage(localTime), 5L].value
                 if (frame == null || !frame.isCreated()) onMissingImageOrFrame((localTime * 1000).toInt())
                 else {
                     lastW = frame.width

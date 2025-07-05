@@ -99,6 +99,7 @@ object RemsCLI {
 
         val scene = try {
             JsonStringReader.readFirstOrNull(sceneSourceFile, project0, Transform::class)
+                .waitFor()
                 ?: return error("Could not find scene")
         } catch (e: RuntimeException) {
             e.printStackTrace()

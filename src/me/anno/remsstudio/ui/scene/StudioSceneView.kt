@@ -79,7 +79,7 @@ import kotlin.math.tan
 
 @Suppress("MemberVisibilityCanBePrivate")
 open class StudioSceneView(style: Style) :
-    PanelList(null, style.getChild("sceneView")), ISceneView {
+    PanelList(style.getChild("sceneView")), ISceneView {
 
     companion object {
         private val LOGGER = LogManager.getLogger(StudioSceneView::class)

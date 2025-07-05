@@ -127,10 +127,7 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
     var imageSequenceMeta: ImageSequenceMeta? = null
     val imSeqExampleMeta: MediaMetadata?
         get() = imageSequenceMeta?.matches?.firstOrNull()?.first?.run {
-            getMeta(
-                this,
-                true
-            )
+            getMeta(this).value
         }
 
     var type = VideoType.UNKNOWN
@@ -153,8 +150,8 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
 
     var is3D = false
 
-    val meta get() = getMeta(file, async = !isFinalRendering)
-    val forcedMeta get() = getMeta(file, false)
+    val meta get() = getMeta(file).waitFor(!isFinalRendering)
+    val forcedMeta get() = getMeta(file).waitFor()
 
     var needsUpdate = true
     var audioStream: AudioFileStreamOpenAL2? = null
@@ -254,17 +251,17 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
         val ext = file.extension
         return when {
             ext.equals("svg", true) ->
-                SVGMeshCache[file, imageTimeout, true]
+                SVGMeshCache[file, imageTimeout]
             ext.equals("webp", true) || ext.equals("dds", true) ->
                 // calculate required scale? no, without animation, we don't need to scale it down ;)
-                VideoCache.getVideoFrame(file, 1, 0, 1, 1.0, imageTimeout, true)
+                VideoCache.getVideoFrame(file, 1, 0, 1, 1.0, imageTimeout)
             else -> // some image
-                TextureCache[file, imageTimeout, true]
-        }
+                TextureCache[file, imageTimeout]
+        }.value
     }
 
     fun getVideoFrame(scale: Int, index: Int, fps: Double): GPUFrame? {
-        return VideoCache.getVideoFrame(file, scale, index, framesPerContainer, fps, imageTimeout, true)
+        return VideoCache.getVideoFrame(file, scale, index, framesPerContainer, fps, imageTimeout).value
     }
 
     fun getVideoFrameWithoutGenerator(scale: Int, index: Int, fps: Double): GPUFrame? {

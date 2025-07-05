@@ -54,7 +54,7 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val inset = clamp(starNess[time], 0f, 1f)
-        val image = TextureCache[texture, 5000, true]
+        val image = TextureCache[texture, 5000].value
         if (image == null && texture != InvalidRef && isFinalRendering) {
             onMissingResource("Missing texture", texture)
             return
@@ -158,7 +158,7 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
             { max(Casting.castToInt2(it), minEdges) }, Casting::castToInt
         )
 
-        val PolygonCache = CacheSection("PolygonCache")
+        private val polygonCache = CacheSection<Int, Mesh>("PolygonCache")
 
         val meshTimeout = 1000L
         private const val minEdges = 3
@@ -167,10 +167,10 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
         fun getBuffer(n: Int, hasDepth: Boolean): Mesh {
             if (n < minEdges) return getBuffer(minEdges, hasDepth)
             if (n > maxEdges) return getBuffer(maxEdges, hasDepth)
-            return PolygonCache.getEntry(
+            return polygonCache.getEntry(
                 n * 2 + (if (hasDepth) 1 else 0),
-                meshTimeout, false
-            ) { createBuffer(n, hasDepth) } as Mesh
+                meshTimeout
+            ) { key, result -> result.value = createBuffer(n, hasDepth) }.waitFor()!!
         }
 
         private fun createBuffer(n: Int, hasDepth: Boolean): Mesh {

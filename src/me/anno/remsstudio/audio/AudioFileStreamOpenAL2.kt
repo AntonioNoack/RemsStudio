@@ -9,8 +9,8 @@ import me.anno.audio.openal.SoundBuffer
 import me.anno.audio.openal.SoundSource
 import me.anno.io.MediaMetadata
 import me.anno.io.files.FileReference
-import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Camera
+import me.anno.remsstudio.objects.video.Video
 import org.apache.logging.log4j.LogManager
 import org.lwjgl.openal.AL10.*
 import java.nio.ByteBuffer
@@ -43,7 +43,7 @@ class AudioFileStreamOpenAL2(
     constructor(audio: Video, speed: Double, globalTime: Double, listener: Camera) :
             this(
                 audio.file, audio.isLooping.value, globalTime,
-                MediaMetadata.getMeta(audio.file, false)!!,
+                MediaMetadata.getMeta(audio.file).waitFor()!!,
                 audio, listener, speed
             )
 
@@ -132,7 +132,7 @@ class AudioFileStreamOpenAL2(
 
     var hadFirstBuffer = false
 
-    override fun onBufferFilled(stereoBuffer: ShortBuffer, sb0: ByteBuffer, bufferIndex: Long, session: Int): Boolean {
+    override fun onBufferFilled(stereoBuffer: ShortBuffer, byteBuffer: ByteBuffer, bufferIndex: Long, session: Int): Boolean {
 
         if (!isPlaying) return true
 
@@ -177,7 +177,7 @@ class AudioFileStreamOpenAL2(
                 ALBase.check()
                 val soundBuffer = SoundBuffer()
                 ALBase.check()
-                soundBuffer.loadRaw16(stereoBuffer, sb0, playbackSampleRate, AL_FORMAT_STEREO16)
+                soundBuffer.loadRaw16(stereoBuffer, byteBuffer, playbackSampleRate, AL_FORMAT_STEREO16)
                 soundBuffer.ensureData()
                 buffers.add(soundBuffer)
 

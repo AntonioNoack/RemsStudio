@@ -190,7 +190,7 @@ object DownloadUI {
         val thumbnailHeight = 240
         val thumbnailPanel = object : ImagePanel(style) {
             override val className: String get() = "ThumbnailPanel"
-            override fun getTexture() = TextureCache[thumbnailSource, true]
+            override fun getTexture() = TextureCache[thumbnailSource].value
             override fun getTooltipText(x: Float, y: Float) = thumbnailSource.toString()
             override fun onCopyRequested(x: Float, y: Float) = thumbnailSource
             override fun calculateSize(w: Int, h: Int) {

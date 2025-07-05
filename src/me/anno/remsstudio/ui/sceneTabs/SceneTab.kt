@@ -39,10 +39,10 @@ class SceneTab(var file: FileReference, var scene: Transform, history: History?)
 
     var history = history ?: try {
         // todo find project for file
-        JsonStringReader.readFirstOrNull(file, workspace, History::class)!!
-    } catch (e: java.lang.Exception) {
-        History()
-    }
+        JsonStringReader.readFirstOrNull(file, workspace, History::class).waitFor()
+    } catch (_: Exception) {
+        null
+    } ?: History()
 
     private val longName get() = file.nullIfUndefined()?.name ?: scene.name
     private val shortName
@@ -75,12 +75,14 @@ class SceneTab(var file: FileReference, var scene: Transform, history: History?)
         addLeftClickListener { open(this) }
         addRightClickListener {
             if (hasChanged) {
-                openMenu(windowStack, listOf(
+                openMenu(
+                    windowStack, listOf(
                     MenuOption(NameDesc("Close", "", "ui.sceneTab.closeSaved")) { save { close() } },
                     MenuOption(NameDesc("Close (Unsaved)", "", "ui.sceneTab.closeUnsaved")) { close() }
                 ))
             } else {
-                openMenu(windowStack, listOf(
+                openMenu(
+                    windowStack, listOf(
                     MenuOption(NameDesc("Close", "", "ui.sceneTab.close")) { close() }
                 ))
             }
@@ -124,7 +126,7 @@ class SceneTab(var file: FileReference, var scene: Transform, history: History?)
             name = name.toAllowedFilename() ?: ""
             if (name.isEmpty()) {
                 val project = project ?: throw IllegalStateException("Missing project")
-                val dst = project.scenes.getChild( name)
+                val dst = project.scenes.getChild(name)
                 if (dst.exists) {
                     ask(
                         windowStack,

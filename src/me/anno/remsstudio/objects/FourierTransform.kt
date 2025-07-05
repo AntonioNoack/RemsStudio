@@ -45,8 +45,8 @@ import kotlin.math.sqrt
 @Suppress("MemberVisibilityCanBePrivate")
 class FourierTransform : Transform() {
 
-    val meta get() = MediaMetadata.getMeta(file, true)
-    val forcedMeta get() = MediaMetadata.getMeta(file, false)
+    val meta get() = MediaMetadata.getMeta(file).value
+    val forcedMeta get() = MediaMetadata.getMeta(file).waitFor()
 
     // effect properties; default is logarithmic x scale
     val rotLin = AnimatedProperty.rotYXZ()

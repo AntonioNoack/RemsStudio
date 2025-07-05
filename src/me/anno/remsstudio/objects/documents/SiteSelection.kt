@@ -1,15 +1,14 @@
 package me.anno.remsstudio.objects.documents
 
-import me.anno.cache.CacheData
 import me.anno.cache.CacheSection
 import me.anno.utils.types.Strings.isBlank2
 
-object SiteSelection : CacheSection("SiteSelection") {
+object SiteSelection : CacheSection<String, List<IntRange>>("SiteSelection") {
     fun parseSites(sites: String): List<IntRange> {
         if (sites.isBlank2()) return listOf(0 until maxSite)
-        val cacheData = getEntry(sites, timeout, false) {
+        return getEntry(sites, timeout) { sites, result ->
             val delta = -1
-            val list = sites
+            result.value = sites
                 .replace('+', ',')
                 .replace(';', ',')
                 .split(',')
@@ -26,10 +25,7 @@ object SiteSelection : CacheSection("SiteSelection") {
                     }
                 }
                 .filter { !it.isEmpty() }
-            CacheData(list)
-        } as CacheData<*>
-        @Suppress("UNCHECKED_CAST")
-        return cacheData.value as List<IntRange>
+        }.waitFor() ?: emptyList()
     }
 
     private const val timeout = 1000L

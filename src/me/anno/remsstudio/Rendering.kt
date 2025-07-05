@@ -226,7 +226,7 @@ object Rendering {
 
     fun overrideAudio(videoSrc: FileReference, callback: () -> Unit) {
 
-        val meta = getMeta(videoSrc, false)!!
+        val meta = getMeta(videoSrc).waitFor()!!
 
         isRendering = true
         LOGGER.info("Rendering audio onto video")

@@ -1,10 +1,7 @@
 package me.anno.remsstudio.objects.particles
 
-import me.anno.cache.CacheData
 import me.anno.engine.inspector.Inspectable
 import me.anno.fonts.FontManager
-import me.anno.fonts.FontManager.TextCache
-import me.anno.fonts.PartResult
 import me.anno.fonts.mesh.TextMesh
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.InvalidRef
@@ -12,7 +9,7 @@ import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.jvm.fonts.AWTFont
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.objects.text.Text
-import me.anno.remsstudio.objects.text.TextSegmentKey
+import me.anno.remsstudio.objects.text.Text.Companion.textVisCache
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -55,71 +52,67 @@ class TextParticles : ParticleSystem() {
         var px = 0f
         var py = 0f
 
-        text.apply {
+        val visualState = text.getVisualState(text2)
+        val data = textVisCache.getEntry(visualState, 1000L) { key, result ->
+            val segments = text.splitSegments(text2)
+            val keys = text.createKeys(segments)
+            result.value = segments to keys
+        }.waitFor()
+        val dataValue = data!!
 
-            val visualState = getVisualState(text2)
-            val data = TextCache.getEntry(visualState, 1000L, false) {
-                val segments = splitSegments(text2)
-                val keys = createKeys(segments)
-                CacheData(segments to keys)
-            } as CacheData<*>
-            val dataValue = data.value as Pair<*, *>
+        val keys = dataValue.second
+        val lineSegmentsWithStyle = dataValue.first
 
-            @Suppress("UNCHECKED_CAST")
-            val keys = dataValue.second as List<TextSegmentKey>
-            val lineSegmentsWithStyle = dataValue.first as PartResult
+        val font2 = FontManager.getFont(text.font) as AWTFont
+        val exampleLayout = font2.exampleLayout
+        val scaleX = TextMesh.DEFAULT_LINE_HEIGHT / (exampleLayout.ascent + exampleLayout.descent)
+        val scaleY = 1f / (exampleLayout.ascent + exampleLayout.descent)
+        val width = lineSegmentsWithStyle.width * scaleX
+        val height = lineSegmentsWithStyle.height * scaleY
 
-            val font2 = FontManager.getFont(font) as AWTFont
-            val exampleLayout = font2.exampleLayout
-            val scaleX = TextMesh.DEFAULT_LINE_HEIGHT / (exampleLayout.ascent + exampleLayout.descent)
-            val scaleY = 1f / (exampleLayout.ascent + exampleLayout.descent)
-            val width = lineSegmentsWithStyle.width * scaleX
-            val height = lineSegmentsWithStyle.height * scaleY
+        val lineOffset = -TextMesh.DEFAULT_LINE_HEIGHT * text.relativeLineSpacing[time]
 
-            val lineOffset = -TextMesh.DEFAULT_LINE_HEIGHT * relativeLineSpacing[time]
+        // min and max x are cached for long texts with thousands of lines (not really relevant)
+        // actual text height vs baseline? for height
 
-            // min and max x are cached for long texts with thousands of lines (not really relevant)
-            // actual text height vs baseline? for height
+        val totalHeight = lineOffset * height
 
-            val totalHeight = lineOffset * height
+        val dx = text.getDrawDX(width, time)
+        val dy = text.getDrawDY(lineOffset, totalHeight, time)
 
-            val dx = getDrawDX(width, time)
-            val dy = getDrawDY(lineOffset, totalHeight, time)
+        var charIndex = 0
 
-            var charIndex = 0
+        text.forceVariableBuffer = true
 
-            forceVariableBuffer = true
+        val textAlignment01 = text.textAlignment[time] * .5f + .5f
+        partSearch@ for ((partIndex, part) in lineSegmentsWithStyle.parts.withIndex()) {
 
-            val textAlignment01 = textAlignment[time] * .5f + .5f
-            partSearch@ for ((partIndex, part) in lineSegmentsWithStyle.parts.withIndex()) {
+            val startIndex = charIndex
+            val partLength = part.codepointLength
+            val endIndex = charIndex + partLength
 
-                val startIndex = charIndex
-                val partLength = part.codepointLength
-                val endIndex = charIndex + partLength
+            if (index in startIndex until endIndex) {
 
-                if (index in startIndex until endIndex) {
+                val offsetX = (width - part.lineWidth * scaleX) * textAlignment01
 
-                    val offsetX = (width - part.lineWidth * scaleX) * textAlignment01
+                val lineDeltaX = dx + part.xPos * scaleX + offsetX
+                val lineDeltaY = dy + part.yPos * scaleY * lineOffset
 
-                    val lineDeltaX = dx + part.xPos * scaleX + offsetX
-                    val lineDeltaY = dy + part.yPos * scaleY * lineOffset
+                val key = keys[partIndex]
+                val textMesh = text.getTextMesh(key)!!
 
-                    val key = keys[partIndex]
-                    val textMesh = getTextMesh(key)!!
+                val di = index - startIndex
+                val xOffset = (textMesh.offsets[di] + textMesh.offsets[di + 1]).toFloat() * 0.5f
+                val offset = Vector3f(lineDeltaX + xOffset, lineDeltaY, 0f)
+                px = offset.x / 100f
+                py = offset.y
 
-                    val di = index - startIndex
-                    val xOffset = (textMesh.offsets[di] + textMesh.offsets[di + 1]).toFloat() * 0.5f
-                    val offset = Vector3f(lineDeltaX + xOffset, lineDeltaY, 0f)
-                    px = offset.x / 100f
-                    py = offset.y
-
-                    break@partSearch
-
-                }
-
-                charIndex = endIndex + 1 // '\n'
+                break@partSearch
 
             }
+
+            charIndex = endIndex + 1 // '\n'
+
         }
 
         particle.states.first().position.add(px, py, 0f)

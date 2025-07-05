@@ -2,13 +2,14 @@ package me.anno.remsstudio.audio
 
 import me.anno.animation.LoopingState
 import me.anno.audio.streams.AudioFileStream
+import me.anno.cache.AsyncCacheData
 import me.anno.io.MediaMetadata
 import me.anno.io.MediaMetadata.Companion.getMeta
 import me.anno.io.files.FileReference
 import me.anno.remsstudio.audio.AudioFXCache2.convert
 import me.anno.remsstudio.audio.effects.Time
-import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.Camera
+import me.anno.remsstudio.objects.video.Video
 
 // only play once, then destroy; it makes things easier
 // (on user input and when finally rendering only)
@@ -43,7 +44,7 @@ open class AudioFileStream2(
             this(
                 audio.file, audio.isLooping.value,
                 getIndex(globalTime, speed, playbackSampleRate),
-                getMeta(audio.file, false)!!,
+                getMeta(audio.file).waitFor()!!,
                 audio, listener, speed, playbackSampleRate
             )
 
@@ -54,9 +55,9 @@ open class AudioFileStream2(
     fun getTime(index: Long): Time = getTime(frameIndexToTime(index))
     private fun getTime(globalTime: Double): Time = Time(globalToLocalTime(globalTime), globalTime)
 
-    override fun getBuffer(bufferIndex: Long): Pair<ShortArray?, ShortArray?> {
+    override fun getBuffer(bufferIndex: Long): AsyncCacheData<Pair<ShortArray?, ShortArray?>> {
         val data = AudioFXCache2.getBuffer(bufferIndex, this, false)!!
-        return Pair(convert(data.first), convert(data.second))
+        return AsyncCacheData(Pair(convert(data.first), convert(data.second)))
     }
 
     // todo is this correct with the speed?

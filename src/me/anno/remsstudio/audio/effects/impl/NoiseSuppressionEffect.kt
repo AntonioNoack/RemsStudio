@@ -1,6 +1,8 @@
 package me.anno.remsstudio.audio.effects.impl
 
+import me.anno.audio.openal.SoundBuffer
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
+import me.anno.cache.AsyncCacheData
 import me.anno.engine.Events.addEvent
 import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
@@ -112,29 +114,33 @@ class NoiseSuppressionEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAI
                             val histogram = IntArray(subdivisions)
                             // average values inside buffer
                             val sampleRate = meta.audioSampleRate
-                            val stereoData = getAudioSequence(audio.file, 0.0, duration, sampleRate).value?.data
-                            if (stereoData != null) {
-                                var k0 = 0
-                                for (j in 0 until subdivisions) {
-                                    var sum = 0L
-                                    val k1 = (j + 1) * stereoData.capacity() / subdivisions
-                                    for (k in k0 until k1) {
-                                        val vk = stereoData[k]
-                                        sum += vk * vk // should fit into an integer :)
+                            val result = AsyncCacheData<SoundBuffer>()
+                            getAudioSequence(audio.file, 0.0, duration, sampleRate, result)
+                            result.waitFor { stereoData0 ->
+                                val stereoData = stereoData0?.data
+                                if (stereoData != null) {
+                                    var k0 = 0
+                                    for (j in 0 until subdivisions) {
+                                        var sum = 0L
+                                        val k1 = (j + 1) * stereoData.capacity() / subdivisions
+                                        for (k in k0 until k1) {
+                                            val vk = stereoData[k]
+                                            sum += vk * vk // should fit into an integer :)
+                                        }
+                                        histogram[j] = sqrt(sum / (k1 - k0).toDouble()).toInt()
+                                        k0 = k1
                                     }
-                                    histogram[j] = sqrt(sum / (k1 - k0).toDouble()).toInt()
-                                    k0 = k1
-                                }
 
-                                histogram.sort()
+                                    histogram.sort()
 
-                                val percentileLevel = histogram[(subdivisions + 3) / 5] / 32767f
-                                addEvent {
-                                    (nlp.child as FloatInput)
-                                        .setValue(percentileLevel, true)
-                                }
+                                    val percentileLevel = histogram[(subdivisions + 3) / 5] / 32767f
+                                    addEvent {
+                                        (nlp.child as FloatInput)
+                                            .setValue(percentileLevel, true)
+                                    }
 
-                            } else LOGGER.warn("Data is null")
+                                } else LOGGER.warn("Data is null")
+                            }
                         }
                     } else LOGGER.warn("Metadata is null")
                 }

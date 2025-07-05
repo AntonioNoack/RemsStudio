@@ -49,7 +49,7 @@ object VideoPreview {
                 VideoCache.getVideoFrame(
                     file, scale, frameIndex, frameIndex,
                     1, sourceFPS, previewTimeout, true
-                )
+                ).value
             }
             if (frame != null && frame.isCreated) {
                 return frame

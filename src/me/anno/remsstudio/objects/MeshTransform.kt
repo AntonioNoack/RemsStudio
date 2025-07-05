@@ -78,7 +78,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val file = file
-        val data = PrefabCache[file]?.getSampleInstance()
+        val data = PrefabCache[file].value?.sample
         if (data is Entity) {
             val ditherMode =
                 if (GFXState.blendMode.currentValue == null) DitherMode.DITHER2X2
@@ -109,11 +109,12 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         entity.forAll {
             if (it is AnimMeshComponent) {
                 val mesh = it.getMesh()
-                val skeleton = SkeletonCache[mesh?.skeleton]
+                val skeleton = SkeletonCache.getEntry(mesh?.skeleton).waitFor()
                 if (skeleton != null) {
-                    for ((name, anim) in skeleton.animations) {
-                        result[name] = AnimationCache[anim] ?: continue
-                    }
+                    // todo find the animations again!!!
+                    /* for ((name, anim) in skeleton.animations) {
+                         result[name] = AnimationCache[anim] ?: continue
+                     }*/
                 }
             }
         }
