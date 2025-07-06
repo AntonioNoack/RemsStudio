@@ -3,7 +3,6 @@ package me.anno.remsstudio.objects.video
 import me.anno.Time
 import me.anno.animation.LoopingState
 import me.anno.config.DefaultConfig
-import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.io.MediaMetadata
 import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.objects.video.VideoSize.getCacheableZoomLevel
@@ -19,44 +18,58 @@ object VideoPreview {
 
     private var lastFailureFrameTime = 0L
 
+    private fun isTimeValid(sourceFPS: Double, time: Double, isLooping: LoopingState, duration: Double): Boolean {
+        return sourceFPS > 0.0 && time >= 0.0 && (isLooping != LoopingState.PLAY_ONCE || time <= duration)
+    }
+
+    fun Video.getFrameIndexForPreview(time: Double, meta: MediaMetadata): Int {
+        val sourceFPS = meta.videoFPS
+        val duration = meta.videoDuration
+        val isLooping = isLooping.value
+
+        val frameCount = max(1, (duration * sourceFPS).roundToInt())
+        val localTime = isLooping[time, duration]
+        val frameIndex = clamp((localTime * sourceFPS).toInt(), 0, frameCount - 1)
+        return frameIndex
+    }
+
+    private fun getFrameScaleForPreview(width: Int, meta: MediaMetadata): Int {
+        val rawZoomLevel = meta.videoWidth / width
+        return max(1, getCacheableZoomLevel(rawZoomLevel))
+    }
+
     fun Video.getFrameAtLocalTimeForPreview(time: Double, width: Int, meta: MediaMetadata): GPUFrame? {
-
-        // only load a single frame at a time?? idk...
-
-        if (isFinalRendering) throw RuntimeException("Not supported")
 
         val sourceFPS = meta.videoFPS
         val duration = meta.videoDuration
         val isLooping = isLooping.value
 
-        if (sourceFPS > 0.0 && time >= 0.0 && (isLooping != LoopingState.PLAY_ONCE || time <= duration)) {
-
-            val rawZoomLevel = meta.videoWidth / width
-            val scale = max(1, getCacheableZoomLevel(rawZoomLevel))
-
-            val frameCount = max(1, (duration * sourceFPS).roundToInt())
-
-            val localTime = isLooping[time, duration]
-            val frameIndex = clamp((localTime * sourceFPS).toInt(), 0, frameCount - 1)
-            val frameTime = Time.frameTimeNanos
-            val frame = if (frameTime == lastFailureFrameTime) {
-                // prevent loading too many frames at the same time -> just check whether it's available
-                VideoCache.getVideoFrameWithoutGenerator(
-                    file, scale, frameIndex, frameIndex,
-                    1, sourceFPS
-                )
-            } else {
-                VideoCache.getVideoFrame(
-                    file, scale, frameIndex, frameIndex,
-                    1, sourceFPS, previewTimeout, true
-                ).value
-            }
-            if (frame != null && frame.isCreated) {
-                return frame
-            } else {
-                lastFailureFrameTime = frameTime
-            }
+        if (!isTimeValid(sourceFPS, time, isLooping, duration)) {
+            return null
         }
-        return null
+
+        val frameIndex = getFrameIndexForPreview(time, meta)
+        if (frameIndex < 0) return null
+
+        val scale = getFrameScaleForPreview(width, meta)
+        val frameTime = Time.frameTimeNanos
+        val frame = if (frameTime == lastFailureFrameTime) {
+            // prevent loading too many frames at the same time -> just check whether it's available
+            VideoCache.getVideoFrameWithoutGenerator(
+                file, scale, frameIndex, frameIndex,
+                1, sourceFPS
+            )
+        } else {
+            VideoCache.getVideoFrame(
+                file, scale, frameIndex, frameIndex,
+                1, sourceFPS, previewTimeout, true
+            ).value
+        }
+        if (frame != null && frame.isCreated) {
+            return frame
+        } else {
+            lastFailureFrameTime = frameTime
+            return null
+        }
     }
 }

@@ -33,13 +33,11 @@ class VideoPreviewPanel(
         val meta = video.meta ?: return
         val window = window ?: return
         val time = getTime(window.mouseX)
-        val frame = video.getFrameAtLocalTimeForPreview(time, width1, meta)
-        if (frame != null) {
-            val color = white4
-            DrawGradients.drawRectGradient(
-                x0, y0, x1 - x0, y1 - y0, color, color, frame,
-                Vector4f(0f, 0f, 1f, 1f)
-            )
-        }
+        val frame = video.getFrameAtLocalTimeForPreview(time, width1, meta) ?: return
+        val color = white4
+        DrawGradients.drawRectGradient(
+            x0, y0, x1 - x0, y1 - y0, color, color, frame,
+            Vector4f(0f, 0f, 1f, 1f)
+        )
     }
 }
