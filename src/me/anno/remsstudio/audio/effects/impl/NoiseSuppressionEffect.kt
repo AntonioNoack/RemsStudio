@@ -3,6 +3,7 @@ package me.anno.remsstudio.audio.effects.impl
 import me.anno.audio.openal.SoundBuffer
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
 import me.anno.cache.AsyncCacheData
+import me.anno.cache.ThreadPool
 import me.anno.engine.Events.addEvent
 import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
@@ -106,7 +107,7 @@ class NoiseSuppressionEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAI
                     val meta = audio.forcedMeta
                     if (meta != null) {
                         // make this async to prevent lag
-                        thread(name = "Noise Level") {
+                        ThreadPool.start( "Noise Level") {
                             val duration = min(10.0, meta.audioDuration)
                             val numSamples = min((duration * meta.audioSampleRate).toLong(), meta.audioSampleCount)
                             // if audio is short, subdivide buffers, so we get more decision freedom on histogram

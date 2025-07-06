@@ -1,6 +1,7 @@
 package me.anno.remsstudio
 
 import me.anno.Engine
+import me.anno.cache.ThreadPool
 import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.gpu.GFX
 import me.anno.gpu.texture.TextureCache
@@ -254,7 +255,7 @@ object DownloadUI {
                 .addAll(args)
 
             val process = builder.start()
-            thread(name = "cmd($args):error") {
+            ThreadPool.start("cmd($args):error") {
                 process.errorStream.use {
                     val reader = it.bufferedReader()
                     while (!Engine.shutdown) {
@@ -267,7 +268,7 @@ object DownloadUI {
                 }
             }
 
-            thread(name = "cmd($args):input") {
+            ThreadPool.start("cmd($args):input") {
                 process.inputStream.use { input ->
                     val txt = input.readText()
                     if (iter != iteration) return@use
@@ -439,7 +440,7 @@ object DownloadUI {
                 object : ProgressBar("Download", "%", 100.0) {
                     override fun formatProgress(): String = progressLine
                 })
-            thread(name = "cmd($args):error") {
+            ThreadPool.start("cmd($args):error") {
                 val reader = process.errorStream.bufferedReader()
                 while (!Engine.shutdown) {
                     val line = reader.readLine() ?: break
@@ -449,7 +450,7 @@ object DownloadUI {
                 }
                 reader.close()
             }
-            thread(name = "cmd($args):input") {
+            ThreadPool.start("cmd($args):input") {
                 // show progress bar while downloading
                 // [download]  87.1% of  228.51MiB at    5.75MiB/s ETA 00:05
                 val reader = process.inputStream.bufferedReader()

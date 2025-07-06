@@ -1,5 +1,6 @@
 package me.anno.remsstudio.ui.sceneTabs
 
+import me.anno.cache.ThreadPool
 import me.anno.config.DefaultConfig
 import me.anno.engine.EngineBase.Companion.dragged
 import me.anno.engine.EngineBase.Companion.workspace
@@ -101,7 +102,7 @@ class SceneTab(var file: FileReference, var scene: Transform, history: History?)
     fun save(dst: FileReference, onSuccess: () -> Unit) {
         if (dst.isDirectory) dst.delete()
         LOGGER.info("Saving $dst, ${scene.listOfAll.joinToString { it.name }}")
-        thread(name = "SaveScene") {
+        ThreadPool.start( "SaveScene") {
             try {
                 synchronized(scene) {
                     dst.getParent().mkdirs()

@@ -17,7 +17,7 @@ class TimeControlsPanel(style: Style) : PanelListX(style) {
 
     private fun setEditorTimeDilation(speed: Double) {
         val speed1 = if (RemsStudio.editorTimeDilation == speed) 0.0 else speed
-        StudioActions.setEditorTimeDilation(speed1, true)
+        StudioActions.setEditorTimeDilation(speed1)
     }
 
     init {

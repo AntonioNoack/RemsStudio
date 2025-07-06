@@ -23,7 +23,6 @@ import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.remsstudio.ui.scene.StudioSceneView
 import me.anno.ui.Panel
 import me.anno.ui.WindowStack.Companion.printLayout
-import me.anno.ui.input.components.TitlePanel
 import me.anno.utils.structures.lists.Lists.any2
 import org.apache.logging.log4j.LogManager
 import kotlin.math.round
@@ -45,29 +44,16 @@ object StudioActions {
         return true
     }
 
-    private fun isInputInFocus(): Boolean {
-        return GFX.windows.any2 { w ->
-            val inFocus = w.windowStack.inFocus0
-            inFocus != null &&
-                    inFocus !is TitlePanel &&
-                    inFocus.anyInHierarchy { pi -> pi is Panel && pi.isKeyInput() }
-        }
-    }
-
     private var lastTimeDilationChange = 0L
-    fun setEditorTimeDilation(dilation: Double, allowKeys: Boolean = false): Boolean {
+    fun setEditorTimeDilation(dilation: Double): Boolean {
         val currentTime = Time.frameTimeNanos
-        if (currentTime == lastTimeDilationChange || (!allowKeys && isInputInFocus())) {
-            return false
-        }
-        return if (dilation == RemsStudio.editorTimeDilation) false
-        else {
-            LOGGER.info("Set dilation to $dilation")
-            lastTimeDilationChange = currentTime
-            RemsStudio.editorTimeDilation = dilation
-            RemsStudio.updateAudio()
-            true
-        }
+        if (currentTime == lastTimeDilationChange || dilation == RemsStudio.editorTimeDilation) return false
+
+        LOGGER.info("Set dilation to $dilation")
+        lastTimeDilationChange = currentTime
+        RemsStudio.editorTimeDilation = dilation
+        RemsStudio.updateAudio()
+        return true
     }
 
     fun jumpToStart() {

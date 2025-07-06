@@ -1,5 +1,6 @@
 package me.anno.remsstudio.video
 
+import me.anno.cache.ThreadPool
 import me.anno.gpu.Blitting
 import me.anno.gpu.FinalRendering
 import me.anno.gpu.GFX
@@ -8,11 +9,7 @@ import me.anno.gpu.GFXState.alwaysDepthMode
 import me.anno.gpu.GPUTasks.addGPUTask
 import me.anno.gpu.GPUTasks.addNextGPUTask
 import me.anno.gpu.blending.BlendMode
-import me.anno.gpu.framebuffer.DepthBufferType
-import me.anno.gpu.framebuffer.FBStack
-import me.anno.gpu.framebuffer.Frame
-import me.anno.gpu.framebuffer.Framebuffer
-import me.anno.gpu.framebuffer.TargetType
+import me.anno.gpu.framebuffer.*
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.texture.Texture2D
 import me.anno.image.raw.ByteImage
@@ -22,7 +19,6 @@ import me.anno.utils.pooling.ByteBufferPool
 import me.anno.video.VideoBackgroundTask.Companion.missingResource
 import org.apache.logging.log4j.LogManager
 import org.lwjgl.opengl.GL46C
-import kotlin.concurrent.thread
 
 abstract class FrameTask(
     val width: Int,
@@ -91,7 +87,7 @@ abstract class FrameTask(
 
         GFX.check()
 
-        thread(name = "FrameTask::writeFrame") {// offload to other thread
+        ThreadPool.start("FrameTask::writeFrame") {// offload to other thread
             // val c1 = Clock()
             val image = ByteImage(width, height, ByteImageFormat.RGB)
             pixels.get(image.data, 0, image.data.size)
@@ -145,7 +141,7 @@ abstract class FrameTask(
                     }
                     if (!needsMoreSources) {
                         partialFrame.bindTrulyNearest(0)
-                        GFXState.blendMode.use(BlendMode.PURE_ADD) {
+                        GFXState.blendMode.use(BlendMode.ADD) {
                             GFXState.depthMode.use(alwaysDepthMode) {
                                 // write with alpha 1/motionBlurSteps
                                 Blitting.copyColorWithSpecificAlpha(1f / motionBlurSteps, 1, true)

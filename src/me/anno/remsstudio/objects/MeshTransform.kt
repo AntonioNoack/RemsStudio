@@ -1,9 +1,9 @@
 package me.anno.remsstudio.objects
 
-import me.anno.cache.AsyncUtils.waitForAll
 import me.anno.config.DefaultConfig
 import me.anno.ecs.Entity
 import me.anno.ecs.EntityQuery.forAllComponents
+import me.anno.ecs.EntityQuery.forAllComponentsInChildren
 import me.anno.ecs.EntityQuery.hasComponent
 import me.anno.ecs.components.anim.*
 import me.anno.ecs.components.anim.BoneData.uploadJointMatrices
@@ -17,6 +17,7 @@ import me.anno.engine.ui.render.ECSShaderLib
 import me.anno.engine.ui.render.Renderers.previewRenderer
 import me.anno.gpu.DitherMode
 import me.anno.gpu.FinalRendering.isFinalRendering
+import me.anno.gpu.FinalRendering.onMissingResource
 import me.anno.gpu.GFXState
 import me.anno.gpu.shader.Shader
 import me.anno.gpu.shader.renderer.Renderer
@@ -43,6 +44,7 @@ import me.anno.ui.input.EnumInput
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.pooling.JomlPools
 import me.anno.utils.structures.Collections.filterIsInstance2
+import me.anno.utils.types.AnyToBool
 import org.apache.logging.log4j.LogManager
 import org.joml.Matrix4f
 import org.joml.Matrix4fArrayList
@@ -71,7 +73,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
 
     var centerMesh = true
     var normalizeScale = true
-    var lastAnimations: Map<String, Animation>? = null
+    var drawAsLines = false
 
     // for the start it is nice to be able to import meshes like a torus into the engine :)
 
@@ -89,13 +91,13 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                     GFXState.useFrame(previewRenderer) {
                         GFXState.animated.use(true) {
                             lastWarning = null
-                            lastAnimations = draw(data, stack, time, color)
+                            draw(data, stack, time, color)
                         }
                     }
                 } else {
                     GFXState.animated.use(true) {
                         lastWarning = null
-                        lastAnimations = draw(data, stack, time, color)
+                        draw(data, stack, time, color)
                     }
                 }
             }
@@ -105,34 +107,44 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         }
     }
 
-    private fun findAnimations(entity: Entity): HashMap<String, Animation> {
-        // todo this is bugged, no animations are found for azeria
-        val result = HashMap<String, Animation>()
-        entity.forAllComponents(AnimMeshComponent::class) { animMeshComponent ->
+    private fun getAnimName(source: FileReference): String {
+        return "${source.getParent().name}/${source.name}"
+    }
 
-            val mesh = animMeshComponent.getMesh()
-            animMeshComponent.animations.forEach { animState ->
-                val source = animState.source
-                val anim = AnimationCache.getEntry(source).waitFor()
-                if (source != InvalidRef && anim != null) {
-                    result[source.name] = anim
+    private fun findCurrentAnimation(entity: Entity, animationName: String): Animation? {
+        if ('/' !in animationName) return null
+        var result: Animation? = null
+        entity.forAllComponentsInChildren(AnimMeshComponent::class) { animMeshComponent ->
+            if (result == null) {
+                val mesh = animMeshComponent.getMesh()
+                val skeleton = mesh?.skeleton ?: InvalidRef
+                if (skeleton != InvalidRef) {
+                    val skeletonFolder = skeleton.getParent()
+                    val animationFolder = skeletonFolder.getSibling("animations")
+                    val animSource = animationFolder.getChild(animationName)
+                    val animation = AnimationCache.getEntry(animSource)
+                    if (isFinalRendering && !animation.hasValue) {
+                        onMissingResource("Animation missing", animSource)
+                    } else {
+                        result = animation.value
+                    }
                 }
             }
+        }
+        return result
+    }
 
-            val skeletonFile = mesh?.skeleton ?: InvalidRef
-            if (skeletonFile != InvalidRef) {
-                val skeletons = skeletonFile.getParent() // Skeletons folder
-                val assetFiles = skeletons.getParent() // Contains scene.json, meshes, animations, ...
-                val animationsFolder = assetFiles.getChild("animations")
-                val animationChildren = animationsFolder.listChildren().flatMap { folder -> folder.listChildren() }
-                val animations = animationChildren.map { file -> AnimationCache.getEntry(file) }
-                    .waitForAll().waitFor() ?: emptyList()
-                for (i in animations.indices) {
-                    val value = animations[i] ?: continue
-                    val parent = animationChildren[i].getParent()
-                    val self = animationChildren[i]
-                    result["${parent.name}/${self.nameWithoutExtension}"] = value
-                }
+    private fun findAllAnimations(entity: Entity?): HashSet<FileReference> {
+        // todo this is bugged, no animations are found for azeria
+        val result = HashSet<FileReference>()
+        entity?.forAllComponentsInChildren(AnimMeshComponent::class) { animMeshComponent ->
+            val mesh = animMeshComponent.getMesh()
+            val skeleton = mesh?.skeleton ?: InvalidRef
+            if (skeleton != InvalidRef) {
+                val skeletonFolder = skeleton.getParent()
+                val animationFolder = skeletonFolder.getSibling("animations")
+                val allAnimations = animationFolder.listChildren().flatMap { it.listChildren() }
+                result.addAll(allAnimations)
             }
         }
         return result
@@ -143,7 +155,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         cameraMatrix: Matrix4fArrayList,
         time: Double,
         color: Vector4f
-    ): Map<String, Animation> {
+    ) {
 
         val animationName = animation[time]
 
@@ -156,8 +168,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         // attractors aren't supported anymore
         uploadAttractors0(shader)
 
-        val animations = findAnimations(entity)
-        val animation = animations[animationName]
+        val animation = findCurrentAnimation(entity, animationName)
         var animTexture: ITexture2D? = null
         if (animation != null) {
             if (AnimTexture.useAnimTextures) {
@@ -200,14 +211,12 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             MeshUtils.centerStackFromAABB(localTransform, entity.getGlobalBounds())
         }
 
-        drawHierarchy(
-            shader, cameraMatrix, localTransform,
-            color, entity, drawSkeletons, animTexture
-        )
-
-        // todo line mode: draw every mesh as lines
-        return animations
-
+        GFXState.drawLines.use(drawAsLines) {
+            drawHierarchy(
+                shader, cameraMatrix, localTransform,
+                color, entity, drawSkeletons, animTexture
+            )
+        }
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
@@ -309,6 +318,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             "mesh.normalizeScale",
             null, normalizeScale, style
         ) { it, _ -> for (x in c) x.normalizeScale = it }
+
         list += vi(
             inspected, "Center Mesh",
             "If your mesh is off-center, this corrects it",
@@ -316,33 +326,49 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             null, centerMesh, style
         ) { it, _ -> for (x in c) x.centerMesh = it }
 
+        list += vi(
+            inspected, "Draw As Lines",
+            "Draws your mesh as lines instead of triangles",
+            "mesh.drawAsLines",
+            null, drawAsLines, style
+        ) { it, _ -> for (x in c) x.drawAsLines = it }
+
         // the list of available animations depends on the model
         // but still, it's like an enum: only a certain set of animations is available,
         // and the user wouldn't know perfectly, which
-        val map = HashMap<Map<String, Animation>?, Panel>()
+        val map = HashMap<Set<FileReference>, Panel>()
         list += UpdatingContainer(100, {
-            val animations = lastAnimations
+            val entity = PrefabCache[file].value?.sample as? Entity
+            val animations = findAllAnimations(entity)
             map.getOrPut(animations) {
-                if (!animations.isNullOrEmpty()) {
+                if (animations.isNotEmpty()) {
+
+                    val animationNames = animations
+                        .map { source -> getAnimName(source) }
+                        .sorted()
+
                     var currentValue = animation[lastLocalTime]
                     val noAnimName = "No animation"
-                    if (currentValue !in animations.keys) {
+                    if (currentValue !in animationNames) {
                         currentValue = noAnimName
                     }
-                    val options = listOf(NameDesc(noAnimName)) + animations.map { NameDesc(it.key) }
+
+                    val options = listOf(NameDesc(noAnimName)) +
+                            animationNames.map { name -> NameDesc(name) }
+
                     EnumInput(
                         NameDesc("Animation"),
                         NameDesc(currentValue),
                         options, style
-                    ).setChangeListener { value, _, _ ->
-                        RemsStudio.incrementalChange("Change MeshTransform.animation Value") {
-                            for (x in c) x.putValue(x.animation, value, false)
+                    ).setChangeListener { value, index, _ ->
+                        RemsStudio.largeChange("Change MeshTransform.animation Value") {
+                            val newValue = if (index == 0) "" else value.name
+                            for (x in c) x.putValue(x.animation, newValue, false)
                         }
                     }
                 } else TextPanel("No animations found!", style)
             }
         }, style)
-
     }
 
     override fun save(writer: BaseWriter) {
@@ -351,6 +377,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         writer.writeObject(this, "animation", animation)
         writer.writeBoolean("normalizeScale", normalizeScale, true)
         writer.writeBoolean("centerMesh", centerMesh, true)
+        writer.writeBoolean("drawAsLines", drawAsLines, true)
     }
 
     override fun setProperty(name: String, value: Any?) {
@@ -359,6 +386,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             "centerMesh" -> centerMesh = value == true
             "animation" -> animation.copyFrom(value)
             "file" -> file = (value as? String)?.toGlobalFile() ?: (value as? FileReference) ?: InvalidRef
+            "drawAsLines" -> drawAsLines = AnyToBool.anyToBool(value)
             else -> super.setProperty(name, value)
         }
     }

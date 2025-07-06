@@ -44,7 +44,11 @@ fun decode(file: FileReference, start: Int, end: Int, fps: Double) {
     val bufferLength = end - start
     val bufferIndex = index / bufferLength
     while (true) {
-        val frame = VideoCache.getVideoFrame(file, 1, index, bufferIndex, bufferLength, fps, 1, async = false, false)
+        val frame = VideoCache.getVideoFrame(
+            file, 1, index,
+            bufferIndex, bufferLength, fps,
+            1, false
+        ).waitFor()
         if (frame != null) break
         Sleep.sleepShortly(true)
     }

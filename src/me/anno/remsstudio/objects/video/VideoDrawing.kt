@@ -41,7 +41,7 @@ object VideoDrawing {
 
     @JvmStatic
     val imageTimeout: Long
-        get() = DefaultConfig["ui.video.frameTimeout", 50L]
+        get() = DefaultConfig["ui.video.frameTimeout", 250L]
 
     fun Video.drawImage(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val file = file
@@ -259,9 +259,9 @@ object VideoDrawing {
                 getFrame(frameIndex + delta)
             }
         } else if (useStreaming || isFinalRendering) {
-            getFrame(frameIndex).also {
-                insertLastFrame(frameIndex)
-            }
+            val frame = getFrame(frameIndex)
+            insertLastFrame(frameIndex)
+            frame
         } else {
             findClosestFrame(frameIndex, scale, videoFPS)
         }

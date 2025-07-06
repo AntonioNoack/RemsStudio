@@ -1,5 +1,6 @@
 package me.anno.remsstudio
 
+import me.anno.cache.ThreadPool
 import me.anno.engine.Events.addEvent
 import me.anno.installer.Installer
 import me.anno.language.translation.NameDesc
@@ -12,7 +13,6 @@ import me.anno.utils.files.OpenFileExternally.openInExplorer
 import org.apache.logging.log4j.LogManager
 import java.io.IOException
 import java.net.URL
-import kotlin.concurrent.thread
 
 @Suppress("unused")
 object CheckVersion {
@@ -28,7 +28,7 @@ object CheckVersion {
 
     fun checkVersion() {
         val windowStack = defaultWindowStack
-        thread(name = "CheckVersion") {
+        ThreadPool.start("CheckVersion") {
             val latestVersion = checkVersion(URL(url))
             if (latestVersion > -1) {
                 if (latestVersion > RemsStudio.versionNumber) {
@@ -38,7 +38,8 @@ object CheckVersion {
                         LOGGER.info("Found newer version: $name")
                         // wait for everything to be loaded xD
                         addEvent {
-                            Menu.openMenu(windowStack,
+                            Menu.openMenu(
+                                windowStack,
                                 NameDesc("New Version Available!", "", "ui.newVersion"), listOf(
                                     MenuOption(NameDesc("See Download Options", "", "ui.newVersion.openLink")) {
                                         openInBrowser("https://remsstudio.phychi.com/s=download")
@@ -50,7 +51,8 @@ object CheckVersion {
                                         // download the file
                                         // RemsStudio_v1.00.00.jar ?
                                         Installer.download(name, dst) {
-                                            Menu.openMenu(windowStack, listOf(
+                                            Menu.openMenu(
+                                                windowStack, listOf(
                                                 MenuOption(
                                                     NameDesc("Downloaded file to %1", "", "")
                                                         .with("%1", dst.toString())

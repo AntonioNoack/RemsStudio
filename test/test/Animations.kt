@@ -7,5 +7,5 @@ import me.anno.utils.OS.downloads
 fun main() {
     OfficialExtensions.initForTests()
     val src = downloads.getChild("3d/azeria/scene.gltf")
-    println(SkeletonCache[src.getChild("Skeleton.json")]!!.animations.keys)
+   // println(SkeletonCache[src.getChild("Skeleton.json")]!!.animations.keys)
 }

@@ -1,5 +1,6 @@
 package me.anno.remsstudio
 
+import me.anno.cache.ThreadPool
 import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.engine.Events.addEvent
 import me.anno.gpu.GFX
@@ -258,7 +259,7 @@ object Rendering {
                 callback()
                 targetOutputFile.invalidate()
             }
-            thread(name = "Rendering::renderAudio()") {
+            ThreadPool.start("Rendering::renderAudio()") {
                 createOrAppendAudio(targetOutputFile, videoSrc, false)
             }
         }
@@ -299,7 +300,7 @@ object Rendering {
                 callback()
                 targetOutputFile.invalidate()
             }
-            thread(name = "Rendering::renderAudio()") {
+            ThreadPool.start("Rendering::renderAudio()") {
                 createOrAppendAudio(targetOutputFile, InvalidRef, false)
             }
         }

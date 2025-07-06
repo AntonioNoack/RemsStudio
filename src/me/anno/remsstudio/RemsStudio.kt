@@ -330,6 +330,13 @@ object RemsStudio : EngineBase(NameDesc("Rem's Studio"), 10403, true), WelcomeUI
     @JvmStatic
     fun main(args: Array<String>) {
 
+        // todo bugs:
+        //  - engine becomes extremely laggy when selecting a file... it's whyever constantly reloading preview frames...
+        //    -> yes, our cache timeout is/was too low, and that caused constant reloading
+        //    -> we need better cache timeout logic
+        //  - turning the camera in 3d changes video scale with auto-mode, and that causes lots of lag
+        //  - preview scales <= 1/4 aren't loading
+
         // to do integration-test scene with ALL rendering/playback features
         // -> Example Project
         // todo publish that project, and write an article for it

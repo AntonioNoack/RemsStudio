@@ -1,5 +1,6 @@
 package me.anno.remsstudio.ui
 
+import me.anno.cache.ThreadPool
 import me.anno.config.DefaultConfig
 import me.anno.engine.Events.addEvent
 import me.anno.io.files.FileReference
@@ -70,7 +71,7 @@ object StudioFileImporter : FileContentImporter<Transform>() {
                     }
                 }
                 else -> {
-                    thread(name = "ImportFromFile") {
+                    ThreadPool.start("ImportFromFile") {
                         val text = file.readTextSync()
                         try {
                             val transform = text.toTransform()
