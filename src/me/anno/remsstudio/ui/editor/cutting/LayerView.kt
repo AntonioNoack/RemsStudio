@@ -14,6 +14,7 @@ import me.anno.input.Key
 import me.anno.io.files.FileReference
 import me.anno.io.json.saveable.JsonStringReader
 import me.anno.language.translation.NameDesc
+import me.anno.maths.Maths.MILLIS_TO_NANOS
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.mix
 import me.anno.maths.Maths.sq
@@ -94,6 +95,8 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
 
     var lastTime = gameTime
 
+    private val renderSize = RenderPosSize()
+
     // calculation is fast, drawing is slow
     override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
 
@@ -109,6 +112,8 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
             drawTypeInCorner("Cutting", fontColor)
         }
 
+        val hasConstantSize = renderSize.updateSize(x1 - x0, x0)
+
         // val t1 = System.nanoTime()
         val solution = solution
         val needsUpdate = needsUpdate ||
@@ -118,9 +123,9 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
                 isHovered ||
                 mouseKeysDown.isNotEmpty() ||
                 keysDown.isNotEmpty() ||
-                abs(this.lastTime - gameTime) > 5e7
+                abs(lastTime - gameTime) > 500 * MILLIS_TO_NANOS
 
-        if (needsUpdate && !computer.isCalculating) {
+        if (needsUpdate && !computer.isCalculating && hasConstantSize) {
             lastTime = gameTime
             taskQueue += {
                 try {
@@ -134,10 +139,10 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
             }
         }
 
-        this.solution?.apply {
-            this.y0 = y
-            this.y1 = y + height
-            draw(selectedTransforms, draggedTransform)
+        if (solution != null) {
+            solution.y0 = y
+            solution.y1 = y + height
+            solution.draw(selectedTransforms, draggedTransform)
         }
 
         val draggedTransform = draggedTransform
@@ -152,7 +157,6 @@ class LayerView(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
                 if (hovered != null) drawLines(x0, y0, x1, y1, hovered)
             }
         } else drawLines(x0, y0, x1, y1, draggedTransform)
-
     }
 
     @Suppress("UNUSED_PARAMETER")

@@ -38,8 +38,8 @@ class SceneTab(var file: FileReference, var scene: Transform, history: History?)
     }
 
     var history = history ?: try {
-        // todo find project for file
-        JsonStringReader.readFirstOrNull(file, workspace, History::class).waitFor()
+        if (file == InvalidRef) null // todo find project for file
+        else JsonStringReader.readFirstOrNull(file, workspace, History::class).waitFor()
     } catch (_: Exception) {
         null
     } ?: History()
@@ -57,7 +57,7 @@ class SceneTab(var file: FileReference, var scene: Transform, history: History?)
         tooltip = longName
     }
 
-    var hasChanged = false
+    var hasChanged: Boolean = false
         set(value) {
             if (field != value) {
                 val baseName = shortName
@@ -77,14 +77,14 @@ class SceneTab(var file: FileReference, var scene: Transform, history: History?)
             if (hasChanged) {
                 openMenu(
                     windowStack, listOf(
-                    MenuOption(NameDesc("Close", "", "ui.sceneTab.closeSaved")) { save { close() } },
-                    MenuOption(NameDesc("Close (Unsaved)", "", "ui.sceneTab.closeUnsaved")) { close() }
-                ))
+                        MenuOption(NameDesc("Close", "", "ui.sceneTab.closeSaved")) { save { close() } },
+                        MenuOption(NameDesc("Close (Unsaved)", "", "ui.sceneTab.closeUnsaved")) { close() }
+                    ))
             } else {
                 openMenu(
                     windowStack, listOf(
-                    MenuOption(NameDesc("Close", "", "ui.sceneTab.close")) { close() }
-                ))
+                        MenuOption(NameDesc("Close", "", "ui.sceneTab.close")) { close() }
+                    ))
             }
         }
     }
