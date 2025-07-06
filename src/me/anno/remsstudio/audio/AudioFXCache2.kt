@@ -21,9 +21,7 @@ import me.anno.remsstudio.audio.effects.SoundPipeline.Companion.changeDomain
 import me.anno.remsstudio.audio.effects.Time
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.video.Video
-import me.anno.utils.Sleep.acquire
 import me.anno.utils.hpc.ProcessingQueue
-import java.util.concurrent.Semaphore
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.min
@@ -193,20 +191,7 @@ object AudioFXCache2 {
         return buffer.getBuffersOfDomain(domain)
     }
 
-    // limit the calls to this function, at max 32 simultaneously
-    // this fixes the running out of memory issues from 13-15th May 2021
-    // I don't know where these problems came from... in Release 1.1.2, they were fine
-    private val rawDataLimiter = Semaphore(32)
     fun getRawData(
-        source: Video,
-        destination: Camera,
-        key: PipelineKey
-    ): AudioData = getRawData(
-        source.forcedMeta ?: throw IllegalStateException("Invalid meta for ${source.file}"),
-        source, destination, key
-    )
-
-    fun getRawData0(
         meta: MediaMetadata,
         source: Video?,
         destination: Camera?,
@@ -222,19 +207,6 @@ object AudioFXCache2 {
             val pair = stream.getBuffer(key.bufferSize, key.time0.globalTime, key.time1.globalTime)
             result.value = AudioData(key, convert(pair.first), convert(pair.second), Domain.TIME_DOMAIN)
         }
-    }
-
-    fun getRawData(
-        meta: MediaMetadata,
-        source: Video?,
-        destination: Camera?,
-        key: PipelineKey
-    ): AudioData {
-        // we cannot simply return null from this function, so getEntryLimited isn't an option
-        acquire(true, rawDataLimiter)
-        val entry = getRawData0(meta, source, destination, key).waitFor()
-        rawDataLimiter.release()
-        return entry!!
     }
 
     fun convert(src: ShortArray): FloatArray {
@@ -258,7 +230,7 @@ object AudioFXCache2 {
     ): AudioData? {
         val effectKey = pipelineKey.effectKey
         if (effectKey != null) throw IllegalStateException()
-        return getRawData0(meta, source, destination, pipelineKey)
+        return getRawData(meta, source, destination, pipelineKey)
             .waitFor(async)
     }
 
@@ -277,7 +249,7 @@ object AudioFXCache2 {
         if (key1.effectKey == null) {
             // get raw data
             val meta = source.forcedMeta ?: return null
-            return getRawData0(meta, source, destination, key1)
+            return getRawData(meta, source, destination, key1)
                 .waitFor(async)
         }
         return effectCache.getEntry(key1, timeout) { key, result ->

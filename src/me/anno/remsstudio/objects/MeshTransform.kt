@@ -1,5 +1,6 @@
 package me.anno.remsstudio.objects
 
+import me.anno.cache.AsyncUtils.waitForAll
 import me.anno.config.DefaultConfig
 import me.anno.ecs.Entity
 import me.anno.ecs.EntityQuery.forAllComponents
@@ -105,16 +106,32 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
     }
 
     private fun findAnimations(entity: Entity): HashMap<String, Animation> {
+        // todo this is bugged, no animations are found for azeria
         val result = HashMap<String, Animation>()
-        entity.forAll {
-            if (it is AnimMeshComponent) {
-                val mesh = it.getMesh()
-                val skeleton = SkeletonCache.getEntry(mesh?.skeleton).waitFor()
-                if (skeleton != null) {
-                    // todo find the animations again!!!
-                    /* for ((name, anim) in skeleton.animations) {
-                         result[name] = AnimationCache[anim] ?: continue
-                     }*/
+        entity.forAllComponents(AnimMeshComponent::class) { animMeshComponent ->
+
+            val mesh = animMeshComponent.getMesh()
+            animMeshComponent.animations.forEach { animState ->
+                val source = animState.source
+                val anim = AnimationCache.getEntry(source).waitFor()
+                if (source != InvalidRef && anim != null) {
+                    result[source.name] = anim
+                }
+            }
+
+            val skeletonFile = mesh?.skeleton ?: InvalidRef
+            if (skeletonFile != InvalidRef) {
+                val skeletons = skeletonFile.getParent() // Skeletons folder
+                val assetFiles = skeletons.getParent() // Contains scene.json, meshes, animations, ...
+                val animationsFolder = assetFiles.getChild("animations")
+                val animationChildren = animationsFolder.listChildren().flatMap { folder -> folder.listChildren() }
+                val animations = animationChildren.map { file -> AnimationCache.getEntry(file) }
+                    .waitForAll().waitFor() ?: emptyList()
+                for (i in animations.indices) {
+                    val value = animations[i] ?: continue
+                    val parent = animationChildren[i].getParent()
+                    val self = animationChildren[i]
+                    result["${parent.name}/${self.nameWithoutExtension}"] = value
                 }
             }
         }

@@ -17,10 +17,12 @@ import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.mix
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.video.Video
+import me.anno.utils.pooling.ByteBufferPool
 import me.anno.utils.pooling.JomlPools
 import me.anno.utils.structures.tuples.ShortPair
 import me.anno.video.ffmpeg.FFMPEGStream.Companion.getAudioSequence
 import org.joml.Vector3f
+import org.lwjgl.openal.AL10.AL_FORMAT_STEREO16
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -41,7 +43,7 @@ class AudioStreamRaw2(
     // should be at least as long as the ffmpeg response time (0.3s for the start of a FHD video)
     companion object {
         val AudioCache2 = CacheSection<AudioSliceKey, SoundBuffer>("Audio2")
-        val minPerceptibleAmplitude = 1f / 32500f
+        const val MIN_PERCEPTIBLE_VOLUME = 1f / 32500f
     }
 
     fun globalToLocalTime(time: Double): Double {
@@ -92,13 +94,13 @@ class AudioStreamRaw2(
             val key = AudioSliceKey(file, sliceIndex)
             val timeout = (ffmpegSliceSampleDuration * 2 * 1000).toLong()
             val sliceTime = sliceIndex * ffmpegSliceSampleDuration
-            val sv = AudioCache2.getEntry(key, timeout) { key, result ->
+            val soundBuffer = AudioCache2.getEntry(key, timeout) { key, result ->
                 getAudioSequence(file, sliceTime, ffmpegSliceSampleDuration, ffmpegSampleRate, result)
-            }.waitFor()!!
-            lastSoundBuffer = sv
+            }.waitFor()
+            lastSoundBuffer = soundBuffer
             lastSliceIndex = sliceIndex
-            lastChannels = if (sv.isStereo) 2 else 1
-            sv
+            lastChannels = if (soundBuffer != null && soundBuffer.isStereo) 2 else 1
+            soundBuffer
         }
 
         val data = soundBuffer?.data ?: return dst.set(0, 0)
@@ -128,7 +130,7 @@ class AudioStreamRaw2(
 
         val localTime = globalToLocalTime(globalTime)
         val amplitude = abs(localAmplitude(localTime))
-        if (amplitude < minPerceptibleAmplitude) {
+        if (amplitude < MIN_PERCEPTIBLE_VOLUME) {
             return t0.set(0f, 0f)
         }
 

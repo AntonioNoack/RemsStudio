@@ -27,13 +27,17 @@ class SceneTabData() : Saveable() {
     fun apply(tab: SceneTab) {
         tab.file = file
         val read by lazy { JsonStringReader.read(file, workspace, true).waitFor() ?: emptyList() }
-        tab.scene = transform ?: read.firstInstanceOrNull(Transform::class) ?: Transform().run {
+        tab.scene = transform ?: read.firstInstanceOrNull(Transform::class) ?: createEmptyScene()
+        tab.history = history ?: read.firstInstanceOrNull(History::class) ?: tab.history
+    }
+
+    private fun createEmptyScene(): Transform {
+        return Transform().run {
             // todo translate
             name = "Root"
             comment = "Error loading $file!"
             this
         }
-        tab.history = history ?: read.firstInstanceOrNull(History::class) ?: tab.history
     }
 
     override fun save(writer: BaseWriter) {

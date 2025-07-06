@@ -1,6 +1,5 @@
 package me.anno.remsstudio.objects.geometric
 
-import me.anno.cache.CacheSection
 import me.anno.config.DefaultConfig
 import me.anno.ecs.components.mesh.Mesh
 import me.anno.engine.inspector.Inspectable
@@ -28,6 +27,9 @@ import me.anno.ui.input.NumberType
 import me.anno.utils.files.LocalFile.toGlobalFile
 import me.anno.utils.pooling.JomlPools
 import me.anno.utils.structures.Collections.filterIsInstance2
+import me.anno.utils.structures.lists.LazyList
+import me.anno.utils.types.Booleans.hasFlag
+import me.anno.utils.types.Booleans.toInt
 import me.anno.utils.types.Casting
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
@@ -70,7 +72,7 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
         stack.next {
             if (!is3D) stack.scale(1f, 1f, 0f)
             draw3DPolygon(
-                this, time, stack, getBuffer(count, selfDepth > 0f), texture, color,
+                this, time, stack, getMesh(count, selfDepth > 0f), texture, color,
                 inset, filtering, Clamping.CLAMP
             )
         }
@@ -153,27 +155,36 @@ open class Polygon(parent: Transform? = null) : GFXTransform(parent) {
 
     companion object {
 
-        val NUM_EDGES_TYPE = NumberType(
-            0, 1, 1f, hasLinear = true, hasExponential = true,
-            { max(Casting.castToInt2(it), minEdges) }, Casting::castToInt
-        )
+        private const val MIN_EDGES = 3
 
-        private val polygonCache = CacheSection<Int, Mesh>("PolygonCache")
-
-        val meshTimeout = 1000L
-        private const val minEdges = 3
-        private val maxEdges by lazy { DefaultConfig["objects.polygon.maxEdges", 1000] }
-
-        fun getBuffer(n: Int, hasDepth: Boolean): Mesh {
-            if (n < minEdges) return getBuffer(minEdges, hasDepth)
-            if (n > maxEdges) return getBuffer(maxEdges, hasDepth)
-            return polygonCache.getEntry(
-                n * 2 + (if (hasDepth) 1 else 0),
-                meshTimeout
-            ) { key, result -> result.value = createBuffer(n, hasDepth) }.waitFor()!!
+        private val maxEdges = lazy {
+            max(DefaultConfig["objects.polygon.maxEdges", 1000], MIN_EDGES)
         }
 
-        private fun createBuffer(n: Int, hasDepth: Boolean): Mesh {
+        private val meshes by lazy {
+            LazyList((maxEdges.value + 1 - MIN_EDGES) * 2) { index ->
+                val n = index ushr 1
+                val hasDepth = n.hasFlag(1)
+                createMesh(n, hasDepth)
+            }
+        }
+
+        val NUM_EDGES_TYPE = NumberType(
+            0, 1, 1f, hasLinear = true, hasExponential = true,
+            {
+                val asInt = Casting.castToInt2(it)
+                if (maxEdges.isInitialized()) clamp(asInt, MIN_EDGES, maxEdges.value)
+                else max(asInt, MIN_EDGES)
+            }, Casting::castToInt
+        )
+
+        fun getMesh(n: Int, hasDepth: Boolean): Mesh {
+            val n = clamp(n, MIN_EDGES, maxEdges.value)
+            val index = (n - MIN_EDGES).shl(1) + hasDepth.toInt()
+            return meshes[index]
+        }
+
+        private fun createMesh(n: Int, hasDepth: Boolean): Mesh {
 
             val frontCount = n * 3
             val sideCount = n * 6

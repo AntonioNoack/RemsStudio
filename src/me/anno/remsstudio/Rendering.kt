@@ -226,7 +226,11 @@ object Rendering {
 
     fun overrideAudio(videoSrc: FileReference, callback: () -> Unit) {
 
-        val meta = getMeta(videoSrc).waitFor()!!
+        val meta = getMeta(videoSrc).waitFor()
+        if(meta == null) {
+            LOGGER.warn("Failed to load metadata for '$videoSrc'")
+            return
+        }
 
         isRendering = true
         LOGGER.info("Rendering audio onto video")
