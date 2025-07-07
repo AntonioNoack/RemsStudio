@@ -28,7 +28,6 @@ import me.anno.ui.editor.files.FileExplorer
 import me.anno.ui.editor.files.FileNames.toAllowedFilename
 import me.anno.utils.Color.mixARGB
 import org.apache.logging.log4j.LogManager
-import kotlin.concurrent.thread
 
 @Suppress("MemberVisibilityCanBePrivate")
 class SceneTab(var file: FileReference, var scene: Transform, history: History?) : TextPanel("", DefaultConfig.style) {
@@ -78,12 +77,14 @@ class SceneTab(var file: FileReference, var scene: Transform, history: History?)
             if (hasChanged) {
                 openMenu(
                     windowStack, listOf(
+                        MenuOption(NameDesc("Save", "", "ui.sceneTab.saved")) { save { } },
                         MenuOption(NameDesc("Close", "", "ui.sceneTab.closeSaved")) { save { close() } },
                         MenuOption(NameDesc("Close (Unsaved)", "", "ui.sceneTab.closeUnsaved")) { close() }
                     ))
             } else {
                 openMenu(
                     windowStack, listOf(
+                        MenuOption(NameDesc("Save", "", "ui.sceneTab.saved")) { save { } },
                         MenuOption(NameDesc("Close", "", "ui.sceneTab.close")) { close() }
                     ))
             }
@@ -102,7 +103,7 @@ class SceneTab(var file: FileReference, var scene: Transform, history: History?)
     fun save(dst: FileReference, onSuccess: () -> Unit) {
         if (dst.isDirectory) dst.delete()
         LOGGER.info("Saving $dst, ${scene.listOfAll.joinToString { it.name }}")
-        ThreadPool.start( "SaveScene") {
+        ThreadPool.start("SaveScene") {
             try {
                 synchronized(scene) {
                     dst.getParent().mkdirs()
@@ -164,7 +165,6 @@ class SceneTab(var file: FileReference, var scene: Transform, history: History?)
                     )
                 }
             }
-
             else -> return super.onGotAction(x, y, dx, dy, action, isContinuous)
         }
         return true

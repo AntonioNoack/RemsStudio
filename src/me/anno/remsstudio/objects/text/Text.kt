@@ -5,12 +5,12 @@ import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
 import me.anno.fonts.Font
 import me.anno.fonts.FontManager
+import me.anno.fonts.LineSplitter
 import me.anno.fonts.PartResult
 import me.anno.fonts.mesh.TextMesh.Companion.DEFAULT_LINE_HEIGHT
 import me.anno.fonts.mesh.TextMeshGroup
 import me.anno.fonts.signeddistfields.TextSDFGroup
 import me.anno.io.base.BaseWriter
-import me.anno.jvm.fonts.AWTFont
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.mix
@@ -121,7 +121,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
 
     open fun splitSegments(text: String): PartResult {
         if (text.isEmpty()) return PartResult(emptyList(), 0f, font.size, 1)
-        val awtFont = FontManager.getFont(font) as AWTFont
+        val awtFont = FontManager.getFont(font) as LineSplitter<*>
         val absoluteLineBreakWidth = lineBreakWidth * font.size * 2f / DEFAULT_LINE_HEIGHT
         val text2 = if (smallCaps) text.smallCaps() else text
         return awtFont.splitParts(text2, font.size, relativeTabSize, relativeCharSpacing, absoluteLineBreakWidth, -1f)
@@ -136,7 +136,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
     fun getTextMesh(key: TextSegmentKey): TextMeshGroup? {
         return textSegmentCache.getEntry(key, textMeshTimeout) { keyInstance, result ->
             result.value = TextMeshGroup(
-                (keyInstance.font as AWTFont).font,
+                keyInstance.font.fontKey.toFont(),
                 keyInstance.text,
                 keyInstance.charSpacing,
                 forceVariableBuffer
@@ -147,7 +147,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
     fun getSDFTexture(key: TextSegmentKey): TextSDFGroup? {
         return textSDFCache.getEntry(key, textMeshTimeout) { keyInstance, result ->
             result.value = TextSDFGroup(
-                (keyInstance.font as AWTFont).font, keyInstance.text,
+                keyInstance.font.fontKey.toFont(), keyInstance.text,
                 keyInstance.charSpacing.toDouble()
             )
         }.value

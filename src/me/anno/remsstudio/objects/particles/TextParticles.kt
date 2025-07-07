@@ -6,7 +6,6 @@ import me.anno.fonts.mesh.TextMesh
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringWriter
-import me.anno.jvm.fonts.AWTFont
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.objects.text.Text
 import me.anno.remsstudio.objects.text.Text.Companion.textVisCache
@@ -63,10 +62,10 @@ class TextParticles : ParticleSystem() {
         val keys = dataValue.second
         val lineSegmentsWithStyle = dataValue.first
 
-        val font2 = FontManager.getFont(text.font) as AWTFont
-        val exampleLayout = font2.exampleLayout
-        val scaleX = TextMesh.DEFAULT_LINE_HEIGHT / (exampleLayout.ascent + exampleLayout.descent)
-        val scaleY = 1f / (exampleLayout.ascent + exampleLayout.descent)
+        val font2 = FontManager.getFont(text.font)
+        val actualFontHeight = font2.getLineHeight()
+        val scaleX = TextMesh.DEFAULT_LINE_HEIGHT / actualFontHeight
+        val scaleY = 1f / actualFontHeight
         val width = lineSegmentsWithStyle.width * scaleX
         val height = lineSegmentsWithStyle.height * scaleY
 

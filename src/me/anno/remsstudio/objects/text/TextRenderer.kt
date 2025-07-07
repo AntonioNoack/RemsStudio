@@ -7,7 +7,6 @@ import me.anno.fonts.signeddistfields.TextSDF
 import me.anno.fonts.signeddistfields.algorithm.SignedDistanceField
 import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.gpu.FinalRendering.onMissingResource
-import me.anno.jvm.fonts.AWTFont
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.remsstudio.objects.attractors.EffectMorphing
@@ -20,7 +19,6 @@ import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector3f
 import org.joml.Vector4f
-import java.awt.font.TextLayout
 import kotlin.math.max
 import kotlin.math.min
 
@@ -41,10 +39,10 @@ object TextRenderer {
 
         val (lineSegmentsWithStyle, keys) = element.getSegments(text)
 
-        val font2 = FontManager.getFont(element.font) as AWTFont
-        val exampleLayout = font2.exampleLayout
-        val scaleX = TextMesh.DEFAULT_LINE_HEIGHT / (exampleLayout.ascent + exampleLayout.descent)
-        val scaleY = 1f / (exampleLayout.ascent + exampleLayout.descent)
+        val font2 = FontManager.getFont(element.font)
+        val actualFontHeight = font2.getLineHeight()
+        val scaleX = TextMesh.DEFAULT_LINE_HEIGHT / actualFontHeight
+        val scaleY = 1f / actualFontHeight
         val width = lineSegmentsWithStyle.width * scaleX
         val height = lineSegmentsWithStyle.height * scaleY
 
@@ -100,7 +98,7 @@ object TextRenderer {
                 if (tintedShadowColor.w >= 1f / 255f) draw(
                     element, stack, time, tintedShadowColor,
                     lineSegmentsWithStyle, drawMeshes, drawSDFTextures,
-                    keys, exampleLayout,
+                    keys, actualFontHeight,
                     width, lineOffset,
                     dx, dy, scaleX, scaleY,
                     startCursor, endCursor,
@@ -113,7 +111,7 @@ object TextRenderer {
         if (color.w >= 1f / 255f) draw(
             element, stack, time, color,
             lineSegmentsWithStyle, drawMeshes, drawSDFTextures,
-            keys, exampleLayout,
+            keys, actualFontHeight,
             width, lineOffset,
             dx, dy, scaleX, scaleY,
             startCursor, endCursor,
@@ -175,7 +173,7 @@ object TextRenderer {
         stack: Matrix4fArrayList, time: Double, color: Vector4f,
         lineSegmentsWithStyle: PartResult,
         drawMeshes: Boolean, drawSDFTexture: Boolean,
-        keys: List<TextSegmentKey>, exampleLayout: TextLayout,
+        keys: List<TextSegmentKey>, actualFontHeight: Float,
         width: Float, lineOffset: Float,
         dx: Float, dy: Float, scaleX: Float, scaleY: Float,
         startCursor: Int, endCursor: Int,
@@ -223,7 +221,7 @@ object TextRenderer {
                         element, key, time, stack, color,
                         lineDeltaX, lineDeltaY,
                         localMin, localMax,
-                        exampleLayout,
+                        actualFontHeight,
                         extraSmoothness,
                         oc0, oc1, oc2
                     )
@@ -246,7 +244,7 @@ object TextRenderer {
         key: TextSegmentKey, time: Double, stack: Matrix4fArrayList,
         color: Vector4f, lineDeltaX: Float, lineDeltaY: Float,
         startIndex: Int, endIndex: Int,
-        exampleLayout: TextLayout,
+        actualFontHeight: Float,
         extraSmoothness: Float,
         oc1: Vector4f, oc2: Vector4f, oc3: Vector4f
     ) {
@@ -273,7 +271,7 @@ object TextRenderer {
             if (texture != null && texture.isCreated()) {
 
                 val baseScale =
-                    TextMesh.DEFAULT_LINE_HEIGHT / sdfResolution / (exampleLayout.ascent + exampleLayout.descent)
+                    TextMesh.DEFAULT_LINE_HEIGHT / (sdfResolution * actualFontHeight)
 
                 val scaleX = 0.5f * texture.width * baseScale
                 val scaleY = 0.5f * texture.height * baseScale
