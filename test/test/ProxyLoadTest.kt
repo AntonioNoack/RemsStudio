@@ -16,7 +16,7 @@ fun main() {
 
     val frame = Sleep.waitUntilDefined(true) {
         video.getVideoFrame(4, 0, 30.0)
-    }
+    }?.waitFor()
 
     println("Got frame ${frame?.width} x ${frame?.height}")
 

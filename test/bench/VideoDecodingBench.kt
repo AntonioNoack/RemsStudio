@@ -1,5 +1,6 @@
 package bench
 
+import me.anno.io.MediaMetadata.Companion.getMeta
 import me.anno.io.files.FileReference
 import me.anno.remsstudio.objects.video.Video
 import me.anno.utils.OS
@@ -42,12 +43,12 @@ fun decode(file: FileReference, start: Int, end: Int, fps: Double) {
     val t0 = System.nanoTime()
     val index = end - 1
     val bufferLength = end - start
-    val bufferIndex = index / bufferLength
+    val meta = getMeta(file).waitFor()!!
     while (true) {
         val frame = VideoCache.getVideoFrame(
             file, 1, index,
-            bufferIndex, bufferLength, fps,
-            1, false
+            bufferLength, fps, 1,
+            meta
         ).waitFor()
         if (frame != null) break
         Sleep.sleepShortly(true)
