@@ -12,6 +12,7 @@ import me.anno.gpu.texture.TextureLib.colorShowTexture
 import me.anno.image.svg.SVGMeshCache
 import me.anno.io.MediaMetadata
 import me.anno.maths.Maths.clamp
+import me.anno.maths.Maths.posMod
 import me.anno.remsstudio.gpu.DrawSVGv2
 import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.remsstudio.gpu.GFXx3Dv2.draw3DVideo
@@ -219,7 +220,8 @@ object VideoDrawing {
                         tiling, uvProjection.value, cornerRadius
                     )
                     JomlPools.vec4f.sub(2)
-                    if (frame0.frameIndex != frameIndex) {
+                    val mod = VideoCache.framesPerSlice
+                    if (posMod(frame0.frameIndex, mod) != posMod(frameIndex, mod)) {
                         drawLoadingCircle(stack, (Time.nanoTime * 1e-9f) % 1f)
                     }
                     wasDrawn = true

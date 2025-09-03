@@ -8,6 +8,7 @@
       <root url="file://$PROJECT_DIR$/../RemsEngine/src" />
       <root url="file://$PROJECT_DIR$/../RemsEngine/Image/src" />
       <root url="file://$PROJECT_DIR$/../RemsEngine/KOML/src" />
+      <root url="file://$PROJECT_DIR$/../RemsEngine/Video/src" />
     </SOURCES>
   </library>
 </component>
