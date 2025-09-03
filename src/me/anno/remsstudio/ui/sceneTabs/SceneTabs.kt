@@ -31,11 +31,8 @@ object SceneTabs : ScrollPanelX(DefaultConfig.style) {
         if (opened != null) {
             open(opened)
         } else {
-            println("Not yet opened -> importing")
             addEvent {
-                println("Adding child from file...")
                 addChildFromFile(null, file, FileContentImporter.SoftLinkMode.COPY_CONTENT, false) { transform ->
-                    println("Got transform, opening tab $transform")
                     var file2 = file
                     if (file2.lcExtension != "json") {
                         file2 = file2.getParent().getChild(file2.name + ".json")
@@ -43,6 +40,7 @@ object SceneTabs : ScrollPanelX(DefaultConfig.style) {
                     val tab = SceneTab(file2, transform, null)
                     content += tab
                     open(tab)
+                    RemsStudio.project?.saveTabs()
                 }
             }
         }
@@ -91,6 +89,7 @@ object SceneTabs : ScrollPanelX(DefaultConfig.style) {
                 open(panelChildren[max(index, 0)] as SceneTab)
             }
         } else sceneTab.removeFromParent()
+        RemsStudio.project?.saveTabs()
     }
 
     fun closeAll() {

@@ -24,7 +24,6 @@ import me.anno.utils.Threads
 import me.anno.utils.types.Strings.getImportTypeByExtension
 import org.apache.logging.log4j.LogManager
 import org.joml.Vector3f
-import kotlin.concurrent.thread
 
 @Suppress("MemberVisibilityCanBePrivate")
 object StudioFileImporter : FileContentImporter<Transform>() {
@@ -46,8 +45,9 @@ object StudioFileImporter : FileContentImporter<Transform>() {
         callback: (Transform) -> Unit
     ) {
         val name = file.name
-        when (getImportTypeByExtension(file.lcExtension)) {
-            "Transform" -> when (useSoftLink) {
+        val importType = getImportTypeByExtension(file.lcExtension)
+        when (importType) {
+            "Transform", "Metadata" -> when (useSoftLink) {
                 SoftLinkMode.ASK -> openMenu(
                     defaultWindowStack, listOf(
                         MenuOption(NameDesc("Link")) {
