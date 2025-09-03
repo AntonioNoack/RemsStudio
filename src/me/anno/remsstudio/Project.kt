@@ -1,7 +1,6 @@
 package me.anno.remsstudio
 
 import me.anno.config.DefaultConfig.style
-import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.engine.Events.addEvent
 import me.anno.gpu.GFX
 import me.anno.io.config.ConfigBasics
@@ -66,29 +65,40 @@ class Project(var name: String, val folder: FileReference, saveIfMissing: Boolea
         mainUI = createDefaultMainUI(style)
     }
 
+    val rootJson = scenes.getChild("Root.json")
+    fun findFirstTab(ref: FileReference = rootJson): SceneTab {
+        val tab0 = if (ref.exists) {
+            try {
+                val data = JsonStringReader.read(ref.inputStreamSync(), folder, true)
+                val trans = data.firstInstanceOrNull2(Transform::class)
+                val history = data.firstInstanceOrNull2(History::class)
+                if (trans != null) Pair(trans, history ?: History()) else null
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        } else null
+        return SceneTab(
+            ref,
+            tab0?.first ?: Transform().run {
+                name = "Root"
+                Camera(this)
+                this
+            }, tab0?.second ?: History()
+        )
+    }
+
+    fun loadSceneTabs(): List<SceneTabData> {
+        val loadedUIData = JsonStringReader
+            .read(tabsFile.readTextSync(), folder, true)
+        return loadedUIData
+            .filterIsInstance2(SceneTabData::class)
+    }
+
     fun loadInitialUI() {
 
         fun tabsDefault() {
-            val ref = scenes.getChild("Root.json")
-            val tab0 = if (ref.exists) {
-                try {
-                    val data = JsonStringReader.read(ref.inputStreamSync(), workspace, true)
-                    val trans = data.firstInstanceOrNull2(Transform::class)
-                    val history = data.firstInstanceOrNull2(History::class)
-                    if (trans != null) Pair(trans, history ?: History()) else null
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    null
-                }
-            } else null
-            val tab = SceneTab(
-                ref,
-                tab0?.first ?: Transform().run {
-                    name = "Root"
-                    Camera(this)
-                    this
-                }, tab0?.second ?: History()
-            )
+            val tab = findFirstTab(rootJson)
             tab.save {}
             addEvent {
                 SceneTabs.closeAll()
@@ -97,15 +107,10 @@ class Project(var name: String, val folder: FileReference, saveIfMissing: Boolea
             }
         }
 
-
         // tabs
         try {
             if (tabsFile.exists) {
-                val loadedUIData = JsonStringReader
-                    .read(tabsFile, workspace, true)
-                    .waitFor() ?: emptyList()
-                val sceneTabs = loadedUIData
-                    .filterIsInstance2(SceneTabData::class)
+                val sceneTabs = loadSceneTabs()
                 if (sceneTabs.isEmpty()) {
                     tabsDefault()
                 } else {
@@ -147,7 +152,7 @@ class Project(var name: String, val folder: FileReference, saveIfMissing: Boolea
 
     fun saveTabs() {
         val data = SceneTabs.sceneTabs.map { SceneTabData(it) }
-        JsonStringWriter.save(data, tabsFile, workspace)
+        JsonStringWriter.save(data, tabsFile, folder)
     }
 
     fun loadUILayout(name: String = uiFile.nameWithoutExtension): Panel? {

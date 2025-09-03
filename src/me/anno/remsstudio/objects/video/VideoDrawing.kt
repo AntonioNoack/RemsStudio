@@ -53,21 +53,25 @@ object VideoDrawing {
         val projection = uvProjection.value
         when {
             ext == "svg" -> {
-                val bufferData = SVGMeshCache[file, imageTimeout].value
-                if (bufferData == null) onMissingImageOrFrame(0)
-                else {
+                val wrapper = SVGMeshCache[file, imageTimeout]
+                if (!wrapper.hasValue && !wrapper.hasBeenDestroyed) onMissingImageOrFrame(0)
+                val image = wrapper.value
+                if (image != null) {
                     DrawSVGv2.draw3DSVG(
                         this, time,
-                        stack, bufferData, TextureLib.whiteTexture,
+                        stack, image, TextureLib.whiteTexture,
                         color, filtering, clamping, tiling
                     )
                 }
             }
             ext.isFFMPEGOnlyExtension() -> {
                 // calculate required scale? no, without animation, we don't need to scale it down ;)
-                val texture = VideoCache.getVideoFrame(file, 1, 0, 1, 1.0, imageTimeout).value
-                if (texture == null || !texture.isCreated) onMissingImageOrFrame(0)
-                else {
+                val wrapper = VideoCache.getVideoFrame(file, 1, 0, 1, 1.0, imageTimeout)
+                if (!wrapper.hasValue && !wrapper.hasBeenDestroyed) {
+                    onMissingImageOrFrame(0)
+                }
+                val texture = wrapper.value
+                if (texture != null && texture.isCreated) {
                     lastW = texture.width
                     lastH = texture.height
                     draw3DVideo(
@@ -115,9 +119,10 @@ object VideoDrawing {
                 val localTime = isLooping[time, duration]
 
 
-                val frame = TextureCache[meta.getImage(localTime), 5L].value
-                if (frame == null || !frame.isCreated()) onMissingImageOrFrame((localTime * 1000).toInt())
-                else {
+                val wrapper = TextureCache[meta.getImage(localTime), 5L]
+                if (!wrapper.hasValue && !wrapper.hasBeenDestroyed) onMissingImageOrFrame((localTime * 1000).toInt())
+                val frame = wrapper.value
+                if (frame != null && frame.isCreated()) {
                     lastW = frame.width
                     lastH = frame.height
                     val tiling = tiling[time, JomlPools.vec4f.create()]
@@ -247,11 +252,17 @@ object VideoDrawing {
         val useStreaming = streamManager.canUseVideoStreaming()
         fun getFrame(frameIndex: Int): GPUFrame? {
             if (frameIndex !in 0 until meta.videoFrameCount) return null
-            val frame = if (useStreaming) {
-                streamManager.getFrame(scale, frameIndex, videoFPS)
-            } else getVideoFrame(scale, frameIndex, videoFPS)
-            if (frame == null) onMissingImageOrFrame(frameIndex)
-            return frame
+            if (useStreaming) {
+                val frame = streamManager.getFrame(scale, frameIndex, videoFPS)
+                if (frame == null) onMissingImageOrFrame(frameIndex)
+                return frame
+            } else {
+                val wrapper = getVideoFrame(scale, frameIndex, videoFPS)
+                if (!wrapper.hasValue && !wrapper.hasBeenDestroyed) onMissingImageOrFrame(frameIndex)
+                val value = wrapper.value
+                if (value != null && !value.isCreated && !value.isDestroyed) onMissingImageOrFrame(frameIndex)
+                return if (value != null && value.isCreated) value else null
+            }
         }
 
         var frame0 = if (usesBlankFrameDetection()) {
@@ -267,7 +278,7 @@ object VideoDrawing {
         }
 
         if (frame0 == null || !frame0.isCreated || frame0.isDestroyed) {
-            onMissingImageOrFrame(frameIndex)
+            // onMissingImageOrFrame(frameIndex)
             frame0 = getVideoFrameWithoutGenerator(meta, frameIndex, bufferSize, videoFPS)
             if (frame0 == null || !frame0.isCreated || frame0.isDestroyed) frame0 = lastFrame
         }
@@ -278,7 +289,7 @@ object VideoDrawing {
     }
 
     private fun Video.findClosestFrame(frameIndex: Int, scale: Int, videoFPS: Double): GPUFrame? {
-        var bestFrame = getVideoFrame(scale, frameIndex, videoFPS)
+        var bestFrame = getVideoFrame(scale, frameIndex, videoFPS).value
         if (bestFrame != null) return bestFrame
         val lastFrames = lastXFrames
         for (i in lastFrames.indices) {

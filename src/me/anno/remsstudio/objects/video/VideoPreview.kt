@@ -58,11 +58,11 @@ object VideoPreview {
             VideoCache.getVideoFrameWithoutGenerator(
                 file, scale, frameIndex, frameIndex,
                 1, sourceFPS
-            )
+            ).value
         } else {
-            VideoCache.getVideoFrame(
+            VideoCache.getVideoFrameImpl(
                 file, scale, frameIndex, frameIndex,
-                1, sourceFPS, previewTimeout, true
+                1, sourceFPS, previewTimeout
             ).value
         }
         if (frame != null && frame.isCreated) {

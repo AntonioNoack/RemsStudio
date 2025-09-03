@@ -1,6 +1,7 @@
 package test
 
 import me.anno.config.DefaultConfig
+import me.anno.fonts.Codepoints.codepoints
 import me.anno.fonts.Font
 import me.anno.gpu.drawing.DrawTexts
 import me.anno.ui.base.text.TextPanel
@@ -15,20 +16,20 @@ fun main() {
     val font0 = Font("Verdana", 15)
     val font1 = Font("Segoe UI Emoji", 15)
     println(listOf(127902).joinChars())
-    println(listOf(127902).joinChars().codePoints().toList())
+    println(listOf(127902).joinChars().codepoints().toList())
     println(DrawTexts.getTextSizeX(font0, listOf(127902).joinChars(), s, s))
     println(DrawTexts.getTextSizeX(font1, listOf(127902).joinChars(), s, s))
     println(DrawTexts.getTextSizeX(font0, listOf(65039).joinChars(), s, s))
     println(DrawTexts.getTextSizeX(font1, listOf(65039).joinChars(), s, s))
     println("\uD83C\uDF9E️")
-    println("\uD83C\uDF9E️".codePoints().toList())
+    println("\uD83C\uDF9E️".codepoints().toList())
     println("xx " + listOf(127902).joinChars().length)
     println("xx " + listOf(65039).joinChars().length)
     println(
-        "xx " + "\uD83C\uDF9E️".length + "\uD83C\uDF9E".length + " xx " + "\uD83C\uDF9E️".codePoints().toList()
+        "xx " + "\uD83C\uDF9E️".length + "\uD83C\uDF9E".length + " xx " + "\uD83C\uDF9E️".codepoints().toList()
             .joinChars().length
     )
-    println("xx " + "\uD83C\uDF9E️".codePoints().toList().joinChars().codePoints().toList())
+    println("xx " + "\uD83C\uDF9E️".codePoints().toList().joinChars().codepoints().toList())
     println(DrawTexts.getTextSizeX(font0, "\uD83C\uDF9E️", s, s))
     println(DrawTexts.getTextSizeX(font1, "\uD83C\uDF9E️", s, s))
     println("\uD83C\uDFA5️")

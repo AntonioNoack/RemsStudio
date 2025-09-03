@@ -1,6 +1,5 @@
 package me.anno.remsstudio
 
-import me.anno.cache.ThreadPool
 import me.anno.engine.Events.addEvent
 import me.anno.installer.Installer
 import me.anno.language.translation.NameDesc
@@ -8,6 +7,7 @@ import me.anno.remsstudio.RemsStudio.defaultWindowStack
 import me.anno.ui.base.menu.Menu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.utils.OS
+import me.anno.utils.Threads
 import me.anno.utils.files.OpenFileExternally.openInBrowser
 import me.anno.utils.files.OpenFileExternally.openInExplorer
 import org.apache.logging.log4j.LogManager
@@ -28,7 +28,7 @@ object CheckVersion {
 
     fun checkVersion() {
         val windowStack = defaultWindowStack
-        ThreadPool.start("CheckVersion") {
+        Threads.runTaskThread("CheckVersion") {
             val latestVersion = checkVersion(URL(url))
             if (latestVersion > -1) {
                 if (latestVersion > RemsStudio.versionNumber) {

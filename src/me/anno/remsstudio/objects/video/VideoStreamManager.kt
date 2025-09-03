@@ -69,13 +69,15 @@ class VideoStreamManager(val video: Video) : ICacheData {
     }
 
     fun canUseVideoStreaming(): Boolean {
-        return !isCacheableVideo() && !isScrubbing() && hasSimpleTime() && isPlayingForward()
+        return !isCacheableVideo() && !isScrubbing() &&
+                hasSimpleTime() && isPlayingForward() &&
+                video.isLooping.value == LoopingState.PLAY_ONCE
     }
 
     private val lastFile: FileReference? get() = stream?.file
     private var lastScale = 0
     private var lastFPS = 0.0
-    private var stream: VideoStream? = null
+    var stream: VideoStream? = null
     private var timeoutNanos = 0L
 
     fun destroyIfUnused() {

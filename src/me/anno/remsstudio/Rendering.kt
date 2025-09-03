@@ -1,6 +1,5 @@
 package me.anno.remsstudio
 
-import me.anno.cache.ThreadPool
 import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.engine.Events.addEvent
 import me.anno.gpu.GFX
@@ -25,6 +24,7 @@ import me.anno.remsstudio.video.VideoBackgroundTaskV2
 import me.anno.ui.base.menu.Menu.ask
 import me.anno.ui.base.menu.Menu.msg
 import me.anno.ui.base.progress.ProgressBar
+import me.anno.utils.Threads
 import me.anno.utils.files.FileChooser
 import me.anno.utils.files.FileExtensionFilter
 import me.anno.utils.structures.Collections.filterIsInstance2
@@ -259,7 +259,7 @@ object Rendering {
                 callback()
                 targetOutputFile.invalidate()
             }
-            ThreadPool.start("Rendering::renderAudio()") {
+            Threads.runWorkerThread("Rendering::renderAudio()") {
                 createOrAppendAudio(targetOutputFile, videoSrc, false)
             }
         }
@@ -300,7 +300,7 @@ object Rendering {
                 callback()
                 targetOutputFile.invalidate()
             }
-            ThreadPool.start("Rendering::renderAudio()") {
+            Threads.runWorkerThread("Rendering::renderAudio()") {
                 createOrAppendAudio(targetOutputFile, InvalidRef, false)
             }
         }

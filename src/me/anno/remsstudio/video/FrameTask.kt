@@ -1,6 +1,5 @@
 package me.anno.remsstudio.video
 
-import me.anno.cache.ThreadPool
 import me.anno.gpu.Blitting
 import me.anno.gpu.FinalRendering
 import me.anno.gpu.GFX
@@ -15,6 +14,7 @@ import me.anno.gpu.texture.Texture2D
 import me.anno.image.raw.ByteImage
 import me.anno.image.raw.ByteImageFormat
 import me.anno.io.files.FileReference
+import me.anno.utils.Threads
 import me.anno.utils.pooling.ByteBufferPool
 import me.anno.video.VideoBackgroundTask.Companion.missingResource
 import org.apache.logging.log4j.LogManager
@@ -87,7 +87,7 @@ abstract class FrameTask(
 
         GFX.check()
 
-        ThreadPool.start("FrameTask::writeFrame") {// offload to other thread
+        Threads.runTaskThread("FrameTask::writeFrame") {// offload to other thread
             // val c1 = Clock()
             val image = ByteImage(width, height, ByteImageFormat.RGB)
             pixels.get(image.data, 0, image.data.size)

@@ -1,6 +1,7 @@
 package me.anno.remsstudio.audio
 
 import me.anno.animation.LoopingState
+import me.anno.audio.AudioData
 import me.anno.audio.streams.AudioFileStream
 import me.anno.cache.AsyncCacheData
 import me.anno.io.MediaMetadata
@@ -55,9 +56,9 @@ open class AudioFileStream2(
     fun getTime(index: Long): Time = getTime(frameIndexToTime(index))
     private fun getTime(globalTime: Double): Time = Time(globalToLocalTime(globalTime), globalTime)
 
-    override fun getBuffer(bufferIndex: Long): AsyncCacheData<Pair<ShortArray?, ShortArray?>> {
+    override fun getBuffer(bufferIndex: Long): AsyncCacheData<AudioData> {
         val data = AudioFXCache2.getBuffer(bufferIndex, this, false)!!
-        return AsyncCacheData(Pair(convert(data.first), convert(data.second)))
+        return AsyncCacheData(AudioData(convert(data.first), convert(data.second)))
     }
 
     // todo is this correct with the speed?

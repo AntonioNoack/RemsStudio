@@ -3,7 +3,6 @@ package me.anno.remsstudio.audio.effects.impl
 import me.anno.audio.openal.SoundBuffer
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
 import me.anno.cache.AsyncCacheData
-import me.anno.cache.ThreadPool
 import me.anno.engine.Events.addEvent
 import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
@@ -22,6 +21,7 @@ import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.FloatInput
+import me.anno.utils.Threads
 import me.anno.video.ffmpeg.FFMPEGStream.Companion.getAudioSequence
 import org.apache.logging.log4j.LogManager
 import kotlin.concurrent.thread
@@ -107,7 +107,7 @@ class NoiseSuppressionEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAI
                     val meta = audio.forcedMeta
                     if (meta != null) {
                         // make this async to prevent lag
-                        ThreadPool.start( "Noise Level") {
+                        Threads.runTaskThread("Noise Level") {
                             val duration = min(10.0, meta.audioDuration)
                             val numSamples = min((duration * meta.audioSampleRate).toLong(), meta.audioSampleCount)
                             // if audio is short, subdivide buffers, so we get more decision freedom on histogram

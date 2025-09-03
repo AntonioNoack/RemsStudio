@@ -7,7 +7,6 @@ import me.anno.audio.AudioPools.FAPool
 import me.anno.audio.AudioPools.SAPool
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
 import me.anno.cache.AsyncCacheData
-import me.anno.cache.CacheData
 import me.anno.cache.CacheSection
 import me.anno.cache.ICacheData
 import me.anno.gpu.GFX
@@ -309,7 +308,6 @@ object AudioFXCache2 {
     }
 
     private val rangingProcessing = ProcessingQueue("AudioFX")
-    private val rangingProcessing2 = ProcessingQueue("AudioFX-2")
 
     data class RangeKey(val i0: Long, val i1: Long, val identifier: String) {
 
@@ -326,75 +324,68 @@ object AudioFXCache2 {
 
     }
 
-    class ShortData : CacheData<ShortArray?>(null) {
+    class ShortData : AsyncCacheData<ShortArray>(null) {
         override fun destroy() {
             SAPool.returnBuffer(value)
         }
     }
 
     fun getRange(
-        bufferSize: Int,
-        index0: Long,
-        index1: Long,
-        identifier: String,
-        source: Video,
-        destination: Camera,
+        bufferSize: Int, index0: Long, index1: Long,
+        identifier: String, source: Video, destination: Camera,
         async: Boolean = true
     ): ShortArray? {
-        val queue = if (async) rangingProcessing2 else null
-        return rangeCache.getEntryLimited(
-            RangeKey(index0, index1, identifier),
-            audioTimeoutMillis,
-            queue,
-            rangeRequestLimit
-        ) { key, result ->
+        val queue = if (async) rangingProcessing else null
+        val key = RangeKey(index0, index1, identifier)
+        if (queue != null && queue.size >= rangeRequestLimit) {
+            return rangeCache.getEntryWithoutGenerator(key, audioTimeoutMillis)?.value?.value
+        }
+        return rangeCache.getEntry(key, audioTimeoutMillis, queue) { key, result ->
             val data = ShortData()
-            rangingProcessing += {
-                val splits = SPLITS
-                val values = SAPool[splits * 2, false, true]
-                var lastBufferIndex = 0L
-                lateinit var buffer: Pair<FloatArray, FloatArray>
-                val bufferSizeM1 = bufferSize - 1
-                for (split in 0 until splits) {
+            val splits = SPLITS
+            val values = SAPool[splits * 2, false, true]
+            var lastBufferIndex = 0L
+            lateinit var buffer: Pair<FloatArray, FloatArray>
+            val bufferSizeM1 = bufferSize - 1
+            for (split in 0 until splits) {
 
-                    var minV = +1e5f
-                    var maxV = -1e5f
+                var minV = +1e5f
+                var maxV = -1e5f
 
-                    val deltaIndex = index1 - index0
-                    val index0i = index0 + deltaIndex * split / splits
-                    val index1i = StrictMath.min(index0i + 256, index0 + deltaIndex * (split + 1) / splits)
-                    for (i in index0i until index1i) {
+                val deltaIndex = index1 - index0
+                val index0i = index0 + deltaIndex * split / splits
+                val index1i = StrictMath.min(index0i + 256, index0 + deltaIndex * (split + 1) / splits)
+                for (i in index0i until index1i) {
 
-                        val bufferIndex = Math.floorDiv(i, bufferSize.toLong())
-                        if (i == index0 || lastBufferIndex != bufferIndex) {
-                            buffer = getBuffer(
-                                source, destination, bufferSize,
-                                Domain.TIME_DOMAIN, false
-                            ) { getTime(bufferIndex + it, source) }!!
-                            lastBufferIndex = bufferIndex
-                        }
-
-                        val localIndex = i.toInt() and bufferSizeM1
-                        val v0 = buffer.first[localIndex]
-                        val v1 = buffer.second[localIndex]
-
-                        minV = min(minV, v0)
-                        minV = min(minV, v1)
-                        maxV = max(maxV, v0)
-                        maxV = max(maxV, v1)
-
+                    val bufferIndex = Math.floorDiv(i, bufferSize.toLong())
+                    if (i == index0 || lastBufferIndex != bufferIndex) {
+                        buffer = getBuffer(
+                            source, destination, bufferSize,
+                            Domain.TIME_DOMAIN, false
+                        ) { getTime(bufferIndex + it, source) }!!
+                        lastBufferIndex = bufferIndex
                     }
 
-                    val minInt = floor(minV).toInt()
-                    val maxInt = ceil(maxV).toInt()
-                    values[split * 2 + 0] = clamp(minInt, -32768, 32767).toShort()
-                    values[split * 2 + 1] = clamp(maxInt, -32768, 32767).toShort()
+                    val localIndex = i.toInt() and bufferSizeM1
+                    val v0 = buffer.first[localIndex]
+                    val v1 = buffer.second[localIndex]
+
+                    minV = min(minV, v0)
+                    minV = min(minV, v1)
+                    maxV = max(maxV, v0)
+                    maxV = max(maxV, v1)
 
                 }
-                data.value = values
+
+                val minInt = floor(minV).toInt()
+                val maxInt = ceil(maxV).toInt()
+                values[split * 2 + 0] = clamp(minInt, -32768, 32767).toShort()
+                values[split * 2 + 1] = clamp(maxInt, -32768, 32767).toShort()
+
             }
+            data.value = values
             result.value = data
-        }?.value?.value
+        }.value?.value
     }
 
     fun getKey(

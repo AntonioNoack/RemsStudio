@@ -26,7 +26,7 @@ class SceneTabData() : Saveable() {
 
     fun apply(tab: SceneTab) {
         tab.file = file
-        val read by lazy { JsonStringReader.read(file, workspace, true).waitFor() ?: emptyList() }
+        val read by lazy { JsonStringReader.read(file.readTextSync(), workspace, true) }
         tab.scene = transform ?: read.firstInstanceOrNull(Transform::class) ?: createEmptyScene()
         tab.history = history ?: read.firstInstanceOrNull(History::class) ?: tab.history
     }

@@ -9,7 +9,6 @@ import me.anno.utils.Color.black
 import me.anno.utils.hpc.threadLocal
 import me.anno.video.VideoCache
 import me.anno.video.VideoFramesKey
-import me.anno.video.VideoSlice
 import me.anno.video.formats.gpu.BlankFrameDetector
 import kotlin.math.max
 
@@ -57,12 +56,12 @@ enum class FrameStatus(val color: Int) {
             key.bufferLength = bufferLength
             key.fps = fps
 
-            val videoData = VideoCache.getEntryWithoutGenerator(key) as? VideoSlice
-            if (videoData == null) {
+            val slice = VideoCache.getVideoFramesWithoutGenerator(key)?.value
+            if (slice == null) {
                 return video.streamManager.getFrameStatus(frameIndex)
             }
 
-            val frame = videoData.frames.getOrNull(localIndex)
+            val frame = slice.getOrNull(localIndex)?.value
             return when {
                 frame == null -> BUFFER_LOADING
                 frame.isDestroyed -> DESTROYED

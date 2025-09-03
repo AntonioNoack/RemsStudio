@@ -1,8 +1,8 @@
 package me.anno.remsstudio.ui
 
-import me.anno.cache.ThreadPool
 import me.anno.config.DefaultConfig
 import me.anno.engine.Events.addEvent
+import me.anno.fonts.Codepoints.countCodepoints
 import me.anno.io.files.FileReference
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.RemsStudio
@@ -20,6 +20,7 @@ import me.anno.ui.base.menu.Menu.ask
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.editor.files.FileContentImporter
+import me.anno.utils.Threads
 import me.anno.utils.types.Strings.getImportTypeByExtension
 import org.apache.logging.log4j.LogManager
 import org.joml.Vector3f
@@ -71,7 +72,7 @@ object StudioFileImporter : FileContentImporter<Transform>() {
                     }
                 }
                 else -> {
-                    ThreadPool.start("ImportFromFile") {
+                    Threads.runTaskThread("ImportFromFile") {
                         val text = file.readTextSync()
                         try {
                             val transform = text.toTransform()
@@ -188,7 +189,7 @@ object StudioFileImporter : FileContentImporter<Transform>() {
                 ask(
                     defaultWindowStack,
                     NameDesc("Text has %1 characters, import?", "", "obj.text.askLargeImport")
-                        .with("%1", text.codePoints().count().toString())
+                        .with("%1", text.countCodepoints().toString())
                 ) {
                     RemsStudio.largeChange("Imported Text") {
                         val textNode = Text(text, parent)

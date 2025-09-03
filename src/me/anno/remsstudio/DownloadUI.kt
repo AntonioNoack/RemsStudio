@@ -1,7 +1,6 @@
 package me.anno.remsstudio
 
 import me.anno.Engine
-import me.anno.cache.ThreadPool
 import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.gpu.GFX
 import me.anno.gpu.texture.TextureCache
@@ -31,6 +30,7 @@ import me.anno.ui.input.URLInput
 import me.anno.utils.Color.black
 import me.anno.utils.Color.withAlpha
 import me.anno.utils.OS
+import me.anno.utils.Threads
 import me.anno.utils.files.Files.formatFileSize
 import me.anno.utils.types.Floats.f2
 import me.anno.utils.types.Strings.formatTime
@@ -255,7 +255,7 @@ object DownloadUI {
                 .addAll(args)
 
             val process = builder.start()
-            ThreadPool.start("cmd($args):error") {
+            Threads.runWorkerThread("cmd($args):error") {
                 process.errorStream.use {
                     val reader = it.bufferedReader()
                     while (!Engine.shutdown) {
@@ -268,7 +268,7 @@ object DownloadUI {
                 }
             }
 
-            ThreadPool.start("cmd($args):input") {
+            Threads.runTaskThread("cmd($args):input") {
                 process.inputStream.use { input ->
                     val txt = input.readText()
                     if (iter != iteration) return@use
@@ -440,7 +440,7 @@ object DownloadUI {
                 object : ProgressBar("Download", "%", 100.0) {
                     override fun formatProgress(): String = progressLine
                 })
-            ThreadPool.start("cmd($args):error") {
+            Threads.runWorkerThread("cmd($args):error") {
                 val reader = process.errorStream.bufferedReader()
                 while (!Engine.shutdown) {
                     val line = reader.readLine() ?: break
@@ -450,7 +450,7 @@ object DownloadUI {
                 }
                 reader.close()
             }
-            ThreadPool.start("cmd($args):input") {
+            Threads.runWorkerThread("cmd($args):input") {
                 // show progress bar while downloading
                 // [download]  87.1% of  228.51MiB at    5.75MiB/s ETA 00:05
                 val reader = process.inputStream.bufferedReader()

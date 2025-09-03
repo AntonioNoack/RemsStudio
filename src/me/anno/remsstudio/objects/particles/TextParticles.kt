@@ -1,6 +1,7 @@
 package me.anno.remsstudio.objects.particles
 
 import me.anno.engine.inspector.Inspectable
+import me.anno.fonts.Codepoints.codepoints
 import me.anno.fonts.FontManager
 import me.anno.fonts.mesh.TextMesh
 import me.anno.io.base.BaseWriter
@@ -38,7 +39,7 @@ class TextParticles : ParticleSystem() {
 
         val text2 = text.text[time]
 
-        val char = text2.codePoints().toList().getOrNull(index) ?: return null
+        val char = text2.codepoints().getOrNull(index) ?: return null
 
         val str = listOf(char).joinChars().toString()
         val clone = text.clone() as Text

@@ -2,6 +2,7 @@ package me.anno.remsstudio.objects.video
 
 import me.anno.animation.LoopingState
 import me.anno.audio.openal.AudioTasks.addAudioTask
+import me.anno.cache.AsyncCacheData
 import me.anno.config.DefaultConfig
 import me.anno.ecs.annotations.Range
 import me.anno.engine.inspector.Inspectable
@@ -260,13 +261,14 @@ class Video(var file: FileReference = InvalidRef, parent: Transform? = null) : G
         }.value
     }
 
-    fun getVideoFrame(scale: Int, index: Int, fps: Double): GPUFrame? {
-        return VideoCache.getVideoFrame(file, scale, index, framesPerContainer, fps, imageTimeout).value
+    fun getVideoFrame(scale: Int, index: Int, fps: Double): AsyncCacheData<GPUFrame> {
+        return VideoCache.getVideoFrame(file, scale, index, framesPerContainer, fps, imageTimeout)
     }
 
     fun getVideoFrameWithoutGenerator(scale: Int, index: Int, fps: Double): GPUFrame? {
         val bufferLength = framesPerContainer
         return VideoCache.getVideoFrameWithoutGenerator(file, scale, index, index % bufferLength, bufferLength, fps)
+            .value
     }
 
     var needsImageUpdate = false
