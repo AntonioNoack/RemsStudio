@@ -8,7 +8,7 @@ import me.anno.remsstudio.ui.editor.TimelinePanel
 import me.anno.utils.Color.white4
 import me.anno.utils.pooling.JomlPools
 
-class LayerViewComputer(private val view: LayerView) {
+class LayerViewComputer(private val view: CuttingLayer) {
 
     var isCalculating = false
     var calculated: List<Transform>? = null
@@ -23,7 +23,7 @@ class LayerViewComputer(private val view: LayerView) {
 
         val root = RemsStudio.root
 
-        val transforms = view.findElements()
+        val transforms = view.findTransformsInSlotAndTheirHierarchy()
 
         // load all metas
         for (transform in transforms) {
@@ -88,7 +88,7 @@ class LayerViewComputer(private val view: LayerView) {
                     val tr = transforms[index]
                     val color = localColor[index]
                     val alpha = color.w * view.alphaMultiplier
-                    if (tr.isVisible(localTime[index]) && alpha >= LayerView.minAlpha) {
+                    if (tr.isVisible(localTime[index]) && alpha >= CuttingLayer.minAlpha) {
                         color.w = alpha
 
                         val list = stripes[lineIndex]
@@ -103,7 +103,7 @@ class LayerViewComputer(private val view: LayerView) {
                             }
                         }
 
-                        if (lineIndex + 1 >= LayerView.maxLines) break
+                        if (lineIndex + 1 >= CuttingLayer.maxLines) break
                         else lineIndex++
                     }
                 }

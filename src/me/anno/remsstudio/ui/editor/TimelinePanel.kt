@@ -23,8 +23,8 @@ import me.anno.remsstudio.RemsStudio.targetFPS
 import me.anno.remsstudio.RemsStudio.updateAudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.objects.Transform
-import me.anno.remsstudio.ui.graphs.GraphEditorBody.Companion.shouldMove
-import me.anno.remsstudio.ui.graphs.GraphEditorBody.Companion.shouldScrub
+import me.anno.remsstudio.ui.graphs.KeyframeEditorBody.Companion.shouldMove
+import me.anno.remsstudio.ui.graphs.KeyframeEditorBody.Companion.shouldScrub
 import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.components.AxisAlignment

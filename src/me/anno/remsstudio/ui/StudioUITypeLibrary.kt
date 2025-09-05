@@ -6,8 +6,8 @@ import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.ui.editor.TimelinePanel
-import me.anno.remsstudio.ui.editor.cutting.LayerViewContainer
-import me.anno.remsstudio.ui.graphs.GraphEditor
+import me.anno.remsstudio.ui.editor.cutting.CuttingEditor
+import me.anno.remsstudio.ui.graphs.KeyframeEditor
 import me.anno.remsstudio.ui.scene.StudioSceneView
 import me.anno.ui.Panel
 import me.anno.ui.base.menu.Menu.askName
@@ -48,11 +48,11 @@ class StudioUITypeLibrary : UITypeLibrary(typeList) {
             NameDesc("Properties", "", "ui.customize.inspector") to
                     { StudioPropertyInspector({ Selection.selectedInspectables }, DefaultConfig.style) },
             NameDesc("Cutting", "", "ui.customize.cuttingPanel") to
-                    { LayerViewContainer(DefaultConfig.style) },
+                    { CuttingEditor(DefaultConfig.style) },
             NameDesc("Timeline", "", "ui.customize.timeline") to
                     { TimelinePanel(DefaultConfig.style) },
-            NameDesc("Keyframe Editor", "", "ui.customize.graphEditor") to
-                    { GraphEditor(DefaultConfig.style) },
+            NameDesc("Keyframes", "", "ui.customize.graphEditor") to
+                    { KeyframeEditor(DefaultConfig.style) },
             NameDesc("Files", "", "ui.customize.fileExplorer") to
                     { StudioFileExplorer(RemsStudio.project?.scenes, DefaultConfig.style) },
             NameDesc("Time Control", "", "ui.customize.timeControl") to

@@ -25,8 +25,8 @@ import me.anno.remsstudio.Selection.selectTransform
 import me.anno.remsstudio.Selection.selectedTransforms
 import me.anno.remsstudio.ui.*
 import me.anno.remsstudio.ui.StudioTreeView.Companion.openAddMenu
-import me.anno.remsstudio.ui.editor.cutting.LayerViewContainer
-import me.anno.remsstudio.ui.graphs.GraphEditor
+import me.anno.remsstudio.ui.editor.cutting.CuttingEditor
+import me.anno.remsstudio.ui.graphs.KeyframeEditor
 import me.anno.remsstudio.ui.scene.StudioSceneView
 import me.anno.remsstudio.ui.sceneTabs.SceneTabs
 import me.anno.ui.Panel
@@ -263,8 +263,8 @@ object RemsStudioUILayouts {
         topHalf.add(propertiesAndTime, 0.5f)
         topHalf.weight = 1f
 
-        customUI.add(CustomContainer(GraphEditor(style), library, style), 0.25f)
-        customUI.add(CustomContainer(LayerViewContainer(style), library, style), 0.25f)
+        customUI.add(CustomContainer(KeyframeEditor(style), library, style), 0.25f)
+        customUI.add(CustomContainer(CuttingEditor(style), library, style), 0.25f)
 
         return customUI
 

@@ -16,6 +16,7 @@ import me.anno.gpu.framebuffer.*
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.shader.renderer.Renderer.Companion.colorRenderer
 import me.anno.gpu.shader.renderer.Renderer.Companion.colorSqRenderer
+import me.anno.image.ImageScale
 import me.anno.input.Input
 import me.anno.input.Input.isControlDown
 import me.anno.input.Input.isShiftDown
@@ -239,22 +240,41 @@ open class StudioSceneView(style: Style) :
     private val tmpScene = Framebuffer("StudioSceneView", 1, 1, TargetType.UInt8x4, DepthBufferType.TEXTURE)
 
     override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
+        drawBackground(x0, y0, x1, y1)
 
         val mode = if (camera.toneMapping == ToneMappers.RAW8) colorRenderer else colorSqRenderer
 
         GFX.check()
 
-        val bt = borderThickness
-        val bth = bt shr 1
+        val thick = borderThickness
+        val thickHalf = thick shr 1
+
+        var w = width - thick * 2
+        var h = height - thick * 2
+        val project = project
+        if (camera.onlyShowTarget && project != null) {
+            val (nw, nh) = ImageScale.scaleMax(
+                project.targetWidth, project.targetHeight,
+                w, h
+            )
+            w = nw
+            h = nh
+        }
+
+        val x = x + (width - (w + 2 * thick)).shr(1)
+        val y = y + (height - (h + 2 * thick)).shr(1)
+
+        val width = w + 2 * thick
+        val height = h + 2 * thick
 
         val white = -1
         val b = DrawRectangles.startBatch()
-        drawBorder(x, y, width, height, white, bth)
-        drawBorder(x + bth, y + bth, width - bt, height - bt, black, bth)
+        drawBorder(x, y, width, height, white, thickHalf)
+        drawBorder(x + thickHalf, y + thickHalf, width - thick, height - thick, black, thickHalf)
         // filled with scene background color anyway
         DrawRectangles.finishBatch(b)
 
-        renderSize.render(width - bt * 2, height - 2 * bt) { rw, rh ->
+        renderSize.render(w, h) { rw, rh ->
             if (rw > 0 && rh > 0) {
                 useFrame(rw, rh, true, tmpScene) {
                     Scene.draw(
@@ -264,14 +284,14 @@ open class StudioSceneView(style: Style) :
                         mode, this
                     )
                 }
-                drawTexture(x + bt, y + bt, width - 2 * bt, height - 2 * bt, tmpScene.getTexture0())
+                drawTexture(x + thick, y + thick, width - 2 * thick, height - 2 * thick, tmpScene.getTexture0())
             }
         }
 
         Clipping.clip2(x0, y0, x1, y1) {
             renderDefault {
                 for (control in controls) {
-                    control.draw(x, y, width, height, x0, y0, x1, y1)
+                    control.draw(this.x, this.y, this.width, this.height, x0, y0, x1, y1)
                 }
             }
             drawChildren(x0, y0, x1, y1)

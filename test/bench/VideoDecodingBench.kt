@@ -1,5 +1,6 @@
 package bench
 
+import me.anno.engine.OfficialExtensions
 import me.anno.io.MediaMetadata.Companion.getMeta
 import me.anno.io.files.FileReference
 import me.anno.remsstudio.objects.video.Video
@@ -11,15 +12,17 @@ import org.apache.logging.log4j.LogManager
 private val LOGGER = LogManager.getLogger("VideoDecodingBench")
 fun main() {
 
+    OfficialExtensions.initForTests()
+
     // create a graph of how long it takes to decode 1 .. 1024 frames of a video file
     // check at the start and at the end of the video: what is the overhead
     // short vs long video? idk...
 
     // doesn't matter, still 1frame/40s for 1.6GB file, and 9 min + 23 s length, 35211 frames (60 fps)
     // val folderExternal = File("E:\\Videos\\")
-    val folderInternal = OS.documents
+    // val folderInternal = OS.documents
 
-    val file = folderInternal.getChild("Large World.mp4")
+    val file = OS.videos.getChild("treemiddle.mp4")
     val meta = Video(file).forcedMeta!!
     val frameCount = meta.videoFrameCount
     val fps = meta.videoFPS
@@ -45,11 +48,7 @@ fun decode(file: FileReference, start: Int, end: Int, fps: Double) {
     val bufferLength = end - start
     val meta = getMeta(file).waitFor()!!
     while (true) {
-        val frame = VideoCache.getVideoFrame(
-            file, 1, index,
-            bufferLength, fps, 1,
-            meta
-        ).waitFor()
+        val frame = VideoCache.getVideoFrame(file, 1, index, bufferLength, fps, 1, meta).waitFor()
         if (frame != null) break
         Sleep.sleepShortly(true)
     }

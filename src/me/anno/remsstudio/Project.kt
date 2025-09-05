@@ -20,7 +20,7 @@ import me.anno.remsstudio.history.History
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.ui.*
-import me.anno.remsstudio.ui.editor.cutting.LayerViewContainer
+import me.anno.remsstudio.ui.editor.cutting.CuttingEditor
 import me.anno.remsstudio.ui.scene.SceneTabData
 import me.anno.remsstudio.ui.scene.StudioSceneView
 import me.anno.remsstudio.ui.sceneTabs.SceneTab
@@ -178,7 +178,7 @@ class Project(var name: String, val folder: FileReference, saveIfMissing: Boolea
                         "CustomListY" -> CustomList(true, style)
                         "TreeView" -> StudioTreeView(style)
                         "FileExplorer" -> StudioFileExplorer(project?.scenes, style)
-                        "CuttingView", "LayerViewContainer" -> LayerViewContainer(style)
+                        "CuttingView", "LayerViewContainer" -> CuttingEditor(style)
                         "SceneView", "StudioSceneView" -> StudioSceneView(style)
                         "PropertyInspector" -> StudioPropertyInspector({ Selection.selectedInspectables }, style)
                         "TimeControlsPanel" -> TimeControlsPanel(style)

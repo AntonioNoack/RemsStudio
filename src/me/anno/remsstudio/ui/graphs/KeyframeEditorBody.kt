@@ -17,9 +17,9 @@ import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringReader
 import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.language.translation.NameDesc
+import me.anno.maths.Maths.MILLIS_TO_NANOS
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.dtTo10
-import me.anno.maths.Maths.length
 import me.anno.maths.Maths.mix
 import me.anno.maths.Maths.pow
 import me.anno.remsstudio.RemsStudio
@@ -56,7 +56,7 @@ import kotlin.math.*
 // todo list all (animated) properties of this object (abbreviated)
 
 @Suppress("MemberVisibilityCanBePrivate")
-class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(style.getChild("deep")) {
+class KeyframeEditorBody(val editor: KeyframeEditor, style: Style) : TimelinePanel(style.getChild("deep")) {
 
     var draggedKeyframe: Keyframe<*>? = null
     var draggedChannel = 0
@@ -419,28 +419,29 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
 
     fun Int.isChannelActive(activeChannels: Int) = activeChannels.hasFlag(1 shl this)
 
-    fun getKeyframeAt(x: Float, y: Float): Pair<Keyframe<*>, Int>? {
+    fun getKeyframeAt(mouseX: Float, mouseY: Float, lenience: Float = 1f): Pair<Keyframe<*>, Int>? {
         val selectedProperty = selectedProperties.firstOrNull()
         val property = selectedProperty ?: return null
         var bestDragged: Keyframe<*>? = null
         var bestChannel = 0
-        val maxMargin = dotSize * 2.0 / 3.0 + 1.0
-        var bestDistance = maxMargin
+        var bestDistance = dotSize * lenience + 2.0
         val activeChannels = activeChannels
+        val y0 = y.toDouble()
+        val y1 = y0 + height
         for (kf in property.keyframes) {
-            val globalT = mix(0.0, 1.0, kf2Global(kf.time))
-            val dx = x - getXAt(globalT)
-            if (abs(dx) < maxMargin) {
+            val localTime = kf.time
+            val globalTime = kf2Global(localTime)
+            val dx = mouseX - getXAt(globalTime)
+            if (abs(dx) < bestDistance) {
                 for (channel in 0 until property.type.numComponents) {
                     if (channel.isChannelActive(activeChannels)) {
-                        val dy = y - getYAt(kf.getChannelAsFloat(channel))
-                        if (abs(dy) < maxMargin) {
-                            val distance = length(dx, dy)
-                            if (distance < bestDistance) {
-                                bestDragged = kf
-                                bestChannel = channel
-                                bestDistance = distance
-                            }
+                        val kfY = getYAt(kf.getChannelAsFloat(channel))
+                        val dy = mouseY - clamp(kfY, y0, y1) // keyframe will be clamped
+                        val distance = max(abs(dx), abs(dy))
+                        if (distance < bestDistance) {
+                            bestDragged = kf
+                            bestChannel = channel
+                            bestDistance = distance
                         }
                     }
                 }
@@ -483,6 +484,8 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
     }
 
     override fun onKeyDown(x: Float, y: Float, key: Key) {
+        if (key == Key.BUTTON_LEFT) downTime = Time.nanoTime
+
         // find the dragged element
         if (!isHovered || (key != Key.BUTTON_LEFT && key != Key.BUTTON_RIGHT)) {
             super.onKeyDown(x, y, key)
@@ -611,21 +614,30 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
         return abs(getXAt(delta) - getXAt(0.0)) < radius // snap if within +/- radius px
     }
 
+    var draggingDelayMillis = 70
+    var downTime = 0L
+
     override fun onMouseMoved(x: Float, y: Float, dx: Float, dy: Float) {
         val draggedKeyframe = draggedKeyframe
         val selectedProperty = selectedProperties.firstOrNull()
         if (isSelecting) {
             // select new elements, update the selected keyframes?
         } else if (draggedKeyframe != null && selectedProperty != null) {
+
+            // too soon for dragging
+            if (Time.nanoTime - downTime < draggingDelayMillis * MILLIS_TO_NANOS) {
+                return
+            }
+
             // dragging
-            val time = getTimeAt(x)
+            val globalTime = getTimeAt(x)
             // if there are multiples selected, allow them to be moved via shift key
             val moveValues = isShiftDown || selectedKeyframes.size < 2
             val property = selectedProperties.firstOrNull()
             RemsStudio.incrementalChange("Dragging keyframe") {
-                val timeHere = global2Kf(time) // global -> local
-                val deltaTime = timeHere - draggedKeyframe.time
-                val shouldSnap = shouldSnap(time)
+                val localTime = global2Kf(globalTime) // global -> local
+                val deltaTime = localTime - draggedKeyframe.time
+                val shouldSnap = shouldSnap(globalTime)
                 for (keyframe in selectedKeyframes) {
                     incTime(keyframe, deltaTime, shouldSnap)
                 }
@@ -753,12 +765,14 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
     }
 
     override fun onMouseClicked(x: Float, y: Float, button: Key, long: Boolean) {
-        when (button) {
-            Key.BUTTON_RIGHT -> {
+        when {
+            isCursorOnCross(x, y) -> super.onMouseClicked(x, y, button, long)
+            button == Key.BUTTON_RIGHT -> {
                 if (selectedKeyframes.isEmpty()) {
                     super.onMouseClicked(x, y, button, long)
                 } else {
-                    openMenu(windowStack,
+                    openMenu(
+                        windowStack,
                         NameDesc("Interpolation", "", "ui.graphEditor.interpolation.title"),
                         Interpolation.entries.map { mode ->
                             MenuOption(NameDesc(mode.displayName, mode.description, "")) {
@@ -771,6 +785,15 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
                         })
                 }
             }
+            button == Key.BUTTON_LEFT -> {
+                // if close enough to a keyframe to select it, jump to the x of the keyframe
+                val keyframe = getKeyframeAt(x, y, 2f)
+                if (keyframe != null) {
+                    val keyframeTime = keyframe.first.time
+                    val globalTime = kf2Global(keyframeTime)
+                    jumpToT(globalTime)
+                } else jumpToX(x)
+            }
             else -> super.onMouseClicked(x, y, button, long)
         }
     }
@@ -778,7 +801,7 @@ class GraphEditorBody(val editor: GraphEditor, style: Style) : TimelinePanel(sty
     override val className get() = "GraphEditorBody"
 
     companion object {
-        private val LOGGER = LogManager.getLogger(GraphEditorBody::class)
+        private val LOGGER = LogManager.getLogger(KeyframeEditorBody::class)
         val valueFractions = listOf(
             0.1f, 0.2f, 0.5f, 1f,
             2f, 5f, 10f, 15f, 30f, 45f,

@@ -14,9 +14,7 @@ fun main() {
     val video = Video()
     video.file = videos.getChild("Transitions.mkv")
 
-    val frame = Sleep.waitUntilDefined(true) {
-        video.getVideoFrame(4, 0, 30.0)
-    }?.waitFor()
+    val frame = video.getVideoFrame(4, 0, 30.0).waitFor()
 
     println("Got frame ${frame?.width} x ${frame?.height}")
 

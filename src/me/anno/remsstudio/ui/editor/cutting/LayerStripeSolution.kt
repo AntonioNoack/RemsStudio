@@ -25,7 +25,7 @@ import me.anno.remsstudio.objects.video.VideoPreview.getFrameAtLocalTimeForPrevi
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.centralTime
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.dtHalfLength
 import me.anno.remsstudio.ui.editor.cutting.FrameStatus.Companion.drawLoadingStatus
-import me.anno.remsstudio.ui.editor.cutting.LayerView.Companion.maxLines
+import me.anno.remsstudio.ui.editor.cutting.CuttingLayer.Companion.maxLines
 import me.anno.ui.UIColors
 import me.anno.utils.Color.black
 import me.anno.utils.Color.mixARGB
@@ -69,7 +69,7 @@ class LayerStripeSolution(
     // if audio, draw audio levels
 
 
-    fun draw(selectedTransform: List<Transform>, draggedTransform: Transform?) {
+    fun draw(selectedTransform: List<Transform>, dragged: (Transform) -> Boolean) {
 
         val y = y0
         val h = y1 - y0
@@ -87,7 +87,7 @@ class LayerStripeSolution(
             for (j in gradients.indices) {
                 val gradient = gradients[j]
                 drawGradient(
-                    gradient, selectedTransform, draggedTransform,
+                    gradient, selectedTransform, dragged,
                     xTimeCorrection, h, y0, h0, timeOffset, toStringCache
                 )
             }
@@ -96,12 +96,13 @@ class LayerStripeSolution(
 
     private fun drawGradient(
         gradient: LayerViewGradient,
-        selectedTransform: List<Transform>, draggedTransform: Transform?,
-        xTimeCorrection: Int, h: Int, y0: Int, h0: Int, timeOffset: Double, toStringCache: HashMap<Transform, String>
+        selectedTransform: List<Transform>, dragged: (Transform) -> Boolean,
+        xTimeCorrection: Int, h: Int, y0: Int, h0: Int, timeOffset: Double,
+        toStringCache: HashMap<Transform, String>
     ) {
 
         val transform = gradient.owner as? Transform
-        val isStriped = selectedTransform === transform || draggedTransform === transform
+        val isStriped = transform != null && (selectedTransform === transform || dragged(transform))
 
         val video = transform as? Video
         val meta = video?.meta

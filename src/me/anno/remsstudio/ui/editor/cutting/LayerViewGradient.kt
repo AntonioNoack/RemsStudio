@@ -2,8 +2,8 @@ package me.anno.remsstudio.ui.editor.cutting
 
 import me.anno.maths.Maths.max
 import me.anno.maths.Maths.mix
-import me.anno.remsstudio.ui.editor.cutting.LayerView.Companion.minAlphaInt
-import me.anno.remsstudio.ui.editor.cutting.LayerView.Companion.minDistSq
+import me.anno.remsstudio.ui.editor.cutting.CuttingLayer.Companion.minAlphaInt
+import me.anno.remsstudio.ui.editor.cutting.CuttingLayer.Companion.minDistSq
 import me.anno.utils.Color.a
 import me.anno.utils.Color.a01
 import me.anno.utils.Color.b01

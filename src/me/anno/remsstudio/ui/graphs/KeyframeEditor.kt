@@ -3,6 +3,7 @@ package me.anno.remsstudio.ui.graphs
 import me.anno.animation.Interpolation
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.Selection
+import me.anno.remsstudio.animation.Keyframe
 import me.anno.ui.Style
 import me.anno.ui.base.SpacerPanel
 import me.anno.ui.base.components.AxisAlignment
@@ -15,10 +16,10 @@ import me.anno.ui.input.components.Checkbox
 import me.anno.utils.Color.black
 
 @Suppress("MemberVisibilityCanBePrivate")
-class GraphEditor(style: Style) : PanelListY(style) {
+class KeyframeEditor(style: Style) : PanelListY(style) {
 
     val controls = ScrollPanelX(style)
-    val body = GraphEditorBody(this, style)
+    val body = KeyframeEditorBody(this, style)
 
     val font = style.getFont("text")
 
@@ -48,6 +49,12 @@ class GraphEditor(style: Style) : PanelListY(style) {
         MaskCheckbox(color, index, font.sizeInt - 2, style)
     }
 
+    val interpolationInput = EnumInput(
+        // todo change the state automatically based on the selected keyframes
+        NameDesc("Interpolation"), true, Interpolation.LINEAR_BOUNDED.nameDesc,
+        Interpolation.entries.map { it.nameDesc }, style
+    )
+
     init {
         this += controls
         body.alignmentX = AxisAlignment.FILL
@@ -57,6 +64,7 @@ class GraphEditor(style: Style) : PanelListY(style) {
         cc.padding.add(2)
         cc += TextPanel("Channel Mask: ", style).apply {
             textAlignmentY = AxisAlignment.CENTER
+            tooltip = "Which channels are selectable/editable. Use this when you want to only change x for example."
         }
         // mask buttons for x,y,z,w
         for (mask in channelMasks) {
@@ -64,11 +72,7 @@ class GraphEditor(style: Style) : PanelListY(style) {
             cc += mask
             cc += SpacerPanel(3, 1, style).makeBackgroundTransparent()
         }
-        cc += EnumInput(
-            // todo change the state automatically based on the selected keyframes
-            NameDesc("Interpolation"), true, Interpolation.LINEAR_BOUNDED.nameDesc,
-            Interpolation.entries.map { it.nameDesc }, style
-        ).setChangeListener { _, index, _ ->
+        cc += interpolationInput.setChangeListener { _, index, _ ->
             val type = Interpolation.entries[index]
             for (kf in body.selectedKeyframes) {
                 kf.interpolation = type
@@ -76,9 +80,19 @@ class GraphEditor(style: Style) : PanelListY(style) {
         }
     }
 
+    private var lastKeyframe: Keyframe<*>? = null
     override fun onUpdate() {
         super.onUpdate()
-        controls.isVisible = body.selectedKeyframes.isNotEmpty()
+        val kf = body.selectedKeyframes.firstOrNull()
+        val isVisible = kf != null
+        if (controls.isVisible != isVisible || lastKeyframe != kf) {
+            if (isVisible) {
+                val title = kf.interpolation.nameDesc
+                interpolationInput.setValue(title, false)
+            }
+            controls.isVisible = isVisible
+            lastKeyframe = kf
+        }
     }
 
     override val className get() = "GraphEditor"

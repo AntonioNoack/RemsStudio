@@ -12,11 +12,11 @@ import org.joml.Vector4f
 @Suppress("MemberVisibilityCanBePrivate")
 class VideoPreviewPanel(
     val video: Video,
-    val height1: Int, style: Style,
+    val constMinH: Int, style: Style,
     val getTime: (x: Float) -> Double
 ) : Panel(style) {
 
-    val width1 = height1 * video.lastW / video.lastH
+    val constMinW = constMinH * video.lastW / video.lastH
 
     init {
         background.color = 0xff777777.toInt()
@@ -25,15 +25,15 @@ class VideoPreviewPanel(
     override val onMovementHideTooltip get() = false
 
     override fun calculateSize(w: Int, h: Int) {
-        minW = width1
-        minH = height1
+        minW = constMinW
+        minH = constMinH
     }
 
     override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
         val meta = video.meta ?: return
         val window = window ?: return
         val time = getTime(window.mouseX)
-        val frame = video.getFrameAtLocalTimeForPreview(time, width1, meta) ?: return
+        val frame = video.getFrameAtLocalTimeForPreview(time, constMinW, meta) ?: return
         val color = white4
         DrawGradients.drawRectGradient(
             x0, y0, x1 - x0, y1 - y0, color, color, frame,
