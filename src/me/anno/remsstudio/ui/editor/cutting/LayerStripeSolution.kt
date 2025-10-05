@@ -13,7 +13,6 @@ import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.io.saveable.Saveable
 import me.anno.maths.Maths.clamp
-import me.anno.maths.Maths.max
 import me.anno.maths.Maths.posMod
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection

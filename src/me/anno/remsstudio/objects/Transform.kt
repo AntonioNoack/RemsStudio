@@ -19,7 +19,6 @@ import me.anno.io.saveable.Saveable
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
-import me.anno.maths.Maths.max
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.editorTime
 import me.anno.remsstudio.Scene
@@ -63,6 +62,7 @@ import me.anno.utils.types.Strings.isBlank2
 import org.apache.logging.log4j.LogManager
 import org.joml.*
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.math.max
 import kotlin.math.min
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -591,14 +591,14 @@ open class Transform() : Saveable(),
 
     override fun setProperty(name: String, value: Any?) {
         when (name) {
-            "collapsed" -> isCollapsed = AnyToBool.anyToBool(value)
+            "collapsed" -> isCollapsed = AnyToBool.getBool(value)
             "timelineSlot" -> timelineSlot.value = AnyToInt.getInt(value, 0)
             "visibility" -> visibility = TransformVisibility[value as? Int ?: return]
             "uuid" -> Unit// hide the warning
             "weight" -> weight = AnyToFloat.getFloat(value, 0f)
             "timeDilation" -> timeDilation.value = AnyToDouble.getDouble(value, 1.0)
             "timeOffset" -> timeOffset.value = AnyToDouble.getDouble(value, 0.0)
-            "lockTransform" -> lockTransform = AnyToBool.anyToBool(value)
+            "lockTransform" -> lockTransform = AnyToBool.getBool(value)
             "fadeIn" -> {
                 var value = value
                 if (value is AnimatedProperty<*>) value = value[0.0]

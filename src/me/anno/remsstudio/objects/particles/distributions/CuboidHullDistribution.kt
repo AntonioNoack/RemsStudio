@@ -2,7 +2,7 @@ package me.anno.remsstudio.objects.particles.distributions
 
 import me.anno.ecs.components.mesh.shapes.CubemapModel
 import me.anno.language.translation.NameDesc
-import me.anno.maths.Maths.max
+import me.anno.maths.MinMax.max
 import me.anno.ui.editor.sceneView.Grid
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f

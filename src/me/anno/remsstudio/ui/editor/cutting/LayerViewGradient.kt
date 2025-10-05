@@ -1,6 +1,5 @@
 package me.anno.remsstudio.ui.editor.cutting
 
-import me.anno.maths.Maths.max
 import me.anno.maths.Maths.mix
 import me.anno.remsstudio.ui.editor.cutting.CuttingLayer.Companion.minAlphaInt
 import me.anno.remsstudio.ui.editor.cutting.CuttingLayer.Companion.minDistSq
@@ -12,6 +11,7 @@ import me.anno.utils.Color.r01
 import me.anno.utils.Color.toARGB
 import me.anno.utils.Color.toHexColor
 import org.joml.Vector4f
+import kotlin.math.max
 
 class LayerViewGradient(
     val owner: Any?,

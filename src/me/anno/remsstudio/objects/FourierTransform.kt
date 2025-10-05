@@ -14,7 +14,6 @@ import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths
 import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.fract
-import me.anno.maths.Maths.max
 import me.anno.maths.Maths.mix
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.audio.AudioFXCache2
@@ -33,6 +32,7 @@ import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
 import kotlin.math.floor
+import kotlin.math.max
 import kotlin.math.sqrt
 
 // todo option for gaussian smoothing

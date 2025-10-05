@@ -188,12 +188,14 @@ object RemsStudio : EngineBase(NameDesc("Rem's Studio"), 10405, true), WelcomeUI
         ActionManager.init()
     }
 
-    override fun openHistory() {
-        history?.display()
+    override fun openHistory(): Boolean {
+        history?.display() ?: return false
+        return true
     }
 
-    override fun save() {
-        project?.save()
+    override fun save(): Boolean {
+        project?.save() ?: return false
+        return true
     }
 
     override fun getDefaultFileLocation(): FileReference {

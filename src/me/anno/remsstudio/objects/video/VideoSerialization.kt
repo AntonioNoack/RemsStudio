@@ -29,7 +29,7 @@ object VideoSerialization {
 
     fun Video.needSuperSetProperty(name: String, value: Any?): Boolean {
         when (name) {
-            "stayVisibleAtEnd" -> stayVisibleAtEnd = AnyToBool.anyToBool(value)
+            "stayVisibleAtEnd" -> stayVisibleAtEnd = AnyToBool.getBool(value)
             "tiling" -> tiling.copyFrom(value)
             "cgSaturation" -> cgSaturation.copyFrom(value)
             "cgOffset", "cgOffsetAdd" -> cgOffsetAdd.copyFrom(value)

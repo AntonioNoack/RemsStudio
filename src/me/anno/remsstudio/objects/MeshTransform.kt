@@ -386,7 +386,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
             "centerMesh" -> centerMesh = value == true
             "animation" -> animation.copyFrom(value)
             "file" -> file = (value as? String)?.toGlobalFile() ?: (value as? FileReference) ?: InvalidRef
-            "drawAsLines" -> drawAsLines = AnyToBool.anyToBool(value)
+            "drawAsLines" -> drawAsLines = AnyToBool.getBool(value)
             else -> super.setProperty(name, value)
         }
     }

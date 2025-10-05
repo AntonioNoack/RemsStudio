@@ -3,8 +3,8 @@ package me.anno.remsstudio.utils
 import me.anno.fonts.Codepoints.codepoints
 import me.anno.maths.Maths
 import me.anno.maths.Maths.clamp
-import me.anno.maths.Maths.max
 import me.anno.utils.types.Strings.joinChars0
+import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.random.Random
 

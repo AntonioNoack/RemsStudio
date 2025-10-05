@@ -225,8 +225,8 @@ class Transition(parent: Transform? = null) : GFXTransform(parent) {
             "fadeColor" -> fadeColor.copyFrom(value)
             "center" -> center.copyFrom(value)
             "tiling" -> tiling.copyFrom(value)
-            "fadeFirstTex" -> fadeFirstTex = AnyToBool.anyToBool(value)
-            "fadeBlackToWhite" -> fadeBlackToWhite = AnyToBool.anyToBool(value)
+            "fadeFirstTex" -> fadeFirstTex = AnyToBool.getBool(value)
+            "fadeBlackToWhite" -> fadeBlackToWhite = AnyToBool.getBool(value)
             else -> super.setProperty(name, value)
         }
     }

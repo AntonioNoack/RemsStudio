@@ -8,7 +8,6 @@ import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
-import me.anno.maths.Maths.min
 import me.anno.maths.Maths.mix
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.audio.effects.Domain
@@ -24,7 +23,7 @@ import me.anno.ui.input.FloatInput
 import me.anno.utils.Threads
 import me.anno.video.ffmpeg.FFMPEGStream.Companion.getAudioSequence
 import org.apache.logging.log4j.LogManager
-import kotlin.concurrent.thread
+import kotlin.math.min
 import kotlin.math.sqrt
 
 @Suppress("MemberVisibilityCanBePrivate")

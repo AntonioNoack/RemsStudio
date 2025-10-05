@@ -13,7 +13,6 @@ import me.anno.gpu.GFX
 import me.anno.io.MediaMetadata
 import me.anno.io.files.FileReference
 import me.anno.maths.Maths.clamp
-import me.anno.maths.Maths.max
 import me.anno.remsstudio.audio.effects.Domain
 import me.anno.remsstudio.audio.effects.SoundEffect
 import me.anno.remsstudio.audio.effects.SoundPipeline.Companion.changeDomain
@@ -23,6 +22,7 @@ import me.anno.remsstudio.objects.video.Video
 import me.anno.utils.hpc.ProcessingQueue
 import kotlin.math.ceil
 import kotlin.math.floor
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToLong
 
