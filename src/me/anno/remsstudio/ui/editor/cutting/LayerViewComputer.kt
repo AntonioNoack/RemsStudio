@@ -113,7 +113,7 @@ class LayerViewComputer(private val view: CuttingLayer) {
         }
 
         for (stripe in stripes) {
-            stripe.removeIf { !it.needsDrawn() }
+            stripe.removeIf { !it.isVisibleByAlpha() }
         }
 
         addEvent {

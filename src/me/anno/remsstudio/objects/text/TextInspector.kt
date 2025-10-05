@@ -160,6 +160,16 @@ fun Text.createInspectorWithoutSuperImpl(
             // making something black should be simple
             shadow.color.set(signalColor)
             shadow.position.set(pos)
+            shadow.scale.clear()
+            shadow.rotationYXZ.clear()
+
+            // time needs to be adjusted, too
+            shadow.timeOffset.value = 0.0
+            shadow.timeDilation.value = 0.0
+            shadow.timeAnimated.clear()
+
+            // todo why is the scale not transferred as expected???
+
             // evil ;), because we link instances instead of making a copy
             shadow.relativeLineSpacing = relativeLineSpacing
             RemsStudio.largeChange("Add Text Shadow") { x.addChild(shadow) }

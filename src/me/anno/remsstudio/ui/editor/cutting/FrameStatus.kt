@@ -56,10 +56,8 @@ enum class FrameStatus(val color: Int) {
             key.bufferLength = bufferLength
             key.fps = fps
 
-            val slice = VideoCache.getVideoFramesWithoutGenerator(key)?.value
-            if (slice == null) {
-                return video.streamManager.getFrameStatus(frameIndex)
-            }
+            val slice = VideoCache.getVideoFramesWithoutGenerator(key, 0L)?.value
+                ?: return video.streamManager.getFrameStatus(frameIndex)
 
             val frame = slice.getOrNull(localIndex)?.value
             return when {

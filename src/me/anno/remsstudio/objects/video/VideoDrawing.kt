@@ -42,7 +42,7 @@ object VideoDrawing {
 
     @JvmStatic
     val imageTimeout: Long
-        get() = DefaultConfig["ui.video.frameTimeout", 250L]
+        get() = DefaultConfig["ui.video.frameTimeout", 50L]
 
     fun Video.drawImage(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val file = file

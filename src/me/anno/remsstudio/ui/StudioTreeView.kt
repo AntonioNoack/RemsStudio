@@ -10,8 +10,10 @@ import me.anno.language.translation.NameDesc
 import me.anno.maths.Maths.clamp
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.RemsStudio.defaultWindowStack
+import me.anno.remsstudio.RemsStudio.editorTime
 import me.anno.remsstudio.RemsStudio.lastTouchedCamera
 import me.anno.remsstudio.RemsStudio.nullCamera
+import me.anno.remsstudio.RemsStudio.root
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.MeshTransform
@@ -71,7 +73,9 @@ class StudioTreeView(style: Style) :
         }
 
         fun openAddMenu(baseTransform: Transform) {
+
             fun add(action: (Transform) -> Transform): () -> Unit = { Selection.selectTransform(action(baseTransform)) }
+
             val options = DefaultConfig["createNewInstancesList"] as? StringMap
             if (options != null) {
                 val extras = ArrayList<MenuOption>()
@@ -113,11 +117,15 @@ class StudioTreeView(style: Style) :
                         .sortedBy { (key, _) -> key.lowercase(Locale.getDefault()) }
                         .map { (key, value) ->
                             val sample = if (value is Transform) value.clone() else value.toString().toTransform()
-                            MenuOption(NameDesc(key, sample?.defaultDisplayName ?: "", ""), add {
-                                val newT = if (value is Transform) value.clone() else value.toString().toTransform()
-                                newT!!
-                                it.addChild(newT)
-                                newT
+                            MenuOption(NameDesc(key, sample?.defaultDisplayName ?: "", ""), add { parentTransform ->
+                                val newTransform =
+                                    if (value is Transform) value.clone()
+                                    else value.toString().toTransform()!!
+                                parentTransform.addChild(newTransform)
+                                if (parentTransform == root) {
+                                    newTransform.timeOffset.value = editorTime
+                                }
+                                newTransform
                             })
                         } + extras
                 )

@@ -332,7 +332,14 @@ object RemsStudio : EngineBase(NameDesc("Rem's Studio"), 10405, true), WelcomeUI
     @JvmStatic
     fun main(args: Array<String>) {
 
-        // todo bugs:
+        // todo high-priority bugs:
+        //  - emojis are not supported properly in TextMesh and SDF mode for Linux
+        //  - lineBreakWidth is not working
+        //  - the rendered result is extremely jittery - are we rendering the right frames??? -> now it worked just fine???
+        // fixed: - there is a VRAM leak: frames around a clicked location are not unloading
+        // fixed: - video playback is completely broken for my Roadcraft Rambling (skip was throwing exceptions on Linux)
+
+        // todo low-priority bugs:
         //  - turning the camera in 3d changes video scale with auto-mode, and that causes lots of lag
 
         // to do integration-test scene with ALL rendering/playback features

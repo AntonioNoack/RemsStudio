@@ -36,7 +36,7 @@ class LayerViewGradient(
 
     var w = x1 - x0 + 1
 
-    fun needsDrawn() = max(c0.a(), c1.a()) >= minAlphaInt
+    fun isVisibleByAlpha() = max(c0.a(), c1.a()) >= minAlphaInt
 
     fun isLinear(x3: Int, step: Int, c3: Vector4f): Boolean {
         // the total width is just one step
@@ -70,6 +70,4 @@ class LayerViewGradient(
             firstX1 = x
         }
     }
-
-
 }
