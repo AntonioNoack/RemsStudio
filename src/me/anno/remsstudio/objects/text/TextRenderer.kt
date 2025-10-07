@@ -1,17 +1,21 @@
 package me.anno.remsstudio.objects.text
 
 import me.anno.fonts.FontManager
-import me.anno.fonts.PartResult
+import me.anno.fonts.GlyphLayout
+import me.anno.fonts.mesh.MeshGlyphLayout
 import me.anno.fonts.mesh.TextMesh
-import me.anno.fonts.signeddistfields.TextSDF
+import me.anno.fonts.signeddistfields.SDFGlyphLayout
 import me.anno.fonts.signeddistfields.algorithm.SignedDistanceField
 import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.gpu.FinalRendering.onMissingResource
+import me.anno.gpu.texture.Texture2D
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.gpu.GFXx3Dv2
 import me.anno.remsstudio.objects.attractors.EffectMorphing
 import me.anno.remsstudio.objects.modes.TextRenderMode
 import me.anno.remsstudio.objects.text.Text.Companion.DEFAULT_FONT_HEIGHT
+import me.anno.remsstudio.objects.text.Text.Companion.meshLayouts
+import me.anno.remsstudio.objects.text.Text.Companion.sdfLayouts
 import me.anno.ui.editor.sceneView.Grid
 import me.anno.utils.pooling.JomlPools
 import me.anno.utils.types.Strings.isBlank2
@@ -25,6 +29,26 @@ import kotlin.math.min
 @Suppress("MemberVisibilityCanBePrivate")
 object TextRenderer {
 
+    val timeout = 10_000L
+
+    fun getGlyphLayout(key0: TextState): GlyphLayout? {
+        val glyphLayout0 = if (key0.textRenderMode == TextRenderMode.MESH) {
+            meshLayouts.getEntry(key0, timeout) { key, result ->
+                result.value = MeshGlyphLayout(key.font, key.text, key.relativeWidthLimit, Int.MAX_VALUE, null)
+            }
+        } else {
+            sdfLayouts.getEntry(key0, timeout) { key, result ->
+                result.value = SDFGlyphLayout(key.font, key.text, key.relativeWidthLimit, Int.MAX_VALUE)
+            }
+        }
+
+        if (!glyphLayout0.hasValue) {
+            if (isFinalRendering) onMissingResource("Text Layout", key0)
+        }
+
+        return glyphLayout0.value
+    }
+
     fun draw(
         element: Text, stack: Matrix4fArrayList, time: Double, color: Vector4f,
         superCall: () -> Unit
@@ -37,28 +61,24 @@ object TextRenderer {
             return
         }
 
-        val (lineSegmentsWithStyle, keys) = element.getSegments(text)
+        val key = element.getVisualState(text)
+        val glyphLayout = getGlyphLayout(key) ?: return
 
         val font2 = FontManager.getFont(element.font)
         val actualFontHeight = font2.getLineHeight()
-        val scaleX = TextMesh.DEFAULT_LINE_HEIGHT / actualFontHeight
-        val scaleY = 1f / actualFontHeight
-        val width = lineSegmentsWithStyle.width * scaleX
-        val height = lineSegmentsWithStyle.height * scaleY
 
-        val lineOffset = -TextMesh.DEFAULT_LINE_HEIGHT * element.relativeLineSpacing[time]
+        val width = glyphLayout.width * glyphLayout.baseScale
+        val height = glyphLayout.height * glyphLayout.baseScale
+
+        val relativeLineSpacing = element.relativeLineSpacing[time]
 
         // min and max x are cached for long texts with thousands of lines (not really relevant)
         // actual text height vs baseline? for height
 
-        val totalHeight = lineOffset * height
+        val totalHeight = relativeLineSpacing * height
 
         val dx = element.getDrawDX(width, time)
-        val dy = element.getDrawDY(lineOffset, totalHeight, time)
-
-        val renderingMode = element.renderingMode
-        val drawMeshes = renderingMode == TextRenderMode.MESH
-        val drawSDFTextures = !drawMeshes
+        val dy = element.getDrawDY(relativeLineSpacing, totalHeight, time)
 
         // limit the characters
         // cursorLimit1 .. cursorLimit2
@@ -74,14 +94,14 @@ object TextRenderer {
             return
         }
 
-        val lineBreakWidth = element.lineBreakWidth
+        val lineBreakWidth = element.relativeWidthLimit
         if (lineBreakWidth > 0f && !isFinalRendering && element in Selection.selectedTransforms) {
             // draw the borders
             // why 0.81? correct x-scale? (off by ca ~ x0.9)
             val x0 = dx + width * 0.5f
             val minX = x0 - 0.81f * lineBreakWidth
             val maxX = x0 + 0.81f * lineBreakWidth
-            val y0 = dy - lineOffset * 0.75f
+            val y0 = dy - relativeLineSpacing * 0.75f
             val y1 = y0 + totalHeight
             Grid.drawLine(stack, color, Vector3f(minX, y0, 0f), Vector3f(minX, y1, 0f))
             Grid.drawLine(stack, color, Vector3f(maxX, y0, 0f), Vector3f(maxX, y1, 0f))
@@ -97,10 +117,10 @@ object TextRenderer {
                     .set(color).mul(shadowColor)
                 if (tintedShadowColor.w >= 1f / 255f) draw(
                     element, stack, time, tintedShadowColor,
-                    lineSegmentsWithStyle, drawMeshes, drawSDFTextures,
-                    keys, actualFontHeight,
-                    width, lineOffset,
-                    dx, dy, scaleX, scaleY,
+                    glyphLayout,
+                    actualFontHeight,
+                    width, relativeLineSpacing,
+                    dx, dy,
                     startCursor, endCursor,
                     false, shadowSmoothness
                 )
@@ -110,10 +130,10 @@ object TextRenderer {
 
         if (color.w >= 1f / 255f) draw(
             element, stack, time, color,
-            lineSegmentsWithStyle, drawMeshes, drawSDFTextures,
-            keys, actualFontHeight,
-            width, lineOffset,
-            dx, dy, scaleX, scaleY,
+            glyphLayout,
+            actualFontHeight,
+            width, relativeLineSpacing,
+            dx, dy,
             startCursor, endCursor,
             true, 0f
         )
@@ -171,11 +191,10 @@ object TextRenderer {
     private fun draw(
         element: Text,
         stack: Matrix4fArrayList, time: Double, color: Vector4f,
-        lineSegmentsWithStyle: PartResult,
-        drawMeshes: Boolean, drawSDFTexture: Boolean,
-        keys: List<TextSegmentKey>, actualFontHeight: Float,
+        glyphLayout: GlyphLayout,
+        actualFontHeight: Float,
         width: Float, lineOffset: Float,
-        dx: Float, dy: Float, scaleX: Float, scaleY: Float,
+        dx: Float, dy: Float,
         startCursor: Int, endCursor: Int,
         useExtraColors: Boolean,
         extraSmoothness: Float
@@ -185,181 +204,112 @@ object TextRenderer {
         val oc1 = oc1
         val oc2 = oc2
 
+        val drawSDFTexture = glyphLayout is SDFGlyphLayout
         getOutlineColors(element, useExtraColors, drawSDFTexture, time, color, oc0, oc1, oc2)
-
-        var charIndex = 0
 
         firstTimeDrawing = true
 
-        val textAlignment01 = element.textAlignment[time] * .5f + .5f
-        for ((index, part) in lineSegmentsWithStyle.parts.withIndex()) {
+        // todo map cursor to codepoint position?
+        //  being stuck on emojis is weird
 
-            val startIndex = charIndex
-            val partLength = part.codepointLength
-            val endIndex = charIndex + partLength
-
-            val localMin = max(0, startCursor - startIndex)
-            val localMax = min(partLength, endCursor - startIndex)
-
-            if (localMin < localMax) {
-
-                val key = keys[index]
-                val offsetX = (width - part.lineWidth * scaleX) * textAlignment01
-                val lineDeltaX = dx + part.xPos * scaleX + offsetX
-                val lineDeltaY = dy + part.yPos * scaleY * lineOffset
-
-                if (drawMeshes) {
-                    drawMesh(
-                        element, key, time, stack, color,
-                        lineDeltaX, lineDeltaY,
-                        localMin, localMax
-                    )
+        val textAlignment01 = element.textAlignment[time] * 0.5f + 0.5f
+        when (glyphLayout) {
+            is MeshGlyphLayout -> {
+                glyphLayout.draw(startCursor, endCursor) { buffer, x0, x1, y, lineWidth ->
+                    val localAlignment = textAlignment01 * (glyphLayout.width * glyphLayout.baseScale - lineWidth)
+                    // todo transform x0 and y into usable units
+                    val offset = offset.set(x0 + localAlignment, y)
+                    if (firstTimeDrawing) {
+                        GFXx3Dv2.draw3DText(element, time, offset, stack, buffer, color)
+                        firstTimeDrawing = false
+                    } else {
+                        GFXx3Dv2.draw3DTextWithOffset(buffer, offset)
+                    }
+                    false // don't quit yet
                 }
-
-                if (drawSDFTexture) {
-                    drawSDFTexture(
-                        element, key, time, stack, color,
-                        lineDeltaX, lineDeltaY,
-                        localMin, localMax,
-                        actualFontHeight,
-                        extraSmoothness,
-                        oc0, oc1, oc2
-                    )
-                }
-
             }
-
-            charIndex = endIndex
-
+            is SDFGlyphLayout -> {
+                glyphLayout.roundCorners = element.roundSDFCorners
+                glyphLayout.draw(startCursor, endCursor) { sdfText, x0, x1, y, lineWidth ->
+                    val localAlignment = textAlignment01 * (glyphLayout.width * glyphLayout.baseScale - lineWidth)
+                    // todo transform x0 and y into usable units
+                    val texture = sdfText.texture
+                    if (texture is Texture2D && texture.isCreated()) {
+                        drawSDFTexture(
+                            element, texture, time, stack, color, x0 + localAlignment, y, actualFontHeight,
+                            extraSmoothness, oc1, oc2, oc3
+                        )
+                    } else if (isFinalRendering) {
+                        onMissingResource("Missing SDF Texture", texture)
+                    }
+                    false // don't quit yet
+                }
+            }
         }
     }
 
     var firstTimeDrawing = false
 
-    private val tmpScale = Vector2f()
-    private val tmpOffset = Vector2f()
-
     private fun drawSDFTexture(
         element: Text,
-        key: TextSegmentKey, time: Double, stack: Matrix4fArrayList,
+        texture: Texture2D,
+        time: Double,
+        stack: Matrix4fArrayList,
         color: Vector4f, lineDeltaX: Float, lineDeltaY: Float,
-        startIndex: Int, endIndex: Int,
         actualFontHeight: Float,
         extraSmoothness: Float,
         oc1: Vector4f, oc2: Vector4f, oc3: Vector4f
     ) {
 
         if (color.w + oc1.w + oc2.w + oc3.w <= 0f) return
-        val sdf2 = element.getSDFTexture(key)
-        if (sdf2 == null) {
-            if (isFinalRendering) {
-                onMissingResource("Text-Texture ${element.font}", element.text)
-            }
-            return
-        }
 
         val sdfResolution = SignedDistanceField.sdfResolution
 
-        sdf2.charByChar = element.renderingMode != TextRenderMode.SDF_JOINED
-        sdf2.roundCorners = element.roundSDFCorners
-
         val hasUVAttractors = element.children.any { it is EffectMorphing }
 
-        sdf2.draw(startIndex, endIndex) { _, sdf, xOffset ->
+        val baseScale = TextMesh.DEFAULT_LINE_HEIGHT / (sdfResolution * actualFontHeight)
 
-            val texture = sdf?.texture
-            if (texture != null && texture.isCreated()) {
+        val scaleX = 0.5f * texture.width * baseScale
+        val scaleY = 0.5f * texture.height * baseScale
 
-                val baseScale =
-                    TextMesh.DEFAULT_LINE_HEIGHT / (sdfResolution * actualFontHeight)
+        val tmpOffset = tmpOffset.set(lineDeltaX, lineDeltaY)
+        val tmpScale = tmpScale.set(scaleX, scaleY)
 
-                val scaleX = 0.5f * texture.width * baseScale
-                val scaleY = 0.5f * texture.height * baseScale
+        if (firstTimeDrawing) {
 
-                val sdfOffset = sdf.offset
+            val outline = element.outlineWidths[time, Vector4f()].mul(sdfResolution)
+            outline.y = max(0f, outline.y) + outline.x
+            outline.z = max(0f, outline.z) + outline.y
+            outline.w = max(0f, outline.w) + outline.z
 
-                /**
-                 * character- and alignment offset
-                 * */
-                val charAlignOffsetX = lineDeltaX + xOffset
-                val charAlignOffsetY = lineDeltaY + 0f
+            val smoothness = element.outlineSmoothness[time, Vector4f()]
+                .add(extraSmoothness, extraSmoothness, extraSmoothness, extraSmoothness)
+                .mul(sdfResolution)
 
-                /**
-                 * offset, because the textures are always centered; don't start from the bottom left
-                 * (text mesh does)
-                 * */
-                val sdfX = sdfOffset.x * scaleX
-                val sdfY = sdfOffset.y * scaleY
+            val outlineDepth = element.outlineDepth[time]
 
-                val tmpOffset = tmpOffset.set(charAlignOffsetX + sdfX, charAlignOffsetY + sdfY)
-                val tmpScale = tmpScale.set(scaleX, scaleY)
+            GFXx3Dv2.drawOutlinedText(
+                element, time,
+                stack, tmpOffset, tmpScale,
+                texture, color, 5,
+                arrayOf(// is only created once -> don't worry too much about it
+                    color, oc1, oc2, oc3, oc4
+                ),
+                floatArrayOf(-1e3f, outline.x, outline.y, outline.z, outline.w),
+                floatArrayOf(0f, smoothness.x, smoothness.y, smoothness.z, smoothness.w),
+                outlineDepth,
+                hasUVAttractors,
+            )
 
-                if (firstTimeDrawing) {
+            firstTimeDrawing = false
 
-                    val outline = element.outlineWidths[time, Vector4f()].mul(sdfResolution)
-                    outline.y = max(0f, outline.y) + outline.x
-                    outline.z = max(0f, outline.z) + outline.y
-                    outline.w = max(0f, outline.w) + outline.z
-
-                    val smoothness = element.outlineSmoothness[time, Vector4f()]
-                        .add(extraSmoothness, extraSmoothness, extraSmoothness, extraSmoothness)
-                        .mul(sdfResolution)
-
-                    val outlineDepth = element.outlineDepth[time]
-
-                    GFXx3Dv2.drawOutlinedText(
-                        element, time,
-                        stack, tmpOffset, tmpScale,
-                        texture, color, 5,
-                        arrayOf(// is only created once -> don't worry too much about it
-                            color, oc1, oc2, oc3,
-                            Vector4f(0f)
-                        ),
-                        floatArrayOf(-1e3f, outline.x, outline.y, outline.z, outline.w),
-                        floatArrayOf(0f, smoothness.x, smoothness.y, smoothness.z, smoothness.w),
-                        outlineDepth,
-                        hasUVAttractors,
-                    )
-
-                    firstTimeDrawing = false
-
-                } else GFXx3Dv2.drawOutlinedText(stack, tmpOffset, tmpScale, texture, hasUVAttractors)
-            } else if (sdf == null || texture == null || !texture.isCreated()) {
-                if (isFinalRendering && sdf !== TextSDF.empty) {
-                    onMissingResource("Text-Texture I '${element.font}'", key.text)
-                }
-            }
-            false
-        }
+        } else GFXx3Dv2.drawOutlinedText(stack, tmpOffset, tmpScale, texture, hasUVAttractors)
     }
 
+    private val tmpScale = Vector2f()
+    private val tmpOffset = Vector2f()
     private val offset = Vector2f()
+    private val oc3 = Vector4f(0f)
+    private val oc4 = Vector4f(0f)
 
-    private fun drawMesh(
-        element: Text,
-        key: TextSegmentKey, time: Double, stack: Matrix4fArrayList,
-        color: Vector4f, lineDeltaX: Float, lineDeltaY: Float,
-        startIndex: Int, endIndex: Int
-    ) {
-
-        val textMesh = element.getTextMesh(key)
-        if (textMesh == null) {
-            if (isFinalRendering) {
-                onMissingResource("Text-Mesh II '${element.font}'", key.text)
-            }
-            return
-        }
-
-        textMesh.draw(startIndex, endIndex) { buffer, _, xOffset ->
-            buffer!!
-            val offset = offset.set(lineDeltaX + xOffset, lineDeltaY)
-            if (firstTimeDrawing) {
-                GFXx3Dv2.draw3DText(element, time, offset, stack, buffer, color)
-                firstTimeDrawing = false
-            } else {
-                GFXx3Dv2.draw3DTextWithOffset(buffer, offset)
-            }
-            false
-        }
-    }
 }

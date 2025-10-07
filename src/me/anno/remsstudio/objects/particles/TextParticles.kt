@@ -2,21 +2,17 @@ package me.anno.remsstudio.objects.particles
 
 import me.anno.engine.inspector.Inspectable
 import me.anno.fonts.Codepoints.codepoints
-import me.anno.fonts.FontManager
-import me.anno.fonts.mesh.TextMesh
 import me.anno.io.base.BaseWriter
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.objects.text.Text
-import me.anno.remsstudio.objects.text.Text.Companion.textVisCache
+import me.anno.remsstudio.objects.text.TextRenderer.getGlyphLayout
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.utils.structures.Collections.filterIsInstance2
 import me.anno.utils.types.Strings.joinChars
-import org.joml.Vector3f
-import kotlin.streams.toList
 
 class TextParticles : ParticleSystem() {
 
@@ -37,85 +33,48 @@ class TextParticles : ParticleSystem() {
 
     override fun createParticle(index: Int, time: Double): Particle? {
 
-        val text2 = text.text[time]
+        // index is the glyphIndex
 
-        val char = text2.codepoints().getOrNull(index) ?: return null
+        val currText = text.text[time]
+        val currCodepoints = currText.codepoints()
 
-        val str = listOf(char).joinChars().toString()
+        val codepoint = currCodepoints.getOrNull(index) ?: return null
+        val codepointAsString = codepoint.joinChars()
         val clone = text.clone() as Text
-        clone.text.set(str)
+        clone.text.set(codepointAsString)
 
         val particle = super.createParticle(index, time)!!
         particle.type = clone
 
-        // get position and add to original particle
-        var px = 0f
-        var py = 0f
+        val key = text.getVisualState(currText)
+        val glyphLayout = getGlyphLayout(key) ?: return null
 
-        val visualState = text.getVisualState(text2)
-        val data = textVisCache.getEntry(visualState, 1000L) { key, result ->
-            val segments = text.splitSegments(text2)
-            val keys = text.createKeys(segments)
-            result.value = segments to keys
-        }.waitFor()
-        val dataValue = data!!
+        val width = glyphLayout.width
+        val height = glyphLayout.height
 
-        val keys = dataValue.second
-        val lineSegmentsWithStyle = dataValue.first
-
-        val font2 = FontManager.getFont(text.font)
-        val actualFontHeight = font2.getLineHeight()
-        val scaleX = TextMesh.DEFAULT_LINE_HEIGHT / actualFontHeight
-        val scaleY = 1f / actualFontHeight
-        val width = lineSegmentsWithStyle.width * scaleX
-        val height = lineSegmentsWithStyle.height * scaleY
-
-        val lineOffset = -TextMesh.DEFAULT_LINE_HEIGHT * text.relativeLineSpacing[time]
+        val lineOffset = text.relativeLineSpacing[time] - 1f
 
         // min and max x are cached for long texts with thousands of lines (not really relevant)
         // actual text height vs baseline? for height
 
-        val totalHeight = lineOffset * height
+        val totalHeight = height + lineOffset * glyphLayout.numLines
 
         val dx = text.getDrawDX(width, time)
         val dy = text.getDrawDY(lineOffset, totalHeight, time)
 
-        var charIndex = 0
-
         text.forceVariableBuffer = true
 
-        val textAlignment01 = text.textAlignment[time] * .5f + .5f
-        partSearch@ for ((partIndex, part) in lineSegmentsWithStyle.parts.withIndex()) {
+        val textAlignment01 = text.textAlignment[time] * 0.5f + 0.5f
+        val extraSpace = width - glyphLayout.getLineWidth(index)
+        val offsetX = extraSpace * textAlignment01
 
-            val startIndex = charIndex
-            val partLength = part.codepointLength
-            val endIndex = charIndex + partLength
+        val px = dx + offsetX + (glyphLayout.getX0(index) + glyphLayout.getX1(index)) * 0.5f
+        val py = dy + lineOffset * glyphLayout.getLineIndex(index) + glyphLayout.getY(index)
 
-            if (index in startIndex until endIndex) {
-
-                val offsetX = (width - part.lineWidth * scaleX) * textAlignment01
-
-                val lineDeltaX = dx + part.xPos * scaleX + offsetX
-                val lineDeltaY = dy + part.yPos * scaleY * lineOffset
-
-                val key = keys[partIndex]
-                val textMesh = text.getTextMesh(key)!!
-
-                val di = index - startIndex
-                val xOffset = (textMesh.offsets[di] + textMesh.offsets[di + 1]).toFloat() * 0.5f
-                val offset = Vector3f(lineDeltaX + xOffset, lineDeltaY, 0f)
-                px = offset.x / 100f
-                py = offset.y
-
-                break@partSearch
-
-            }
-
-            charIndex = endIndex + 1 // '\n'
-
-        }
-
-        particle.states.first().position.add(px, py, 0f)
+        particle.states.first().position.add(
+            px * glyphLayout.baseScale,
+            py * glyphLayout.baseScale, 0f
+        )
         return particle
 
     }

@@ -133,9 +133,9 @@ fun Text.createInspectorWithoutSuperImpl(
     spaceGroup += vi(
         inspected, "Line Break Width",
         "How broad the text shall be, at maximum; < 0 = no limit", "text.widthLimit",
-        Text.lineBreakType, lineBreakWidth, style
+        Text.lineBreakType, relativeWidthLimit, style
     ) { it, _ ->
-        RemsStudio.incrementalChange("line break width") { for (x in c) x.lineBreakWidth = it }
+        RemsStudio.incrementalChange("line break width") { for (x in c) x.relativeWidthLimit = it }
     }
 
     // val ops = getGroup("Operations", "", "operations")

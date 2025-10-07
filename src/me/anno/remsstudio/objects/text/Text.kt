@@ -5,11 +5,9 @@ import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
 import me.anno.fonts.Font
 import me.anno.fonts.FontManager
-import me.anno.fonts.LineSplitter
 import me.anno.fonts.PartResult
-import me.anno.fonts.mesh.TextMesh.Companion.DEFAULT_LINE_HEIGHT
-import me.anno.fonts.mesh.TextMeshGroup
-import me.anno.fonts.signeddistfields.TextSDFGroup
+import me.anno.fonts.mesh.MeshGlyphLayout
+import me.anno.fonts.signeddistfields.SDFGlyphLayout
 import me.anno.io.base.BaseWriter
 import me.anno.language.translation.Dict
 import me.anno.language.translation.NameDesc
@@ -45,11 +43,8 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
         val tabSpaceType = NumberType.FLOAT_PLUS.withDefaultValue(4f)
         val lineBreakType = NumberType.FLOAT_PLUS.withDefaultValue(0f)
 
-        val textMeshTimeout = 5000L
-
-        private val textSegmentCache = CacheSection<TextSegmentKey, TextMeshGroup>("TextSegmentCache")
-        private val textSDFCache = CacheSection<TextSegmentKey, TextSDFGroup>("TextSDFCache")
-        val textVisCache = CacheSection<VisState, Pair<PartResult, List<TextSegmentKey>>>("TextVisCache")
+        val meshLayouts = CacheSection<TextState, MeshGlyphLayout>("TextSegmentCache")
+        val sdfLayouts = CacheSection<TextState, SDFGlyphLayout>("TextSDFCache")
 
     }
 
@@ -93,65 +88,43 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
     // val endDegrees = AnimatedProperty.float(360f)
 
     // automatic line break after length x
-    var lineBreakWidth = 0f
+    var relativeWidthLimit = 0f
 
     // todo allow style by HTML/.md? :D
     // var textMode = TextMode.RAW
 
     var relativeLineSpacing = AnimatedProperty.float(1f)
 
-    var relativeCharSpacing = 0f
-    var relativeTabSize = 4f
+    var relativeCharSpacing: Float
+        get() = font.relativeCharSpacing
+        set(value) {
+            font.relativeCharSpacing = value
+        }
+
+    var relativeTabSize: Float
+        get() = font.relativeTabSize
+        set(value) {
+            font.relativeTabSize = value
+        }
 
     var font = Font("Verdana", DEFAULT_FONT_HEIGHT, isBold = false, isItalic = false)
     var smallCaps = false
-    val charSpacing get() = font.size * relativeCharSpacing
     var forceVariableBuffer = false
 
-    fun createKeys(lineSegmentsWithStyle: PartResult) =
-        lineSegmentsWithStyle.parts.map {
-            TextSegmentKey(
-                it.font,
-                font.isBold,
-                font.isItalic,
-                it.text,
-                charSpacing
-            )
-        }
-
     open fun splitSegments(text: String): PartResult {
-        if (text.isEmpty()) return PartResult(emptyList(), 0f, font.size, 1)
-        val awtFont = FontManager.getFont(font) as LineSplitter<*>
-        val absoluteLineBreakWidth = lineBreakWidth * font.size * 2f / DEFAULT_LINE_HEIGHT
+        if (text.isEmpty()) return PartResult(ArrayList(), font.size, 0f, 0f, 0)
+        val awtFont = FontManager.getFont(font)
         val text2 = if (smallCaps) text.smallCaps() else text
-        return awtFont.splitParts(text2, font.size, relativeTabSize, relativeCharSpacing, absoluteLineBreakWidth, -1f)
+        return awtFont.splitParts(
+            text2, font.size, relativeTabSize, relativeCharSpacing,
+            relativeWidthLimit, Int.MAX_VALUE
+        )
     }
 
-    fun getVisualState(text: String) = VisState(
-        renderingMode, roundSDFCorners, charSpacing,
-        text, font, smallCaps, lineBreakWidth, relativeTabSize
+    fun getVisualState(text: String) = TextState(
+        renderingMode, roundSDFCorners,
+        text, font, smallCaps, relativeWidthLimit,
     )
-
-    private val shallLoadAsync get() = !forceVariableBuffer
-    fun getTextMesh(key: TextSegmentKey): TextMeshGroup? {
-        return textSegmentCache.getEntry(key, textMeshTimeout) { keyInstance, result ->
-            result.value = TextMeshGroup(
-                keyInstance.font.fontKey.toFont(),
-                keyInstance.text,
-                keyInstance.charSpacing,
-                forceVariableBuffer
-            )
-        }.waitFor(shallLoadAsync)
-    }
-
-    fun getSDFTexture(key: TextSegmentKey): TextSDFGroup? {
-        return textSDFCache.getEntry(key, textMeshTimeout) { keyInstance, result ->
-            result.value = TextSDFGroup(
-                keyInstance.font.fontKey.toFont(), keyInstance.text,
-                keyInstance.charSpacing.toDouble()
-            )
-        }.value
-    }
 
     fun getDrawDX(width: Float, time: Double): Float {
         val blockAlignmentX01 = blockAlignmentX[time] * .5f + .5f
@@ -168,14 +141,6 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
         } else {
             mix(dy1, dy2, blockAlignmentY11)
         }
-    }
-
-    fun getSegments(text: String): Pair<PartResult, List<TextSegmentKey>> {
-        return textVisCache.getEntry(getVisualState(text), 1000L) { key, result ->
-            val segments = splitSegments(text)
-            val keys = createKeys(segments)
-            result.value = segments to keys
-        }.waitFor()!!
     }
 
     override fun onDraw(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
@@ -211,7 +176,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
         // spacing
         writer.writeObject(this, "relativeLineSpacing", relativeLineSpacing)
         writer.writeFloat("relativeTabSize", relativeTabSize, true)
-        writer.writeFloat("lineBreakWidth", lineBreakWidth)
+        writer.writeFloat("lineBreakWidth", relativeWidthLimit)
         writer.writeFloat("relativeCharSpacing", relativeCharSpacing)
 
         // outlines
@@ -254,7 +219,7 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
             "renderingMode" -> renderingMode = TextRenderMode.entries.firstOrNull { it.id == value } ?: renderingMode
             "relativeTabSize" -> relativeTabSize = value as? Float ?: return
             "relativeCharSpacing" -> relativeCharSpacing = value as? Float ?: return
-            "lineBreakWidth" -> lineBreakWidth = value as? Float ?: return
+            "lineBreakWidth" -> relativeWidthLimit = value as? Float ?: return
             "text" -> {
                 if (value is String) text.set(value)
                 else text.copyFrom(value)

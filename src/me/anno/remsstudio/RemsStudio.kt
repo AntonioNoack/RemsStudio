@@ -332,6 +332,10 @@ object RemsStudio : EngineBase(NameDesc("Rem's Studio"), 10405, true), WelcomeUI
     @JvmStatic
     fun main(args: Array<String>) {
 
+        // todo high-priority todos:
+        //  - test all text rendering, layout & finalRendering
+        //  - test all text particle rendering, layout & finalRendering
+
         // todo high-priority bugs:
         //  - emojis are not supported properly in TextMesh and SDF mode for Linux
         //  - lineBreakWidth is not working
