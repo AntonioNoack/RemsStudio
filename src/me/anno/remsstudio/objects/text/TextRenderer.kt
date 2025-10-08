@@ -1,10 +1,9 @@
 package me.anno.remsstudio.objects.text
 
-import me.anno.fonts.FontManager
 import me.anno.fonts.GlyphLayout
 import me.anno.fonts.mesh.MeshGlyphLayout
-import me.anno.fonts.mesh.TextMesh
 import me.anno.fonts.signeddistfields.SDFGlyphLayout
+import me.anno.fonts.signeddistfields.TextSDF
 import me.anno.fonts.signeddistfields.algorithm.SignedDistanceField
 import me.anno.gpu.FinalRendering.isFinalRendering
 import me.anno.gpu.FinalRendering.onMissingResource
@@ -34,7 +33,7 @@ object TextRenderer {
     fun getGlyphLayout(key0: TextState): GlyphLayout? {
         val glyphLayout0 = if (key0.textRenderMode == TextRenderMode.MESH) {
             meshLayouts.getEntry(key0, timeout) { key, result ->
-                result.value = MeshGlyphLayout(key.font, key.text, key.relativeWidthLimit, Int.MAX_VALUE, null)
+                result.value = MeshGlyphLayout(key.font, key.text, key.relativeWidthLimit, Int.MAX_VALUE)
             }
         } else {
             sdfLayouts.getEntry(key0, timeout) { key, result ->
@@ -56,16 +55,20 @@ object TextRenderer {
 
         val text = element.text[time]
         if (text.isBlank2()) {
+            println("text @$time is blank :(")
             // element.super.onDraw(stack, time, color)
             superCall()
             return
         }
 
         val key = element.getVisualState(text)
-        val glyphLayout = getGlyphLayout(key) ?: return
+        val glyphLayout = getGlyphLayout(key)
+        if (glyphLayout == null) {
+            // ...
+            return
+        }
 
-        val font2 = FontManager.getFont(element.font)
-        val actualFontHeight = font2.getLineHeight()
+        val actualFontHeight = glyphLayout.actualFontSize
 
         val width = glyphLayout.width * glyphLayout.baseScale
         val height = glyphLayout.height * glyphLayout.baseScale
@@ -193,6 +196,7 @@ object TextRenderer {
         stack: Matrix4fArrayList, time: Double, color: Vector4f,
         glyphLayout: GlyphLayout,
         actualFontHeight: Float,
+        // todo respect line offset
         width: Float, lineOffset: Float,
         dx: Float, dy: Float,
         startCursor: Int, endCursor: Int,
@@ -209,16 +213,15 @@ object TextRenderer {
 
         firstTimeDrawing = true
 
-        // todo map cursor to codepoint position?
-        //  being stuck on emojis is weird
-
         val textAlignment01 = element.textAlignment[time] * 0.5f + 0.5f
+        val totalWidth = glyphLayout.width * glyphLayout.baseScale
         when (glyphLayout) {
             is MeshGlyphLayout -> {
-                glyphLayout.draw(startCursor, endCursor) { buffer, x0, x1, y, lineWidth ->
-                    val localAlignment = textAlignment01 * (glyphLayout.width * glyphLayout.baseScale - lineWidth)
+                glyphLayout.draw(startCursor, endCursor) { buffer, x0, _, y, lineWidth ->
+
+                    val localAlignment = textAlignment01 * (totalWidth - lineWidth)
                     // todo transform x0 and y into usable units
-                    val offset = offset.set(x0 + localAlignment, y)
+                    val offset = offset.set(x0 + localAlignment + dx, -y + dy)
                     if (firstTimeDrawing) {
                         GFXx3Dv2.draw3DText(element, time, offset, stack, buffer, color)
                         firstTimeDrawing = false
@@ -230,13 +233,15 @@ object TextRenderer {
             }
             is SDFGlyphLayout -> {
                 glyphLayout.roundCorners = element.roundSDFCorners
-                glyphLayout.draw(startCursor, endCursor) { sdfText, x0, x1, y, lineWidth ->
-                    val localAlignment = textAlignment01 * (glyphLayout.width * glyphLayout.baseScale - lineWidth)
+                glyphLayout.draw(startCursor, endCursor) { textSDF, x0, _, y, lineWidth ->
+                    val localAlignment = textAlignment01 * (totalWidth - lineWidth)
                     // todo transform x0 and y into usable units
-                    val texture = sdfText.texture
+                    val texture = textSDF.texture
                     if (texture is Texture2D && texture.isCreated()) {
                         drawSDFTexture(
-                            element, texture, time, stack, color, x0 + localAlignment, y, actualFontHeight,
+                            element, glyphLayout, textSDF, texture, time, stack, color,
+                            x0 + localAlignment + dy,
+                            -y + dy,
                             extraSmoothness, oc1, oc2, oc3
                         )
                     } else if (isFinalRendering) {
@@ -252,11 +257,12 @@ object TextRenderer {
 
     private fun drawSDFTexture(
         element: Text,
+        glyphLayout: SDFGlyphLayout,
+        textSDF: TextSDF,
         texture: Texture2D,
         time: Double,
         stack: Matrix4fArrayList,
         color: Vector4f, lineDeltaX: Float, lineDeltaY: Float,
-        actualFontHeight: Float,
         extraSmoothness: Float,
         oc1: Vector4f, oc2: Vector4f, oc3: Vector4f
     ) {
@@ -267,12 +273,16 @@ object TextRenderer {
 
         val hasUVAttractors = element.children.any { it is EffectMorphing }
 
-        val baseScale = TextMesh.DEFAULT_LINE_HEIGHT / (sdfResolution * actualFontHeight)
+        val bounds = textSDF.bounds
+        val baseScale = glyphLayout.baseScale
 
-        val scaleX = 0.5f * texture.width * baseScale
-        val scaleY = 0.5f * texture.height * baseScale
+        val scaleX = 0.5f * bounds.deltaX * baseScale
+        val scaleY = 0.5f * bounds.deltaY * baseScale
 
-        val tmpOffset = tmpOffset.set(lineDeltaX, lineDeltaY)
+        val tmpOffset = tmpOffset.set(
+            lineDeltaX + bounds.centerX * baseScale,
+            lineDeltaY - bounds.centerY * baseScale
+        )
         val tmpScale = tmpScale.set(scaleX, scaleY)
 
         if (firstTimeDrawing) {

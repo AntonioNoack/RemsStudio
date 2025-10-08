@@ -4,8 +4,6 @@ import me.anno.cache.CacheSection
 import me.anno.config.DefaultConfig
 import me.anno.engine.inspector.Inspectable
 import me.anno.fonts.Font
-import me.anno.fonts.FontManager
-import me.anno.fonts.PartResult
 import me.anno.fonts.mesh.MeshGlyphLayout
 import me.anno.fonts.signeddistfields.SDFGlyphLayout
 import me.anno.io.base.BaseWriter
@@ -21,7 +19,6 @@ import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
 import me.anno.ui.input.NumberType
-import me.anno.utils.types.Strings.smallCaps
 import org.joml.Matrix4fArrayList
 import org.joml.Vector3f
 import org.joml.Vector4f
@@ -110,16 +107,6 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
     var font = Font("Verdana", DEFAULT_FONT_HEIGHT, isBold = false, isItalic = false)
     var smallCaps = false
     var forceVariableBuffer = false
-
-    open fun splitSegments(text: String): PartResult {
-        if (text.isEmpty()) return PartResult(ArrayList(), font.size, 0f, 0f, 0)
-        val awtFont = FontManager.getFont(font)
-        val text2 = if (smallCaps) text.smallCaps() else text
-        return awtFont.splitParts(
-            text2, font.size, relativeTabSize, relativeCharSpacing,
-            relativeWidthLimit, Int.MAX_VALUE
-        )
-    }
 
     fun getVisualState(text: String) = TextState(
         renderingMode, roundSDFCorners,
