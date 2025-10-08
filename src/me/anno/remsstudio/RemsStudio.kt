@@ -332,8 +332,9 @@ object RemsStudio : EngineBase(NameDesc("Rem's Studio"), 10405, true), WelcomeUI
     @JvmStatic
     fun main(args: Array<String>) {
 
+        // done: test text rendering, layout
         // todo high-priority todos:
-        //  - test all text rendering, layout & finalRendering
+        //  - test text finalRendering
         //  - test all text particle rendering, layout & finalRendering
 
         // todo high-priority bugs:

@@ -95,13 +95,13 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
     var relativeCharSpacing: Float
         get() = font.relativeCharSpacing
         set(value) {
-            font.relativeCharSpacing = value
+            font = font.withRelativeCharSpacing(value)
         }
 
     var relativeTabSize: Float
         get() = font.relativeTabSize
         set(value) {
-            font.relativeTabSize = value
+            font = font.withRelativeTabSize(value)
         }
 
     var font = Font("Verdana", DEFAULT_FONT_HEIGHT, isBold = false, isItalic = false)
@@ -118,11 +118,15 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
         return (blockAlignmentX01 - 1f) * width
     }
 
-    fun getDrawDY(lineOffset: Float, totalHeight: Float, time: Double): Float {
-        val dy0 = lineOffset * 0.57f // text touches top
-        val dy1 = -totalHeight * 0.5f + lineOffset * 0.75f // center line, height of horizontal in e
-        val dy2 = -totalHeight + lineOffset // exactly baseline
+    fun getDrawDY(totalHeight: Float, numLines: Int, time: Double): Float {
         val blockAlignmentY11 = blockAlignmentY[time]
+        val lineHeight = totalHeight / numLines
+        // text touches top
+        val dy0 = 0f
+        // center line, height of horizontal in e
+        val dy1 = mix(0.5f, 0.62f + 0.5f * lineHeight, numLines - 1f)
+        // exactly baseline
+        val dy2 = dy0 + totalHeight - 0.6f
         return if (blockAlignmentY11 < 0f) {
             mix(dy0, dy1, blockAlignmentY11 + 1f)
         } else {

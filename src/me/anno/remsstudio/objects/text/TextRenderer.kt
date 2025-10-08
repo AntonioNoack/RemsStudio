@@ -55,33 +55,25 @@ object TextRenderer {
 
         val text = element.text[time]
         if (text.isBlank2()) {
-            println("text @$time is blank :(")
-            // element.super.onDraw(stack, time, color)
             superCall()
             return
         }
 
         val key = element.getVisualState(text)
-        val glyphLayout = getGlyphLayout(key)
-        if (glyphLayout == null) {
-            // ...
-            return
-        }
-
-        val actualFontHeight = glyphLayout.actualFontSize
+        val glyphLayout = getGlyphLayout(key) ?: return
 
         val width = glyphLayout.width * glyphLayout.baseScale
         val height = glyphLayout.height * glyphLayout.baseScale
 
-        val relativeLineSpacing = element.relativeLineSpacing[time]
+        val extraLineOffset = element.relativeLineSpacing[time] - 1f
 
         // min and max x are cached for long texts with thousands of lines (not really relevant)
         // actual text height vs baseline? for height
 
-        val totalHeight = relativeLineSpacing * height
+        val totalHeight = height + extraLineOffset * (glyphLayout.numLines - 1)
 
         val dx = element.getDrawDX(width, time)
-        val dy = element.getDrawDY(relativeLineSpacing, totalHeight, time)
+        val dy = element.getDrawDY(totalHeight, glyphLayout.numLines, time)
 
         // limit the characters
         // cursorLimit1 .. cursorLimit2
@@ -92,7 +84,6 @@ object TextRenderer {
 
         if (startCursor > endCursor) {
             // invisible
-            // element.super.onDraw(stack, time, color)
             superCall()
             return
         }
@@ -100,12 +91,11 @@ object TextRenderer {
         val lineBreakWidth = element.relativeWidthLimit
         if (lineBreakWidth > 0f && !isFinalRendering && element in Selection.selectedTransforms) {
             // draw the borders
-            // why 0.81? correct x-scale? (off by ca ~ x0.9)
             val x0 = dx + width * 0.5f
-            val minX = x0 - 0.81f * lineBreakWidth
-            val maxX = x0 + 0.81f * lineBreakWidth
-            val y0 = dy - relativeLineSpacing * 0.75f
-            val y1 = y0 + totalHeight
+            val minX = x0 - 0.5f * lineBreakWidth
+            val maxX = x0 + 0.5f * lineBreakWidth
+            val y0 = dy + 1f
+            val y1 = y0 - totalHeight
             Grid.drawLine(stack, color, Vector3f(minX, y0, 0f), Vector3f(minX, y1, 0f))
             Grid.drawLine(stack, color, Vector3f(maxX, y0, 0f), Vector3f(maxX, y1, 0f))
         }
@@ -121,8 +111,7 @@ object TextRenderer {
                 if (tintedShadowColor.w >= 1f / 255f) draw(
                     element, stack, time, tintedShadowColor,
                     glyphLayout,
-                    actualFontHeight,
-                    width, relativeLineSpacing,
+                    extraLineOffset,
                     dx, dy,
                     startCursor, endCursor,
                     false, shadowSmoothness
@@ -134,13 +123,11 @@ object TextRenderer {
         if (color.w >= 1f / 255f) draw(
             element, stack, time, color,
             glyphLayout,
-            actualFontHeight,
-            width, relativeLineSpacing,
+            extraLineOffset,
             dx, dy,
             startCursor, endCursor,
             true, 0f
         )
-
     }
 
     private val oc0 = Vector4f()
@@ -195,9 +182,7 @@ object TextRenderer {
         element: Text,
         stack: Matrix4fArrayList, time: Double, color: Vector4f,
         glyphLayout: GlyphLayout,
-        actualFontHeight: Float,
-        // todo respect line offset
-        width: Float, lineOffset: Float,
+        extraLineOffset: Float,
         dx: Float, dy: Float,
         startCursor: Int, endCursor: Int,
         useExtraColors: Boolean,
@@ -217,31 +202,30 @@ object TextRenderer {
         val totalWidth = glyphLayout.width * glyphLayout.baseScale
         when (glyphLayout) {
             is MeshGlyphLayout -> {
-                glyphLayout.draw(startCursor, endCursor) { buffer, x0, _, y, lineWidth ->
-
+                glyphLayout.draw(startCursor, endCursor) { mesh, x0, _, y, lineWidth, glyphIndex ->
+                    val lineIndex = glyphLayout.getLineIndex(glyphIndex)
                     val localAlignment = textAlignment01 * (totalWidth - lineWidth)
-                    // todo transform x0 and y into usable units
-                    val offset = offset.set(x0 + localAlignment + dx, -y + dy)
+                    val offset = offset.set(x0 + localAlignment + dx, -y + dy - extraLineOffset * lineIndex)
                     if (firstTimeDrawing) {
-                        GFXx3Dv2.draw3DText(element, time, offset, stack, buffer, color)
+                        GFXx3Dv2.draw3DText(element, time, offset, stack, mesh, color)
                         firstTimeDrawing = false
                     } else {
-                        GFXx3Dv2.draw3DTextWithOffset(buffer, offset)
+                        GFXx3Dv2.draw3DTextWithOffset(mesh, offset)
                     }
                     false // don't quit yet
                 }
             }
             is SDFGlyphLayout -> {
                 glyphLayout.roundCorners = element.roundSDFCorners
-                glyphLayout.draw(startCursor, endCursor) { textSDF, x0, _, y, lineWidth ->
+                glyphLayout.draw(startCursor, endCursor) { textSDF, x0, _, y, lineWidth, glyphIndex ->
                     val localAlignment = textAlignment01 * (totalWidth - lineWidth)
-                    // todo transform x0 and y into usable units
                     val texture = textSDF.texture
                     if (texture is Texture2D && texture.isCreated()) {
+                        val lineIndex = glyphLayout.getLineIndex(glyphIndex)
                         drawSDFTexture(
                             element, glyphLayout, textSDF, texture, time, stack, color,
-                            x0 + localAlignment + dy,
-                            -y + dy,
+                            x0 + localAlignment + dx,
+                            -y + dy - extraLineOffset * lineIndex,
                             extraSmoothness, oc1, oc2, oc3
                         )
                     } else if (isFinalRendering) {

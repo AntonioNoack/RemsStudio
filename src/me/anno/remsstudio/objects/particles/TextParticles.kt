@@ -49,18 +49,18 @@ class TextParticles : ParticleSystem() {
         val key = text.getVisualState(currText)
         val glyphLayout = getGlyphLayout(key) ?: return null
 
-        val width = glyphLayout.width
-        val height = glyphLayout.height
+        val width = glyphLayout.width * glyphLayout.baseScale
+        val height = glyphLayout.height * glyphLayout.baseScale
 
-        val lineOffset = text.relativeLineSpacing[time] - 1f
+        val extraLineOffset = text.relativeLineSpacing[time] - 1f
 
         // min and max x are cached for long texts with thousands of lines (not really relevant)
         // actual text height vs baseline? for height
 
-        val totalHeight = height + lineOffset * glyphLayout.numLines
+        val totalHeight = height + extraLineOffset * (glyphLayout.numLines - 1f)
 
         val dx = text.getDrawDX(width, time)
-        val dy = text.getDrawDY(lineOffset, totalHeight, time)
+        val dy = text.getDrawDY(totalHeight, glyphLayout.numLines, time)
 
         text.forceVariableBuffer = true
 
@@ -69,7 +69,7 @@ class TextParticles : ParticleSystem() {
         val offsetX = extraSpace * textAlignment01
 
         val px = dx + offsetX + (glyphLayout.getX0(index) + glyphLayout.getX1(index)) * 0.5f
-        val py = dy + lineOffset * glyphLayout.getLineIndex(index) + glyphLayout.getY(index)
+        val py = dy + extraLineOffset * glyphLayout.getLineIndex(index) + glyphLayout.getY(index)
 
         particle.states.first().position.add(
             px * glyphLayout.baseScale,
