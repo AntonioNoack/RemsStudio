@@ -11,6 +11,7 @@ import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.audio.effects.impl.EqualizerEffect
 import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.objects.Transform.Companion.show
 import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.ui.input.ColorInputV2
 import me.anno.remsstudio.ui.input.FloatInputV2
@@ -41,12 +42,11 @@ object ComponentUIV2 {
     @Suppress("unchecked_cast") // all casts are checked in all known use-cases ;)
     fun <V> vi(
         inspected: List<Inspectable>,
-        self: Transform,
         title: String, ttt: String, visibilityKey: String,
         type: NumberType?, value: V,
         style: Style, setValue: (value: V, mask: Int) -> Unit
     ): Panel {
-        val t = inspected.filterIsInstance2(Transform::class)
+        val toShowTransforms = inspected.filterIsInstance2(Transform::class)
         val nd = NameDesc(title, ttt, "")
         val panel = when (value) {
             is Boolean -> BooleanInput(nd, value, type?.defaultValue as? Boolean ?: false, style)
@@ -55,7 +55,7 @@ object ComponentUIV2 {
                         setValue(it as V, -1)
                     }
                 }
-                .setIsSelectedListener { self.show(t, null) }
+                .setIsSelectedListener { show(toShowTransforms, null) }
                 .setTooltip(ttt)
             is Int -> IntInput(nd, visibilityKey, value, type ?: NumberType.INT, style)
                 .setChangeListener {
@@ -63,7 +63,7 @@ object ComponentUIV2 {
                         setValue(it.toInt() as V, -1)
                     }
                 }
-                .setIsSelectedListener { self.show(t, null) }
+                .setIsSelectedListener { show(toShowTransforms, null) }
                 .setTooltip(ttt)
             is Long -> IntInput(nd, visibilityKey, value, type ?: NumberType.LONG, style)
                 .setChangeListener {
@@ -71,7 +71,7 @@ object ComponentUIV2 {
                         setValue(it as V, -1)
                     }
                 }
-                .setIsSelectedListener { self.show(t, null) }
+                .setIsSelectedListener { show(toShowTransforms, null) }
                 .setTooltip(ttt)
             is Float -> FloatInput(nd, visibilityKey, value, type ?: NumberType.FLOAT, style)
                 .setChangeListener {
@@ -79,7 +79,7 @@ object ComponentUIV2 {
                         setValue(it.toFloat() as V, -1)
                     }
                 }
-                .setIsSelectedListener { self.show(t, null) }
+                .setIsSelectedListener { show(toShowTransforms, null) }
                 .setTooltip(ttt)
             is Double -> FloatInput(nd, visibilityKey, value, type ?: NumberType.DOUBLE, style)
                 .setChangeListener {
@@ -87,7 +87,7 @@ object ComponentUIV2 {
                         setValue(it as V, -1)
                     }
                 }
-                .setIsSelectedListener { self.show(t, null) }
+                .setIsSelectedListener { show(toShowTransforms, null) }
                 .setTooltip(ttt)
             is Vector2f -> FloatVectorInput(nd, visibilityKey, value, type ?: NumberType.VEC2, style)
                 .addChangeListener { x, y, _, _, mask ->
@@ -95,7 +95,7 @@ object ComponentUIV2 {
                         setValue(Vector2f(x.toFloat(), y.toFloat()) as V, mask)
                     }
                 }
-                .setIsSelectedListener { self.show(t, null) }
+                .setIsSelectedListener { show(toShowTransforms, null) }
                 .setTooltip(ttt)
             is Vector3f ->
                 if (type == NumberType.COLOR3) {
@@ -105,7 +105,7 @@ object ComponentUIV2 {
                                 setValue(Vector3f(r, g, b) as V, mask)
                             }
                         }
-                        .setIsSelectedListener { self.show(t, null) }
+                        .setIsSelectedListener { show(toShowTransforms, null) }
                         .setTooltip(ttt)
                 } else {
                     FloatVectorInput(nd, visibilityKey, value, type ?: NumberType.VEC3, style)
@@ -114,7 +114,7 @@ object ComponentUIV2 {
                                 setValue(Vector3f(x.toFloat(), y.toFloat(), z.toFloat()) as V, mask)
                             }
                         }
-                        .setIsSelectedListener { self.show(t, null) }
+                        .setIsSelectedListener { show(toShowTransforms, null) }
                         .setTooltip(ttt)
                 }
             is Vector4f -> {
@@ -125,7 +125,7 @@ object ComponentUIV2 {
                                 setValue(Vector4f(r, g, b, a) as V, mask)
                             }
                         }
-                        .setIsSelectedListener { self.show(t, null) }
+                        .setIsSelectedListener { show(toShowTransforms, null) }
                         .setTooltip(ttt)
                 } else {
                     FloatVectorInput(nd, visibilityKey, value, type, style)
@@ -134,7 +134,7 @@ object ComponentUIV2 {
                                 setValue(Vector4f(x.toFloat(), y.toFloat(), z.toFloat(), w.toFloat()) as V, mask)
                             }
                         }
-                        .setIsSelectedListener { self.show(t, null) }
+                        .setIsSelectedListener { show(toShowTransforms, null) }
                         .setTooltip(ttt)
                 }
             }
@@ -144,7 +144,7 @@ object ComponentUIV2 {
                         setValue(Quaternionf(x, y, z, w) as V, mask)
                     }
                 }
-                .setIsSelectedListener { self.show(t, null) }
+                .setIsSelectedListener { show(toShowTransforms, null) }
                 .setTooltip(ttt)
             is String -> TextInputML(nd, value, style)
                 .addChangeListener {
@@ -152,7 +152,7 @@ object ComponentUIV2 {
                         setValue(it as V, -1)
                     }
                 }
-                .setIsSelectedListener { self.show(t, null) }
+                .setIsSelectedListener { show(toShowTransforms, null) }
                 .setTooltip(ttt)
             is FileReference -> FileInput(nd, style, value, emptyList())
                 .addChangeListener {
@@ -160,7 +160,7 @@ object ComponentUIV2 {
                         setValue(it as V, -1)
                     }
                 }
-                .setIsSelectedListener { self.show(t, null) }
+                .setIsSelectedListener { show(toShowTransforms, null) }
                 .setTooltip(ttt)
             is BlendMode -> {
                 val values = blendModes.values
@@ -174,7 +174,7 @@ object ComponentUIV2 {
                             setValue(valueNames[index].first as V, -1)
                         }
                     }
-                    .setIsSelectedListener { self.show(t, null) }
+                    .setIsSelectedListener { show(toShowTransforms, null) }
                     .setTooltip(ttt)
             }
             is Enum<*> -> {
@@ -185,7 +185,7 @@ object ComponentUIV2 {
                             setValue(values[index] as V, -1)
                         }
                     }
-                    .setIsSelectedListener { self.show(t, null) }
+                    .setIsSelectedListener { show(toShowTransforms, null) }
                     .setTooltip(ttt)
             }
             is ExtendableEnum -> {
@@ -198,7 +198,7 @@ object ComponentUIV2 {
                             setValue(values[index] as V, -1)
                         }
                     }
-                    .setIsSelectedListener { self.show(t, null) }
+                    .setIsSelectedListener { show(toShowTransforms, null) }
                     .setTooltip(ttt)
             }
             is ValueWithDefaultFunc<*>, is ValueWithDefault<*> -> throw IllegalArgumentException("Must pass value, not ValueWithDefault(Func)!")
@@ -229,7 +229,7 @@ object ComponentUIV2 {
         values: AnimatedProperty<*>, style: Style
     ): IsAnimatedWrapper {
         val time = self.lastLocalTime
-        val sl = { self.show(listOf(self), listOf(values)) }
+        val sl = { show(listOf(self), listOf(values)) }
         val nd = NameDesc(title, ttt, "")
         val panel = when (val value = values[time]) {
             is Int -> IntInputV2(nd, visibilityKey, values, time, style)
@@ -495,7 +495,7 @@ object ComponentUIV2 {
             else -> throw RuntimeException("Type $value not yet implemented!")
         }
         panel.apply {
-            val sl = { self.show(transforms, values) }
+            val sl = { show(transforms, values) }
             when (this) {
                 is NumberInput<*> -> setIsSelectedListener(sl)
                 is FloatVectorInputV2 -> setIsSelectedListener(sl)

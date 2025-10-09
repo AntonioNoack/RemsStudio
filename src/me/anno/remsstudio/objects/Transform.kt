@@ -63,7 +63,6 @@ import org.apache.logging.log4j.LogManager
 import org.joml.*
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.max
-import kotlin.math.min
 
 @Suppress("MemberVisibilityCanBePrivate")
 open class Transform() : Saveable(),
@@ -201,10 +200,6 @@ open class Transform() : Saveable(),
         child.parent = this
     }
 
-    fun show(selves: List<Transform>, anim: List<AnimatedProperty<*>?>?) {
-        select(selves, anim ?: emptyList())
-    }
-
     private val tmp0 = Vector4f()
     open fun claimResources(pTime0: Double, pTime1: Double, pMaxAlpha: Float) {
         // todo we should get min and max time, not just the border values
@@ -238,15 +233,16 @@ open class Transform() : Saveable(),
         getGroup: (nameDesc: NameDesc) -> SettingCategory
     ) {
 
-        val c = inspected.filterIsInstance2(Transform::class)
+        @Suppress("UnnecessaryVariable") val showIfSelected = inspected
+        val toBeChanged = showIfSelected.filterIsInstance2(Transform::class)
 
         list += TextInput(NameDesc("Name ($className)"), "", name, style)
-            .addChangeListener { for (x in c) name = it.ifEmpty { "-" } }
-            .setIsSelectedListener { show(c, null) }
+            .addChangeListener { for (x in toBeChanged) x.name = it.ifEmpty { "-" } }
+            .setIsSelectedListener { show(toBeChanged, null) }
             .apply { alignmentX = AxisAlignment.FILL }
         list += TextInputML(NameDesc("Comment"), comment, style)
-            .addChangeListener { for (x in c) comment = it }
-            .setIsSelectedListener { show(c, null) }
+            .addChangeListener { for (x in toBeChanged) x.comment = it }
+            .setIsSelectedListener { show(toBeChanged, null) }
             .apply { alignmentX = AxisAlignment.FILL }
 
         val warningPanel = UpdatingTextPanel(500, style) { lastWarning }
@@ -269,105 +265,105 @@ open class Transform() : Saveable(),
         // todo if tags are the same, show same tags,
         // todo else show sth like ---
         list += TextInput(NameDesc("Tags"), "", tags, style)
-            .addChangeListener { for (x in c) x.tags = it }
-            .setIsSelectedListener { show(c, null) }
+            .addChangeListener { for (x in toBeChanged) x.tags = it }
+            .setIsSelectedListener { show(toBeChanged, null) }
             .setTooltip("For Search | Not implemented yet")
 
         // transforms
         val transform = getGroup(NameDesc("Transform", "Translation, Scale, Rotation, Skewing", "obj.transform"))
         transform += vis(
-            c,
+            toBeChanged,
             "Position",
             "Location of this object",
             "transform.position",
-            c.map { it.position },
+            toBeChanged.map { it.position },
             style
         )
-        transform += vis(c, "Scale", "Makes it bigger/smaller", "transform.scale", c.map { it.scale }, style)
-        transform += vis(c, "Rotation", "Pitch,Yaw,Roll", "transform.rotation", c.map { it.rotationYXZ }, style)
-        transform += vis(c, "Skew", "Transform it similar to a shear", "transform.skew", c.map { it.skew }, style)
+        transform += vis(toBeChanged, "Scale", "Makes it bigger/smaller", "transform.scale", toBeChanged.map { it.scale }, style)
+        transform += vis(toBeChanged, "Rotation", "Pitch,Yaw,Roll", "transform.rotation", toBeChanged.map { it.rotationYXZ }, style)
+        transform += vis(toBeChanged, "Skew", "Transform it similar to a shear", "transform.skew", toBeChanged.map { it.skew }, style)
         transform += vis(
-            c,
+            toBeChanged,
             "Alignment with Camera",
             "0 = in 3D, 1 = looking towards the camera; billboards",
             "transform.alignWithCamera",
-            c.map { it.alignWithCamera }, style
+            toBeChanged.map { it.alignWithCamera }, style
         )
         transform += vi(
-            c, "Lock Transform", "So you don't accidentally move them", "transform.lockTransform",
+            toBeChanged, "Lock Transform", "So you don't accidentally move them", "transform.lockTransform",
             null, lockTransform, style
         ) { value, _ ->
-            for (ci in c) ci.lockTransform = value
+            for (ci in toBeChanged) ci.lockTransform = value
         }
 
         // color
         val colorGroup = getGroup(NameDesc("Color", "", "obj.color"))
-        colorGroup += vis(c, "Color", "Tint, applied to this & children", "color.tint", c.map { it.color }, style)
+        colorGroup += vis(toBeChanged, "Color", "Tint, applied to this & children", "color.tint", toBeChanged.map { it.color }, style)
         colorGroup += vis(
-            c, "Brightness Multiplier", "To make things brighter than usually possible", "color.multiplier",
-            c.map { it.colorMultiplier }, style
+            toBeChanged, "Brightness Multiplier", "To make things brighter than usually possible", "color.multiplier",
+            toBeChanged.map { it.colorMultiplier }, style
         )
 
         // kind of color...
         colorGroup += vi(
-            inspected, "Blend Mode", "How this' element color is combined with what was rendered before that.",
+            showIfSelected, "Blend Mode", "How this' element color is combined with what was rendered before that.",
             "color.blendMode",
             null, blendMode, style
-        ) { it, _ -> for (x in c) x.blendMode = it }
+        ) { it, _ -> for (x in toBeChanged) x.blendMode = it }
 
         // time
         val timeGroup = getGroup(NameDesc("Time", "", "obj.time"))
         timeGroup += vis(
-            inspected, "Start Time", "Delay the animation", "time.startTime", null,
-            c.map { it.timeOffset }, style
+            showIfSelected, "Start Time", "Delay the animation", "time.startTime", null,
+            toBeChanged.map { it.timeOffset }, style
         )
         timeGroup += vis(
-            inspected, "Time Multiplier", "Speed up the animation", "time.timeMultiplier",
-            dilationType, c.map { it.timeDilation }, style
+            showIfSelected, "Time Multiplier", "Speed up the animation", "time.timeMultiplier",
+            dilationType, toBeChanged.map { it.timeDilation }, style
         )
         timeGroup += vis(
-            c, "Advanced Time", "Add acceleration/deceleration to your elements", "time.advanced",
-            c.map { it.timeAnimated }, style
+            toBeChanged, "Advanced Time", "Add acceleration/deceleration to your elements", "time.advanced",
+            toBeChanged.map { it.timeAnimated }, style
         )
 
         val ufd = usesFadingDifferently()
         if (ufd || getStartTime().isFinite()) {
             timeGroup += vis(
-                c, "Fade In",
+                toBeChanged, "Fade In",
                 "Transparency at the start, in seconds",
                 "time.fadeIn",
                 NumberType.FLOAT_PLUS,
-                c.map { it.fadeIn },
+                toBeChanged.map { it.fadeIn },
                 style
             )
             timeGroup += vis(
-                c, "Fade Out",
+                toBeChanged, "Fade Out",
                 "Transparency at the end, in seconds",
                 "time.fadeOut",
                 NumberType.FLOAT_PLUS,
-                c.map { it.fadeOut },
+                toBeChanged.map { it.fadeOut },
                 style
             )
         }
 
         val editorGroup = getGroup(NameDesc("Editor", "", "obj.editor"))
         editorGroup += vi(
-            inspected, "Timeline Slot", "< 1 means invisible", "editor.timelineSlot",
+            showIfSelected, "Timeline Slot", "< 1 means invisible", "editor.timelineSlot",
             NumberType.INT_PLUS, timelineSlot.value, style
-        ) { it, _ -> for (x in c) x.timelineSlot.value = it }
+        ) { it, _ -> for (x in toBeChanged) x.timelineSlot.value = it }
         // todo warn of invisible elements somehow!...
         editorGroup += vi(
-            inspected, "Visibility", "Whether the object is visible when rendering and/or when editing",
+            showIfSelected, "Visibility", "Whether the object is visible when rendering and/or when editing",
             "visibility", null, visibility, style
-        ) { it, _ -> for (x in c) x.visibility = it }
+        ) { it, _ -> for (x in toBeChanged) x.visibility = it }
 
         if (parent?.acceptsWeight() == true) {
             val psGroup = getGroup(NameDesc("Particle System Child", "", "obj.particles"))
             psGroup += vi(
-                inspected, "Weight", "For particle systems", "particles.weight",
+                showIfSelected, "Weight", "For particle systems", "particles.weight",
                 NumberType.FLOAT_PLUS, weight, style
             ) { it, _ ->
-                for (x in c) {
+                for (x in toBeChanged) {
                     x.weight = it
                     (x.parent as? ParticleSystem)?.apply {
                         if (children.size > 1) clearCache()
@@ -760,11 +756,11 @@ open class Transform() : Saveable(),
     }
 
     fun <V> vis(
-        inspected: List<Inspectable>,
+        showIfSelected: List<Inspectable>,
         title: String, ttt: String, dictSubPath: String, type: NumberType?,
         values: List<ValueWithDefault<V>>, style: Style
     ): Panel {
-        return vi(inspected, title, ttt, dictSubPath, type, values[0].value, style) { newValue, mask ->
+        return vi(showIfSelected, title, ttt, dictSubPath, type, values[0].value, style) { newValue, mask ->
             for (x in values) {
                 x.value = setViaMask(x.value, newValue, mask)
             }
@@ -777,13 +773,13 @@ open class Transform() : Saveable(),
      * callback is used to adjust the value
      * */
     fun <V> vi(
-        inspected: List<Inspectable>,
+        showIfSelected: List<Inspectable>,
         title: String, ttt: String, dictSubPath: String,
         type: NumberType?, value: V,
         style: Style, setValue: (value: V, mask: Int) -> Unit
     ): Panel {
         return ComponentUIV2.vi(
-            inspected, this,
+            showIfSelected,
             Dict[title, "obj.$dictSubPath"],
             Dict[ttt, "obj.$dictSubPath.desc"],
             dictSubPath, type, value, style, setValue
@@ -905,6 +901,10 @@ open class Transform() : Saveable(),
     companion object {
 
         val NO_BLENDING = BlendMode(NameDesc("No Blending", "", "gpu.blendMode.none"), "None")
+
+        fun show(selves: List<Transform>, anim: List<AnimatedProperty<*>?>?) {
+            select(selves, anim ?: emptyList())
+        }
 
         fun drawUICircle(stack: Matrix4fArrayList, scale: Float = 0.02f, inner: Float = 0.7f, color: Vector4f) {
             // draw a small symbol to indicate pivot

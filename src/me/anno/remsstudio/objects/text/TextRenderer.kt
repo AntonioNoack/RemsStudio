@@ -18,6 +18,7 @@ import me.anno.remsstudio.objects.text.Text.Companion.sdfLayouts
 import me.anno.ui.editor.sceneView.Grid
 import me.anno.utils.pooling.JomlPools
 import me.anno.utils.types.Strings.isBlank2
+import me.anno.utils.types.Strings.smallCaps
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector3f
@@ -33,11 +34,13 @@ object TextRenderer {
     fun getGlyphLayout(key0: TextState): GlyphLayout? {
         val glyphLayout0 = if (key0.textRenderMode == TextRenderMode.MESH) {
             meshLayouts.getEntry(key0, timeout) { key, result ->
-                result.value = MeshGlyphLayout(key.font, key.text, key.relativeWidthLimit, Int.MAX_VALUE)
+                val text = if (key.smallCaps) key.text.smallCaps() else key.text
+                result.value = MeshGlyphLayout(key.font, text, key.relativeWidthLimit, Int.MAX_VALUE)
             }
         } else {
             sdfLayouts.getEntry(key0, timeout) { key, result ->
-                result.value = SDFGlyphLayout(key.font, key.text, key.relativeWidthLimit, Int.MAX_VALUE)
+                val text = if (key.smallCaps) key.text.smallCaps() else key.text
+                result.value = SDFGlyphLayout(key.font, text, key.relativeWidthLimit, Int.MAX_VALUE)
             }
         }
 

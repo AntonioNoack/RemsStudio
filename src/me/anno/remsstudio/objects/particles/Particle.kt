@@ -106,6 +106,7 @@ class Particle(
                     // node editor? like in Blender or Unreal Engine
                     val particleColor = JomlPools.vec4f.create()
                     this.color.mul(color, particleColor)
+
                     type.draw(stack, particleTime, particleColor)
                     JomlPools.vec4f.sub(1)
 

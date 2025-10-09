@@ -10,6 +10,7 @@ import me.anno.remsstudio.RemsStudio.isPaused
 import me.anno.remsstudio.RemsStudio.nullCamera
 import me.anno.remsstudio.objects.ColorGrading
 import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.objects.Transform.Companion.show
 import me.anno.remsstudio.objects.modes.VideoType
 import me.anno.remsstudio.objects.video.AudioPlayback.startPlayback
 import me.anno.remsstudio.objects.video.Video.Companion.editorFPS
@@ -27,7 +28,6 @@ import me.anno.ui.input.EnumInput
 import me.anno.ui.input.FloatInput
 import me.anno.ui.input.NumberType
 import me.anno.utils.structures.Collections.filterIsInstance2
-import me.anno.utils.types.Booleans.toInt
 import me.anno.utils.types.Floats.f2
 import me.anno.utils.types.Strings.formatTime2
 import org.apache.logging.log4j.LogManager
@@ -50,8 +50,8 @@ object VideoInspector {
             pipeline.createInspector(list, style, getGroup)
         }
 
-        val t = inspected.filterIsInstance2(Transform::class)
-        val c = inspected.filterIsInstance2(Video::class)
+        val showIfSelected = inspected.filterIsInstance2(Transform::class)
+        val toBeChanged = inspected.filterIsInstance2(Video::class)
 
         // to hide elements, which are not usable / have no effect
         val videoPanels = ArrayList<Panel>()
@@ -100,37 +100,37 @@ object VideoInspector {
             inspected, "File Location", "Source file of this video", "video.fileLocation",
             null, file, style
         ) { newFile, _ ->
-            for (x in c) x.file = newFile
+            for (x in toBeChanged) x.file = newFile
         }
 
         val colorGroup = getGroup(NameDesc("Color", "", "obj.color"))
         colorGroup += vis(
-            c, "Corner Radius", "Makes the corners round", "cornerRadius",
-            c.map { it.cornerRadius }, style
+            toBeChanged, "Corner Radius", "Makes the corners round", "cornerRadius",
+            toBeChanged.map { it.cornerRadius }, style
         )
 
         val uvMap = getGroup(NameDesc("Texture", "", "obj.uvs"))
         uvMap += img(
             vis(
-                c, "Tiling", "(tile count x, tile count y, offset x, offset y)", "video.tiling",
-                c.map { it.tiling }, style
+                toBeChanged, "Tiling", "(tile count x, tile count y, offset x, offset y)", "video.tiling",
+                toBeChanged.map { it.tiling }, style
             )
         )
         uvMap += img(
             vi(
                 inspected, "UV-Projection", "Can be used for 360°-Videos", "video.uvProjection",
                 null, uvProjection.value, style
-            ) { it, _ -> for (x in c) x.uvProjection.value = it })
+            ) { it, _ -> for (x in toBeChanged) x.uvProjection.value = it })
         uvMap += img(
             vi(
                 inspected, "Filtering", "Pixelated look?", "texture.filtering",
                 null, filtering.value, style
-            ) { it, _ -> for (x in c) x.filtering.value = it })
+            ) { it, _ -> for (x in toBeChanged) x.filtering.value = it })
         uvMap += img(
             vi(
                 inspected, "Clamping", "For tiled images", "texture.clamping",
                 null, clampMode.value, style
-            ) { it, _ -> for (x in c) x.clampMode.value = it })
+            ) { it, _ -> for (x in toBeChanged) x.clampMode.value = it })
 
         fun invalidateTimeline() {
             AudioManager.requestUpdate()
@@ -142,7 +142,7 @@ object VideoInspector {
             "video.loopingType",
             null, isLooping.value, style
         ) { it, _ ->
-            for (x in c) x.isLooping.value = it
+            for (x in toBeChanged) x.isLooping.value = it
             invalidateTimeline()
         }
         time += vi(
@@ -151,7 +151,7 @@ object VideoInspector {
             "video.stayVisibleAtEnd", "video.stayVisibleAtEnd",
             null, stayVisibleAtEnd, style
         ) { it, _ ->
-            for (x in c) x.stayVisibleAtEnd = it
+            for (x in toBeChanged) x.stayVisibleAtEnd = it
             invalidateTimeline()
         }
 
@@ -170,8 +170,8 @@ object VideoInspector {
                 NameDesc(videoScaleNames.reverse[videoScale.value] ?: "Auto"),
                 videoScales.map { NameDesc(it.key) }, style
             )
-                .setChangeListener { _, index, _ -> for (x in c) x.videoScale.value = videoScales[index].value }
-                .setIsSelectedListener { show(t, null) })
+                .setChangeListener { _, index, _ -> for (x in toBeChanged) x.videoScale.value = videoScales[index].value }
+                .setIsSelectedListener { show(showIfSelected, null) })
 
         editor += vid(
             EnumInput(
@@ -184,8 +184,8 @@ object VideoInspector {
                 editorFPS.filterIndexed { index, it -> index == 0 || it * 0.98 <= (meta?.videoFPS ?: 1e85) }
                     .map { NameDesc(it.toString()) }, style
             )
-                .setChangeListener { _, index, _ -> for (x in c) x.editorVideoFPS.value = editorFPS[index] }
-                .setIsSelectedListener { show(t, null) })
+                .setChangeListener { _, index, _ -> for (x in toBeChanged) x.editorVideoFPS.value = editorFPS[index] }
+                .setIsSelectedListener { show(showIfSelected, null) })
 
         quality() += vid(
             FloatInput(
@@ -197,20 +197,20 @@ object VideoInspector {
                 ), blankFrameThreshold,
                 NumberType.FLOAT_03, style
             )
-                .setChangeListener { for (x in c) x.blankFrameThreshold = it.toFloat() }
-                .setIsSelectedListener { show(t, null) })
+                .setChangeListener { for (x in toBeChanged) x.blankFrameThreshold = it.toFloat() }
+                .setIsSelectedListener { show(showIfSelected, null) })
 
 
         ColorGrading.createInspector(
-            c, c.map { it.cgPower }, c.map { it.cgSaturation }, c.map { it.cgSlope }, c.map { it.cgOffsetAdd },
-            c.map { it.cgOffsetSub }, { img(it) },
+            toBeChanged, toBeChanged.map { it.cgPower }, toBeChanged.map { it.cgSaturation }, toBeChanged.map { it.cgSlope }, toBeChanged.map { it.cgOffsetAdd },
+            toBeChanged.map { it.cgOffsetSub }, { img(it) },
             getGroup, style
         )
 
         val audio = getGroup(NameDesc("Audio", "", "obj.audio"))
-        audio += aud(vis(c, "Amplitude", "How loud it is", "audio.amplitude", c.map { it.amplitude }, style))
+        audio += aud(vis(toBeChanged, "Amplitude", "How loud it is", "audio.amplitude", toBeChanged.map { it.amplitude }, style))
         audio += aud(vi(inspected, "Is 3D Sound", "Sound becomes directional", "audio.3d", null, is3D, style) { it, _ ->
-            for (x in c) x.is3D = it
+            for (x in toBeChanged) x.is3D = it
             AudioManager.requestUpdate()
         })
 

@@ -49,7 +49,7 @@ abstract class Distribution(val nameDesc: NameDesc) : Saveable(), InspectableAtt
         val properties = listProperties()
         for (property in properties) {
             list += ComponentUIV2.vi(
-                listOf(actor), actor, property.nameDesc.name, property.nameDesc.desc,
+                listOf(actor), property.nameDesc.name, property.nameDesc.desc,
                 property.nameDesc.key, property.pType.type, property.value, style
             ) { it, _ -> property.value.set(it) }
         }

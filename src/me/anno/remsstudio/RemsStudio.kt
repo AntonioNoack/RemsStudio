@@ -336,9 +336,11 @@ object RemsStudio : EngineBase(NameDesc("Rem's Studio"), 10405, true), WelcomeUI
         // todo high-priority todos:
         //  - test text finalRendering
         //  - test all text particle rendering, layout & finalRendering
+        //  - in TextParticleSystem, clicking on a Text property changes the UI to only show Text-properties
 
         // todo high-priority bugs:
         //  - you cannot cut-paste in a Multiline Text Panel with multiple lines: the line breaks just disappear
+        //  - selection over multiple lines in Multiline Text Input looks weird
         //  - emojis are not supported properly in TextMesh and SDF mode for Linux
         //  - lineBreakWidth is not working
         //  - the rendered result is extremely jittery - are we rendering the right frames??? -> now it worked just fine???

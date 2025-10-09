@@ -6,8 +6,10 @@ import me.anno.io.base.BaseWriter
 import me.anno.io.files.InvalidRef
 import me.anno.io.json.saveable.JsonStringWriter
 import me.anno.language.translation.NameDesc
+import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.text.Text
 import me.anno.remsstudio.objects.text.TextRenderer.getGlyphLayout
+import me.anno.remsstudio.objects.text.createInspectorWithoutSuperImpl
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.editor.SettingCategory
@@ -27,8 +29,9 @@ class TextParticles : ParticleSystem() {
         getGroup: (NameDesc) -> SettingCategory
     ) {
         super.createInspector(inspected, list, style, getGroup)
-        val inspected2 = inspected.filterIsInstance2(TextParticles::class).map { it.text }
-        text.createInspectorWithoutSuper(inspected2, list, style, getGroup)
+        val transforms = inspected.filterIsInstance2(Transform::class)
+        val toBeChanged = inspected.filterIsInstance2(TextParticles::class).map { it.text }
+        text.createInspectorWithoutSuperImpl(list, style, getGroup, transforms, toBeChanged)
     }
 
     override fun createParticle(index: Int, time: Double): Particle? {
@@ -76,7 +79,6 @@ class TextParticles : ParticleSystem() {
             py * glyphLayout.baseScale, 0f
         )
         return particle
-
     }
 
     override fun save(writer: BaseWriter) {

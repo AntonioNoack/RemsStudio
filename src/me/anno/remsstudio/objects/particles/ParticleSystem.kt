@@ -266,7 +266,9 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
             }
             val dist = selectedDistribution
             dist.update(time, Random())
-            dist.distribution.onDraw(stack, color)
+            stack.next {
+                dist.distribution.onDraw(stack, color)
+            }
         }
 
         sumWeight = children
@@ -274,25 +276,21 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
             .sumOf { it.weight.toDouble() }.toFloat()
         if (needsChildren() && (time < 0f || children.isEmpty() || sumWeight <= 0.0)) return
 
-        if (step(time)) {
-            drawParticles(stack, time, color)
-        } else {
+        if (!step(time)) {
+            println("Waiting for particles")
             if (isFinalRendering) {
                 onMissingResource("Computing Particles", null)
                 return
             }
             drawLoadingCircle(stack, (Time.nanoTime * 1e-9f) % 1f)
-            drawParticles(stack, time, color)
         }
 
-    }
-
-    private fun drawParticles(stack: Matrix4fArrayList, time: Double, color: Vector4f) {
         val fadeIn = fadeIn.value.toDouble()
         val fadeOut = fadeOut.value.toDouble()
         val simulationStep = simulationStep
-        for (p in particles) {
-            p.draw(stack, time, color, simulationStep, fadeIn, fadeOut)
+        for (pi in particles.indices) {
+            val particle = particles[pi]
+            particle.draw(stack, time, color, simulationStep, fadeIn, fadeOut)
         }
     }
 
