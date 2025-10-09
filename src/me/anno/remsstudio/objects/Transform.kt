@@ -178,18 +178,6 @@ open class Transform() : Saveable(),
             weightI.value = value
         }
 
-    fun putValue(list: AnimatedProperty<*>?, value: Any, updateHistory: Boolean) {
-        list ?: return
-        val time = global2Kf(editorTime)
-        if (updateHistory) {
-            RemsStudio.incrementalChange("Change Keyframe Value") {
-                list.addKeyframe(time, value, TimelinePanel.keyframeSnappingDt)
-            }
-        } else {
-            list.addKeyframe(time, value, TimelinePanel.keyframeSnappingDt)
-        }
-    }
-
     open fun clearCache() {}
 
     fun setChildAt(child: Transform, index: Int) {
@@ -279,9 +267,30 @@ open class Transform() : Saveable(),
             toBeChanged.map { it.position },
             style
         )
-        transform += vis(toBeChanged, "Scale", "Makes it bigger/smaller", "transform.scale", toBeChanged.map { it.scale }, style)
-        transform += vis(toBeChanged, "Rotation", "Pitch,Yaw,Roll", "transform.rotation", toBeChanged.map { it.rotationYXZ }, style)
-        transform += vis(toBeChanged, "Skew", "Transform it similar to a shear", "transform.skew", toBeChanged.map { it.skew }, style)
+        transform += vis(
+            toBeChanged,
+            "Scale",
+            "Makes it bigger/smaller",
+            "transform.scale",
+            toBeChanged.map { it.scale },
+            style
+        )
+        transform += vis(
+            toBeChanged,
+            "Rotation",
+            "Pitch,Yaw,Roll",
+            "transform.rotation",
+            toBeChanged.map { it.rotationYXZ },
+            style
+        )
+        transform += vis(
+            toBeChanged,
+            "Skew",
+            "Transform it similar to a shear",
+            "transform.skew",
+            toBeChanged.map { it.skew },
+            style
+        )
         transform += vis(
             toBeChanged,
             "Alignment with Camera",
@@ -298,7 +307,14 @@ open class Transform() : Saveable(),
 
         // color
         val colorGroup = getGroup(NameDesc("Color", "", "obj.color"))
-        colorGroup += vis(toBeChanged, "Color", "Tint, applied to this & children", "color.tint", toBeChanged.map { it.color }, style)
+        colorGroup += vis(
+            toBeChanged,
+            "Color",
+            "Tint, applied to this & children",
+            "color.tint",
+            toBeChanged.map { it.color },
+            style
+        )
         colorGroup += vis(
             toBeChanged, "Brightness Multiplier", "To make things brighter than usually possible", "color.multiplier",
             toBeChanged.map { it.colorMultiplier }, style
@@ -805,12 +821,12 @@ open class Transform() : Saveable(),
     }
 
     fun vis(
-        selves: List<Transform>,
+        toBeShown: List<Transform>,
         title: String, ttt: String, dictSubPath: String,
         values: List<AnimatedProperty<*>>, style: Style
     ): Panel {
         return ComponentUIV2.vis(
-            selves,
+            this, toBeShown,
             Dict[title, "obj.$dictSubPath"],
             Dict[ttt, "obj.$dictSubPath.desc"],
             dictSubPath, values, style
@@ -904,6 +920,18 @@ open class Transform() : Saveable(),
 
         fun show(selves: List<Transform>, anim: List<AnimatedProperty<*>?>?) {
             select(selves, anim ?: emptyList())
+        }
+
+        fun putValue(list: AnimatedProperty<*>?, value: Any, updateHistory: Boolean) {
+            list ?: return
+            val time = global2Kf(editorTime)
+            if (updateHistory) {
+                RemsStudio.incrementalChange("Change Keyframe Value") {
+                    list.addKeyframe(time, value, TimelinePanel.keyframeSnappingDt)
+                }
+            } else {
+                list.addKeyframe(time, value, TimelinePanel.keyframeSnappingDt)
+            }
         }
 
         fun drawUICircle(stack: Matrix4fArrayList, scale: Float = 0.02f, inner: Float = 0.7f, color: Vector4f) {

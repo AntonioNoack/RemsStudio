@@ -11,6 +11,7 @@ import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.audio.effects.impl.EqualizerEffect
 import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.objects.Transform.Companion.putValue
 import me.anno.remsstudio.objects.Transform.Companion.show
 import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.ui.input.ColorInputV2
@@ -235,7 +236,7 @@ object ComponentUIV2 {
             is Int -> IntInputV2(nd, visibilityKey, values, time, style)
                 .setChangeListener {
                     RemsStudio.incrementalChange("Set $title to $it", title) {
-                        self.putValue(values, it.toInt(), false)
+                        putValue(values, it.toInt(), false)
                     }
                 }
                 .setIsSelectedListener(sl)
@@ -243,7 +244,7 @@ object ComponentUIV2 {
             is Long -> IntInputV2(nd, visibilityKey, values, time, style)
                 .setChangeListener {
                     RemsStudio.incrementalChange("Set $title to $it", title) {
-                        self.putValue(values, it, false)
+                        putValue(values, it, false)
                     }
                 }
                 .setIsSelectedListener(sl)
@@ -255,7 +256,7 @@ object ComponentUIV2 {
                     SliderInput(0.0, 1.0, 0.0, value.toDouble(), nd, visibilityKey, style)
                         .setChangeListener {
                             RemsStudio.incrementalChange("Set $title to $it", title) {
-                                self.putValue(values, it.toFloat(), false)
+                                putValue(values, it.toFloat(), false)
                             }
                         }
                         .setIsSelectedListener(sl)
@@ -264,7 +265,7 @@ object ComponentUIV2 {
                     FloatInputV2(nd, visibilityKey, values, time, style)
                         .setChangeListener {
                             RemsStudio.incrementalChange("Set $title to $it", title) {
-                                self.putValue(values, it.toFloat(), false)
+                                putValue(values, it.toFloat(), false)
                             }
                         }
                         .setIsSelectedListener(sl)
@@ -274,7 +275,7 @@ object ComponentUIV2 {
             is Double -> FloatInputV2(nd, visibilityKey, values, time, style)
                 .setChangeListener {
                     RemsStudio.incrementalChange("Set $title to $it", title) {
-                        self.putValue(values, it, false)
+                        putValue(values, it, false)
                     }
                 }
                 .setIsSelectedListener(sl)
@@ -282,7 +283,7 @@ object ComponentUIV2 {
             is Vector2f -> FloatVectorInputV2(nd, visibilityKey, values, time, style)
                 .addChangeListener { x, y, _, _, _ ->
                     RemsStudio.incrementalChange("Set $title to ($x,$y)", title) {
-                        self.putValue(values, Vector2f(x.toFloat(), y.toFloat()), false)
+                        putValue(values, Vector2f(x.toFloat(), y.toFloat()), false)
                     }
                 }
                 .setIsSelectedListener(sl)
@@ -292,7 +293,7 @@ object ComponentUIV2 {
                     ColorInputV2(nd, visibilityKey, Vector4f(value, 1f), false, values, style)
                         .setChangeListener { r, g, b, _, _ ->
                             RemsStudio.incrementalChange("Set $title to ${Vector3f(r, g, b).toHexColor()}", title) {
-                                self.putValue(values, Vector3f(r, g, b), false)
+                                putValue(values, Vector3f(r, g, b), false)
                             }
                         }
                         .setResetListener { toColor(values.defaultValue) }
@@ -302,7 +303,7 @@ object ComponentUIV2 {
                     FloatVectorInputV2(nd, visibilityKey, values, time, style)
                         .addChangeListener { x, y, z, _, _ ->
                             RemsStudio.incrementalChange("Set $title to ($x,$y,$z)", title) {
-                                self.putValue(values, Vector3f(x.toFloat(), y.toFloat(), z.toFloat()), false)
+                                putValue(values, Vector3f(x.toFloat(), y.toFloat(), z.toFloat()), false)
                             }
                         }
                         .setIsSelectedListener(sl)
@@ -313,7 +314,7 @@ object ComponentUIV2 {
                     ColorInputV2(nd, visibilityKey, value, true, values, style)
                         .setChangeListener { r, g, b, a, _ ->
                             RemsStudio.incrementalChange("Set $title to ${Vector4f(r, g, b, a).toHexColor()}", title) {
-                                self.putValue(values, Vector4f(r, g, b, a), false)
+                                putValue(values, Vector4f(r, g, b, a), false)
                             }
                         }
                         .setResetListener { toColor(values.defaultValue) }
@@ -323,7 +324,7 @@ object ComponentUIV2 {
                     FloatVectorInputV2(nd, visibilityKey, values, time, style)
                         .addChangeListener { x, y, z, w, _ ->
                             RemsStudio.incrementalChange("Set $title to ($x,$y,$z,$w)", title) {
-                                self.putValue(
+                                putValue(
                                     values,
                                     Vector4f(x.toFloat(), y.toFloat(), z.toFloat(), w.toFloat()),
                                     false
@@ -337,7 +338,7 @@ object ComponentUIV2 {
             is String -> TextInputML(nd, value, style)
                 .addChangeListener {
                     RemsStudio.incrementalChange("Set $title to $it") {
-                        self.putValue(values, it, false)
+                        putValue(values, it, false)
                     }
                 }
                 .setIsSelectedListener(sl)
@@ -345,7 +346,7 @@ object ComponentUIV2 {
             is Quaternionf -> FloatVectorInputV2(nd, visibilityKey, values, time, style)
                 .addChangeListener { x, y, z, w, _ ->
                     RemsStudio.incrementalChange("Set $title to ($x,$y,$z,$w)", title) {
-                        self.putValue(values, Quaternionf(x, y, z, w), false)
+                        putValue(values, Quaternionf(x, y, z, w), false)
                     }
                 }
                 .setIsSelectedListener(sl)
@@ -361,13 +362,13 @@ object ComponentUIV2 {
      * modifies the AnimatedProperty-Object, so no callback is needed
      * */
     fun vis(
-        transforms: List<Transform>,
+        self: Transform,
+        toBeShown: List<Transform>,
         title: String, ttt: String, visibilityKey: String,
         values: List<AnimatedProperty<*>>,
         style: Style
     ): Panel {
         val sampleValues = values[0]
-        val self = transforms[0]
         val time = self.lastLocalTime
         val nd = NameDesc(title, ttt, "")
         val panel = when (val value = sampleValues[time]) {
@@ -376,7 +377,7 @@ object ComponentUIV2 {
                     RemsStudio.incrementalChange("Set $title to $it", title) {
                         val ii = it.toInt()
                         for (i in values.indices) {
-                            transforms[i].putValue(values[i], ii, false)
+                            putValue(values[i], ii, false)
                         }
                     }
                 }
@@ -385,7 +386,7 @@ object ComponentUIV2 {
                 .setChangeListener {
                     RemsStudio.incrementalChange("Set $title to $it", title) {
                         for (i in values.indices) {
-                            transforms[i].putValue(values[i], it, false)
+                            putValue(values[i], it, false)
                         }
                     }
                 }
@@ -395,7 +396,7 @@ object ComponentUIV2 {
                     RemsStudio.incrementalChange("Set $title to $it", title) {
                         val ii = it.toFloat()
                         for (i in values.indices) {
-                            transforms[i].putValue(values[i], ii, false)
+                            putValue(values[i], ii, false)
                         }
                     }
                 }
@@ -404,7 +405,7 @@ object ComponentUIV2 {
                 .setChangeListener {
                     RemsStudio.incrementalChange("Set $title to $it", title) {
                         for (i in values.indices) {
-                            transforms[i].putValue(values[i], it, false)
+                            putValue(values[i], it, false)
                         }
                     }
                 }
@@ -414,7 +415,7 @@ object ComponentUIV2 {
                     RemsStudio.incrementalChange("Set $title to ($x,$y)", title) {
                         // multiple instances?
                         for (i in values.indices) {
-                            transforms[i].putValue(values[i], Vector2f(x.toFloat(), y.toFloat()), false)
+                            putValue(values[i], Vector2f(x.toFloat(), y.toFloat()), false)
                         }
                     }
                 }
@@ -425,7 +426,7 @@ object ComponentUIV2 {
                             RemsStudio.incrementalChange("Set $title to ${Vector3f(r, g, b).toHexColor()}", title) {
                                 // multiple instances?
                                 for (i in values.indices) {
-                                    transforms[i].putValue(values[i], Vector3f(r, g, b), false)
+                                    putValue(values[i], Vector3f(r, g, b), false)
                                 }
                             }
                         }
@@ -436,7 +437,7 @@ object ComponentUIV2 {
                             RemsStudio.incrementalChange("Set $title to ($x,$y,$z)", title) {
                                 // multiple instances?
                                 for (i in values.indices) {
-                                    transforms[i].putValue(
+                                    putValue(
                                         values[i],
                                         Vector3f(x.toFloat(), y.toFloat(), z.toFloat()),
                                         false
@@ -452,7 +453,7 @@ object ComponentUIV2 {
                             RemsStudio.incrementalChange("Set $title to ${Vector4f(r, g, b, a).toHexColor()}", title) {
                                 // multiple instances?
                                 for (i in values.indices) {
-                                    transforms[i].putValue(values[i], Vector4f(r, g, b, a), false)
+                                    putValue(values[i], Vector4f(r, g, b, a), false)
                                 }
                             }
                         }
@@ -463,7 +464,7 @@ object ComponentUIV2 {
                             RemsStudio.incrementalChange("Set $title to ($x,$y,$z,$w)", title) {
                                 // multiple instances?
                                 for (i in values.indices) {
-                                    transforms[i].putValue(
+                                    putValue(
                                         values[i],
                                         Vector4f(x.toFloat(), y.toFloat(), z.toFloat(), w.toFloat()),
                                         false
@@ -477,7 +478,7 @@ object ComponentUIV2 {
                 .addChangeListener {
                     RemsStudio.incrementalChange("Set $title to $it") {
                         for (i in values.indices) {
-                            transforms[i].putValue(values[i], it, false)
+                            putValue(values[i], it, false)
                         }
                     }
                 }
@@ -488,14 +489,14 @@ object ComponentUIV2 {
                 .addChangeListener { x, y, z, w, _ ->
                     RemsStudio.incrementalChange("Set $title to ($x,$y,$z,$w)", title) {
                         for (i in values.indices) {
-                            transforms[i].putValue(values[i], Quaternionf(x, y, z, w), false)
+                            putValue(values[i], Quaternionf(x, y, z, w), false)
                         }
                     }
                 }
             else -> throw RuntimeException("Type $value not yet implemented!")
         }
         panel.apply {
-            val sl = { show(transforms, values) }
+            val sl = { show(toBeShown, values) }
             when (this) {
                 is NumberInput<*> -> setIsSelectedListener(sl)
                 is FloatVectorInputV2 -> setIsSelectedListener(sl)

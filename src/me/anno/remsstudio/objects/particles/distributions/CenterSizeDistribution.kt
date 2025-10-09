@@ -74,10 +74,9 @@ abstract class CenterSizeDistribution(
     }
 
     override fun listProperties(): List<InspectableVector> {
-        val prefix = "obj.distribution"
         return super.listProperties() + listOf(
-            InspectableVector(scale, NameDesc("Radius / Size", "", "$prefix.radius"), InspectableVector.PType.SCALE),
-            InspectableVector(rotation, NameDesc("Rotation", "", "$prefix.rotation"), InspectableVector.PType.ROTATION)
+            InspectableVector(scale, NameDesc("Radius / Size", "", "obj.distribution.radius"), InspectableVector.PType.SCALE),
+            InspectableVector(rotation, NameDesc("Rotation", "", "obj.distribution.rotation"), InspectableVector.PType.ROTATION)
         )
     }
 

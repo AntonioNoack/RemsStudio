@@ -6,6 +6,7 @@ import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.objects.Transform.Companion.putValue
 import me.anno.remsstudio.objects.Transform.Companion.show
 import me.anno.remsstudio.ui.IsAnimatedWrapper
 import me.anno.remsstudio.ui.IsSelectedWrapper
@@ -28,10 +29,11 @@ fun Text.createInspectorWithoutSuperImpl(
 ) {
     val showIfSelected = inspected.filterIsInstance2(Transform::class)
     val toBeChanged = inspected.filterIsInstance2(Text::class)
-    createInspectorWithoutSuperImpl(list, style, getGroup, showIfSelected, toBeChanged)
+    createInspectorWithoutSuperImpl(this, list, style, getGroup, showIfSelected, toBeChanged)
 }
 
-fun Text.createInspectorWithoutSuperImpl(
+fun Transform.createInspectorWithoutSuperImpl(
+    text: Text,
     list: PanelListY, style: Style,
     getGroup: (NameDesc) -> SettingCategory,
     showIfSelected: List<Transform>,
@@ -47,13 +49,13 @@ fun Text.createInspectorWithoutSuperImpl(
     textInput.addChangeListener {
         RemsStudio.incrementalChange("text") {
             for (x in toBeChanged) for (e in x.getSelfWithShadows()) {
-                e.putValue(e.text, it, true)
+                putValue(e.text, it, true)
             }
         }
     }
 
     val fontGroup = getGroup(NameDesc("Font", "In what style text is rendered.", "obj.font"))
-    fontGroup += createFontInput(font.name, style) {
+    fontGroup += createFontInput(text.font.name, style) {
         RemsStudio.largeChange("Change Font to '$it'") {
             for (x in toBeChanged) for (e in x.getSelfWithShadows()) {
                 e.font = e.font.withName(it)
@@ -63,7 +65,7 @@ fun Text.createInspectorWithoutSuperImpl(
 
     fontGroup += BooleanInput(
         NameDesc("Italic", "Chooses a sideways-leaning variant of the font.", "obj.text.italic"),
-        font.isItalic, false, style
+        text.font.isItalic, false, style
     ).setChangeListener {
         RemsStudio.largeChange("Italic: $it") {
             for (x in toBeChanged) for (e in x.getSelfWithShadows()) {
@@ -73,7 +75,7 @@ fun Text.createInspectorWithoutSuperImpl(
     }.setIsSelectedListener { show(showIfSelected, null) }
     fontGroup += BooleanInput(
         NameDesc("Bold", "Chooses a thicker variant of the font.", "obj.text.bold"),
-        font.isBold, false, style
+        text.font.isBold, false, style
     ).setChangeListener {
         RemsStudio.largeChange("Bold: $it") {
             for (x in toBeChanged) for (e in x.getSelfWithShadows()) {
@@ -86,7 +88,7 @@ fun Text.createInspectorWithoutSuperImpl(
             "Small Caps",
             "This is a hack, where English letters get replaced by an UTF-8 variant in small caps.",
             "obj.text.smallCaps"
-        ), smallCaps, false, style
+        ), text.smallCaps, false, style
     ).setChangeListener {
         RemsStudio.largeChange("Small Caps: $it") {
             for (x in toBeChanged) for (e in x.getSelfWithShadows()) {
@@ -119,7 +121,7 @@ fun Text.createInspectorWithoutSuperImpl(
         showIfSelected, "Character Spacing",
         "Space between individual characters",
         "text.characterSpacing",
-        null, relativeCharSpacing, style
+        null, text.relativeCharSpacing, style
     ) { it, _ ->
         RemsStudio.incrementalChange("char space") { for (x in toBeChanged) x.relativeCharSpacing = it }
     }
@@ -131,14 +133,14 @@ fun Text.createInspectorWithoutSuperImpl(
     )
     spaceGroup += vi(
         showIfSelected, "Tab Size", "Relative tab size, in widths of o's", "text.tabSpacing",
-        Text.tabSpaceType, relativeTabSize, style
+        Text.tabSpaceType, text.relativeTabSize, style
     ) { it, _ ->
         RemsStudio.incrementalChange("tab size") { for (x in toBeChanged) x.relativeTabSize = it }
     }
     spaceGroup += vi(
         showIfSelected, "Line Break Width",
         "How broad the text shall be, at maximum; < 0 = no limit", "text.widthLimit",
-        Text.lineBreakType, relativeWidthLimit, style
+        Text.lineBreakType, text.relativeWidthLimit, style
     ) { it, _ ->
         RemsStudio.incrementalChange("line break width") { for (x in toBeChanged) x.relativeWidthLimit = it }
     }
@@ -176,7 +178,7 @@ fun Text.createInspectorWithoutSuperImpl(
             // todo why is the scale not transferred as expected???
 
             // evil ;), because we link instances instead of making a copy
-            shadow.relativeLineSpacing = relativeLineSpacing
+            shadow.relativeLineSpacing = text.relativeLineSpacing
             RemsStudio.largeChange("Add Text Shadow") { x.addChild(shadow) }
             Selection.selectTransform(shadow)
         }
@@ -198,23 +200,23 @@ fun Text.createInspectorWithoutSuperImpl(
     outline += vi(
         showIfSelected, "Rendering Mode",
         "Mesh: Sharp, Signed Distance Fields: with outline", "text.renderingMode",
-        null, renderingMode, style
+        null, text.renderingMode, style
     ) { it, _ -> for (x in toBeChanged) x.renderingMode = it }
     outline += vis(
-        toBeChanged, "Color 1", "First Outline Color", "outline.color1", toBeChanged.map { it.outlineColor0 },
-        style
+        toBeChanged, "Color 1", "First Outline Color", "outline.color1",
+        toBeChanged.map { it.outlineColor0 }, style
     )
     outline += vis(
-        toBeChanged, "Color 2", "Second Outline Color", "outline.color2", toBeChanged.map { it.outlineColor1 },
-        style
+        toBeChanged, "Color 2", "Second Outline Color", "outline.color2",
+        toBeChanged.map { it.outlineColor1 }, style
     )
     outline += vis(
-        toBeChanged, "Color 3", "Third Outline Color", "outline.color3", toBeChanged.map { it.outlineColor2 },
-        style
+        toBeChanged, "Color 3", "Third Outline Color", "outline.color3",
+        toBeChanged.map { it.outlineColor2 }, style
     )
     outline += vis(
-        toBeChanged, "Widths", "[Main, 1st, 2nd, 3rd]", "outline.widths", toBeChanged.map { it.outlineWidths },
-        style
+        toBeChanged, "Widths", "[Main, 1st, 2nd, 3rd]", "outline.widths",
+        toBeChanged.map { it.outlineWidths }, style
     )
     outline += vis(
         toBeChanged,
@@ -232,7 +234,7 @@ fun Text.createInspectorWithoutSuperImpl(
     )
     outline += vi(
         showIfSelected, "Rounded Corners", "Makes corners curvy", "outline.roundCorners",
-        null, roundSDFCorners, style
+        null, text.roundSDFCorners, style
     ) { it, _ ->
         for (x in toBeChanged) x.roundSDFCorners = it
     }

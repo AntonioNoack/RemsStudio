@@ -210,7 +210,7 @@ class SoftLink(var file: FileReference) : GFXTransform(null) {
             .setChangeListener { w, h ->
                 RemsStudio.incrementalChange("Change Resolution") {
                     // share vector?
-                    for (x in c) x.putValue(x.resolution, Vector2f(w.toFloat(), h.toFloat()), false)
+                    for (x in c) putValue(x.resolution, Vector2f(w.toFloat(), h.toFloat()), false)
                 }
             }
             .setIsSelectedListener { show(t, t.map { (it as? SoftLink)?.resolution }) }

@@ -31,7 +31,7 @@ class TextParticles : ParticleSystem() {
         super.createInspector(inspected, list, style, getGroup)
         val transforms = inspected.filterIsInstance2(Transform::class)
         val toBeChanged = inspected.filterIsInstance2(TextParticles::class).map { it.text }
-        text.createInspectorWithoutSuperImpl(list, style, getGroup, transforms, toBeChanged)
+        createInspectorWithoutSuperImpl(text, list, style, getGroup, transforms, toBeChanged)
     }
 
     override fun createParticle(index: Int, time: Double): Particle? {

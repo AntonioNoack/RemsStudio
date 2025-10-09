@@ -83,7 +83,7 @@ abstract class ForceField(val displayName: String, val descriptionI: String) : T
                 if (p != null) Pair(it, p) else null
             }
             list += ComponentUIV2.vis(
-                matching.map { it.first }, property.nameDesc.name, property.nameDesc.desc, property.nameDesc.key,
+                this,inspected, property.nameDesc.name, property.nameDesc.desc, property.nameDesc.key,
                 matching.map { it.second }, style
             )
         }

@@ -42,6 +42,7 @@ import me.anno.remsstudio.Selection.selectTransform
 import me.anno.remsstudio.Selection.selectedTransforms
 import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.objects.Transform
+import me.anno.remsstudio.objects.Transform.Companion.putValue
 import me.anno.remsstudio.objects.effects.ToneMappers
 import me.anno.remsstudio.objects.particles.ParticleSystem
 import me.anno.remsstudio.objects.particles.distributions.CenterDistribution
@@ -132,7 +133,7 @@ open class StudioSceneView(style: Style) :
             if (isLocked2D && !isControlDown) {
                 val rot = camera.rotationYXZ
                 val rot0z = rot[camera.lastLocalTime].z
-                camera.putValue(rot, Vector3f(0f, 0f, rot0z), true)
+                putValue(rot, Vector3f(0f, 0f, rot0z), true)
             }
             is2DPanel.text = if (isLocked2D) "2D" else "3D"
         }
@@ -445,7 +446,7 @@ open class StudioSceneView(style: Style) :
                             // todo delta zoom for cameras without orbit
                         } else {
                             val newZoom = oldCamZoom * d0 / d1
-                            camera.putValue(camera.orbitRadius, newZoom, false)
+                            putValue(camera.orbitRadius, newZoom, false)
                         }
                     }
 
@@ -689,7 +690,7 @@ open class StudioSceneView(style: Style) :
         RemsStudio.incrementalChange("Turn Camera") {
             val newRotation = Vector3f(oldRotation).add(dy0, dx0, 0f)
             newRotation.x = clamp(newRotation.x, -90f, 90f)
-            camera.putValue(camera.rotationYXZ, newRotation, false)
+            putValue(camera.rotationYXZ, newRotation, false)
             invalidateUI(false)
         }
     }
@@ -698,12 +699,12 @@ open class StudioSceneView(style: Style) :
     val firstCamera get() = root.listOfAll.firstInstanceOrNull2(Camera::class)
 
     fun rotateCameraTo(rotation: Vector3f) {
-        camera.putValue(camera.rotationYXZ, rotation, true)
+        putValue(camera.rotationYXZ, rotation, true)
     }
 
     fun rotateCamera(delta: Vector3f) {
         val oldRot = camera.rotationYXZ[cameraTime]
-        camera.putValue(
+        putValue(
             camera.rotationYXZ,
             oldRot + delta,
             true
@@ -728,7 +729,7 @@ open class StudioSceneView(style: Style) :
                 }
             }
             "Cam5" -> {// switch between orthographic and perspective
-                camera.putValue(camera.orthographicness, 1f - camera.orthographicness[cameraTime], true)
+                putValue(camera.orthographicness, 1f - camera.orthographicness[cameraTime], true)
             }
             // todo control + numpad does not work
             "Cam1" -> rotateCameraTo(Vector3f(0f, if (isControlDown) 180f else 0f, 0f))// default view
@@ -940,12 +941,12 @@ open class StudioSceneView(style: Style) :
                         val dy2 = -(this.y - y + this.height * 0.5f) * fov
                         val oldPos = camera.position[cameraTime]
                         oldPos.add(dx2, dy2, 0f)
-                        camera.putValue(camera.position, oldPos, false)
+                        putValue(camera.position, oldPos, false)
                     }
-                    camera.putValue(camera.orbitRadius, newOrbitDistance, false)
+                    putValue(camera.orbitRadius, newOrbitDistance, false)
                     if (camera == nullCamera) {
-                        camera.putValue(camera.farZ, camera.farZ[cameraTime] * factor, false)
-                        camera.putValue(camera.nearZ, camera.nearZ[cameraTime] * factor, false)
+                        putValue(camera.farZ, camera.farZ[cameraTime] * factor, false)
+                        putValue(camera.nearZ, camera.nearZ[cameraTime] * factor, false)
                     }
                 }
             }

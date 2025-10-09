@@ -277,7 +277,6 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
         if (needsChildren() && (time < 0f || children.isEmpty() || sumWeight <= 0.0)) return
 
         if (!step(time)) {
-            println("Waiting for particles")
             if (isFinalRendering) {
                 onMissingResource("Computing Particles", null)
                 return
@@ -305,7 +304,13 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
         val c = inspected.filterIsInstance2(ParticleSystem::class)
 
         var viCtr = 0
-        fun vi(c: List<ParticleSystem>, name: String, description: String, properties: List<AnimatedDistribution>) {
+        fun vi(
+            distName: String,
+            c: List<ParticleSystem>,
+            name: String,
+            description: String,
+            properties: List<AnimatedDistribution>
+        ) {
             val property = properties.first()
             fun getName() = "$name: ${property.distribution.className.split("Distribution").first()}"
             val group = getGroup(NameDesc(getName(), description, "$viCtr"))
@@ -335,22 +340,25 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
                             clearCache()
                             group.content.clear()
                             group.titlePanel.text = getName()
-                            property.createInspector(c, properties, group.content, style)
+                            property.distName = distName
+                            property.createInspector(this, c, properties, group.content, style)
                         }
                     }
                 )
             }
-            property.createInspector(c, properties, group.content, style)
+            property.distName = distName
+            property.createInspector(this, c, properties, group.content, style)
             viCtr++
         }
 
         fun vt(name: String, title: String, description: String, obj: List<AnimatedDistribution>) {
-            vi(c, Dict[title, "obj.particles.$name"], Dict[description, "obj.particles.$name.desc"], obj)
+            vi(name, c, Dict[title, "obj.particles.$name"], Dict[description, "obj.particles.$name.desc"], obj)
         }
 
         vt("lifeTime", "Life Time", "How many seconds a particle is visible", c.map { it.lifeTime })
         vt("initPosition", "Initial Position", "Where the particles spawn", c.map { it.spawnPosition })
-        vt("initVelocity", "Initial Velocity", "How fast the particles are, when they are spawned",
+        vt(
+            "initVelocity", "Initial Velocity", "How fast the particles are, when they are spawned",
             c.map { it.spawnVelocity })
         vt("initRotation", "Initial Rotation", "How the particles are rotated initially", c.map { it.spawnRotation })
         vt("angularVel", "Rotation Velocity", "How fast the particles are rotating", c.map { it.spawnRotationVelocity })

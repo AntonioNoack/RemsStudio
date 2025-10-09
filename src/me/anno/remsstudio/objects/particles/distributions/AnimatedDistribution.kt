@@ -40,8 +40,11 @@ class AnimatedDistribution(
 
     val lastChanged get() = channels.maxOfOrNull { it.lastChanged } ?: 0L
 
+    var distName = ""
+
     fun createInspector(
-        c: List<Transform>,
+        self: Transform,
+        toBeShown: List<Transform>,
         inspected: List<AnimatedDistribution>,
         list: PanelListY,
         style: Style
@@ -60,7 +63,8 @@ class AnimatedDistribution(
             val property = properties[index]
             // could this crash? only if another property had differing amounts of channels
             list += ComponentUIV2.vis(
-                c, property.nameDesc.name, property.nameDesc.desc, property.nameDesc.key,
+                self, toBeShown, property.nameDesc.name, property.nameDesc.desc,
+                property.nameDesc.key + distName,
                 inspected.map { it.channels[index] },
                 style
             )

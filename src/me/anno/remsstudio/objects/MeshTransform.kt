@@ -363,7 +363,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                     ).setChangeListener { value, index, _ ->
                         RemsStudio.largeChange("Change MeshTransform.animation Value") {
                             val newValue = if (index == 0) "" else value.name
-                            for (x in c) x.putValue(x.animation, newValue, false)
+                            for (x in c) putValue(x.animation, newValue, false)
                         }
                     }
                 } else TextPanel("No animations found!", style)

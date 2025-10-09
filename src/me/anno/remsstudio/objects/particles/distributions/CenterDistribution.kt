@@ -3,6 +3,7 @@ package me.anno.remsstudio.objects.particles.distributions
 import me.anno.language.translation.NameDesc
 import me.anno.remsstudio.Scene
 import me.anno.remsstudio.objects.inspectable.InspectableVector
+import me.anno.utils.structures.lists.Lists.wrap
 import org.joml.Matrix4fArrayList
 import org.joml.Vector2f
 import org.joml.Vector3f
@@ -40,12 +41,9 @@ abstract class CenterDistribution(
     }
 
     override fun listProperties(): List<InspectableVector> {
-        val prefix = "obj.distribution"
-        return listOf(
-            InspectableVector(
-                center, NameDesc("Center", "", "$prefix.center"),
-                InspectableVector.PType.DEFAULT
-            )
-        )
+        return InspectableVector(
+            center, NameDesc("Center", "", "obj.distribution.center"),
+            InspectableVector.PType.DEFAULT
+        ).wrap()
     }
 }
