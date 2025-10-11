@@ -581,10 +581,12 @@ object Scene {
     }
 
     fun drawSelectionRing(stack: Matrix4fArrayList) {
+        stack.pushMatrix()
         stack.scale(0.02f)
         drawUICircle(stack, 1f, 0.700f, c0)
         stack.scale(1.2f)
         drawUICircle(stack, 1f, 0.833f, c1)
+        stack.popMatrix()
     }
 
     val c0 = Vector4f(1f, 0.9f, 0.5f, 1f)

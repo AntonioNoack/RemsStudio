@@ -51,6 +51,34 @@ object TextRenderer {
         return glyphLayout0.value
     }
 
+    fun showLineBreakWidth(
+        element: Text, stack: Matrix4fArrayList, time: Double, color: Vector4f,
+        glyphLayout: GlyphLayout, lineBreakWidth: Float
+    ) {
+
+        val width = glyphLayout.width * glyphLayout.baseScale
+        val height = glyphLayout.height * glyphLayout.baseScale
+
+        val extraLineOffset = element.relativeLineSpacing[time] - 1f
+
+        // min and max x are cached for long texts with thousands of lines (not really relevant)
+        // actual text height vs baseline? for height
+
+        val totalHeight = height + extraLineOffset * (glyphLayout.numLines - 1)
+
+        val dx = element.getDrawDX(width, time)
+        val dy = element.getDrawDY(totalHeight, glyphLayout.numLines, time)
+
+        // draw the borders
+        val x0 = dx + width * 0.5f
+        val minX = x0 - 0.5f * lineBreakWidth
+        val maxX = x0 + 0.5f * lineBreakWidth
+        val y0 = dy + 1f
+        val y1 = y0 - totalHeight
+        Grid.drawLine(stack, color, Vector3f(minX, y0, 0f), Vector3f(minX, y1, 0f))
+        Grid.drawLine(stack, color, Vector3f(maxX, y0, 0f), Vector3f(maxX, y1, 0f))
+    }
+
     fun draw(
         element: Text, stack: Matrix4fArrayList, time: Double, color: Vector4f,
         superCall: () -> Unit
@@ -93,14 +121,7 @@ object TextRenderer {
 
         val lineBreakWidth = element.relativeWidthLimit
         if (lineBreakWidth > 0f && !isFinalRendering && element in Selection.selectedTransforms) {
-            // draw the borders
-            val x0 = dx + width * 0.5f
-            val minX = x0 - 0.5f * lineBreakWidth
-            val maxX = x0 + 0.5f * lineBreakWidth
-            val y0 = dy + 1f
-            val y1 = y0 - totalHeight
-            Grid.drawLine(stack, color, Vector3f(minX, y0, 0f), Vector3f(minX, y1, 0f))
-            Grid.drawLine(stack, color, Vector3f(maxX, y0, 0f), Vector3f(maxX, y1, 0f))
+            showLineBreakWidth(element, stack, time, color, glyphLayout, lineBreakWidth)
         }
 
         val shadowColor = element.shadowColor[time, Vector4f()]

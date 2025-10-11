@@ -49,8 +49,10 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
 
     val spawnColor = AnimatedDistribution(NumberType.COLOR3, listOf(Vector3f(1f), Vector3f(0f), Vector3f(0f)))
     val spawnPosition = AnimatedDistribution(NumberType.POSITION, listOf(Vector3f(0f), Vector3f(1f), Vector3f(0f)))
-    val spawnVelocity =
-        AnimatedDistribution(GaussianDistribution(), NumberType.POSITION, listOf(Vector3f(), Vector3f(1f), Vector3f()))
+    val spawnVelocity = AnimatedDistribution(
+        GaussianDistribution(), NumberType.POSITION,
+        listOf(Vector3f(), Vector3f(1f), Vector3f())
+    )
     val spawnSize = AnimatedDistribution(NumberType.SCALE, listOf(Vector3f(1f), Vector3f(0f), Vector3f(0f)))
     var spawnSize1D = true
 
@@ -386,9 +388,6 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
             clearCache()
         }
 
-        // general += vi("Fade In", "Time from spawning to the max. opacity", fadeIn, style)
-        // general += vi("Fade Out", "Time before death, from which is starts to fade away", fadeOut, style)
-
         general += BooleanInput(NameDesc("Show Children"), showChildren, false, style)
             .setChangeListener { for (x in c) x.showChildren = it }
             .setIsSelectedListener { show(inspected.filterIsInstance2(Transform::class), null) }
@@ -413,8 +412,6 @@ open class ParticleSystem(parent: Transform? = null) : Transform(parent) {
     override fun save(writer: BaseWriter) {
         super.save(writer)
         writer.writeMaybe(this, "simulationStep", simulationStepI)
-        // writer.writeMaybe(this, "fadeIn", fadeInI)
-        // writer.writeMaybe(this, "fadeOut", fadeOutI)
         writer.writeObject(this, "spawnPosition", spawnPosition)
         writer.writeObject(this, "spawnVelocity", spawnVelocity)
         writer.writeObject(this, "spawnRotation", spawnRotation)

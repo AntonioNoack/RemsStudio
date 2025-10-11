@@ -11,7 +11,7 @@ import me.anno.remsstudio.objects.effects.MaskLayer
 import me.anno.remsstudio.objects.geometric.Circle
 import me.anno.remsstudio.objects.geometric.Polygon
 import me.anno.remsstudio.objects.particles.ParticleSystem
-import me.anno.remsstudio.objects.particles.TextParticles
+import me.anno.remsstudio.objects.particles.TextParticleSystem
 import me.anno.remsstudio.objects.text.Text
 import me.anno.remsstudio.objects.text.Timer
 import me.anno.remsstudio.objects.video.Video
@@ -92,7 +92,7 @@ object RemsConfig {
                 ps.timeOffset.value = -5.0
                 ps
             },
-            "Text Particles" to TextParticles(),
+            "Text Particles" to TextParticleSystem(),
             "Effect: Coloring" to EffectColoring(),
             "Effect: Morphing" to EffectMorphing()
         )

@@ -120,13 +120,12 @@ open class Text(parent: Transform? = null) : GFXTransform(parent) {
 
     fun getDrawDY(totalHeight: Float, numLines: Int, time: Double): Float {
         val blockAlignmentY11 = blockAlignmentY[time]
-        val lineHeight = totalHeight / numLines
         // text touches top
-        val dy0 = 0f
-        // center line, height of horizontal in e
-        val dy1 = mix(0.5f, 0.62f + 0.5f * lineHeight, numLines - 1f)
+        val dy0 = -1f
         // exactly baseline
-        val dy2 = dy0 + totalHeight - 0.6f
+        val dy2 = dy0 + totalHeight
+        // center line, height of horizontal in e
+        val dy1 = if (numLines == 1) 0f else (dy0 + dy2) * 0.5f
         return if (blockAlignmentY11 < 0f) {
             mix(dy0, dy1, blockAlignmentY11 + 1f)
         } else {

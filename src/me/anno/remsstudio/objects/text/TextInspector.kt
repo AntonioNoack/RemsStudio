@@ -42,7 +42,7 @@ fun Transform.createInspectorWithoutSuperImpl(
 
     // todo propagate all changes to shadows
 
-    val textInput0 = vis(toBeChanged, "Text", "", "", toBeChanged.map { it.text }, style) as IsSelectedWrapper
+    val textInput0 = vis(showIfSelected, "Text", "", "", toBeChanged.map { it.text }, style) as IsSelectedWrapper
     list += textInput0
     val textInput1 = textInput0.child as IsAnimatedWrapper
     val textInput = textInput1.child as TextInputML
@@ -99,7 +99,7 @@ fun Transform.createInspectorWithoutSuperImpl(
 
     val alignGroup = getGroup(NameDesc("Alignment", "", "obj.alignment"))
     fun align(title: String, ttt: String, value: List<AnimatedProperty<*>>) {
-        alignGroup += vis(toBeChanged, title, ttt, "", value, style)
+        alignGroup += vis(showIfSelected, title, ttt, "", value, style)
     }
 
     align(
@@ -126,7 +126,7 @@ fun Transform.createInspectorWithoutSuperImpl(
         RemsStudio.incrementalChange("char space") { for (x in toBeChanged) x.relativeCharSpacing = it }
     }
     spaceGroup += vis(
-        toBeChanged, "Line Spacing", "How much lines are apart from each other",
+        showIfSelected, "Line Spacing", "How much lines are apart from each other",
         "text.lineSpacing",
         toBeChanged.map { it.relativeLineSpacing },
         style
@@ -187,11 +187,11 @@ fun Transform.createInspectorWithoutSuperImpl(
     val rpgEffects =
         getGroup(NameDesc("RPG Effects", "This effect is for fading in/out letters one by one.", "obj.rpg-effects"))
     rpgEffects += vis(
-        toBeChanged, "Start Cursor", "The first character index to be drawn", "text.startCursor",
+        showIfSelected, "Start Cursor", "The first character index to be drawn", "text.startCursor",
         toBeChanged.map { it.startCursor }, style
     )
     rpgEffects += vis(
-        toBeChanged, "End Cursor", "The last character index to be drawn; -1 = unlimited", "text.endCursor",
+        showIfSelected, "End Cursor", "The last character index to be drawn; -1 = unlimited", "text.endCursor",
         toBeChanged.map { it.endCursor }, style
     )
 
@@ -203,23 +203,23 @@ fun Transform.createInspectorWithoutSuperImpl(
         null, text.renderingMode, style
     ) { it, _ -> for (x in toBeChanged) x.renderingMode = it }
     outline += vis(
-        toBeChanged, "Color 1", "First Outline Color", "outline.color1",
+        showIfSelected, "Color 1", "First Outline Color", "outline.color1",
         toBeChanged.map { it.outlineColor0 }, style
     )
     outline += vis(
-        toBeChanged, "Color 2", "Second Outline Color", "outline.color2",
+        showIfSelected, "Color 2", "Second Outline Color", "outline.color2",
         toBeChanged.map { it.outlineColor1 }, style
     )
     outline += vis(
-        toBeChanged, "Color 3", "Third Outline Color", "outline.color3",
+        showIfSelected, "Color 3", "Third Outline Color", "outline.color3",
         toBeChanged.map { it.outlineColor2 }, style
     )
     outline += vis(
-        toBeChanged, "Widths", "[Main, 1st, 2nd, 3rd]", "outline.widths",
+        showIfSelected, "Widths", "[Main, 1st, 2nd, 3rd]", "outline.widths",
         toBeChanged.map { it.outlineWidths }, style
     )
     outline += vis(
-        toBeChanged,
+        showIfSelected,
         "Smoothness",
         "How smooth the edge is, [Main, 1st, 2nd, 3rd]",
         "outline.smoothness",
@@ -227,7 +227,7 @@ fun Transform.createInspectorWithoutSuperImpl(
         style
     )
     outline += vis(
-        toBeChanged, "Depth", "For non-merged SDFs to join close characters correctly; needs a distance from the background",
+        showIfSelected, "Depth", "For non-merged SDFs to join close characters correctly; needs a distance from the background",
         "outline.depth",
         toBeChanged.map { it.outlineDepth },
         style
@@ -241,8 +241,8 @@ fun Transform.createInspectorWithoutSuperImpl(
 
     val shadows = getGroup(NameDesc("Shadow", "Built-in Shadow", "obj.shadow"))
     shadows += TextPanel("To enable shadows, change the opacity of the shadow color!", style)
-    shadows += vis(toBeChanged, "Color", "", "shadow.color", toBeChanged.map { it.shadowColor }, style)
-    shadows += vis(toBeChanged, "Offset", "", "shadow.offset", toBeChanged.map { it.shadowOffset }, style)
-    shadows += vis(toBeChanged, "Smoothness", "", "shadow.smoothness", toBeChanged.map { it.shadowSmoothness }, style)
+    shadows += vis(showIfSelected, "Color", "", "shadow.color", toBeChanged.map { it.shadowColor }, style)
+    shadows += vis(showIfSelected, "Offset", "", "shadow.offset", toBeChanged.map { it.shadowOffset }, style)
+    shadows += vis(showIfSelected, "Smoothness", "", "shadow.smoothness", toBeChanged.map { it.shadowSmoothness }, style)
 
 }

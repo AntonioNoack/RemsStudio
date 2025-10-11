@@ -27,7 +27,7 @@ import me.anno.remsstudio.objects.geometric.Circle
 import me.anno.remsstudio.objects.geometric.LinePolygon
 import me.anno.remsstudio.objects.geometric.Polygon
 import me.anno.remsstudio.objects.particles.ParticleSystem
-import me.anno.remsstudio.objects.particles.TextParticles
+import me.anno.remsstudio.objects.particles.TextParticleSystem
 import me.anno.remsstudio.objects.particles.distributions.*
 import me.anno.remsstudio.objects.text.Chapter
 import me.anno.remsstudio.objects.text.Text
@@ -90,7 +90,7 @@ object RemsRegistry {
         registerCustomClass(VelocityFrictionForce())
         registerCustomClass(History())
         registerCustomClass(HistoryState())
-        registerCustomClass(TextParticles())
+        registerCustomClass(TextParticleSystem())
         registerCustomClass(SoftLink())
         registerCustomClass(PDFDocument())
         registerCustomClass(LinePolygon())
