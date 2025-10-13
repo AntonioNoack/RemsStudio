@@ -332,11 +332,6 @@ object RemsStudio : EngineBase(NameDesc("Rem's Studio"), 10405, true), WelcomeUI
     @JvmStatic
     fun main(args: Array<String>) {
 
-        // done: test text rendering, layout
-        // todo high-priority todos:
-        //  - test text finalRendering
-        //  - test text particle finalRendering
-
         // todo high-priority bugs:
         //  - the rendered result is extremely jittery - are we rendering the right frames??? -> now it worked just fine???
         // fixed: - there is a VRAM leak: frames around a clicked location are not unloading
