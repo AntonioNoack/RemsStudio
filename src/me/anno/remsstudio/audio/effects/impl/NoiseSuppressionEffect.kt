@@ -2,7 +2,7 @@ package me.anno.remsstudio.audio.effects.impl
 
 import me.anno.audio.openal.SoundBuffer
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
-import me.anno.cache.AsyncCacheData
+import me.anno.cache.Promise
 import me.anno.engine.Events.addEvent
 import me.anno.engine.inspector.Inspectable
 import me.anno.io.base.BaseWriter
@@ -114,7 +114,7 @@ class NoiseSuppressionEffect : SoundEffect(Domain.TIME_DOMAIN, Domain.TIME_DOMAI
                             val histogram = IntArray(subdivisions)
                             // average values inside buffer
                             val sampleRate = meta.audioSampleRate
-                            val result = AsyncCacheData<SoundBuffer>()
+                            val result = Promise<SoundBuffer>()
                             getAudioSequence(audio.file, 0.0, duration, sampleRate, result)
                             result.waitFor { stereoData0 ->
                                 val stereoData = stereoData0?.data

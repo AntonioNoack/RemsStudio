@@ -333,7 +333,8 @@ object RemsStudio : EngineBase(NameDesc("Rem's Studio"), 10405, true), WelcomeUI
     fun main(args: Array<String>) {
 
         // todo high-priority bugs:
-        //  - the rendered result is extremely jittery - are we rendering the right frames??? -> now it worked just fine???
+        //  - in small window, video might not load :(
+        // the rendered result is extremely jittery - are we rendering the right frames??? -> now it worked just fine???
         // fixed: - there is a VRAM leak: frames around a clicked location are not unloading
         // fixed: - video playback is completely broken for my Roadcraft Rambling (skip was throwing exceptions on Linux)
 

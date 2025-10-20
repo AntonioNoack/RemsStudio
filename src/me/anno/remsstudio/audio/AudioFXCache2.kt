@@ -6,7 +6,7 @@ import me.anno.audio.AudioCache.playbackSampleRate
 import me.anno.audio.AudioPools.FAPool
 import me.anno.audio.AudioPools.SAPool
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
-import me.anno.cache.AsyncCacheData
+import me.anno.cache.Promise
 import me.anno.cache.CacheSection
 import me.anno.cache.ICacheData
 import me.anno.gpu.GFX
@@ -195,7 +195,7 @@ object AudioFXCache2 {
         source: Video?,
         destination: Camera?,
         key: PipelineKey
-    ): AsyncCacheData<AudioData> {
+    ): Promise<AudioData> {
         // we cannot simply return null from this function, so getEntryLimited isn't an option
         return rawCache.getEntry(key, timeout) { key, result ->
             val stream = AudioStreamRaw2(
@@ -324,7 +324,7 @@ object AudioFXCache2 {
 
     }
 
-    class ShortData : AsyncCacheData<ShortArray>(null) {
+    class ShortData : Promise<ShortArray>(null) {
         override fun destroy() {
             SAPool.returnBuffer(value)
         }
