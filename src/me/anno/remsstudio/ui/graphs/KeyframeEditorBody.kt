@@ -3,9 +3,11 @@ package me.anno.remsstudio.ui.graphs
 import me.anno.Time
 import me.anno.animation.Interpolation
 import me.anno.engine.EngineBase.Companion.workspace
+import me.anno.gpu.drawing.DefaultFonts.monospaceFont
 import me.anno.gpu.drawing.DrawCurves
 import me.anno.gpu.drawing.DrawRectangles.drawBorder
 import me.anno.gpu.drawing.DrawRectangles.drawRect
+import me.anno.gpu.drawing.DrawTextBatched.drawSimpleTextCharByChar
 import me.anno.gpu.drawing.DrawTexts
 import me.anno.gpu.drawing.DrawTextures.drawTexture
 import me.anno.gpu.texture.TextureLib.colorShowTexture
@@ -110,7 +112,7 @@ class KeyframeEditorBody(val editor: KeyframeEditor, style: Style) : TimelinePan
     @Suppress("unused_parameter")
     private fun drawValueAxis(x0: Int, y0: Int, x1: Int, y1: Int) {
 
-        val font = DrawTexts.monospaceFont
+        val font = monospaceFont
         val fontHeight = font.size
         val yOffset = fontHeight.toInt() / 2
 
@@ -140,7 +142,7 @@ class KeyframeEditorBody(val editor: KeyframeEditor, style: Style) : TimelinePan
                 if (y in y0 until y1) {
                     drawRect(x + width + 2, y, this.width - width - 2, 1, fontColor and 0x3fffffff)
                 }
-                DrawTexts.drawSimpleTextCharByChar(
+                drawSimpleTextCharByChar(
                     x + 2, y - yOffset, 0,
                     text, fontColor, backgroundColor, AxisAlignment.MIN
                 )

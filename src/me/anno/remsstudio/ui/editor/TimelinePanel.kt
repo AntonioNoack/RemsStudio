@@ -7,7 +7,7 @@ import me.anno.fonts.keys.TextCacheKey
 import me.anno.gpu.GFX
 import me.anno.gpu.drawing.DrawRectangles
 import me.anno.gpu.drawing.DrawRectangles.drawRect
-import me.anno.gpu.drawing.DrawTexts.drawSimpleTextCharByChar
+import me.anno.gpu.drawing.DrawTextBatched.drawSimpleTextCharByChar
 import me.anno.input.Input
 import me.anno.input.Key
 import me.anno.language.translation.NameDesc

@@ -2,7 +2,7 @@ package me.anno.remsstudio.audio.pattern
 
 import me.anno.Time
 import me.anno.config.DefaultConfig.style
-import me.anno.gpu.drawing.DrawTexts.drawSimpleTextCharByChar
+import me.anno.gpu.drawing.DrawTextBatched.drawSimpleTextCharByChar
 import me.anno.gpu.drawing.GFXx2D.drawCircle
 import me.anno.input.Input
 import me.anno.input.Key

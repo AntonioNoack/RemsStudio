@@ -4,7 +4,7 @@ import me.anno.gpu.Cursor
 import me.anno.gpu.drawing.DrawCurves.drawLine
 import me.anno.gpu.drawing.DrawRectangles
 import me.anno.gpu.drawing.DrawRectangles.drawRect
-import me.anno.gpu.drawing.DrawTexts.drawSimpleTextCharByChar
+import me.anno.gpu.drawing.DrawTextBatched.drawSimpleTextCharByChar
 import me.anno.gpu.drawing.GFXx2D.drawCircle
 import me.anno.input.Input
 import me.anno.input.Key

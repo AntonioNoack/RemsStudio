@@ -13,7 +13,10 @@ import me.anno.remsstudio.objects.text.Text
 import me.anno.remsstudio.objects.video.Video
 import me.anno.utils.OS
 import org.apache.logging.log4j.LogManager
-import java.io.*
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.DataInputStream
+import java.io.DataOutputStream
 import java.util.zip.DeflaterOutputStream
 
 fun main() {
@@ -94,7 +97,7 @@ fun main() {
     logger.info("length binary, compressed: ${compress(binaryValue)}")
 
     DataInputStream(ByteArrayInputStream(binaryValue)).use { dis ->
-        val reader = BinaryReader(dis)
+        val reader = BinaryReader(dis, InvalidRef)
         reader.readAllInList()
         val content = reader.allInstances
         for (c in content) logger.info(c.className)

@@ -2,7 +2,7 @@ package me.anno.remsstudio.ui
 
 import me.anno.config.DefaultConfig
 import me.anno.engine.Events.addEvent
-import me.anno.gpu.drawing.DrawTexts
+import me.anno.gpu.drawing.DrawTextBatched.drawSimpleTextCharByChar
 import me.anno.language.translation.NameDesc
 import me.anno.ui.Panel
 import me.anno.ui.Window
@@ -78,7 +78,7 @@ object MenuUtils {
     fun Panel.drawTypeInCorner(type: String, fontColor: Int) {
         // draw in gray, that this is the file explorer
         val color = Color.mixARGB(fontColor, background.color, 0.8f)
-        DrawTexts.drawSimpleTextCharByChar(
+        drawSimpleTextCharByChar(
             x + width - 4, y + height, 0,
             type, color, background.color.withAlpha(0),
             AxisAlignment.MAX, AxisAlignment.MAX

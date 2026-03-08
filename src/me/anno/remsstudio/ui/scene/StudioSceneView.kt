@@ -121,7 +121,6 @@ open class StudioSceneView(style: Style) :
                 "ui.sceneView.3dSwitch"
             ), true, style
         )
-        is2DPanel.instantTextLoading = true
         controls += SimplePanel(
             is2DPanel,
             true, true,
