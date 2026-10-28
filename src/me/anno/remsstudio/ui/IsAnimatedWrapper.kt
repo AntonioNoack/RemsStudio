@@ -7,6 +7,7 @@ import me.anno.ui.Panel
 import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.components.Padding
 import me.anno.ui.base.groups.PanelContainer
+import me.anno.ui.canvas.Canvas
 import me.anno.utils.types.Booleans.toInt
 
 class IsAnimatedWrapper(panel: Panel, val values: AnimatedProperty<*>) :
@@ -26,10 +27,10 @@ class IsAnimatedWrapper(panel: Panel, val values: AnimatedProperty<*>) :
     }
 
     private val color = getSelectionColor(style)
-    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
-        super.draw(x0, y0, x1, y1)
+    override fun draw(canvas: Canvas) {
+        super.draw(canvas)
         if (isAnimated) {
-            drawBorder(x, y, width, height, color, padding.left)
+            drawBorder(canvas, x, y, width, height, color, padding.left)
         }
     }
 

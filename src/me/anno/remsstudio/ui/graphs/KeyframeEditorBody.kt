@@ -6,10 +6,7 @@ import me.anno.engine.EngineBase.Companion.workspace
 import me.anno.gpu.drawing.DefaultFonts.monospaceFont
 import me.anno.gpu.drawing.DrawCurves
 import me.anno.gpu.drawing.DrawRectangles.drawBorder
-import me.anno.gpu.drawing.DrawRectangles.drawRect
-import me.anno.gpu.drawing.DrawTextBatched.drawSimpleTextCharByChar
-import me.anno.gpu.drawing.DrawTexts
-import me.anno.gpu.drawing.DrawTextures.drawTexture
+import me.anno.gpu.drawing.DrawTextures
 import me.anno.gpu.texture.TextureLib.colorShowTexture
 import me.anno.input.Input.isControlDown
 import me.anno.input.Input.isShiftDown
@@ -39,6 +36,7 @@ import me.anno.ui.Style
 import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
+import me.anno.ui.canvas.Canvas
 import me.anno.ui.editor.sceneView.Grid.drawSmoothLine
 import me.anno.ui.input.NumberType
 import me.anno.utils.Color.black
@@ -110,7 +108,7 @@ class KeyframeEditorBody(val editor: KeyframeEditor, style: Style) : TimelinePan
     override val canDrawOverBorders get() = true
 
     @Suppress("unused_parameter")
-    private fun drawValueAxis(x0: Int, y0: Int, x1: Int, y1: Int) {
+    private fun drawValueAxis(canvas: Canvas) {
 
         val font = monospaceFont
         val fontHeight = font.size
@@ -138,12 +136,12 @@ class KeyframeEditorBody(val editor: KeyframeEditor, style: Style) : TimelinePan
             val text = getValueString(value, valueStep)
             val width = font.sampleWidth * text.length
 
-            if (y + yOffset >= y0 && y - yOffset < y1) {
-                if (y in y0 until y1) {
-                    drawRect(x + width + 2, y, this.width - width - 2, 1, fontColor and 0x3fffffff)
+            if (y + yOffset >= canvas.y0 && y - yOffset < canvas.y1) {
+                if (y in canvas.y0 until canvas.y1) {
+                    canvas.drawRect(x + width + 2, y, this.width - width - 2, 1, fontColor and 0x3fffffff)
                 }
-                drawSimpleTextCharByChar(
-                    x + 2, y - yOffset, 0,
+                canvas.drawText(
+                    x + 2, y - yOffset, 0, monospaceFont,
                     text, fontColor, backgroundColor, AxisAlignment.MIN
                 )
             }
@@ -187,13 +185,13 @@ class KeyframeEditorBody(val editor: KeyframeEditor, style: Style) : TimelinePan
     }
 
     var lastProperty: Any? = null
-    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(canvas: Canvas) {
 
         val dotSize = dotSize
 
         drawnStrings.clear()
 
-        drawBackground(x0, y0, x1, y1)
+        drawBackground(canvas)
         drawTypeInCorner("Keyframe Editor", fontColor)
 
         val property = selectedProperties.firstOrNull()
@@ -206,9 +204,9 @@ class KeyframeEditorBody(val editor: KeyframeEditor, style: Style) : TimelinePan
             clampValues()
         }
 
-        drawCurrentTime()
+        drawCurrentTime(canvas)
 
-        drawTimeAxis(x0, y0, x1, y1, true)
+        drawTimeAxis(canvas, true)
 
         updateLocalTime()
 
@@ -224,7 +222,7 @@ class KeyframeEditorBody(val editor: KeyframeEditor, style: Style) : TimelinePan
         }
 
         // only required, if there are values
-        drawValueAxis(x0, y0, x1, y1)
+        drawValueAxis(canvas)
 
         val type = property.type
         val halfSize = dotSize / 2
@@ -246,9 +244,19 @@ class KeyframeEditorBody(val editor: KeyframeEditor, style: Style) : TimelinePan
 
         fun drawDot(x: Int, y: Int, color: Int, willBeSelected: Boolean) {
             if (willBeSelected) {// draw outline, if point is selected
-                drawRect(x - halfSize - 1, clamp(y - halfSize - 1, y0 - 1, y1), dotSize + 2, dotSize + 2, -1)
+                canvas.drawRect(
+                    x - halfSize - 1, clamp(
+                        y - halfSize - 1,
+                        canvas.y0 - 1, canvas.y1
+                    ), dotSize + 2, dotSize + 2, -1
+                )
             }
-            drawRect(x - halfSize, clamp(y - halfSize, y0 - 1, y1), dotSize, dotSize, color)
+            canvas.drawRect(
+                x - halfSize, clamp(
+                    y - halfSize,
+                    canvas.y0 - 1, canvas.y1
+                ), dotSize, dotSize, color
+            )
         }
 
         val window = window!!
@@ -263,10 +271,10 @@ class KeyframeEditorBody(val editor: KeyframeEditor, style: Style) : TimelinePan
         // draw selection box
         if (isSelecting) {
             // draw border
-            drawBorder(minSelectX, minSelectY, maxSelectX * minSelectX, maxSelectY - minSelectY, black, 1)
+            drawBorder(canvas, minSelectX, minSelectY, maxSelectX * minSelectX, maxSelectY - minSelectY, black, 1)
             // draw inner
             if (minSelectX + 1 < maxSelectX && minSelectY + 1 < maxSelectY) {
-                drawRect(
+                canvas.drawRect(
                     minSelectX + 1, minSelectY + 1,
                     maxSelectX - minSelectX - 2, maxSelectY - minSelectY - 2,
                     black and 0x77000000
@@ -281,46 +289,48 @@ class KeyframeEditorBody(val editor: KeyframeEditor, style: Style) : TimelinePan
 
         // draw colored stripes to show the color...
         if (property.type == NumberType.COLOR || property.type == NumberType.COLOR3) {
-            drawColoredStripes(x0, x1, y0, y1, property)
+            drawColoredStripes(canvas, property)
         }
 
         // draw all values
         if (kfs.isNotEmpty() || property.drivers.any { it != null }) {
             val backgroundColor = background.color.withAlpha(0)
-            val batch = DrawCurves.lineBatch.start()
-            for (i in valueColors.indices) {
-                val alpha = if (i.isChannelActive(activeChannels)) 0.3f else 0.1f
-                valueColors[i] = valueColors[i].withAlpha(alpha)
-            }
-            var v0 = property[global2Kf(getTimeAt(x0 + 0f))]
-            for (x in x0 until x1) {
-                val xf0 = x.toFloat()
-                val xf1 = xf0 + 1f
-                val v1 = property[global2Kf(getTimeAt(xf1))]
-                for (i in 0 until channelCount) {
-                    val vy0 = getYAt(getFloat(v0, i, 0f)).toFloat()
-                    val vy1 = getYAt(getFloat(v1, i, 0f)).toFloat()
-                    // skip it, if we don't need it
-                    if (min(vy0, vy1) < y0 || max(vy0, vy1) > y1) continue
-                    DrawCurves.drawLine(
-                        xf0, vy0, xf1, vy1, 0.5f,
-                        valueColors[i],
-                        backgroundColor,
-                        false
-                    )
+            canvas.custom {
+                val batch = DrawCurves.lineBatch.start()
+                for (i in valueColors.indices) {
+                    val alpha = if (i.isChannelActive(activeChannels)) 0.3f else 0.1f
+                    valueColors[i] = valueColors[i].withAlpha(alpha)
                 }
-                v0 = v1
+                var v0 = property[global2Kf(getTimeAt(canvas.x0 + 0f))]
+                for (x in canvas.x0 until canvas.x1) {
+                    val xf0 = x.toFloat()
+                    val xf1 = xf0 + 1f
+                    val v1 = property[global2Kf(getTimeAt(xf1))]
+                    for (i in 0 until channelCount) {
+                        val vy0 = getYAt(getFloat(v0, i, 0f)).toFloat()
+                        val vy1 = getYAt(getFloat(v1, i, 0f)).toFloat()
+                        // skip it, if we don't need it
+                        if (min(vy0, vy1) < canvas.y0 || max(vy0, vy1) > canvas.y1) continue
+                        DrawCurves.drawLine(
+                            xf0, vy0, xf1, vy1, 0.5f,
+                            valueColors[i],
+                            backgroundColor,
+                            false
+                        )
+                    }
+                    v0 = v1
+                }
+                for (i in valueColors.indices) {
+                    valueColors[i] = valueColors[i].withAlpha(1f)
+                }
+                DrawCurves.lineBatch.finish(batch)
             }
-            for (i in valueColors.indices) {
-                valueColors[i] = valueColors[i].withAlpha(1f)
-            }
-            DrawCurves.lineBatch.finish(batch)
         } else {
             val value = property.defaultValue
             for (i in 0 until channelCount) {
                 val y = getYAt(getFloat(value, i, 0f)).toFloat()
                 drawSmoothLine(
-                    x0.toFloat(), y, x1.toFloat(), y,
+                    canvas.x0.toFloat(), y, canvas.x1.toFloat(), y,
                     this.x, this.y, this.width, this.height,
                     valueColors[i],
                     0.5f
@@ -369,7 +379,7 @@ class KeyframeEditorBody(val editor: KeyframeEditor, style: Style) : TimelinePan
         }
 
         // only draw if we have something to animate
-        drawBorder(x, y, width, height, selectionColor.withAlpha(selectionStrength), 1)
+        drawBorder(canvas, x, y, width, height, selectionColor.withAlpha(selectionStrength), 1)
         if (!property.isAnimated) {
             selectionStrength *= dtTo10(IsSelectedWrapper.decaySpeed * Time.deltaTime).toFloat()
         }
@@ -379,7 +389,7 @@ class KeyframeEditorBody(val editor: KeyframeEditor, style: Style) : TimelinePan
     var selectionStrength = 0f
 
     private fun drawColoredStripes(
-        x0: Int, x1: Int, y0: Int, y1: Int,
+        canvas: Canvas,
         property: AnimatedProperty<*>
     ) {
 
@@ -388,14 +398,14 @@ class KeyframeEditorBody(val editor: KeyframeEditor, style: Style) : TimelinePan
         val halfWidth = (width + 1) / 2
         val kfs = property.keyframes
         val stripeMultiplier = 0.33f // just to make it calmer
-        val tiling = Vector4f(1f, (y1 - y0).toFloat() * stripeMultiplier / dotSize, 0f, 0f)
-        val h = y1 - y0
+        val tiling = Vector4f(1f, canvas.dy.toFloat() * stripeMultiplier / dotSize, 0f, 0f)
+        val h = canvas.dy
 
         synchronized(property) {
             for (kf in kfs) {
                 val tGlobal = kf2Global(kf.time)
                 val x = getXAt(tGlobal).roundToInt() - halfWidth
-                if (x < x1 || x + width >= x0) {// visible
+                if (x < canvas.x1 || x + width >= canvas.x0) {// visible
                     val colorVector =
                         if (property.type == NumberType.COLOR3)
                             Vector4f(kf.value as Vector3f, 1f)
@@ -404,11 +414,21 @@ class KeyframeEditorBody(val editor: KeyframeEditor, style: Style) : TimelinePan
                     val color2 = color.mulAlpha(0.25f)
                     if (h > dotSize * 4) {
                         val border = dotSize
-                        drawRect(x, y0, width, border, color2)
-                        drawTexture(x, y0 + border, width, h - border * 2, colorShowTexture, color, tiling)
-                        drawRect(x, y1 - border, width, border, color2)
+                        canvas.drawRect(x, canvas.y0, width, border, color2)
+                        canvas.custom {
+                            DrawTextures.drawTexture(
+                                x, canvas.y0 + border, width, h - border * 2,
+                                colorShowTexture, color, tiling
+                            )
+                        }
+                        canvas.drawRect(x, canvas.y1 - border, width, border, color2)
                     } else {
-                        drawTexture(x, y0, width, h, colorShowTexture, color, tiling)
+                        canvas.custom {
+                            DrawTextures.drawTexture(
+                                x, canvas.y0, width, h,
+                                colorShowTexture, color, tiling
+                            )
+                        }
                     }
                 }
             }

@@ -11,6 +11,7 @@ import me.anno.ui.base.SpacerPanel
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.groups.PanelListX
+import me.anno.ui.canvas.Canvas
 import me.anno.utils.Color
 
 class TimeControlsPanel(style: Style) : PanelListX(style) {
@@ -62,8 +63,8 @@ class TimeControlsPanel(style: Style) : PanelListX(style) {
         get() = true
 
     private val fontColor = style.getColor("textColor", DefaultStyle.fontGray)
-    override fun drawBackground(x0: Int, y0: Int, x1: Int, y1: Int, dx: Int, dy: Int) {
-        super.drawBackground(x0, y0, x1, y1, dx, dy)
+    override fun drawBackground(canvas: Canvas, dx: Int, dy: Int) {
+        super.drawBackground(canvas, dx, dy)
         drawTypeInCorner("Time Control", fontColor)
     }
 

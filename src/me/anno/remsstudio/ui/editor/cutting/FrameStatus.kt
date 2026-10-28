@@ -5,6 +5,7 @@ import me.anno.io.MediaMetadata
 import me.anno.io.files.FileReference
 import me.anno.io.files.InvalidRef
 import me.anno.remsstudio.objects.video.Video
+import me.anno.ui.canvas.Canvas
 import me.anno.utils.Color.black
 import me.anno.utils.hpc.threadLocal
 import me.anno.video.VideoCache
@@ -35,6 +36,7 @@ enum class FrameStatus(val color: Int) {
         private val tmpStatus = threadLocal { VideoFramesKey(InvalidRef, 1, 0, 0, 0.0) }
 
         private fun drawStatus(x: Int, y: Int, w: Int, h: Int, status: FrameStatus) {
+            // used inside canvas.custom, so fine
             DrawRectangles.drawRect(x, y, w, h, status.color)
         }
 
@@ -75,7 +77,7 @@ enum class FrameStatus(val color: Int) {
         }
 
         fun drawLoadingStatus(
-            x0: Int, y0: Int, x1: Int, y1: Int,
+            canvas: Canvas,
             fps: Double,
             meta: MediaMetadata, video: Video,
             pixelXToTime: I1D
@@ -93,13 +95,13 @@ enum class FrameStatus(val color: Int) {
                     )
                     if (status.ordinal < bestStatus.ordinal) bestStatus = status
                 }
-                drawStatus(x0, y0, x1 - x0, y1 - y0, bestStatus)
+                drawStatus(canvas.x0, canvas.y0, canvas.dx, canvas.dy, bestStatus)
             } else {
                 var lastFrameIndex = -1
-                var lastX = x0
+                var lastX = canvas.x0
                 var lastStatus = INVALID_SCALE
                 // from left to right query all video data
-                for (xi in x0 until x1) {
+                for (xi in canvas.x0 until canvas.x1) {
                     val time = pixelXToTime.call(xi)
                     var bestStatus = MISSING
                     if (time >= 0.0) {
@@ -121,15 +123,15 @@ enum class FrameStatus(val color: Int) {
                         }
                     } else bestStatus = NO_FRAME_NEEDED
                     // optimize drawing routine: draw blocks as one
-                    if (bestStatus != lastStatus && xi > x0) {
+                    if (bestStatus != lastStatus && xi > canvas.x0) {
                         // draw previous stripe
-                        drawStatus(lastX, y0, xi - lastX, y1 - y0, lastStatus)
+                        drawStatus(lastX, canvas.y0, xi - lastX, canvas.dy, lastStatus)
                         lastX = xi
                     }
                     lastStatus = bestStatus
                 }
                 // draw last stripe
-                drawStatus(lastX, y0, x1 - lastX, y1 - y0, lastStatus)
+                drawStatus(lastX, canvas.y0, canvas.x1 - lastX, canvas.dy, lastStatus)
             }
         }
     }

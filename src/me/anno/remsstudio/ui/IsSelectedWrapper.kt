@@ -8,6 +8,7 @@ import me.anno.ui.Style
 import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.components.Padding
 import me.anno.ui.base.groups.PanelContainer
+import me.anno.ui.canvas.Canvas
 import me.anno.utils.Color
 import me.anno.utils.Color.withAlpha
 import me.anno.utils.types.Booleans.toInt
@@ -37,10 +38,10 @@ class IsSelectedWrapper(panel: Panel, val getIsSelected: () -> Boolean) :
         isSelected = getIsSelected()
     }
 
-    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
-        super.draw(x0, y0, x1, y1)
+    override fun draw(canvas: Canvas) {
+        super.draw(canvas)
         if (isSelected) {
-            DrawRectangles.drawBorder(x, y, width, height, color.withAlpha(strength), padding.left)
+            DrawRectangles.drawBorder(canvas, x, y, width, height, color.withAlpha(strength), padding.left)
             strength *= dtTo10(decaySpeed * Time.deltaTime).toFloat()
         }
     }

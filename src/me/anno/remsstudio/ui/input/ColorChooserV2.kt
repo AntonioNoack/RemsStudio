@@ -7,6 +7,7 @@ import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.ui.editor.color.ColorChooser
 import me.anno.ui.input.components.ColorPalette
 import me.anno.ui.Style
+import me.anno.ui.canvas.Canvas
 import org.joml.Vector3f
 import org.joml.Vector4f
 
@@ -33,7 +34,7 @@ class ColorChooserV2(style: Style, withAlpha: Boolean, val property: AnimatedPro
     @NotSerializedProperty
     private var lastTime = RemsStudio.editorTime
 
-    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(canvas: Canvas) {
         if (lastTime != RemsStudio.editorTime) {
             lastTime = RemsStudio.editorTime
             when (val c = property[RemsStudio.editorTime]) {
@@ -42,7 +43,7 @@ class ColorChooserV2(style: Style, withAlpha: Boolean, val property: AnimatedPro
                 else -> throw RuntimeException()
             }
         }
-        super.draw(x0, y0, x1, y1)
+        super.draw(canvas)
     }
 
     override fun clone(): ColorChooserV2 {

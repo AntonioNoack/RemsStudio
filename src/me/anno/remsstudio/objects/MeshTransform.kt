@@ -10,6 +10,7 @@ import me.anno.ecs.components.anim.BoneData.uploadJointMatrices
 import me.anno.ecs.components.mesh.Mesh
 import me.anno.ecs.components.mesh.MeshComponent
 import me.anno.ecs.components.mesh.MeshComponentBase
+import me.anno.ecs.components.mesh.material.Material
 import me.anno.ecs.components.mesh.material.Materials
 import me.anno.ecs.prefab.PrefabCache
 import me.anno.engine.inspector.Inspectable
@@ -233,7 +234,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
         localTransform.pushMatrix()
 
         val transform = entity.transform
-        val local = transform.getLocalTransform(JomlPools.mat4x3m.borrow())
+        val local = transform.getLocalTransform(JomlPools.mat4x3.borrow())
         // this moves the engine parts correctly, but ruins the rotation of the ghost
         // and scales it totally incorrectly
         localTransform.mul(
@@ -267,7 +268,7 @@ class MeshTransform(var file: FileReference, parent: Transform?) : GFXTransform(
                     val materialOverrides = comp.materials
                     val materials = mesh.materials
                     for (index in 0 until mesh.numMaterials) {
-                        val material = Materials.getMaterial(materialOverrides, materials, index)
+                        val material = Materials.getMaterial(materialOverrides, materials, index) as Material
                         shader.v1i("hasVertexColors", if (material.enableVertexColors) mesh.hasVertexColors else 0)
                         material.bind(shader)
                         shader.v4f("diffuseBase", material.diffuseBase * color)

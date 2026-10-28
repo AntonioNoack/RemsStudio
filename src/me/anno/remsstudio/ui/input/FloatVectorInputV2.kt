@@ -8,6 +8,7 @@ import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.Selection
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.ui.Style
+import me.anno.ui.canvas.Canvas
 import me.anno.ui.input.FloatVectorInput
 import me.anno.ui.input.NumberType
 import org.apache.logging.log4j.LogManager
@@ -48,13 +49,13 @@ class FloatVectorInputV2(
             ?: super.onPaste(x, y, data, type)
     }
 
-    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(canvas: Canvas) {
         val focused1 = titleView?.isInFocus == true
         if (RemsStudio.hideUnusedProperties) {
             val focused2 = focused1 || owningProperty in Selection.selectedProperties
             valueList.isVisible = focused2
         }
-        super.draw(x0, y0, x1, y1)
+        super.draw(canvas)
     }
 
     override fun onCopyRequested(x: Float, y: Float) = owningProperty.toString()

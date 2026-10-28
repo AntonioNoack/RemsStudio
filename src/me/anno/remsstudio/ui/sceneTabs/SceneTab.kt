@@ -22,6 +22,7 @@ import me.anno.ui.base.menu.Menu.msg
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
 import me.anno.ui.base.text.TextPanel
+import me.anno.ui.canvas.Canvas
 import me.anno.ui.dragging.Draggable
 import me.anno.ui.editor.files.FileExplorer
 import me.anno.ui.editor.files.FileNames.toAllowedFilename
@@ -95,9 +96,9 @@ class SceneTab(var file: FileReference, var scene: Transform, history: History?)
 
     private val bg get() = background.originalColor
     private val bgLight = mixARGB(bg, 0xff777777.toInt(), 0.5f)
-    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(canvas: Canvas) {
         background.color = if (this === currentTab) bgLight else bg
-        super.draw(x0, y0, x1, y1)
+        super.draw(canvas)
     }
 
     fun save(dst: FileReference, onSuccess: () -> Unit) {

@@ -84,8 +84,9 @@ object RemsStudio : EngineBase(NameDesc("Rem's Studio"), 10405, true), WelcomeUI
     lateinit var currentCamera: Camera
     var lastTouchedCamera: Camera? = null
 
-    override var language: Language
-        get() = project?.language ?: super.language
+    var language: Language
+        get() = project?.language
+            ?: Language.get(DefaultConfig["language", Language.AmericanEnglish.code])
         set(value) {
             project?.language = value
         }

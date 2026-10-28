@@ -4,6 +4,7 @@ import me.anno.input.Key
 import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.animation.AnimatedProperty
 import me.anno.ui.Style
+import me.anno.ui.canvas.Canvas
 import me.anno.ui.input.FloatInput
 import me.anno.ui.input.IntInput
 import me.anno.ui.input.NumberInput
@@ -48,7 +49,7 @@ class NumberInputComponentV2(
         super.onMouseMoved(x, y, dx, dy)
     }
 
-    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(canvas: Canvas) {
         val editorTime = RemsStudio.editorTime
         if (lastTime != editorTime && owningProperty.isAnimated) {
             lastTime = editorTime
@@ -67,7 +68,7 @@ class NumberInputComponentV2(
                 setText(value, true)
             }
         }
-        super.draw(x0, y0, x1, y1)
+        super.draw(canvas)
     }
 
     override fun onEmpty(x: Float, y: Float) {

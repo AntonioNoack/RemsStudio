@@ -9,9 +9,7 @@ import me.anno.gpu.GFX
 import me.anno.gpu.GFXState.renderDefault
 import me.anno.gpu.GFXState.useFrame
 import me.anno.gpu.GPUTasks.addGPUTask
-import me.anno.gpu.drawing.DrawRectangles
 import me.anno.gpu.drawing.DrawRectangles.drawBorder
-import me.anno.gpu.drawing.DrawTextures.drawTexture
 import me.anno.gpu.framebuffer.*
 import me.anno.gpu.shader.renderer.Renderer
 import me.anno.gpu.shader.renderer.Renderer.Companion.colorRenderer
@@ -22,6 +20,7 @@ import me.anno.input.Input.isControlDown
 import me.anno.input.Input.isShiftDown
 import me.anno.input.Input.shiftSlowdown
 import me.anno.input.Key
+import me.anno.input.Touch
 import me.anno.input.Touch.Companion.touches
 import me.anno.io.files.FileReference
 import me.anno.language.translation.NameDesc
@@ -56,6 +55,7 @@ import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.buttons.TextButton
 import me.anno.ui.base.groups.PanelList
+import me.anno.ui.canvas.Canvas
 import me.anno.ui.custom.CustomContainer
 import me.anno.ui.editor.PropertyInspector.Companion.invalidateUI
 import me.anno.ui.editor.files.FileContentImporter
@@ -139,11 +139,11 @@ open class StudioSceneView(style: Style) :
         fun add(i: Int, mode: SceneDragMode) {
             controls += SimplePanel(
                 object : TextButton(NameDesc(mode.displayName, mode.description, ""), true, style) {
-                    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
-                        drawBackground(x0, y0, x1, y1)
-                        drawButtonText()
+                    override fun draw(canvas: Canvas) {
+                        drawBackground(canvas)
+                        drawText(canvas, textColor)
                         drawButtonBorder(
-                            leftColor, topColor, rightColor, bottomColor,
+                            canvas, leftColor, topColor, rightColor, bottomColor,
                             isInputAllowed, borderSize, isPressed || mode == this@StudioSceneView.mode
                         )
                     }
@@ -239,8 +239,8 @@ open class StudioSceneView(style: Style) :
 
     private val tmpScene = Framebuffer("StudioSceneView", 1, 1, TargetType.UInt8x4, DepthBufferType.TEXTURE)
 
-    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
-        drawBackground(x0, y0, x1, y1)
+    override fun draw(canvas: Canvas) {
+        drawBackground(canvas)
 
         val mode = if (camera.toneMapping == ToneMappers.RAW8) colorRenderer else colorSqRenderer
 
@@ -268,11 +268,9 @@ open class StudioSceneView(style: Style) :
         val height = h + 2 * thick
 
         val white = -1
-        val b = DrawRectangles.startBatch()
-        drawBorder(x, y, width, height, white, thickHalf)
-        drawBorder(x + thickHalf, y + thickHalf, width - thick, height - thick, black, thickHalf)
+        drawBorder(canvas, x, y, width, height, white, thickHalf)
+        drawBorder(canvas, x + thickHalf, y + thickHalf, width - thick, height - thick, black, thickHalf)
         // filled with scene background color anyway
-        DrawRectangles.finishBatch(b)
 
         renderSize.render(w, h) { rw, rh ->
             if (rw > 0 && rh > 0) {
@@ -284,17 +282,17 @@ open class StudioSceneView(style: Style) :
                         mode, this
                     )
                 }
-                drawTexture(x + thick, y + thick, width - 2 * thick, height - 2 * thick, tmpScene.getTexture0())
+                canvas.drawTexture(x + thick, y + thick, width - 2 * thick, height - 2 * thick, tmpScene.getTexture0())
             }
         }
 
-        Clipping.clip2(x0, y0, x1, y1) {
+        Clipping.clip2(canvas.x0, canvas.y0, canvas.x1, canvas.y1) {
             renderDefault {
                 for (control in controls) {
-                    control.draw(this.x, this.y, this.width, this.height, x0, y0, x1, y1)
+                    control.draw(canvas, this.x, this.y, this.width, this.height)
                 }
             }
-            drawChildren(x0, y0, x1, y1)
+            drawChildren(canvas)
         }
 
         // todo this text is always black... why???
@@ -419,20 +417,22 @@ open class StudioSceneView(style: Style) :
 
         // todo rotate/move our camera or the selected object?
         val size = -20f * shiftSlowdown / window!!.height
-        val touches = touches.values.toList()
-        when (touches.size) {
+        val touches1 = ArrayList<Touch>()
+        touches.forEach { _, touch -> touches1.add(touch) }
+
+        when (touches1.size) {
             2 -> {
-                val first = touches[0]
+                val first = touches1[0]
                 if (contains(first.x, first.y)) {
                     // this gesture started on this view -> this is our gesture
                     // rotating is the hardest on a touchpad, because we need to click right
                     // -> rotation
                     // axes: angle, zoom,
-                    val dx = touches.sumOf { (it.x - it.lastX).toDouble() }.toFloat() * size * 0.5f
-                    val dy = touches.sumOf { (it.y - it.lastY).toDouble() }.toFloat() * size * 0.5f
+                    val dx = touches1.sumOf { (it.x - it.lastX).toDouble() }.toFloat() * size * 0.5f
+                    val dy = touches1.sumOf { (it.y - it.lastY).toDouble() }.toFloat() * size * 0.5f
 
-                    val t0 = touches[0]
-                    val t1 = touches[1]
+                    val t0 = touches1[0]
+                    val t1 = touches1[1]
 
                     val d1 = length(t1.x - t0.x, t1.y - t0.y)
                     val d0 = length(t1.lastX - t0.lastX, t1.lastY - t0.lastY)
@@ -460,20 +460,20 @@ open class StudioSceneView(style: Style) :
                     } else {
                         // move camera? completely ignore, what is selected
                     }
-                    touches.forEach { it.update() }
+                    touches1.forEach { it.update() }
                 }
             }
 
             3 -> {
                 // very slow..., but we can move around with a single finger, so it shouldn't matter...
                 // move the camera around
-                val first = touches.first()
+                val first = touches1.first()
                 val speed = 10f / 3f
                 if (contains(first.x, first.y)) {
-                    val dx = speed * touches.sumOf { (it.x - it.lastX).toDouble() }.toFloat() * size
-                    val dy = speed * touches.sumOf { (it.y - it.lastY).toDouble() }.toFloat() * size
+                    val dx = speed * touches1.sumOf { (it.x - it.lastX).toDouble() }.toFloat() * size
+                    val dy = speed * touches1.sumOf { (it.y - it.lastY).toDouble() }.toFloat() * size
                     moveSelected(camera, dx, dy)
-                    for (touch in touches) {
+                    for (touch in touches1) {
                         touch.update()
                     }
                 }

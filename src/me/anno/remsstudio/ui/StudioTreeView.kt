@@ -27,6 +27,7 @@ import me.anno.ui.Style
 import me.anno.ui.base.SpacerPanel
 import me.anno.ui.base.menu.Menu
 import me.anno.ui.base.menu.MenuOption
+import me.anno.ui.canvas.Canvas
 import me.anno.ui.editor.treeView.TreeView
 import me.anno.utils.Color.black
 import me.anno.utils.Color.toARGB
@@ -265,8 +266,8 @@ class StudioTreeView(style: Style) :
     }
 
     private val fontColor = style.getColor("textColor", DefaultStyle.fontGray)
-    override fun drawBackground(x0: Int, y0: Int, x1: Int, y1: Int, dx: Int, dy: Int) {
-        super.drawBackground(x0, y0, x1, y1, dx, dy)
+    override fun drawBackground(canvas: Canvas, dx: Int, dy: Int) {
+        super.drawBackground(canvas, dx, dy)
         drawTypeInCorner("Tree", fontColor)
     }
 

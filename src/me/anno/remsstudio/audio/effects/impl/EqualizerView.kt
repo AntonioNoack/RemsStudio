@@ -1,10 +1,7 @@
 package me.anno.remsstudio.audio.effects.impl
 
 import me.anno.gpu.Cursor
-import me.anno.gpu.drawing.DrawCurves.drawLine
-import me.anno.gpu.drawing.DrawRectangles
-import me.anno.gpu.drawing.DrawRectangles.drawRect
-import me.anno.gpu.drawing.DrawTextBatched.drawSimpleTextCharByChar
+import me.anno.gpu.drawing.DefaultFonts.monospaceFont
 import me.anno.gpu.drawing.GFXx2D.drawCircle
 import me.anno.input.Input
 import me.anno.input.Key
@@ -17,6 +14,7 @@ import me.anno.ui.UIColors
 import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.scrolling.ScrollPanelXY.Companion.drawShadowX
 import me.anno.ui.base.scrolling.ScrollPanelXY.Companion.drawShadowY
+import me.anno.ui.canvas.Canvas
 import me.anno.utils.Color.black
 import me.anno.utils.Color.white
 import me.anno.utils.Color.withAlpha
@@ -86,27 +84,27 @@ class EqualizerView(val self: EqualizerEffect, style: Style) : Panel(style) {
         else null
     }
 
-    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
-        super.draw(x0, y0, x1, y1)
+    override fun draw(canvas: Canvas) {
+        super.draw(canvas)
 
         // draw axes with legend (+/- 12dB)
         val numLines = 24
         val color = white
         val unitX = unitX
         val unitY = unitY
-        val x0l = max(x0, x + (unitX * 1.25f).toInt())
-        val x1l = min(x1, x + width - 2)
+        val x0l = max(canvas.x0, x + (unitX * 1.25f).toInt())
+        val x1l = min(canvas.x1, x + width - 2)
         for (i in 1 until numLines) {
             val alpha = if (i == 12) 93 else if (i % 5 == 2) 43 else 20
             val y = y + (height - 1) * i / numLines
-            drawRect(x0l, y, max(x1l - x0l, 0), 1, color.withAlpha(alpha))
+            canvas.drawRect(x0l, y, max(x1l - x0l, 0), 1, color.withAlpha(alpha))
         }
 
         val bg0 = background.color.withAlpha(0)
 
         val time = global2Kf(editorTime)
         for (i in 1 until frequencies.size) {
-            drawLine(
+            canvas.drawLine(
                 x + (unitX * (i + 0.75f)), y + (height * (1f - self.sliders[i - 1][time])),
                 x + (unitX * (i + 1.75f)), y + (height * (1f - self.sliders[i][time])),
                 1f, color.withAlpha(127), background.color, false, 1f
@@ -121,17 +119,26 @@ class EqualizerView(val self: EqualizerEffect, style: Style) : Panel(style) {
         for (i in frequencies.indices) {
             val circleX = x + (unitX * (i + 1.75f)).toInt()
             val circleY = y + (height * (1f - self.sliders[i][time])).toInt()
-            drawRect(circleX, y0 + 2, 1, max(y1 - y0 - 4, 0), color.withAlpha(if (i.hasFlag(1)) 93 else 43))
-            val radiusI = if (i == relevantIndex) radius + 2f else radius
-            drawCircle(
-                circleX, circleY, radiusI, radiusI, radius / radiusI,
-                color, colorI, bg0, 1f
+            canvas.drawRect(
+                circleX,
+                canvas.y0 + 2,
+                1,
+                max(canvas.dy - 4, 0),
+                color.withAlpha(if (i.hasFlag(1)) 93 else 43)
             )
+            canvas.custom {
+                val radiusI = if (i == relevantIndex) radius + 2f else radius
+                drawCircle(
+                    circleX, circleY, radiusI, radiusI, radius / radiusI,
+                    color, colorI, bg0, 1f
+                )
+            }
         }
 
         fun drawLegendYText(yi: Int, text: String) {
-            drawSimpleTextCharByChar(
-                x + (unitX * 1.25f * 0.5f).toInt(), y + height.shr(1) - yi * (height - 1) / numLines, 2, text,
+            canvas.drawText(
+                x + (unitX * 1.25f * 0.5f).toInt(), y + height.shr(1) - yi * (height - 1) / numLines,
+                2, monospaceFont, text,
                 color, bg0, AxisAlignment.CENTER, AxisAlignment.CENTER
             )
         }
@@ -143,8 +150,9 @@ class EqualizerView(val self: EqualizerEffect, style: Style) : Panel(style) {
         drawLegendYText(-10, "-10dB")
 
         fun drawLegendXText(xi: Int, text: String) {
-            drawSimpleTextCharByChar(
-                x + (unitX * (xi + 1.75f)).toInt(), y + unitY, 2, text,
+            canvas.drawText(
+                x + (unitX * (xi + 1.75f)).toInt(), y + unitY,
+                2, monospaceFont, text,
                 color, bg0, AxisAlignment.CENTER, AxisAlignment.CENTER
             )
         }
@@ -157,10 +165,8 @@ class EqualizerView(val self: EqualizerEffect, style: Style) : Panel(style) {
 
         val shadowColor = black.withAlpha(0.12f)
         val shadowRadius = 15
-        val batch = DrawRectangles.startBatch()
-        drawShadowX(x0, y0, x1, y1, shadowColor, shadowRadius)
-        drawShadowY(x0, y0, x1, y1, shadowColor, shadowRadius)
-        DrawRectangles.finishBatch(batch)
+        drawShadowX(canvas, shadowColor, shadowRadius)
+        drawShadowY(canvas, shadowColor, shadowRadius)
 
     }
 }

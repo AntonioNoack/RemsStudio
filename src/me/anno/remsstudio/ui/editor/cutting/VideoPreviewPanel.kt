@@ -5,6 +5,7 @@ import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.video.VideoPreview.getFrameAtLocalTimeForPreview
 import me.anno.ui.Panel
 import me.anno.ui.Style
+import me.anno.ui.canvas.Canvas
 import me.anno.utils.Color.white4
 import org.joml.Vector4f
 
@@ -29,14 +30,15 @@ class VideoPreviewPanel(
         minH = constMinH
     }
 
-    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(canvas: Canvas) {
         val meta = video.meta ?: return
         val window = window ?: return
         val time = getTime(window.mouseX)
         val frame = video.getFrameAtLocalTimeForPreview(time, constMinW, meta) ?: return
         val color = white4
         DrawGradients.drawRectGradient(
-            x0, y0, x1 - x0, y1 - y0, color, color, frame,
+            canvas.x0, canvas.y0, canvas.dx, canvas.dy,
+            color, color, frame,
             Vector4f(0f, 0f, 1f, 1f)
         )
     }

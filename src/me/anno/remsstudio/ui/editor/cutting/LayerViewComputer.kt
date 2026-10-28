@@ -5,6 +5,7 @@ import me.anno.remsstudio.RemsStudio
 import me.anno.remsstudio.objects.Transform
 import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.ui.editor.TimelinePanel
+import me.anno.ui.canvas.Canvas
 import me.anno.utils.Color.white4
 import me.anno.utils.pooling.JomlPools
 
@@ -13,12 +14,16 @@ class LayerViewComputer(private val view: CuttingLayer) {
     var isCalculating = false
     var calculated: List<Transform>? = null
 
-    fun calculateSolution(x0: Int, y0: Int, x1: Int, y1: Int) {
+    fun calculateSolution(canvas: Canvas) {
 
         isCalculating = true
         view.needsUpdate = false
 
-        val solution = LayerStripeSolution(x0, y0, x1, y1, TimelinePanel.centralTime)
+        val solution = LayerStripeSolution(
+            canvas.x0, canvas.y0,
+            canvas.x1, canvas.y1,
+            TimelinePanel.centralTime
+        )
         val stripes = solution.lines
 
         val root = RemsStudio.root
@@ -40,7 +45,7 @@ class LayerViewComputer(private val view: CuttingLayer) {
         if (drawn.isNotEmpty()) {
             val stepSize = 1
 
-            val leftTime = view.getTimeAt(x0.toFloat())
+            val leftTime = view.getTimeAt(canvas.x0.toFloat())
             val dt = TimelinePanel.dtHalfLength * 2.0 / view.width
             val white = white4
 
@@ -66,9 +71,9 @@ class LayerViewComputer(private val view: CuttingLayer) {
                 drawnIndices[k++] = transformMap[entry]!!
             }
 
-            for (x in x0 until x1 step stepSize) {
+            for (x in canvas.x0 until canvas.x1 step stepSize) {
 
-                val i = x - x0
+                val i = x - canvas.x0
                 var lineIndex = 0
                 val globalTime = leftTime + i * dt
 

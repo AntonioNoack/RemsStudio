@@ -1,6 +1,7 @@
 package me.anno.remsstudio.ui.editor
 
 import me.anno.ui.Panel
+import me.anno.ui.canvas.Canvas
 import kotlin.math.max
 import kotlin.math.min
 
@@ -45,17 +46,19 @@ class SimplePanel(
             )
 
     fun draw(
+        canvas: Canvas,
         x: Int, y: Int, w: Int, h: Int,
-        x0: Int, y0: Int, x1: Int, y1: Int
     ) {
         px = x + deltaX + (relativeX + 1) * w / 2
         py = y + deltaY + (relativeY + 1) * h / 2
         // hide if half/a third the size is not enough
         drawable.setPosSize(px, py, sizeX, sizeY)
-        drawable.draw(
-            max(x0, px), max(y0, py),
-            min(x1, px + sizeX), min(y1, py + sizeY)
-        )
+        canvas.clip2(
+            max(canvas.x0, px), max(canvas.y0, py),
+            min(canvas.x1, px + sizeX), min(canvas.y1, py + sizeY)
+        ) {
+            drawable.draw(canvas)
+        }
     }
 
     fun contains(x: Int, y: Int) = x - px in 0 until sizeX && y - py in 0 until sizeY

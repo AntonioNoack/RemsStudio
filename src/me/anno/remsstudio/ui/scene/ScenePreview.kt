@@ -1,9 +1,8 @@
 package me.anno.remsstudio.ui.scene
 
 import me.anno.Time.deltaTime
-import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.gpu.shader.renderer.Renderer
-import me.anno.maths.Maths.clamp01
+import me.anno.maths.Maths.clamp
 import me.anno.maths.Maths.length
 import me.anno.maths.Maths.mixAngleDegrees
 import me.anno.remsstudio.RemsStudio
@@ -14,6 +13,7 @@ import me.anno.remsstudio.objects.Camera
 import me.anno.remsstudio.ui.editor.ISceneView
 import me.anno.ui.Style
 import me.anno.ui.base.groups.PanelList
+import me.anno.ui.canvas.Canvas
 import me.anno.utils.types.Floats.toDegrees
 import org.joml.Vector3f
 import java.util.*
@@ -53,29 +53,31 @@ class ScenePreview(style: Style) : PanelList(style.getChild("sceneView")), IScen
         }
         // go towards that target
         val deltaTime = deltaTime.toFloat()
-        val relativeMovement = clamp01(movementSpeed * deltaTime / (distance + 0.2f))
+        val relativeMovement = clamp(movementSpeed * deltaTime / (distance + 0.2f))
         val diff = pos - (target * 0.5f)
         val r0 = camera.rotationYXZ[0.0]
         val x0 = r0.x
         val x1 = if (isLocked2D) 0f else 0.3f * atan2(diff.y, length(diff.x, diff.z)).toDegrees()
         val y0 = r0.y
         val y1 = if (isLocked2D) 0f else atan2(diff.x, diff.z).toDegrees()
-        val rs = clamp01(rotationSpeed * deltaTime)
+        val rs = clamp(rotationSpeed * deltaTime)
         camera.rotationYXZ.set(Vector3f(mixAngleDegrees(x0, x1, rs), mixAngleDegrees(y0, y1, rs), 0f))
         pos.lerp(target, relativeMovement)
         camera.position.set(pos)
     }
 
     private val mutingColor = style.getColor("welcome.mutingColor", 0x55777777)
-    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(canvas: Canvas) {
         updatePosition()
-        Scene.draw(
-            camera, RemsStudio.root,
-            0, 0, width, height,
-            editorTime, false,
-            Renderer.colorRenderer,
-            this
-        )
-        drawRect(0, 0, width, height, mutingColor)
+        canvas.custom {
+            Scene.draw(
+                camera, RemsStudio.root,
+                0, 0, width, height,
+                editorTime, false,
+                Renderer.colorRenderer,
+                this
+            )
+        }
+        canvas.drawRect(0, 0, width, height, mutingColor)
     }
 }

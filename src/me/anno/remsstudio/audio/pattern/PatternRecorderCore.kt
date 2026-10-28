@@ -15,6 +15,7 @@ import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.groups.PanelListY
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
+import me.anno.ui.canvas.Canvas
 import me.anno.ui.input.TextInput
 import me.anno.utils.Color.black
 import me.anno.utils.Color.mixARGB
@@ -49,9 +50,9 @@ class PatternRecorderCore(val tp: TextInput) : Panel(style) {
         minH = s
     }
 
-    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(canvas: Canvas) {
         background.color = black
-        super.draw(x0, y0, x1, y1)
+        super.draw(canvas)
         // draw record button
         val s = min(width, height)
         val xc = x + width / 2

@@ -29,7 +29,7 @@ import me.anno.ui.editor.frames.FrameSizeInput
 import me.anno.ui.input.*
 import me.anno.utils.Color.black
 import me.anno.utils.Color.mixARGB
-import me.anno.utils.process.DelayedTask
+import me.anno.utils.async.DelayedTask
 import me.anno.video.ffmpeg.FFMPEGEncodingBalance
 import me.anno.video.ffmpeg.FFMPEGEncodingType
 import kotlin.math.max

@@ -5,9 +5,7 @@ import me.anno.fonts.FontManager
 import me.anno.fonts.FontStats
 import me.anno.fonts.keys.TextCacheKey
 import me.anno.gpu.GFX
-import me.anno.gpu.drawing.DrawRectangles
-import me.anno.gpu.drawing.DrawRectangles.drawRect
-import me.anno.gpu.drawing.DrawTextBatched.drawSimpleTextCharByChar
+import me.anno.gpu.drawing.DefaultFonts.monospaceFont
 import me.anno.input.Input
 import me.anno.input.Key
 import me.anno.language.translation.NameDesc
@@ -30,6 +28,7 @@ import me.anno.ui.Style
 import me.anno.ui.base.components.AxisAlignment
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
+import me.anno.ui.canvas.Canvas
 import me.anno.utils.Color.black
 import me.anno.utils.Color.mixARGB
 import me.anno.utils.Color.mulAlpha
@@ -48,21 +47,24 @@ open class TimelinePanel(style: Style) : Panel(style) {
 
     val accentColor = style.getColor("accentColor", black)
 
-    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(canvas: Canvas) {
         drawnStrings.clear()
-        drawBackground(x0, y0, x1, y1)
-        drawTimeAxis(x0, y0, x1, y1, true)
+        drawBackground(canvas)
+        drawTimeAxis(canvas, true)
     }
 
     val font = style.getFont("tinyText")
     val fontColor = style.getColor("textColor", DefaultStyle.fontGray)
     val endColor = style.getColor("endColor", mixARGB(fontColor, 0xff0000 or black, 0.5f))
 
-    fun drawCurrentTime() {
+    fun drawCurrentTime(canvas: Canvas) {
         GFX.loadTexturesSync.push(true)
         val text = getTimeString(editorTime, 0.0)
         val color = mixARGB(fontColor, background.color, 0.8f)
-        drawSimpleTextCharByChar(x + width / 2, y + height / 2, 0, text, color, background.color, AxisAlignment.CENTER)
+        canvas.drawText(
+            x + width / 2, y + height / 2, 0, monospaceFont, text,
+            color, background.color, AxisAlignment.CENTER
+        )
         GFX.loadTexturesSync.pop()
     }
 
@@ -184,7 +186,11 @@ open class TimelinePanel(style: Style) : Panel(style) {
     fun getTimeAt(mx: Float) = centralTime + dtHalfLength * normAxis11(mx, x, width)
     fun getXAt(time: Double) = x + width * normTime01(time)
 
-    fun drawTimeAxis(x0: Int, y0: Int, x1: Int, y1: Int, drawText: Boolean) {
+    fun drawTimeAxis(canvas: Canvas, drawText: Boolean) {
+        val x0 = canvas.x0
+        val x1 = canvas.x1
+        val y0 = canvas.y0
+        val y1 = canvas.y1
 
         val y02 = if (drawText) y0 else y0 - (2 + font.sizeInt)
 
@@ -197,21 +203,19 @@ open class TimelinePanel(style: Style) : Panel(style) {
         val fineLineColor = fontColor and 0x1fffffff
         val veryFineLineColor = fontColor and 0x10ffffff
 
-        val batch = DrawRectangles.startBatch()
-
         // very fine lines, 20x as many
-        drawTimeAxis(timeStep * 0.05, x0, y02, x1, y1, veryFineLineColor, false)
+        canvas.clip2(x0, y02, x1, y1) {
+            drawTimeAxis(timeStep * 0.05, canvas, veryFineLineColor, false)
 
-        // fine lines, 5x as many
-        drawTimeAxis(timeStep * 0.2, x0, y02, x1, y1, fineLineColor, drawText)
+            // fine lines, 5x as many
+            drawTimeAxis(timeStep * 0.2, canvas, fineLineColor, drawText)
 
-        // strong lines
-        drawTimeAxis(timeStep, x0, y02, x1, y1, strongLineColor, false)
+            // strong lines
+            drawTimeAxis(timeStep, canvas, strongLineColor, false)
+        }
 
-        drawLine(targetDuration, y02, y1, endColor)
-        drawLine(editorTime, y02, y1, accentColor)
-
-        DrawRectangles.finishBatch(batch)
+        drawLine(canvas, targetDuration, y02, y1, endColor)
+        drawLine(canvas, editorTime, y02, y1, accentColor)
 
     }
 
@@ -223,7 +227,7 @@ open class TimelinePanel(style: Style) : Panel(style) {
     }
 
     fun drawTimeAxis(
-        timeStep: Double, x0: Int, y0: Int, x1: Int, y1: Int,
+        timeStep: Double, canvas: Canvas,
         lineColor: Int, drawText: Boolean
     ) {
 
@@ -237,8 +241,8 @@ open class TimelinePanel(style: Style) : Panel(style) {
         val fontColor = fontColor
         val backgroundColor = background.color and black.inv()
 
-        val lineY = y0 + 2 + fontSize
-        val lineH = y1 - y0 - 4 - fontSize
+        val lineY = canvas.y0 + 2 + fontSize
+        val lineH = canvas.dy - 4 - fontSize
 
         // splitting this results in 30% less time used
         // probably because of program switching
@@ -247,8 +251,8 @@ open class TimelinePanel(style: Style) : Panel(style) {
             for (stepIndex in maxStepIndex downTo minStepIndex) {
                 val time = stepIndex * timeStep
                 val x = getXAt(time).roundToInt()
-                if (x > x0 + 1 && x + 2 < x1) {
-                    drawRect(x, lineY, 1, lineH, lineColor)
+                if (x > canvas.x0 + 1 && x + 2 < canvas.x1) {
+                    canvas.drawRect(x, lineY, 1, lineH, lineColor)
                 }
             }
         }
@@ -258,15 +262,16 @@ open class TimelinePanel(style: Style) : Panel(style) {
                 val time = stepIndex * timeStep
                 val x = getXAt(time).roundToInt()
                 val text = getTimeString(time, timeStep)
-                drawSimpleTextCharByChar(
-                    x, y0, 2, text, fontColor, backgroundColor, AxisAlignment.CENTER
+                canvas.drawText(
+                    x, canvas.y0, 2, monospaceFont,
+                    text, fontColor, backgroundColor, AxisAlignment.CENTER
                 )
             }
         }
 
     }
 
-    fun drawLine(time: Double, y0: Int, y1: Int, color: Int) {
+    fun drawLine(canvas: Canvas, time: Double, y0: Int, y1: Int, color: Int) {
         if (!time.isFinite()) return
         // if there are sub-pixels, we could use those...
         val x = getXAt(time).toFloat()
@@ -276,8 +281,8 @@ open class TimelinePanel(style: Style) : Panel(style) {
         val alpha0 = 1f - alpha1
         // simple interpolation
         // it looks way better than without (it looks a little lagging without)
-        drawRect(x0 + 0, y0 + 2, 1, y1 - y0 - 4, color.mulAlpha(alpha0))
-        drawRect(x0 + 1, y0 + 2, 1, y1 - y0 - 4, color.mulAlpha(alpha1))
+        canvas.drawRect(x0 + 0, y0 + 2, 1, y1 - y0 - 4, color.mulAlpha(alpha0))
+        canvas.drawRect(x0 + 1, y0 + 2, 1, y1 - y0 - 4, color.mulAlpha(alpha1))
     }
 
     fun getTimeStep(time: Double): Double {

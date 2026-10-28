@@ -122,7 +122,7 @@ class CuboidHullDistribution(center: Vector4f, size: Vector4f, rotation: Vector4
 
     override fun drawTransformed(stack: Matrix4fArrayList, color: Vector4f) {
         // draw cube out of lines
-        Grid.drawLineMesh(null, stack, color, CubemapModel.model.front)
+        Grid.drawLineMesh(null, stack, color, CubemapModel.mesh.front)
     }
 
     override val className get() = "CuboidHullDistribution"

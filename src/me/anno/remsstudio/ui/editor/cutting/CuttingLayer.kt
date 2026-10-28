@@ -4,7 +4,6 @@ import me.anno.Time.gameTime
 import me.anno.cache.CacheSection
 import me.anno.engine.EngineBase.Companion.dragged
 import me.anno.engine.EngineBase.Companion.workspace
-import me.anno.gpu.drawing.DrawRectangles.drawRect
 import me.anno.input.Input
 import me.anno.input.Input.isControlDown
 import me.anno.input.Input.keysDown
@@ -32,6 +31,7 @@ import me.anno.ui.Panel
 import me.anno.ui.Style
 import me.anno.ui.base.menu.Menu.openMenu
 import me.anno.ui.base.menu.MenuOption
+import me.anno.ui.canvas.Canvas
 import me.anno.ui.dragging.Draggable
 import me.anno.ui.editor.files.FileContentImporter
 import me.anno.utils.Color.white4
@@ -96,40 +96,40 @@ class CuttingLayer(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
     private val renderSize = RenderPosSize()
 
     // calculation is fast, drawing is slow
-    override fun draw(x0: Int, y0: Int, x1: Int, y1: Int) {
+    override fun draw(canvas: Canvas) {
 
         drawnStrings.clear()
 
         // val t0 = System.nanoTime()
         // 80-100µ for background and time axis
-        drawBackground(x0, y0, x1, y1)
-        drawTimeAxis(x0, y0, x1, y1, timelineSlot == 0)
+        drawBackground(canvas)
+        drawTimeAxis(canvas, timelineSlot == 0)
 
         val parent = uiParent
         if (parent != null && parent.children.lastOrNull { it is CuttingLayer } == this) {
             drawTypeInCorner("Cutting", fontColor)
         }
 
-        updateSolutionIfNeeded(x0, y0, x1, y1)
-        drawSolution()
+        updateSolutionIfNeeded(canvas)
+        drawSolution(canvas)
 
-        drawKeyframes(x0, y0, x1, y1)
+        drawKeyframes(canvas)
 
         if (Input.isShiftDown && Input.isLeftDown &&
             windowStack.inFocus0 is CuttingLayer
-        ) showRectangleSelection(x0, y0, x1, y1)
+        ) showRectangleSelection(canvas)
     }
 
-    private fun showRectangleSelection(x0: Int, y0: Int, x1: Int, y1: Int) {
+    private fun showRectangleSelection(canvas: Canvas) {
         val window = window ?: return
-        val minX = max(min(window.mouseDownX, window.mouseX).toIntOr(), x0)
-        val maxX = min(max(window.mouseDownX, window.mouseX).toIntOr(), x1)
+        val minX = max(min(window.mouseDownX, window.mouseX).toIntOr(), canvas.x0)
+        val maxX = min(max(window.mouseDownX, window.mouseX).toIntOr(), canvas.x1)
         val minY = min(window.mouseDownY, window.mouseY)
         val maxY = max(window.mouseDownY, window.mouseY)
-        if (maxY <= y0 || minY >= y1 || maxX <= minX) return // not affected
+        if (maxY <= canvas.y0 || minY >= canvas.y1 || maxX <= minX) return // not affected
 
         // show selection
-        drawRect(minX, y0, maxX - minX, y1 - y0, accentColor.withAlpha(127))
+        canvas.drawRect(minX, canvas.y0, maxX - minX, canvas.dy, accentColor.withAlpha(127))
     }
 
     private fun isSelectingByY(): Boolean {
@@ -141,15 +141,15 @@ class CuttingLayer(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
         return !(maxY <= y0 || minY >= y1)// not affected
     }
 
-    private fun updateSolutionIfNeeded(x0: Int, y0: Int, x1: Int, y1: Int) {
-        val hasConstantSize = renderSize.updateSize(x1 - x0, x0)
+    private fun updateSolutionIfNeeded(canvas: Canvas) {
+        val hasConstantSize = renderSize.updateSize(canvas.dx, canvas.x0)
 
         // val t1 = System.nanoTime()
         val solution = solution
         val needsUpdate = needsUpdate ||
                 solution == null ||
-                x0 != solution.x0 ||
-                x1 != solution.x1 ||
+                canvas.x0 != solution.x0 ||
+                canvas.x1 != solution.x1 ||
                 isHovered ||
                 mouseKeysDown.isNotEmpty() ||
                 keysDown.isNotEmpty() ||
@@ -161,7 +161,7 @@ class CuttingLayer(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
                 try {
                     // may throw a null pointer exception,
                     // if the scene changes while calculating
-                    computer.calculateSolution(x0, y0, x1, y1)
+                    computer.calculateSolution(canvas)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -170,33 +170,35 @@ class CuttingLayer(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
         }
     }
 
-    private fun drawSolution() {
+    private fun drawSolution(canvas: Canvas) {
         val solution = solution
         if (solution != null) {
             solution.y0 = y
             solution.y1 = y + height
             val isSelected: (Transform) -> Boolean = { it in selectedTransforms }
-            solution.draw(selectedTransforms, isSelected)
+            canvas.custom {
+                solution.draw(canvas, selectedTransforms, isSelected)
+            }
         }
     }
 
-    private fun drawKeyframes(x0: Int, y0: Int, x1: Int, y1: Int) {
+    private fun drawKeyframes(canvas: Canvas) {
         val draggedKeyframes = draggedKeyframes
         hoveredKeyframes = if (draggedKeyframes.isNotEmpty()) {
             val transform = selectedTransforms.firstOrNull()
-            drawLines(x0, y0, x1, y1, transform, draggedKeyframes)
+            drawLines(canvas, transform, draggedKeyframes)
         } else {
             val window = window ?: return
             val hovered = getTransformAt(window.mouseX, window.mouseY)
                 ?: selectedTransforms.firstOrNull { it.timelineSlot.value == timelineSlot }
             hoveredTransform = hovered
-            drawLines(x0, y0, x1, y1, hovered, null)
+            drawLines(canvas, hovered, null)
         }
     }
 
     @Suppress("UNUSED_PARAMETER")
     private fun drawLines(
-        x0: Int, y0: Int, x1: Int, y1: Int,
+        canvas: Canvas,
         transform: Transform?,
         draggedKeyframes: List<Keyframe<*>>?
     ): List<Keyframe<*>> {
@@ -214,12 +216,12 @@ class CuttingLayer(val timelineSlot: Int, style: Style) : TimelinePanel(style) {
             ht1 = tr.getLocalTime(ht1)
         }
         val keyframes = draggedKeyframes ?: color[ht0, ht1]
-        var x = x0 - 1
+        var x = canvas.x0 - 1
         for (kf in keyframes) {
             val relativeTime = (kf.time - ht0) / (ht1 - ht0)
             val x2 = mix(hx0, hx1, relativeTime).toIntOr()
             if (x2 > x) {
-                drawRect(x2, y0, 1, y1 - y0, accentColor)
+                canvas.drawRect(x2, canvas.y0, 1, canvas.dy, accentColor)
                 x = x2
             }
         }

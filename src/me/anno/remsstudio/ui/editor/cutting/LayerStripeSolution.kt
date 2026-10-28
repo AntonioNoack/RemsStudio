@@ -4,6 +4,7 @@ import me.anno.Build
 import me.anno.animation.LoopingState
 import me.anno.audio.streams.AudioStreamRaw.Companion.bufferSize
 import me.anno.config.DefaultConfig
+import me.anno.gpu.Clipping
 import me.anno.gpu.drawing.DrawGradients.drawRectGradient
 import me.anno.gpu.drawing.DrawRectangles
 import me.anno.gpu.drawing.DrawRectangles.drawRect
@@ -23,9 +24,10 @@ import me.anno.remsstudio.objects.video.Video
 import me.anno.remsstudio.objects.video.VideoPreview.getFrameAtLocalTimeForPreview
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.centralTime
 import me.anno.remsstudio.ui.editor.TimelinePanel.Companion.dtHalfLength
-import me.anno.remsstudio.ui.editor.cutting.FrameStatus.Companion.drawLoadingStatus
 import me.anno.remsstudio.ui.editor.cutting.CuttingLayer.Companion.maxLines
+import me.anno.remsstudio.ui.editor.cutting.FrameStatus.Companion.drawLoadingStatus
 import me.anno.ui.UIColors
+import me.anno.ui.canvas.Canvas
 import me.anno.utils.Color.black
 import me.anno.utils.Color.mixARGB
 import me.anno.utils.Color.withAlpha
@@ -59,7 +61,7 @@ class LayerStripeSolution(
     val timeScale = max(x1 - x0, 1) / (dtHalfLength * 2)
 
     val lines = Array(maxLines) {
-        ArrayList<LayerViewGradient>((x1 - x0).shr(1))
+        ArrayList<LayerViewGradient>(max((x1 - x0).shr(1), 4))
     }
 
     // draw a stripe of the current image, or a symbol or sth...
@@ -68,7 +70,7 @@ class LayerStripeSolution(
     // if audio, draw audio levels
 
 
-    fun draw(selectedTransform: List<Transform>, dragged: (Transform) -> Boolean) {
+    fun draw(canvas: Canvas, selectedTransform: List<Transform>, dragged: (Transform) -> Boolean) {
 
         val y = y0
         val h = y1 - y0
@@ -86,7 +88,7 @@ class LayerStripeSolution(
             for (j in gradients.indices) {
                 val gradient = gradients[j]
                 drawGradient(
-                    gradient, selectedTransform, dragged,
+                    canvas, gradient, selectedTransform, dragged,
                     xTimeCorrection, h, y0, h0, timeOffset, toStringCache
                 )
             }
@@ -94,6 +96,7 @@ class LayerStripeSolution(
     }
 
     private fun drawGradient(
+        canvas: Canvas,
         gradient: LayerViewGradient,
         selectedTransform: List<Transform>, dragged: (Transform) -> Boolean,
         xTimeCorrection: Int, h: Int, y0: Int, h0: Int, timeOffset: Double,
@@ -118,7 +121,7 @@ class LayerStripeSolution(
 
         if (hasVideo) {
             drawVideo(
-                video, meta, gradient,
+                canvas, video, meta, gradient,
                 h, y0, h0, timeOffset, ix0, ix1, c0, c1
             )
         } else {
@@ -145,6 +148,7 @@ class LayerStripeSolution(
     }
 
     private fun drawVideo(
+        canvas: Canvas,
         video: Video, meta: MediaMetadata, gradient: LayerViewGradient,
         h: Int, y0: Int, h0: Int, timeOffset: Double, ix0: Int, ix1: Int, c0: Int, c1: Int
     ) {
@@ -175,7 +179,7 @@ class LayerStripeSolution(
                 val c0x = getLerpedColor(x0)
                 val c1x = getLerpedColor(x1)
                 drawVideoImpl(
-                    x0.toInt(), x1.toInt(), y0, h0, c0x, c1x,
+                    canvas, x0.toInt(), x1.toInt(), y0, h0, c0x, c1x,
                     frameOffset, frameWidth, video, meta, 0f, 1f
                 )
             }
@@ -186,7 +190,7 @@ class LayerStripeSolution(
                 val f0 = getFraction(ix0, true)
                 val lerpedC1 = getLerpedColor(x1 - 1)
                 drawVideoImpl(
-                    ix0, x1.toInt(), y0, h0, c0, lerpedC1,
+                    canvas, ix0, x1.toInt(), y0, h0, c0, lerpedC1,
                     frameOffset, frameWidth, video, meta, f0.toFloat(), 1f
                 )
             }
@@ -197,7 +201,7 @@ class LayerStripeSolution(
                 val lerpedC0 = getLerpedColor(x0)
                 val f1 = getFraction(ix1, false)
                 drawVideoImpl(
-                    x0.toInt(), ix1, y0, h0, lerpedC0, c1,
+                    canvas, x0.toInt(), ix1, y0, h0, lerpedC0, c1,
                     frameOffset, frameWidth, video, meta, 0f, f1.toFloat()
                 )
             }
@@ -206,7 +210,7 @@ class LayerStripeSolution(
             val f0 = getFraction(ix0, true)
             val f1 = getFraction(ix1, false)
             drawVideoImpl(
-                ix0, ix1, y0, h0, c0, c1,
+                canvas, ix0, ix1, y0, h0, c0, c1,
                 frameOffset, frameWidth, video, meta, f0.toFloat(), f1.toFloat()
             )
         }
@@ -300,6 +304,7 @@ class LayerStripeSolution(
         x0 - posMod(x0 - frameOffset, frameWidth) + frameWidth * 0.5
 
     private fun drawVideoImpl(
+        canvas: Canvas,
         x0: Int, x1: Int, y: Int, h: Int,
         c0: Int, c1: Int,
         frameOffset: Double, frameWidth: Double,
@@ -332,9 +337,11 @@ class LayerStripeSolution(
         val size = frameStatusSize
         if (size <= 0) return
         val fps = min(video.editorVideoFPS.value.toDouble(), meta.videoFPS)
-        drawLoadingStatus(x0, y + h - size, x1, y + h, fps, meta, video) { x ->
-            val timeAtX = getTimeAt(x)
-            clampTime(video.getLocalTimeFromRoot(timeAtX, false), video)
+        Clipping.clip2(x0, y + h - size, x1, y + h) {
+            drawLoadingStatus(canvas, fps, meta, video) { x ->
+                val timeAtX = getTimeAt(x)
+                clampTime(video.getLocalTimeFromRoot(timeAtX, false), video)
+            }
         }
     }
 

@@ -63,7 +63,7 @@ class AudioFileStreamOpenAL2(
     val buffers = ArrayList<SoundBuffer>()
 
     fun checkProcessed() {
-        processed = alGetSourcei(alSource.sourcePtr, AL_BUFFERS_PROCESSED)
+        processed = alGetSourcei(alSource.pointer, AL_BUFFERS_PROCESSED)
         ALBase.check()
     }
 
@@ -183,7 +183,7 @@ class AudioFileStreamOpenAL2(
 
                 ALBase.check()
 
-                alSourceQueueBuffers(alSource.sourcePtr, soundBuffer.pointer)
+                alSourceQueueBuffers(alSource.pointer, soundBuffer.pointer)
                 ALBase.check()
 
                 alSource.play()

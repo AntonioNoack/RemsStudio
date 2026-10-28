@@ -1,6 +1,6 @@
 package me.anno.remsstudio.audio
 
-import me.anno.Time.gameTimeN
+import me.anno.Time.gameTimeNanos
 import me.anno.animation.LoopingState
 import me.anno.audio.AudioCache.playbackSampleRate
 import me.anno.audio.AudioPools.FAPool
@@ -147,7 +147,7 @@ object AudioFXCache2 {
                 Engine.shutdown()
                 throw IllegalStateException("Cannot destroy twice, now $gameTime, then: $isDestroyed!")
             }*/
-            isDestroyed = gameTimeN
+            isDestroyed = gameTimeNanos
             /*FAPool.returnBuffer(timeLeft)
             FAPool.returnBuffer(freqLeft)
             FAPool.returnBuffer(timeRight)
